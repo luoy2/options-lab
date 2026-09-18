@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>期权课路线图</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M9%2024c0-8%2014-8%2014-16'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3Ccircle%20cx='9'%20cy='24'%20r='3'%20fill='%23fdf6ec'/%3E%3Ccircle%20cx='23'%20cy='8'%20r='3'%20fill='%23fdf6ec'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84); --panel:oklch(0.947 0.015 82); --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58); --ink-soft:oklch(0.505 0.019 62); --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42); --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214); --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66); --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155); --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:1.5rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.72;padding:0 16px 5rem}
+.wrap{max-width:60rem;margin:0 auto}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+header{padding:3.2rem 0 2rem;border-bottom:1px solid var(--rule);position:relative}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.1rem;color:var(--ink-soft);margin:0;max-width:42rem}
+#themeBtn{position:absolute;top:3.2rem;right:0;background:none;border:1px solid var(--rule);
+  color:var(--ink-faint);border-radius:99px;padding:.25rem .75rem;font-size:.75rem;cursor:pointer;font-family:inherit}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+/* ── 进度 ── */
+.prog{margin:2rem 0 0;padding:1.3rem 1.4rem;background:var(--panel);border-radius:10px}
+.progtop{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1.4rem;margin-bottom:.9rem}
+.progtop .big{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:2.3rem;font-weight:600;
+  color:var(--good);line-height:1;font-variant-numeric:tabular-nums}
+.progtop .lab{font-size:.9rem;color:var(--ink-soft)}
+.bar{height:10px;border-radius:99px;background:var(--panel2);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar .done{background:var(--good)} .bar .next{background:var(--control);opacity:.45}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.4rem;margin-top:.9rem;font-size:.82rem;color:var(--ink-faint)}
+.legend b{display:inline-block;width:.7rem;height:.7rem;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+
+/* ── 地图 ── */
+section{padding:3rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .4rem;font-weight:600;letter-spacing:-.01em}
+.sub{color:var(--ink-soft);max-width:44rem;margin:.6rem 0}
+.tiny{font-size:.85rem;color:var(--ink-faint);line-height:1.65}
+
+.mapwrap{position:relative;margin-top:2rem}
+#links{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:visible}
+#map{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem 1.4rem;position:relative;z-index:1}
+.node{background:var(--panel);border:1.5px solid transparent;border-radius:10px;padding:.85rem .95rem;
+  cursor:pointer;transition:.15s;text-align:left;font-family:inherit;color:inherit;width:100%}
+.node:hover{border-color:var(--ink-faint);transform:translateY(-1px)}
+.node .nid{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.7rem;letter-spacing:.08em;
+  color:var(--ink-faint);font-weight:600}
+.node .nt{font-size:.98rem;font-weight:600;margin:.25rem 0 .3rem;line-height:1.35}
+.node .nd{font-size:.79rem;color:var(--ink-soft);line-height:1.5}
+.node.done{background:var(--good-bg);border-color:var(--good)}
+.node.done .nid,.node.done .nt{color:var(--good)}
+.node.next{background:var(--control-bg);border-color:var(--control);box-shadow:0 0 0 4px var(--control-bg)}
+.node.next .nid,.node.next .nt{color:var(--control)}
+.node.side{background:var(--panel2);border-style:dashed;border-color:var(--rule)}
+.node.on{border-color:var(--result);box-shadow:0 0 0 3px var(--result-bg)}
+.node .tag{display:inline-block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.62rem;
+  padding:.1rem .4rem;border-radius:4px;background:var(--paper);color:var(--ink-faint);margin-left:.35rem;vertical-align:1px}
+
+/* ── 详情 ── */
+.card{background:var(--panel);border-radius:10px;padding:0 1.4rem;margin:1rem 0;border:1.5px solid transparent;transition:.15s}
+.card.on{border-color:var(--result)}
+.card > summary{cursor:pointer;padding:1.1rem 0;list-style:none;display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem .8rem}
+.card > summary::-webkit-details-marker{display:none}
+.card > summary::before{content:"▸";color:var(--ink-faint);margin-right:.2rem}
+.card[open] > summary::before{content:"▾"}
+.card .cid{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.75rem;color:var(--ink-faint);font-weight:600}
+.card .ct{font-size:1.05rem;font-weight:600}
+.card .badge{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.66rem;padding:.12rem .45rem;
+  border-radius:4px;background:var(--panel2);color:var(--ink-faint)}
+.card .badge.done{background:var(--good-bg);color:var(--good)}
+.card .badge.next{background:var(--control-bg);color:var(--control)}
+.card .body{padding-bottom:1.3rem}
+.card h4{font-size:.82rem;letter-spacing:.06em;color:var(--ink-faint);margin:1rem 0 .4rem;font-weight:600;
+  font-family:"IBM Plex Mono",ui-monospace,monospace}
+.card ul{margin:0;padding-left:1.15rem} .card li{margin:.32rem 0;font-size:.94rem;line-height:1.65}
+.card .can li{color:var(--result)}
+.card .src{margin-top:1rem;padding-top:.8rem;border-top:1px dashed var(--rule);font-size:.8rem;color:var(--ink-faint);
+  font-family:"IBM Plex Mono",ui-monospace,monospace}
+.card .go{display:inline-block;margin-top:1rem;font-size:.85rem;color:var(--control);text-decoration:none;
+  border:1px solid var(--control);border-radius:7px;padding:.35rem .8rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.card .go:hover{background:var(--control-bg)}
+
+.mech{background:var(--panel2);border-radius:10px;padding:1.3rem 1.4rem;margin-top:1.6rem;border:1.5px dashed var(--rule)}
+.mech h3{margin:0 0 .5rem;font-size:1rem}
+.mech ul{margin:.5rem 0 0;padding-left:1.15rem;columns:2;column-gap:2rem}
+.mech li{margin:.3rem 0;font-size:.88rem;break-inside:avoid}
+
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.88rem}
+footer a{color:var(--result)}
+
+@media (max-width:760px){
+  body{font-size:16px}
+  #links{display:none}
+  #map{grid-template-columns:1fr;gap:.7rem}
+  .node{grid-column:1 !important;grid-row:auto !important}
+  .mech ul{columns:1}
+  #themeBtn{position:static;margin-bottom:1rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <button id="themeBtn">明暗</button>
+  <p class="eyebrow">FIN 580 Option Trading and Market-Making</p>
+  <h1>课程路线图</h1>
+  <p class="lede">这门课不是一条直线。打完地基之后它会分成两条并行的路 —— 一条练「怎么管风险」，一条练「怎么表达观点」 —— 走到头再合流，去面对真实市场里模型失效的地方。下面每个节点都写了<b>讲什么</b>和<b>学完能干什么</b>。</p>
+
+  <div class="prog">
+    <div class="progtop">
+      <span class="big" id="pct">—</span>
+      <span class="lab">复习进度　<span id="cnt"></span></span>
+    </div>
+    <div class="bar"><i class="done" id="barDone"></i><i class="next" id="barNext"></i></div>
+    <div class="legend">
+      <span><b style="background:var(--good)"></b>已完成</span>
+      <span><b style="background:var(--control);opacity:.5"></b>下一站</span>
+      <span><b style="background:var(--panel2);border:1px solid var(--rule)"></b>未开始</span>
+      <span><b style="background:var(--panel2);border:1px dashed var(--ink-faint)"></b>支线（走完主干再回来也行）</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <h2>地图</h2>
+  <p class="sub">竖着看是时间顺序，横着分开的两列是<b>可以并行走</b>的两条路。点任意节点，下面会展开它的详情。</p>
+  <div class="mapwrap">
+    <svg id="links" aria-hidden="true"></svg>
+    <div id="map"></div>
+  </div>
+
+  <div class="mech">
+    <h3>随时可查 · 机制层</h3>
+    <p class="tiny" style="margin:.3rem 0 0">这些不是关卡，是随用随查的规则。它们会插进上面相应的节点里讲，不单独占进度。</p>
+    <ul>
+      <li>合约规格与交易所对照</li>
+      <li>三种交收形态（实物 / 期货头寸 / 现金）</li>
+      <li>serial month：期权月份怎么映射到期货月份</li>
+      <li>分红的四个日期与除息日推导</li>
+      <li>保证金与清算、变动保证金</li>
+      <li>卖空与借券成本 r<sub>bc</sub> = r<sub>l</sub> − r<sub>s</sub></li>
+      <li>行权与指派的现金流</li>
+      <li>pin risk 与 settlement risk</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>每个节点讲什么</h2>
+  <p class="sub">点上面的地图会自动跳到对应的卡片。也可以直接从这里往下读。</p>
+  <div id="cards"></div>
+</section>
+
+<footer>
+  <p>FIN 580 复习工作台　·　<a href="station-1-1-forward-price.html">进入 1.1 远期价格 →</a></p>
+  <p class="tiny">进度按节点数计。1.1 实际吞掉的内容比一个节点多（期权是什么、损益图与合约乘数、远期价与无套利三块），所以按内容量算会高于这个百分比。</p>
+</footer>
+
+</div>
+<script>
+const $=id=>document.getElementById(id);
+
+/* col: 1 左 / 2 中 / 3 右　status: done | next | todo | side */
+const NODES=[
+{id:'1.1',col:2,row:1,st:'done',t:'远期价格',d:'期权是什么、损益图、定价的中心点',deps:[],
+ teach:['期权是一份「可以但不必」的权利：买方付钱拿权利，卖方收钱担义务，地位完全不对等','到期损益图为什么是折的，那个弯在行权价上','<b>一张合约 = 100 股</b>，报价是每股价，乘 100 才是真金白银','所有定价模型的四个动作，以及全部难点只在「分布中心在哪」和「分布多宽」','远期价 F = S(1+rt) − D：利息是成本所以加，分红是好处所以减','无套利如何把 F 逼到唯一值；分红四个日期与除息日 = 登记日 − (交收周期 − 1)'],
+ can:['看懂任何一张期权报价单，知道每个数字是每股还是每张','知道实务里的「平值」是 ATMF 不是现价 —— 高股息标的上这两者差一整档','用 put-call parity 从真实 call/put 报价反解市场在用多少利率定价','识别分红压过利息时的倒挂：put 比同行权价的 call 贵','算历史波动率时不会被除息日的价格跳空骗到'],
+ src:'S2 后半 + S1 机制层',link:'station-1-1-forward-price.html'},
+
+{id:'1.2',col:2,row:2,st:'next',t:'波动率',d:'分布有多宽；/16 口诀；正态 vs 对数正态',deps:['1.1'],
+ teach:['波动率的定义就一句话：<b>一年期内、以百分比计的一个标准差</b>','时间缩放 σ√t，以及 /16、/7.2、/3.5 三个心算口诀（一年 256 个交易日）','正态区间 F·σ√t 与对数正态区间 F·e<sup>±nσ√t</sup> 的分岔：向上拉伸、向下不破零','ln(X/F)/(σ√t)：某个行权价离中心几个标准差','四种波动率：未来 / 历史 / 预测 / 隐含。讲义原话是「隐含波动率 = 价格，未来波动率 = 价值」'],
+ can:['心算任何标的一天、一周、一个月「正常」该动多少','判断一个行权价有多远，从而知道它值不值那个价','把十个日变动拖成一条线，亲手量出年化波动率','看懂为什么同一张期权，两个人能给出完全不同的估值'],
+ src:'S3'},
+
+{id:'2.1',col:2,row:3,st:'todo',t:'delta',d:'第一个希腊字母，四种读法',deps:['1.2'],
+ teach:['delta 的四种读法：对冲比率、价格变化速度、等价标的头寸、到期实值概率的粗略近似','正负号规则：买 call 与卖 put 为正，卖 call 与买 put 为负','为什么 delta 会自己变：越实值越靠近 1，越虚值越靠近 0'],
+ can:['把任何期权头寸换算成「相当于持有多少股」','算出对冲一个仓位需要买卖多少股标的','解释为什么入场 delta 和事后实际捕获比不相等'],
+ src:'S3 + S4'},
+
+{id:'2.2',col:1,row:4,st:'todo',t:'gamma 与 theta',d:'被 PDE 锁死的一对',deps:['2.1'],
+ teach:['gamma 是 delta 变化的速度；越近到期、越近行权价，gamma 越大','theta 是时间价值的流失速度','<b>Θ ≈ −½σ²S²Γ</b>：这条式子把两者硬绑在一起，不是巧合也不是经验规律'],
+ can:['理解「买 gamma 就必须付 theta」这条天条，从此不再幻想又赚波动又收时间','判断一个仓位是在收租还是在付租','解释为什么标的横盘时买方会慢慢失血'],
+ src:'S3 + S4'},
+
+{id:'2.3',col:3,row:4,st:'todo',t:'vega 与 rho',d:'波动率与利率的敏感度',deps:['2.1'],
+ teach:['vega 三定律（讲义原文给的三条规律）','rho 在两种结算方式下完全不同：<b>期货型结算下 call 与 put 的 rho 全为负</b>','股息通过 delta 传导，不是单独一个希腊字母'],
+ can:['知道隐含波动率变一个点，你的仓位值多少钱','在期货期权上不被利率变动打闷棍','看懂长期期权为什么对利率敏感得多'],
+ src:'S3 + 机制层结算方式'},
+
+{id:'2.4',col:2,row:5,st:'todo',t:'组合希腊字母',d:'把多腿仓位压成四个数',deps:['2.2','2.3'],
+ teach:['希腊字母可加：整个组合的 delta 就是各腿之和','净头寸的读法：四个数就描述完一个任意复杂的仓位','一阶与二阶估算，以及 delta 截断陷阱'],
+ can:['把一个多腿仓位压缩成四个数，一眼看出它在赌什么','估算一次市场变动会让整个组合赚亏多少','这是后面所有策略节点的通用语言'],
+ src:'S4'},
+
+{id:'4.1',col:1,row:6,st:'todo',t:'动态对冲',d:'理论值是怎么被兑现的',deps:['2.4'],
+ teach:['十周重对冲全过程表：理论值 6.55、市价 5.50、逐周调仓','实现 P&amp;L +105.75 对上预测的 105.00 —— 理论值不是纸上谈兵','对冲频率的影响；轮盘赌类比'],
+ can:['理解一张「便宜的」期权是怎么把便宜变成真钱的','知道不对冲时你赌的其实是方向，不是波动率','这是整门课最有说服力的一次兑现证明'],
+ src:'S4'},
+
+{id:'3.1',col:3,row:6,st:'todo',t:'价差家族',d:'两条腿表达方向观点',deps:['2.4'],
+ teach:['bull spread 与 bear spread，各有 call 版和 put 版','垂直价差的定价网格与手算成本','双判据选行权价：方向筛掉一半，vega 再从剩下的里挑'],
+ can:['用两条腿把方向观点表达成风险有限的仓位','在两个候选价差之间说出该选哪个、为什么','读懂「平值腿在买方还是卖方」这句话的含义'],
+ src:'S4 + S5 作业'},
+
+{id:'4.2',col:1,row:7,st:'todo',t:'gamma scalping',d:'盈亏平衡波动率',deps:['4.1'],
+ teach:['break-even volatility = implied volatility，为什么这两个词说的是同一件事','gamma scalping 的现金流从哪来','买方与卖方各自在赌什么'],
+ can:['判断一张期权买贵了还是买便宜了，不靠感觉靠数','知道自己的仓位需要标的实际动多少才回本'],
+ src:'S4 后半'},
+
+{id:'3.2',col:3,row:7,st:'todo',t:'波动率结构',d:'教材里出现的全部组合',deps:['3.1'],
+ teach:['straddle、strangle、<b>guts</b>（用实值做的 strangle）','butterfly（call 版与 put 版恒等）、iron butterfly','condor、iron condor、christmas tree —— 这三个只在 S5/S6 作业里出现','ratio spread、calendar spread'],
+ can:['把「要大动但不知道方向」「会横盘」这类观点翻译成具体合约','看到一串腿就能报出它的名字','算出任意组合的净成本'],
+ src:'S4 讲义 + S5/S6 作业'},
+
+{id:'6',col:1,row:8,st:'todo',t:'风险的动态演化',d:'今天中性不等于明天中性',deps:['4.2'],
+ teach:['delta 随波动率上升向 50 靠拢','gamma 与 theta 在平值和虚值上的规律正好相反；vega 是唯一不分岔的','<b>四个希腊字母全为零、却仍然有巨大风险的仓位</b>'],
+ can:['看穿假中性：知道「现在对冲好了」不代表明天还好','预判自己的希腊字母明天会往哪边漂','这是从「会算」到「会管」的分水岭'],
+ src:'S7'},
+
+{id:'3.3',col:3,row:8,st:'todo',t:'四象限与选择',d:'市场观点 → 该用哪一族',deps:['3.2'],
+ teach:['long straddle / long strangle / <b>short</b> butterfly 都是 +gamma / +vega','short straddle / short strangle / <b>long</b> butterfly 都是 −gamma / −vega','butterfly 与 strangle 符号相反，这是最容易错的一处'],
+ can:['给定一个市场观点，直接定位到该用哪一族结构','不再把 butterfly 和 strangle 的方向搞反','这一节是整个「策略道」的收口'],
+ src:'S4'},
+
+{id:'5.1',col:3,row:9,st:'todo',t:'Synthetics',d:'合成关系与化简',deps:['3.3'],
+ teach:['四条基本合成：用两条腿做出第三样东西','化简的手法：关键在「<b>拆</b>」不在「换」','butterfly + iron butterfly = 行权价间距，这是可用来校验报价的不变量'],
+ can:['把任意多腿仓位化简成最简形式','识别两个看起来不同、实际等价的头寸','用不变量检查自己的报价有没有错'],
+ src:'S5'},
+
+{id:'5.2',col:3,row:10,st:'todo',t:'parity 与 conversion',d:'把合成关系装上价格',deps:['5.1'],
+ teach:['put-call parity 的五步推导（1.1 里只是见过后果）','conversion 与 reversal、combo','pin risk 与 settlement risk'],
+ can:['从三个价格反推第四个','发现定价异常并说出该怎么套','这是做市商的日常检查动作'],
+ src:'S6'},
+
+{id:'9',col:1,row:11,st:'todo',t:'提前行权',d:'三套判据',deps:['5.2'],
+ teach:['股票 call 靠<b>股息</b>、股票 put 靠<b>利息</b>、期货期权靠内在价值的利息','三套不等式各自的经济含义','时点规则与次日判据'],
+ can:['判断手里的实值期权该不该提前行权','预判自己卖出的期权会不会被指派、什么时候','避开除息日前夜被指派的典型坑'],
+ src:'S8'},
+
+{id:'5.3',col:3,row:11,st:'todo',t:'box · roll · collar',d:'相对价值套利',deps:['5.2'],
+ teach:['box：反推无风险利率','roll（行业里也叫 jelly roll）：剥离掉方向与波动率，只剩持有成本','collar：用租金抵保费'],
+ can:['拿一张缺了四个价格的报价表，先用 box 反推利率、再用 parity 反推股价、逐格补齐','做相对价值套利，而不是赌方向'],
+ src:'S6 + S7'},
+
+{id:'7',col:2,row:12,st:'todo',t:'模型假设怎么崩',d:'两条路在这里合流',deps:['6','5.3'],
+ teach:['四条 BS 假设逐条打假：用 S&amp;P 与 Bund 的真实分布、历史波动率曲线、跳跃、down faster','替代模型：CEV 与 jump-diffusion','40% 规则：0.40 × S × σ × √t 能在心算里逼近 BS'],
+ can:['知道模型在什么时候不能信，以及为什么','理解 skew 不是市场的怪癖，是模型假设错了留下的痕迹','这一节把前面两条路的东西全部接上现实'],
+ src:'S9 前半'},
+
+{id:'8',col:2,row:13,st:'todo',t:'skew 与波动率曲面',d:'整门课的最高点',deps:['7'],
+ teach:['skew 管一阶倾斜、kurtosis 管二阶曲率，对应 y = ax² + bx + c 的 b 与 a','±25 delta 对 skew 最敏感、±5 对 kurtosis、±50 对波动率水平','skew 是<b>乘性</b>的：波动率翻倍时点差翻倍，占平值的百分比不变','曲面两维用 ln(X/S)/√t 归一；skewed delta 与模型 delta 的偏离','蝶式法反推市场隐含的分布'],
+ can:['读懂一张波动率曲面，知道每一维在说什么','算出你的真实 delta 与模型 delta 差多少 —— 两侧虚值期权的 delta 会<b>同时</b>缩小','做 skew 与 kurtosis 交易，而不只是买卖波动率水平'],
+ src:'S9 后半（注意：大纲说这是 S10，实际在 S9 讲义里）'},
+
+{id:'M',col:1,row:14,st:'side',t:'做市报价',d:'支线 · 从交易者到做市商',deps:['8'],
+ teach:['双边报价实操与边际（edge）的来源','March 95 call 的全流程实例','库存与风险管理'],
+ can:['给出一个双边报价，并说清自己的边际在哪','理解买卖价差不是「手续费」，是承担风险的对价'],
+ src:'S9 尾 + S10'},
+
+{id:'V',col:3,row:14,st:'side',t:'波动率合约与 VIX',d:'支线 · 直接交易波动率',deps:['8'],
+ teach:['VIX 的构造：它到底是怎么算出来的','波动率合约的种类与结算'],
+ can:['不再把 VIX 当成玄学的「恐慌指数」，而是知道它由哪些期权加权而来','理解为什么 VIX 与你手上期权的隐含波动率不是一回事'],
+ src:'S10（大纲里的 S11）'}
+];
+
+const STLAB={done:'已完成',next:'下一站',todo:'未开始',side:'支线'};
+
+/* ── 进度 ── */
+(function(){
+  const n=NODES.length, done=NODES.filter(x=>x.st==='done').length, next=NODES.filter(x=>x.st==='next').length;
+  $('pct').textContent=Math.round(done/n*100)+'%';
+  $('cnt').textContent=`${done} / ${n} 个节点`;
+  $('barDone').style.width=(done/n*100)+'%';
+  $('barNext').style.width=(next/n*100)+'%';
+})();
+
+/* ── 地图 ── */
+$('map').innerHTML=NODES.map(x=>
+  `<button class="node ${x.st}" id="n-${x.id}" data-id="${x.id}" style="grid-column:${x.col};grid-row:${x.row}">
+     <div class="nid">${x.id}${x.st!=='todo'?`<span class="tag">${STLAB[x.st]}</span>`:''}</div>
+     <div class="nt">${x.t}</div><div class="nd">${x.d}</div>
+   </button>`).join('');
+
+/* ── 详情卡 ── */
+$('cards').innerHTML=NODES.map(x=>
+  `<details class="card" id="c-${x.id}">
+     <summary><span class="cid">${x.id}</span><span class="ct">${x.t}</span>
+       <span class="badge ${x.st}">${STLAB[x.st]}</span></summary>
+     <div class="body">
+       <h4>讲什么</h4><ul>${x.teach.map(p=>`<li>${p}</li>`).join('')}</ul>
+       <h4>学完能干什么</h4><ul class="can">${x.can.map(p=>`<li>${p}</li>`).join('')}</ul>
+       <div class="src">素材：${x.src}${x.deps.length?`　·　前置：${x.deps.join('、')}`:'　·　起点，无前置'}</div>
+       ${x.link?`<a class="go" href="${x.link}">打开这一节 →</a>`:''}
+     </div>
+   </details>`).join('');
+
+/* 点地图 → 展开并滚到对应卡片 */
+document.querySelectorAll('.node').forEach(b=>b.addEventListener('click',()=>{
+  const id=b.dataset.id, c=$('c-'+id);
+  document.querySelectorAll('.node.on,.card.on').forEach(e=>e.classList.remove('on'));
+  b.classList.add('on'); c.classList.add('on'); c.open=true;
+  c.scrollIntoView({behavior:'smooth',block:'center'});
+}));
+
+/* ── 连线 ── */
+function drawLinks(){
+  const svg=$('links'), map=$('map');
+  if(getComputedStyle(svg).display==='none') return;
+  const mb=map.getBoundingClientRect();
+  svg.setAttribute('viewBox',`0 0 ${mb.width} ${mb.height}`);
+  svg.setAttribute('width',mb.width); svg.setAttribute('height',mb.height);
+  let g='';
+  NODES.forEach(n=>n.deps.forEach(d=>{
+    const A=$('n-'+d), B=$('n-'+n.id); if(!A||!B) return;
+    const a=A.getBoundingClientRect(), b=B.getBoundingClientRect();
+    const x1=a.left-mb.left+a.width/2, y1=a.bottom-mb.top;
+    const x2=b.left-mb.left+b.width/2, y2=b.top-mb.top;
+    const my=(y1+y2)/2;
+    const dash = n.st==='side' ? ' stroke-dasharray="5 4"' : '';
+    const col = (d==='1.1') ? 'var(--good)' : 'var(--rule)';
+    g+=`<path d="M${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}" fill="none" stroke="${col}" stroke-width="2"${dash}/>`;
+  }));
+  svg.innerHTML=g;
+}
+addEventListener('resize',drawLinks);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(drawLinks);
+requestAnimationFrame(()=>requestAnimationFrame(drawLinks));
+setTimeout(drawLinks,300);
+
+/* ── 主题 ── */
+$('themeBtn').addEventListener('click',()=>{
+  const dark=document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme=dark?'light':'dark';
+  drawLinks();
+});
+</script>
+</body>
+</html>

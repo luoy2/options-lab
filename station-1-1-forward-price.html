@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>远期价格</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M11%2024V8h10M11%2016h7'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+/* ── 顶栏 ── */
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+
+/* ── 白话符号 ── */
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+/* ── 公式双行 ── */
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.panel.tight{padding:1.1rem 1.2rem}
+
+.story{border-left:none;background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.presets{display:flex;flex-wrap:wrap;gap:.5rem}
+.presets button,.act,.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.presets button:hover,.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+.act{background:var(--control-bg);color:var(--control);font-weight:500}
+.act:hover{border-color:var(--control)}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.3rem 2.2rem;margin-top:.4rem}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;font-size:.87rem;color:var(--ink-soft)}
+.ctl .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1rem;color:var(--control);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--control);margin:.35rem 0 0;height:1.3rem}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.65}
+.say.up{background:var(--result-bg);color:var(--result)}
+.say.down{background:var(--warn-bg);color:var(--warn)}
+.say.flat{background:var(--good-bg);color:var(--good)}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+
+.infer{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem 1rem;margin-top:1.1rem;padding-top:1.1rem;border-top:1px dashed var(--rule)}
+.infer .lab{font-size:.84rem;color:var(--ink-faint)}
+.infer .big{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:600;font-variant-numeric:tabular-nums}
+.infer .cap{font-size:.9rem;color:var(--ink-soft);flex-basis:100%}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+tr.total td{border-bottom:none;border-top:1.5px solid var(--ink-faint);font-weight:600;padding-top:.7rem}
+td.pos{color:var(--good)} td.neg{color:var(--warn)}
+tr.hot td{background:var(--control-bg)}
+
+.bignum{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:2.4rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.arbbox{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.6rem;margin-top:1.4rem;padding:1.1rem 1.2rem;border-radius:9px;transition:.2s}
+.arbbox.open{background:var(--warn-bg)} .arbbox.open .bignum,.arbbox.open .msg{color:var(--warn)}
+.arbbox.shut{background:var(--good-bg)} .arbbox.shut .bignum,.arbbox.shut .msg{color:var(--good)}
+.arbbox .msg{font-size:.93rem;line-height:1.55;flex:1;min-width:15rem}
+
+.scen{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.92rem;margin:1rem 0 .3rem;padding:.75rem 1rem;background:var(--panel2);border-radius:8px}
+.scen b{color:var(--ink);font-weight:600} .scen span{color:var(--ink-faint)}
+
+.fmkt{display:flex;align-items:center;gap:1rem;margin-top:1.3rem;flex-wrap:wrap}
+.fmkt input[type=range]{flex:1;min-width:12rem;margin:0}
+.fmkt input[type=number]{width:7.2rem;font-size:1.05rem;padding:.42rem .6rem;border:1px solid var(--rule);
+  border-radius:7px;background:var(--paper);color:var(--control);font-weight:600;text-align:right}
+.fmkt .cap{font-size:.84rem;color:var(--ink-faint);width:100%}
+
+.days{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:1.4rem 0 .5rem}
+.day{border-radius:7px;background:var(--panel2);padding:.55rem .2rem .5rem;text-align:center;transition:.18s}
+.day .dn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint)}
+.day .tag{font-size:.64rem;line-height:1.25;margin-top:.3rem;min-height:2.1em;color:var(--ink-faint)}
+.day.buy{background:var(--control-bg)} .day.buy .dn,.day.buy .tag{color:var(--control);font-weight:600}
+.day.ex{background:var(--warn-bg)} .day.ex .dn,.day.ex .tag{color:var(--warn);font-weight:600}
+.day.rec{background:var(--result-bg)} .day.rec .dn,.day.rec .tag{color:var(--result);font-weight:600}
+
+.hwtab input[type=number]{width:6.2rem;padding:.35rem .5rem;border:1px solid var(--rule);border-radius:6px;
+  background:var(--paper);color:var(--ink);text-align:right;font-size:.92rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.hwtab input.ok{border-color:var(--good);color:var(--good);background:var(--good-bg)}
+.hwtab input.no{border-color:var(--warn);color:var(--warn);background:var(--warn-bg)}
+.hwtab td.fb{font-size:.78rem;width:9rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.hwtab td.work{font-size:.74rem;color:var(--ink-faint);font-family:"IBM Plex Mono",ui-monospace,monospace}
+.btnrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.3rem;align-items:center}
+.reveal{margin-top:1.4rem;padding:1.1rem 1.2rem;border-radius:9px;background:var(--result-bg);color:var(--result);font-size:.93rem;line-height:1.7}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  .days{grid-template-columns:repeat(4,1fr)}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .formula .math{font-size:1.05rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 什么是期权</a><a href="#s1">一 价格从哪来</a><a href="#s2">二 远期价格</a>
+  <a href="#s3">三 无套利</a><a href="#s4">四 分红日期</a><a href="#s5">五 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 第 1 站 · 小节 1.1</p>
+  <h1>远期价格</h1>
+  <p class="lede">这一节要回答的问题只有一个：给期权定价时，我们心里那个「标的将来大概值多少」的中心点，该放在哪。答案不是今天的股价。但要看懂这句话为什么重要，得先从期权本身是什么开始。</p>
+  <p class="tiny" style="margin-top:1.2rem">页面里凡是<span class="sym" data-say="就像这样。带虚线下划线的符号都可以悬停或点击，会弹出白话解释。">带虚线的符号</span>，悬停或点一下就有白话解释。文末还有一张完整符号表。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>什么是期权</h2>
+
+  <div class="story">
+    <p>你看中一套房，现在标价 500 万。你觉得半年后可能涨，但也可能跌，不敢现在全款买下。</p>
+    <p>于是你和房主谈了个安排：<b>你今天付他 10 万</b>，换来一个权利 —— 半年之内，你随时可以按 500 万把这套房买下来。房主收了这 10 万，就必须认。</p>
+    <p>半年后如果房子涨到 600 万：你行使这个权利，500 万买下，转手 600 万卖掉，赚 100 万，扣掉当初那 10 万，<b>净赚 90 万</b>。</p>
+    <p>半年后如果跌到 400 万：你当然不会按 500 万去买一个只值 400 万的东西。你<b>放弃这个权利</b>，损失就是当初付的 10 万，一分不多。</p>
+  </div>
+
+  <p>这就是一张 <b>call（看涨期权）</b>。把故事里的东西翻译成术语：</p>
+
+  <div class="panel tight">
+    <table>
+      <thead><tr><th>故事里的东西</th><th style="text-align:left">术语</th><th style="text-align:left">白话</th></tr></thead>
+      <tbody>
+        <tr><td>房子现在值 500 万</td><td style="text-align:left"><span class="sym" data-say="Spot price，标的物现在的市场价格。股票期权里就是今天的股价。">S</span> 标的价格</td><td style="text-align:left">这东西今天值多少</td></tr>
+        <tr><td>约定的 500 万</td><td style="text-align:left"><span class="sym" data-say="Exercise / strike price，写死在合约里的成交价。不管市价怎么动，你有权按这个价成交。">X</span> 行权价</td><td style="text-align:left">合约上写死的成交价</td></tr>
+        <tr><td>付出的 10 万</td><td style="text-align:left">权利金 / 期权价格</td><td style="text-align:left">买这个权利花的钱</td></tr>
+        <tr><td>半年</td><td style="text-align:left"><span class="sym" data-say="到期时间，一律换算成「年」。90 天就是 90/365 ≈ 0.2466 年。所有公式里的 t 都是年。">t</span> 到期时间</td><td style="text-align:left">这权利还能用多久</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>反过来也有：你手里已经有房，怕跌。付 10 万买一个「半年内随时可以按 500 万<b>卖出</b>」的权利，这就是一张 <b>put（看跌期权）</b>。它是一份保险。</p>
+
+  <h3>买方和卖方，地位完全不对等</h3>
+  <p class="sub">期权最容易被忽略的一件事：买的人拿到的是<b>权利</b>，可以用也可以不用；卖的人承担的是<b>义务</b>，对方要用他就必须认。所以卖方一定要先收钱，那笔钱就是权利金。</p>
+
+  <div class="panel tight">
+    <table>
+      <thead><tr><th>头寸</th><th style="text-align:left">你付钱还是收钱</th><th style="text-align:left">你的处境</th></tr></thead>
+      <tbody>
+        <tr><td>买 call（long call）</td><td style="text-align:left">付钱</td><td style="text-align:left">有权按 X 买入。涨得越多赚越多，跌了最多亏权利金</td></tr>
+        <tr><td>卖 call（short call）</td><td style="text-align:left">收钱</td><td style="text-align:left">对方要买你就必须卖。最多赚权利金，涨上去亏损没有上限</td></tr>
+        <tr><td>买 put（long put）</td><td style="text-align:left">付钱</td><td style="text-align:left">有权按 X 卖出。跌得越多赚越多，涨了最多亏权利金</td></tr>
+        <tr><td>卖 put（short put）</td><td style="text-align:left">收钱</td><td style="text-align:left">对方要卖你就必须买。最多赚权利金，跌下去亏到标的归零为止</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>先记住一件最容易算错钱的事：一张合约 = 100 股</h3>
+  <p class="sub">期权的报价是<b>每股多少钱</b>，但买卖的单位是<b>一张合约</b>。美股股票期权的<span class="sym" data-say="multiplier，合约乘数。把「每股报价」换算成「一张合约实际金额」的倍数。美股股票期权固定是 100。">合约乘数</span>固定是 <b>100</b>。看到报价 21.10，实际要掏的是 2,110 美元。</p>
+
+  <div class="formula">
+    <div class="math">一张合约的金额 = 每股报价 × 100</div>
+    <div class="gloss">21.10 × 100 = 2,110 美元　　后面所有损益图的纵轴也都是「每股」，乘 100 才是真金白银</div>
+    <div class="note">行权时同理：行使一张 350 call，是按每股 350 美元买进 <b>100 股</b>，掏 35,000 美元。指数期权的乘数可能不同，而且多为现金结算，第 9 站会讲。</div>
+  </div>
+
+  <h3>用真实数据走一遍：2026 年 4 月 13 日的特斯拉</h3>
+  <p class="sub">下面的数字一个都不是编的。这是 <b>2026-04-13 收盘</b> 特斯拉期权链的真实报价，到期日 <b>2026-05-15</b>，当时还剩 <b>32 天</b>，TSLA 报 <b>352.36</b>。挑一个头寸和行权价，权利金按当时真实的买卖盘自动填入 —— 买方付卖一价、卖方收买一价，这就是真实成交的样子。</p>
+
+  <div class="panel">
+    <div class="scen" id="tsScen"></div>
+
+    <div class="seg" id="posSeg" style="margin-top:1.1rem">
+      <button data-k="lc" aria-pressed="true">买 call</button>
+      <button data-k="sc" aria-pressed="false">卖 call</button>
+      <button data-k="lp" aria-pressed="false">买 put</button>
+      <button data-k="sp" aria-pressed="false">卖 put</button>
+    </div>
+
+    <svg id="po" viewBox="0 0 720 300" role="img" aria-label="到期损益图"></svg>
+
+    <div class="controls" style="margin-top:1.2rem">
+      <div class="ctl"><label><span><span class="sym" data-say="Exercise / strike price，写死在合约里的成交价。这里只能选当时交易所真实挂牌的那些档位。">X</span> 行权价</span><span class="v" id="vK">350.00</span></label>
+        <input type="range" id="iK" min="0" max="34" step="1" value="15"></div>
+      <div class="ctl"><label><span><span class="sym" data-say="假设到期那天 TSLA 收在这个价。图上那条橙色竖线。真实结果是 422.32。">到期时 TSLA 收在</span></span><span class="v" id="vST">422.32</span></label>
+        <input type="range" id="iST" min="280" max="520" step="0.01" value="422.32"></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="act" id="btnActual">跳回真实结算价 422.32</button>
+      <button class="ghost" id="btnStock">＋ 同时持有 100 股</button>
+    </div>
+    <p class="tiny" id="vPrem" style="margin-top:.7rem"></p>
+
+    <div class="say plain" id="poSay"></div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">权利金（每股）</div><div class="d" style="color:var(--control)" id="poPr">—</div><div class="d2" id="poPrD">—</div></div>
+      <div class="stat"><div class="k">这笔的盈亏（每股）</div><div class="d" id="poPL">—</div><div class="d2" id="poPLD">—</div></div>
+      <div class="stat"><div class="k">盈亏平衡点</div><div class="d" id="poBE">—</div><div class="d2">TSLA 要走到这里</div></div>
+      <div class="stat"><div class="k">最多能赚</div><div class="d" id="poMax">—</div><div class="d2" id="poMaxD">—</div></div>
+      <div class="stat"><div class="k">最多会亏</div><div class="d" id="poMin">—</div><div class="d2" id="poMinD">—</div></div>
+    </div>
+
+    <div class="say" id="poCombo" hidden style="margin-top:1rem"></div>
+    <div class="say" id="poReal" style="margin-top:1rem"></div>
+  </div>
+
+  <h3>有正股的时候，这四件事各叫什么</h3>
+  <p class="sub">上面那个「＋ 同时持有 100 股」的按钮，按下去就会看到组合的真名和类比。四种放在一起对照更清楚 —— 注意<b>「收租」的标准形态是持股 + 卖 call，不是卖 put</b>。</p>
+
+  <div class="panel tight">
+    <table>
+      <thead><tr><th>你的组合</th><th style="text-align:left">正式名字</th><th style="text-align:left">生活类比</th><th style="text-align:left">换来什么 / 代价是什么</th></tr></thead>
+      <tbody>
+        <tr><td>持股 + 卖 call</td><td style="text-align:left"><b>covered call</b><br>备兑开仓</td><td style="text-align:left"><b>收租</b></td><td style="text-align:left">先收一笔租金。代价是涨过行权价的部分不再归你，股票会被按行权价拿走</td></tr>
+        <tr><td>持股 + 买 put</td><td style="text-align:left"><b>protective put</b><br>保护性看跌</td><td style="text-align:left"><b>买保险</b></td><td style="text-align:left">跌破行权价有人按行权价接盘，亏损封死。代价是保费确定付出，没跌就白花</td></tr>
+        <tr><td>不持股 + 卖 put</td><td style="text-align:left"><b>cash-secured put</b><br>现金担保看跌</td><td style="text-align:left">答应低价接货<br>先收订金</td><td style="text-align:left">本来就想在行权价买入，不如先收权利金。代价是跌破就必须接货，而且可能远低于行权价</td></tr>
+        <tr><td>持股 + 买 put + 卖 call</td><td style="text-align:left"><b>collar</b><br>领口</td><td style="text-align:left">用租金抵保费</td><td style="text-align:left">收的租金抵掉买保险的钱，下跌有底。代价是上涨也被封顶，两头都不属于你了</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="tiny">这四行就是你的第一批<b>组合</b>。整门课后面讲的所有结构 —— straddle、strangle、butterfly、calendar、box —— 都是同一个游戏：<b>把几条折线叠起来，拼出你想要的那个形状。</b> collar 已经是两条腿了，第 5 站会把它拆开看。</p>
+
+  <p>换几个行权价拖一圈，期权的全部特别之处就出来了：<b>图是折的，不是直的。</b> 股票的损益图是一条 45 度直线，涨一块赚一块、跌一块亏一块。期权在行权价那里拐了个弯 —— 一边跟着标的走，另一边平了。买方那个弯是「亏损被封住」，卖方那个弯是「盈利被封住」。</p>
+  <p>整门期权课，本质上就是在研究这个弯：它值多少钱、它怎么随时间和价格变化、怎么把好几个弯拼成你想要的形状。</p>
+
+  <h3>你不必等到到期：期权自己也在被交易</h3>
+  <p class="sub">买了之后不是只能干等。这张合约<b>每天都在市场上有它自己的价格</b>，你随时可以把它卖掉了结，根本不必真的去行权买股票 —— 绝大多数期权就是这样平仓的。<br>下面是这 25 个交易日的真实收盘：<b>黑线是 TSLA 股价（左轴）、橙线是你这张期权自己的价格（右轴）</b>。拖动「卖出日」看那天平仓能拿多少。</p>
+
+  <div class="panel">
+    <div class="seg" id="pathMode" role="group">
+      <button data-m="pct" aria-pressed="true">按涨跌幅看</button>
+      <button data-m="px" aria-pressed="false">按价格看</button>
+    </div>
+    <svg id="path" viewBox="0 0 720 300" role="img" aria-label="标的与期权价格走势"></svg>
+
+    <div class="ctl" style="margin-top:.8rem;max-width:28rem">
+      <label><span>卖出日（拖到最右＝持到到期）</span><span class="v" id="vSell">2026-05-15</span></label>
+      <input type="range" id="iSell" min="0" max="24" step="1" value="24">
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="k">那天 TSLA</div><div class="d" id="seU">—</div><div class="d2" id="seUD">—</div></div>
+      <div class="stat"><div class="k">那天期权价</div><div class="d" style="color:var(--control)" id="seO">—</div><div class="d2" id="seOD">—</div></div>
+      <div class="stat"><div class="k">那天平仓盈亏</div><div class="d" id="sePL">—</div><div class="d2" id="sePLD">—</div></div>
+      <div class="stat"><div class="k">硬扛到到期</div><div class="d" id="seEnd">—</div><div class="d2" id="seEndD">—</div></div>
+    </div>
+
+    <div class="say" id="pathSay"></div>
+  </div>
+
+  <h3>关键观察：期权不跟着标的 1:1 动</h3>
+  <p class="sub">两条线摆在一起，最该注意的不是「都涨了」，而是<b>涨的幅度完全不成比例</b>。TSLA 动 1 块，期权不会也动 1 块 —— 它只动其中一部分，而且这个比例自己还会变。</p>
+
+  <div class="panel">
+    <div class="stats" style="border-top:none;padding-top:0">
+      <div class="stat"><div class="k">全程 TSLA 变动</div><div class="d" id="dvU">—</div><div class="d2" id="dvUP">—</div></div>
+      <div class="stat"><div class="k">全程期权变动</div><div class="d" style="color:var(--control)" id="dvO">—</div><div class="d2" id="dvOP">—</div></div>
+      <div class="stat"><div class="k">实际捕获比例</div><div class="d" style="color:var(--result)" id="dvR">—</div><div class="d2">期权变动 ÷ 标的变动</div></div>
+      <div class="stat"><div class="k">入场时的 delta</div><div class="d" style="color:var(--result)" id="dvD">—</div><div class="d2">ORATS 当时给的值</div></div>
+    </div>
+    <div class="say plain" id="deltaSay"></div>
+  </div>
+
+  <p class="tiny">那个比例有名字，叫 <span class="sym" data-say="delta，期权价格对标的价格的敏感度。标的动 1 块，期权动 delta 块。买 call 的 delta 在 0 到 1 之间，买 put 在 −1 到 0 之间。">delta</span>。它不是常数：期权越深入实值，delta 越靠近 1（表现得越像股票本身）；越虚值越靠近 0。delta 自己变化的速度叫 <span class="sym" data-say="gamma，delta 变化的速度。越接近到期、越接近行权价，gamma 越大。">gamma</span>。另外就算标的原地不动，期权也会一天天变便宜，那个流失速度叫 <span class="sym" data-say="theta，时间价值的流逝速度。期权每天都在因为「离到期又近了一天」而变便宜。">theta</span>。<b>这三个东西就是第 2 站的全部内容</b>，而你已经在这张图上亲眼看见它们了。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>那 10 万块是怎么定出来的</h2>
+  <p class="sub">故事里我随口说了「付 10 万」。可凭什么是 10 万，不是 5 万或 30 万？这是整门课要回答的问题。讲义把所有定价模型都归纳成同样四个动作。</p>
+
+  <div class="panel">
+    <p style="margin-top:0"><b>第 1 步</b> 列出到期那天标的可能落在哪些价格上。</p>
+    <p><b>第 2 步</b> 给每个价格配一个概率。<span style="color:var(--control)">约束条件是：这些价格按概率加权的平均值，必须等于远期价格。</span></p>
+    <p><b>第 3 步</b> 每个价格对应的期权到期价值都能直接算出来（就是上一节那张折线图）。按概率加权求平均，得到期望价值。</p>
+    <p style="margin-bottom:0"><b>第 4 步</b> 把这个期望价值折现回今天，因为钱是将来才拿到的。</p>
+  </div>
+
+  <p>第 3 步和第 4 步是死的，没有争议。<b>真正的全部难点在第 1、2 步：分布的中心放在哪，以及分布有多宽。</b></p>
+
+  <div class="formula">
+    <div class="math">中心在哪 → 本节（远期价格）　　分布多宽 → 下一节（波动率）</div>
+    <div class="gloss">这两件事定下来，期权价格就定下来了。第 1 站剩下的内容就是这两个问题。</div>
+  </div>
+
+  <h3>先感受一下：中心挪一点，价格差多少</h3>
+  <p class="sub">用回上面那张真实的合约：<b>TSLA 350 call，2026-05-15 到期，32 天</b>，当时市场真实中间价 <b>21.05</b>。下面是一个极简版的定价模型：假装到期时 TSLA 只可能落在五个价格上，概率按钟形分配。拖动<b>中心</b>，看理论价值怎么动。</p>
+  <p class="tiny">表里「call 到期值」那一列写作 <span class="sym" data-say="取两者中较大的那个。max[a, b] 就是 a 和 b 里大的那个。">max</span>[到期价 − 行权价, 0]：高于 350 就赚差价，不高于 350 就是 0。之所以能取 0 而不是负数，正是因为<b>你有权不行使</b> —— 这个「0」就是期权全部价值的来源。</p>
+
+  <div class="panel">
+    <div class="controls" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <div class="ctl"><label><span><span class="sym" data-say="希腊字母 mu，读作「谬」。统计里表示一个分布的平均值，也就是中心位置。这里指到期时标的的期望价格。">μ</span> 分布的中心</span><span class="v" id="vMu">352.00</span></label>
+        <input type="range" id="iMu" min="310" max="400" step="1" value="352"></div>
+      <div class="ctl"><label><span>五档之间的间距（分布多宽）</span><span class="v" id="vSp">12</span></label>
+        <input type="range" id="iSp" min="4" max="70" step="1" value="12"></div>
+    </div>
+
+    <table id="disc">
+      <thead><tr><th>到期时 TSLA 收在</th><th>概率</th><th>call 到期值</th><th>加权</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="stats">
+      <div class="stat"><div class="k">期望价值（到期日）</div><div class="d" id="dEV">—</div></div>
+      <div class="stat"><div class="k">折现后 = 理论价值</div><div class="d" style="color:var(--control)" id="dTV">—</div></div>
+      <div class="stat"><div class="k">市场真实报价</div><div class="d" style="color:var(--good)">21.05</div></div>
+      <div class="stat"><div class="k">中心每上移 1 元</div><div class="d" style="color:var(--result)" id="dSens">—</div></div>
+    </div>
+
+    <div class="say plain" id="dSay"></div>
+  </div>
+
+  <p>两件事同时被你摸到了。<b>一，中心放哪不是细节</b>，它几乎直接决定期权值多少钱。<b>二，光有中心还不够</b> —— 把中心摆在当时的股价 352、间距 12，模型给出的价值远低于市场真实的 21.05。差的不是中心，是<b>分布不够宽</b>。把间距拖大试试，看要多宽才够得着 21.05。</p>
+  <p>所以还剩两个问题：<b>中心到底该放哪？</b> 直觉会说当然是今天的股价 352，下一节告诉你为什么不是。<b>宽度又该是多少？</b> 那就是下一小节 1.2 的波动率。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>中心在哪：远期价格</h2>
+
+  <div class="story">
+    <p>假设你现在就确定：三个月后我要持有 100 股某股票。有两条路可以走。</p>
+    <p><b>路 A，今天就买。</b> 你得先掏出这笔钱。掏出去了，这笔钱本来能吃的利息就没了 —— 这是<b>成本</b>。但作为股东，这三个月里公司派的分红你能收到 —— 这是<b>好处</b>。</p>
+    <p><b>路 B，签一份远期合约。</b> 今天不掏钱，只谈好三个月后按某个价格成交。钱还在你手里继续吃利息，但你不是股东，分红拿不到。</p>
+    <p>三个月后，两条路让你拿到的东西<b>一模一样</b>：100 股股票。既然结果相同，今天的代价也必须相同，否则一边买一边卖就是白捡钱。</p>
+  </div>
+
+  <p>把这句话写出来，就是远期价格的公式：</p>
+
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="Forward price，远期价格。今天就谈好、将来某一天成交的价格。它就是期权定价时那个分布的中心。">F</span> = <span class="sym" data-say="Spot price，今天的市场价格。">S</span> (1 + <span class="sym" data-say="无风险年利率。钱存起来一年能拿到的比例。5% 就写成 0.05。">r</span> · <span class="sym" data-say="到期时间，以年为单位。90 天 = 90/365 ≈ 0.2466。">t</span>) − <span class="sym" data-say="从现在到到期，这只股票会派发的现金分红合计。">D</span></div>
+    <div class="gloss">将来成交的价 ＝ 今天的价 × (1 + 年利率 × 年数) − 期间能拿到的分红</div>
+    <div class="note">再白话一点：<b>远期价 = 今天的价 + 现在就买的成本 − 现在就买的好处</b></div>
+  </div>
+
+  <p>利息是<b>持有成本</b>，所以加；分红是<b>持有收益</b>，所以减。方向如果记混了，就回到那句「我借钱买股票会怎样」，不会错。</p>
+
+  <h3>远期价实验室</h3>
+  <p class="sub">四个滑块。下面那张图分两条轨道：橙色是利息把中心往右推，蓝色是分红把它往左拉，落点就是 F。</p>
+
+  <div class="panel">
+    <div class="presets">
+      <button data-p="reset">TSLA 本页案例（352.36 / 32 天）</button>
+      <button data-p="trap">分红 3 的极端例子</button>
+      <button data-p="rich">高息低利率</button>
+    </div>
+
+    <div class="controls" style="margin-top:1.4rem">
+      <div class="ctl"><label><span><span class="sym" data-say="今天的股价。">S</span> 现价</span><span class="v" id="vS">100.00</span></label>
+        <input type="range" id="iS" min="10" max="300" step="0.01" value="100"></div>
+      <div class="ctl"><label><span><span class="sym" data-say="无风险年利率。">r</span> 年利率</span><span class="v" id="vR">5.00%</span></label>
+        <input type="range" id="iR" min="0" max="12" step="0.01" value="5"></div>
+      <div class="ctl"><label><span>期限（<span class="sym" data-say="公式里的 t 是年。天数除以 365 就得到 t。">t</span> 的来源）</span><span class="v" id="vT">90 天</span></label>
+        <input type="range" id="iT" min="7" max="730" step="1" value="90"></div>
+      <div class="ctl"><label><span><span class="sym" data-say="期间会派发的现金分红合计。">D</span> 期间分红</span><span class="v" id="vD">0.00</span></label>
+        <input type="range" id="iD" min="0" max="12" step="0.05" value="0"></div>
+    </div>
+
+    <svg id="wf" viewBox="0 0 720 148" role="img" aria-label="从现价到远期价的分解"></svg>
+
+    <div class="stats">
+      <div class="stat"><div class="k">t（年）</div><div class="d" id="oT">0.2466</div></div>
+      <div class="stat"><div class="k">利息 S·r·t</div><div class="d" style="color:var(--control)" id="oI">+1.23</div></div>
+      <div class="stat"><div class="k">分红 D</div><div class="d" style="color:var(--result)" id="oD">0.00</div></div>
+      <div class="stat"><div class="k">远期价 F</div><div class="d" id="oF">101.23</div></div>
+      <div class="stat"><div class="k">F − S</div><div class="d" id="oG">+1.23</div></div>
+    </div>
+
+    <div class="say up" id="verdict"></div>
+
+    <div class="infer">
+      <span class="lab">推论 · 取行权价 X = S 时</span>
+      <span class="big" id="oCP">call − put = +1.23</span>
+      <span class="cap" id="oCPsay"></span>
+    </div>
+  </div>
+
+  <div class="formula">
+    <div class="math">C − P = ( F − X ) / ( 1 + r·t )</div>
+    <div class="gloss">同一行权价的 call 价格 减去 put 价格 ＝ (远期价 − 行权价) 折回今天</div>
+    <div class="note">这条叫 <b>put-call parity（买卖权平价）</b>，第 5 站会正式推导。现在只需要看它的后果：<b>F 落在行权价的哪一边，哪一边的期权就贵。</b></div>
+  </div>
+
+  <p class="tiny">这也是为什么实务里说的「平值」指的是 <b>ATMF（平值远期）</b>，而不是拿现价去找最近的行权价。在高股息标的上这两者能差出一整档，用现价当锚会在波动率曲面上造出一个根本不存在的倾斜。</p>
+
+  <h3>用真实数据验一把</h3>
+  <p class="sub">上面那条 parity 不是理论上好看而已。把它倒过来用：<b>已知 call 价、put 价和股价，就能反解出市场在用多少利率给期权定价。</b> TSLA 不派股息，所以 D = 0，式子干净：</p>
+
+  <div class="formula">
+    <div class="math">1 + r·t = X / ( S − (C − P) )</div>
+    <div class="gloss">把 parity 移项就得到它。右边全是能在屏幕上直接读到的数。</div>
+  </div>
+
+  <p class="sub">下面这张表用的就是 §0 那批真实报价（取买卖中间价），逐个行权价算一遍。</p>
+
+  <div class="panel">
+    <table id="parity">
+      <thead><tr><th>行权价 X</th><th>call 中间价</th><th>put 中间价</th><th>C − P</th><th>反解的年利率</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="say plain" id="paritySay"></div>
+  </div>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>无套利检验器</h2>
+  <p class="sub">上面那个公式不是谁规定的，是被套利逼出来的。如果市场报出的远期价不等于它，下面这张表就会印出白捡的钱。<b>你的任务：把「合计」调到 0。</b> 能调到 0，说明你真的算对了 F。</p>
+
+  <div class="seg" role="group">
+    <button id="mPractice" aria-pressed="true">练习模式</button>
+    <button id="mChallenge" aria-pressed="false">挑战模式</button>
+  </div>
+
+  <div class="panel">
+    <div class="scen" id="scen"></div>
+
+    <div class="fmkt">
+      <input type="range" id="iFm" min="70" max="130" step="0.01" value="100">
+      <input type="number" id="nFm" step="0.01" value="100.00">
+      <span class="cap">市场报出的远期价 F<sub>市</sub>。滑块粗调，右边数字框精调（也可用方向键微调）。</span>
+    </div>
+
+    <table id="cf"><thead><tr><th>套利动作</th><th>现金流</th></tr></thead><tbody></tbody></table>
+
+    <div class="arbbox open" id="arbbox">
+      <div><div class="tiny" style="margin-bottom:.15rem">白捡的钱</div><div class="bignum" id="arbnum">0.00</div></div>
+      <div class="msg" id="arbmsg"></div>
+    </div>
+
+    <div class="btnrow" id="chalRow" hidden>
+      <button class="act" id="btnNew">换一组参数</button>
+      <button class="ghost" id="btnGive">看答案</button>
+      <span class="tiny" id="chalScore">已归零 0 组</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>分红的四个日期</h2>
+  <p class="sub">公式里那个 <span class="sym" data-say="期间会派发的现金分红合计。">D</span> 看着简单，但要判断「这次分红到底算不算在我的期限内」，得知道四个日期。关键是<b>除息日不是规定出来的，是从交收周期推出来的</b>。切换下面的交收制度，看除息日自己移动。</p>
+
+  <div class="panel tight">
+    <table>
+      <tbody>
+        <tr><td>宣告日 Declared</td><td style="text-align:left">公司宣布这次要派多少钱</td></tr>
+        <tr><td>除息日 Ex-dividend</td><td style="text-align:left"><b>第一个「买了也拿不到这次分红」的日子</b></td></tr>
+        <tr><td>登记日 Record</td><td style="text-align:left">按股东名册确定谁有资格领</td></tr>
+        <tr><td>支付日 Payable</td><td style="text-align:left">钱真正到账（通常在数周后）</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="seg" role="group" style="margin-top:1.5rem">
+    <button data-n="1" aria-pressed="false">T+1（现行美股）</button>
+    <button data-n="2" aria-pressed="false">T+2</button>
+    <button data-n="3" aria-pressed="true">T+3（讲义所写）</button>
+  </div>
+
+  <div class="panel">
+    <div class="days" id="days"></div>
+    <p class="tiny" style="margin-top:1rem" id="calSay"></p>
+    <div class="say up" id="calFormula" style="font-family:'IBM Plex Mono',ui-monospace,monospace"></div>
+  </div>
+
+  <h3>除息日的价格陷阱</h3>
+  <p class="sub">讲义原例：除息日前一天收 56.40，除息日收 56.60。从价格序列上看涨了 0.20。但持股人当天手里是 56.60 的股票<b>加上</b>刚到手的分红。拖动分红，看这两个数字怎么分岔。</p>
+
+  <div class="panel tight">
+    <div class="ctl" style="max-width:22rem"><label><span>分红</span><span class="v" id="vXD">0.35</span></label>
+      <input type="range" id="iXD" min="0" max="3" step="0.05" value="0.35"></div>
+    <div class="stats" style="margin-top:1.2rem">
+      <div class="stat"><div class="k">表观价格变动</div><div class="d" id="xNaive">+0.20</div></div>
+      <div class="stat"><div class="k">含分红的真实所得</div><div class="d" style="color:var(--good)" id="xTrue">+0.55</div></div>
+      <div class="stat"><div class="k">表观日收益率</div><div class="d" id="xRn">+0.35%</div></div>
+      <div class="stat"><div class="k">真实日收益率</div><div class="d" style="color:var(--good)" id="xRt">+0.98%</div></div>
+    </div>
+    <p class="tiny" style="margin-top:1.1rem">用未做除息调整的价格序列算历史波动率，每个除息日都会给你一个偏低的日收益。分红越大，低估越多。<b>这个坑第 3 站算历史波动率时还会再遇到一次。</b></p>
+  </div>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>费曼检验</h2>
+  <p class="sub">下面七道题<b>一道都不需要计算器</b>。每道先在框里用自己的话写出来，写完再展开对照 —— 不是对答案，是看你的解释里缺了哪一块。<b>能讲清楚才算学会，算得对不算。</b></p>
+  <p class="tiny">你写的内容存在这台设备的浏览器里，刷新不会丢，也不会发到任何地方。</p>
+
+  <div id="feynman"></div>
+
+</section>
+
+<!-- ══════════ 符号表 ══════════ -->
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">S</div><div class="t">Spot price，标的物<b>今天</b>的市场价格。股票期权里就是今天的股价。</div></div>
+      <div class="gl"><div class="s">X</div><div class="t">Exercise / strike price，行权价。写死在合约里的成交价，不随市价变。</div></div>
+      <div class="gl"><div class="s">F</div><div class="t">Forward price，远期价格。今天就谈好、将来某天成交的价格。它就是定价时那个分布的中心。</div></div>
+      <div class="gl"><div class="s">r</div><div class="t">无风险年利率。钱存一年能拿到的比例，5% 写成 0.05。</div></div>
+      <div class="gl"><div class="s">t</div><div class="t">到期时间，一律以<b>年</b>为单位。90 天 = 90/365 ≈ 0.2466 年。</div></div>
+      <div class="gl"><div class="s">D</div><div class="t">从现在到到期，标的会派发的现金分红合计。</div></div>
+      <div class="gl"><div class="s">μ</div><div class="t">读作「谬」。统计里表示分布的平均值、中心位置。本课里 μ = F。</div></div>
+      <div class="gl"><div class="s">C / P</div><div class="t">同一行权价、同一到期日的 call 价格与 put 价格。</div></div>
+      <div class="gl"><div class="s">max[a, b]</div><div class="t">取两者中较大的那个。max[S−X, 0] 的意思是「赚了就算，亏了就当 0」，因为你有权不行使。</div></div>
+      <div class="gl"><div class="s">σ</div><div class="t">读作「西格玛」，波动率。下一节 1.2 才正式登场。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节 <b>1.2 波动率的定义与时间缩放</b>：分布有多宽？一年期的一个标准差、/16 与 /7.2 口诀、正态区间与对数正态区间的分岔。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照，价格路径来自 IBKR 分钟线</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f2 = n => n.toFixed(2);
+const s2 = n => (n>=0?"+":"−")+Math.abs(n).toFixed(2);
+const fwd = (S,r,t,D) => S*(1+r*t) - D;
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 〇 · 真实数据损益图 ══════════
+   数据来源：ORATS 期权链快照 2026-02-23 11:30（TSLA 3/20 到期），
+   以及 TSLA 分钟线聚合出的 RTH 日收盘。两者都取自 labubu/vol 仓库，未做任何修改。 */
+const CASE={"entry":"2026-04-13","expiry":"2026-05-15","spot0":352.36,"settle":422.32,"days":["2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15"],"u":[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83,378.75,376.14,373.02,381.77,390.83,392.48,389.52,398.62,411.74,428.45,445.06,433.7,445.2,443.36,422.32],"c":{"300":[56.98,67.6,94.3,90.8,102.45,94.12,88.05,89.25,75.55,77.82,79.88,77.5,73.75,83.12,91.62,93.0,90.0,99.38,112.35,128.62,145.0,133.55,145.35,143.32,122.3],"305":[52.67,62.88,89.58,86.47,97.38,89.47,83.3,84.1,70.6,72.8,75.2,72.53,69.07,77.5,86.53,88.0,85.25,94.38,107.12,123.6,140.2,128.35,140.25,138.23,118.53],"310":[48.5,58.45,84.6,81.1,92.65,84.5,78.58,79.5,65.85,67.9,70.33,67.3,64.15,72.53,81.67,82.95,79.97,89.47,101.5,118.5,134.47,123.8,134.93,133.38,112.33],"315":[44.5,54.17,79.97,77.15,87.7,79.7,73.78,74.7,61.05,63.1,65.47,62.42,59.27,67.62,76.5,78.08,74.97,84.47,96.62,113.15,130.15,118.78,130.25,127.72,108.4],"320":[40.55,49.95,75.33,72.47,83.08,74.9,69.2,69.92,56.33,58.4,60.35,57.73,54.22,63.08,71.7,73.15,70.03,78.97,92.15,108.68,125.15,113.85,125.33,123.25,103.53],"325":[36.8,45.88,70.8,67.85,78.35,70.2,64.35,65.32,51.7,53.83,55.9,52.88,49.45,57.95,66.67,68.2,65.72,74.22,87.1,103.62,120.22,108.88,120.25,118.0,98.17],"330":[33.27,42.08,66.5,63.42,73.53,65.75,60.03,60.55,47.23,49.2,51.05,48.52,44.8,53.12,61.95,63.15,60.4,69.4,81.95,98.72,115.25,103.78,115.25,113.1,93.88],"335":[29.93,38.25,61.95,58.67,68.9,61.2,55.33,55.95,42.8,44.5,46.3,43.85,40.2,48.45,56.75,58.65,55.47,64.05,76.68,93.25,109.58,98.8,110.28,108.38,88.53],"340":[26.77,34.77,57.72,54.55,64.42,56.55,51.08,51.7,38.58,40.15,41.95,39.23,35.8,44.0,52.17,53.5,50.53,59.55,72.2,88.7,105.1,93.4,105.35,103.35,83.75],"345":[23.8,31.38,53.62,50.47,60.0,52.4,46.88,47.45,34.42,35.92,37.62,34.85,31.57,39.2,47.42,48.62,45.55,54.7,67.68,83.75,100.1,89.22,100.38,98.33,76.58],"350":[21.05,28.2,49.67,46.12,55.77,47.92,42.92,43.4,30.6,32.0,33.47,30.88,27.55,35.03,42.7,43.95,40.73,49.75,62.42,78.55,95.18,83.72,95.38,93.4,72.42],"355":[18.55,25.18,45.95,42.58,51.55,43.92,39.17,39.53,27.12,28.25,29.55,27.05,23.8,30.75,38.17,39.35,36.23,45.05,57.35,73.75,89.95,78.53,90.35,88.42,67.25],"360":[16.23,22.45,42.28,39.0,47.5,40.08,35.45,35.83,23.77,24.73,25.98,23.45,20.35,26.83,33.8,34.9,31.77,40.2,52.23,68.6,85.35,73.9,85.38,83.15,62.22],"365":[14.15,19.9,38.7,35.55,43.62,36.38,32.02,32.27,20.7,21.48,22.57,20.1,17.23,23.15,29.65,30.58,27.5,35.72,47.67,63.72,80.12,68.55,80.25,78.45,57.47],"370":[12.25,17.52,35.38,32.12,39.92,32.85,28.75,28.95,17.88,18.5,19.48,17.12,14.3,19.73,25.7,26.45,23.5,31.27,42.9,58.65,75.45,63.88,75.55,73.4,52.38],"375":[10.55,15.4,32.25,29.05,36.3,29.55,25.7,25.85,15.27,15.8,16.6,14.4,11.9,16.6,22.05,22.65,19.85,27.02,38.2,53.7,70.25,58.9,70.55,68.43,47.25],"380":[9.07,13.48,29.32,26.18,32.95,26.43,22.88,23.05,13.03,13.4,14.05,12.05,9.7,13.85,18.73,19.18,16.45,23.02,33.7,49.0,65.15,53.85,65.57,63.47,42.15],"385":[7.75,11.73,26.55,23.5,29.85,23.6,20.27,20.4,11.02,11.27,11.8,9.95,7.88,11.4,15.6,16.0,13.5,19.3,29.23,44.15,60.25,49.1,60.35,58.38,37.2],"390":[6.65,10.18,24.0,21.02,26.8,20.9,17.8,18.02,9.3,9.43,9.85,8.18,6.35,9.32,13.0,13.18,10.85,15.93,25.05,39.38,55.33,43.92,55.45,53.45,32.17],"395":[5.65,8.8,21.62,18.73,24.07,18.45,15.62,15.8,7.8,7.85,8.15,6.7,5.1,7.58,10.65,10.7,8.6,12.95,21.15,34.7,50.45,39.12,50.6,48.42,27.18],"400":[4.78,7.6,19.43,16.62,21.52,16.23,13.68,13.85,6.5,6.5,6.75,5.45,4.05,6.1,8.65,8.6,6.75,10.3,17.73,30.2,45.77,34.38,45.7,43.4,22.15],"405":[4.05,6.55,17.38,14.73,19.23,14.23,11.93,12.05,5.4,5.38,5.55,4.45,3.25,4.9,6.95,6.85,5.25,8.18,14.57,25.95,40.98,29.85,40.77,38.4,17.18],"410":[3.45,5.62,15.52,13.0,17.07,12.4,10.35,10.45,4.5,4.45,4.55,3.62,2.62,3.95,5.57,5.43,4.07,6.4,11.8,22.0,36.35,25.48,35.9,33.42,12.18],"415":[2.92,4.8,13.82,11.45,15.12,10.8,8.98,9.02,3.75,3.65,3.75,2.96,2.11,3.2,4.4,4.25,3.15,4.97,9.45,18.32,31.75,21.3,31.07,28.5,7.15],"420":[2.48,4.15,12.3,10.05,13.35,9.38,7.75,7.85,3.12,3.02,3.08,2.42,1.73,2.57,3.48,3.33,2.42,3.83,7.5,15.05,27.5,17.55,26.3,23.65,2.25],"425":[2.12,3.55,10.93,8.85,11.75,8.1,6.7,6.72,2.6,2.5,2.54,1.99,1.42,2.09,2.73,2.59,1.89,2.95,5.9,12.1,23.32,14.15,21.92,18.92,0.03],"430":[1.81,3.05,9.65,7.75,10.32,7.0,5.8,5.8,2.17,2.08,2.12,1.65,1.17,1.72,2.15,2.03,1.48,2.27,4.6,9.68,19.73,11.18,17.75,14.45,0.01],"435":[1.55,2.6,8.52,6.8,9.03,6.05,5.0,5.0,1.83,1.75,1.77,1.38,0.99,1.43,1.69,1.6,1.19,1.75,3.58,7.7,16.2,8.7,13.93,10.48,0.01],"440":[1.33,2.24,7.53,5.95,7.92,5.25,4.32,4.33,1.54,1.46,1.5,1.17,0.84,1.2,1.35,1.27,0.97,1.36,2.79,6.05,13.18,6.67,10.65,7.18,0.01],"445":[1.15,1.93,6.65,5.2,6.95,4.55,3.75,3.72,1.31,1.25,1.28,1.0,0.73,1.02,1.08,1.01,0.8,1.08,2.17,4.72,10.6,5.1,7.98,4.6,0.01],"450":[1.01,1.67,5.85,4.55,6.1,3.92,3.23,3.23,1.12,1.08,1.1,0.85,0.64,0.89,0.88,0.82,0.68,0.86,1.71,3.7,8.45,3.9,5.8,2.88,0.01],"455":[0.88,1.44,5.15,4.0,5.33,3.4,2.82,2.83,0.97,0.94,0.96,0.75,0.56,0.78,0.72,0.68,0.58,0.7,1.34,2.89,6.7,3.02,4.2,1.78,0.01],"460":[0.78,1.27,4.55,3.52,4.65,2.97,2.47,2.55,0.84,0.83,0.84,0.66,0.5,0.69,0.61,0.57,0.51,0.57,1.07,2.27,5.3,2.35,3.02,1.08,0.01],"465":[0.69,1.1,4.05,3.1,4.1,2.59,2.17,2.14,0.74,0.74,0.75,0.58,0.45,0.61,0.53,0.49,0.45,0.48,0.88,1.79,4.15,1.85,2.13,0.67,0.01],"470":[0.61,0.96,3.55,2.75,3.62,2.27,1.9,1.91,0.66,0.66,0.67,0.53,0.41,0.56,0.46,0.43,0.4,0.41,0.7,1.42,3.25,1.48,1.49,0.41,0.01]},"p":{"300":[3.45,2.23,1.27,1.15,0.75,0.74,0.94,0.69,0.76,0.64,0.51,0.41,0.35,0.28,0.24,0.2,0.15,0.14,0.08,0.07,0.05,0.05,0.03,0.01,0.01],"305":[4.1,2.67,1.47,1.33,0.85,0.85,1.09,0.9,0.89,0.74,0.59,0.48,0.42,0.31,0.27,0.21,0.17,0.16,0.1,0.07,0.06,0.06,0.04,0.01,0.01],"310":[4.9,3.2,1.71,1.56,0.98,0.99,1.29,1.01,1.05,0.87,0.69,0.57,0.5,0.35,0.29,0.24,0.18,0.16,0.11,0.07,0.06,0.16,0.04,0.03,0.01],"315":[5.85,3.85,2.0,1.83,1.14,1.17,1.53,1.16,1.27,1.04,0.83,0.69,0.62,0.41,0.33,0.27,0.21,0.17,0.11,0.08,0.06,0.07,0.04,0.02,0.01],"320":[6.95,4.65,2.36,2.17,1.33,1.39,1.83,1.41,1.56,1.26,1.01,0.85,0.78,0.5,0.38,0.31,0.24,0.2,0.11,0.09,0.07,0.06,0.04,0.03,0.01],"325":[8.2,5.55,2.8,2.58,1.58,1.67,2.21,1.71,1.92,1.56,1.25,1.08,1.0,0.63,0.46,0.36,0.28,0.21,0.14,0.1,0.07,0.06,0.04,0.04,0.01],"330":[9.65,6.62,3.33,3.08,1.88,2.01,2.67,2.17,2.4,1.94,1.56,1.39,1.31,0.8,0.54,0.44,0.34,0.25,0.15,0.1,0.07,0.1,0.05,0.02,0.01],"335":[11.25,7.85,3.95,3.7,2.25,2.45,3.23,2.6,3.02,2.42,1.98,1.8,1.75,1.03,0.66,0.54,0.42,0.3,0.17,0.11,0.08,0.08,0.05,0.01,0.01],"340":[13.1,9.27,4.65,4.4,2.7,3.01,3.92,3.22,3.8,3.05,2.51,2.35,2.32,1.35,0.83,0.67,0.55,0.36,0.21,0.12,0.08,0.1,0.07,0.02,0.01],"345":[15.12,10.9,5.53,5.25,3.25,3.65,4.75,4.0,4.75,3.88,3.2,3.05,3.08,1.79,1.08,0.86,0.73,0.45,0.23,0.13,0.09,0.09,0.07,0.02,0.01],"350":[17.4,12.7,6.55,6.25,3.9,4.4,5.72,4.93,5.9,4.88,4.1,4.0,4.05,2.39,1.42,1.12,1.0,0.59,0.29,0.15,0.1,0.11,0.07,0.03,0.01],"355":[19.85,14.73,7.67,7.4,4.7,5.35,6.85,6.0,7.3,6.1,5.18,5.15,5.3,3.17,1.88,1.5,1.38,0.79,0.35,0.17,0.11,0.12,0.09,0.05,0.01],"360":[22.57,16.93,9.0,8.75,5.65,6.45,8.2,7.28,8.95,7.6,6.5,6.55,6.8,4.2,2.5,2.0,1.92,1.06,0.45,0.2,0.12,0.15,0.08,0.04,0.01],"365":[25.48,19.38,10.5,10.25,6.75,7.75,9.75,8.75,10.88,9.35,8.1,8.25,8.65,5.45,3.33,2.69,2.66,1.44,0.58,0.23,0.12,0.17,0.1,0.04,0.01],"370":[28.62,22.05,12.2,11.98,8.0,9.23,11.45,10.45,13.07,11.38,10.0,10.25,10.82,7.05,4.4,3.6,3.65,1.97,0.8,0.28,0.15,0.2,0.11,0.04,0.01],"375":[31.95,24.88,14.02,13.88,9.45,10.93,13.43,12.4,15.52,13.7,12.15,12.55,13.32,8.95,5.7,4.75,4.95,2.71,1.11,0.34,0.17,0.23,0.12,0.05,0.01],"380":[35.48,27.98,16.07,16.0,11.1,12.82,15.6,14.53,18.3,16.27,14.6,15.18,16.23,11.2,7.35,6.25,6.6,3.7,1.55,0.44,0.19,0.28,0.14,0.06,0.01],"385":[39.15,31.25,18.32,18.3,12.93,14.93,18.02,16.93,21.25,19.15,17.38,18.12,19.43,13.8,9.32,8.05,8.6,5.0,2.17,0.59,0.23,0.35,0.15,0.06,0.01],"390":[43.05,34.72,20.77,20.82,14.98,17.32,20.6,19.48,24.52,22.3,20.4,21.4,22.85,16.68,11.65,10.2,11.0,6.62,3.01,0.82,0.29,0.46,0.17,0.07,0.01],"395":[46.98,38.47,23.43,23.57,17.23,19.9,23.45,22.27,28.05,25.73,23.75,24.82,26.62,19.95,14.32,12.78,13.73,8.65,4.15,1.17,0.38,0.63,0.21,0.08,0.01],"400":[51.23,42.15,26.23,26.45,19.68,22.7,26.55,25.32,31.75,29.4,27.32,28.62,30.62,23.45,17.3,15.7,16.9,11.07,5.6,1.67,0.51,0.91,0.24,0.08,0.01],"405":[55.62,46.12,29.2,29.55,22.38,25.68,29.5,28.57,35.67,33.3,31.15,32.45,34.83,27.25,20.62,18.95,20.45,13.88,7.42,2.4,0.71,1.33,0.32,0.11,0.01],"410":[60.0,50.25,32.38,32.83,25.23,28.88,33.08,31.93,39.8,37.35,35.15,36.83,39.17,31.33,24.25,22.58,24.27,17.1,9.68,3.4,1.02,1.96,0.42,0.14,0.01],"415":[64.5,54.5,35.67,36.3,28.35,32.2,36.52,35.6,44.02,41.48,39.35,41.0,43.62,35.65,28.1,26.38,28.27,20.75,12.3,4.72,1.48,2.83,0.61,0.2,0.01],"420":[69.2,58.9,39.17,39.92,31.52,35.8,40.52,39.33,48.47,46.02,43.75,45.7,48.35,40.52,32.17,30.45,32.62,24.57,15.43,6.42,2.13,4.05,0.93,0.33,0.01],"425":[73.7,63.4,42.77,43.8,34.98,39.42,44.3,43.33,52.9,50.53,48.2,50.05,53.1,45.08,36.45,34.77,37.12,28.77,18.8,8.55,3.05,5.62,1.44,0.59,2.8],"430":[78.58,67.8,46.53,47.55,38.47,43.48,48.6,47.4,57.62,55.3,52.85,54.95,57.75,49.72,40.9,39.17,41.75,33.08,22.48,11.07,4.25,7.65,2.27,1.14,7.85],"435":[83.35,72.5,50.47,51.67,42.3,47.45,52.95,51.55,62.28,59.83,57.52,59.5,62.67,54.03,45.4,43.72,46.28,37.58,26.5,14.03,5.85,10.18,3.5,2.13,12.85],"440":[88.17,77.05,54.45,56.05,46.15,51.75,57.23,55.98,66.97,64.58,62.25,64.5,67.53,58.72,50.15,48.48,51.23,42.2,30.73,17.45,7.88,13.18,5.25,3.8,17.82],"445":[93.03,81.85,58.65,60.03,50.15,55.95,61.52,60.58,71.72,69.38,66.97,69.33,72.42,63.62,54.95,53.2,56.12,47.0,35.12,21.15,10.3,16.57,7.55,6.3,22.82],"450":[97.88,86.6,62.92,64.4,54.38,60.5,66.22,64.92,76.6,74.25,71.72,74.22,77.92,68.45,59.7,58.08,60.95,51.78,39.67,25.15,13.15,20.4,10.38,9.52,27.82],"455":[102.8,91.47,67.1,68.75,58.58,64.83,71.0,69.42,81.4,79.0,76.72,78.92,82.33,73.4,64.58,63.03,65.93,56.47,44.27,29.4,16.45,24.55,13.77,13.43,32.75],"460":[107.7,96.22,71.55,73.4,63.0,69.65,75.5,74.18,86.4,84.08,81.72,83.85,88.0,78.28,69.47,67.85,70.83,61.52,49.05,33.75,20.02,28.93,17.6,17.77,37.83],"465":[112.6,101.08,76.05,77.78,67.42,74.05,80.15,78.83,91.2,88.93,86.55,88.78,92.25,83.25,74.4,72.88,75.8,66.3,53.9,38.27,23.88,33.38,21.7,22.35,42.75],"470":[117.58,105.95,80.6,82.45,71.95,78.9,84.8,83.72,96.1,93.88,91.53,93.75,97.2,88.18,79.28,77.82,80.78,71.33,58.75,42.92,28.0,38.02,26.02,27.1,47.83]},"cd":{"300":0.8825,"305":0.8602,"310":0.8355,"315":0.8083,"320":0.7788,"325":0.7468,"330":0.7125,"335":0.6761,"340":0.6379,"345":0.5982,"350":0.5574,"355":0.5159,"360":0.4744,"365":0.4334,"370":0.3934,"375":0.3549,"380":0.3183,"385":0.2838,"390":0.2519,"395":0.2223,"400":0.1954,"405":0.1708,"410":0.1487,"415":0.1288,"420":0.1111,"425":0.0954,"430":0.0817,"435":0.0697,"440":0.0591,"445":0.05,"450":0.0419,"455":0.0351,"460":0.0294,"465":0.0244,"470":0.0203},"pd":{"300":-0.1175,"305":-0.1398,"310":-0.1645,"315":-0.1917,"320":-0.2212,"325":-0.2532,"330":-0.2875,"335":-0.3239,"340":-0.3621,"345":-0.4018,"350":-0.4426,"355":-0.4841,"360":-0.5256,"365":-0.5666,"370":-0.6066,"375":-0.6451,"380":-0.6817,"385":-0.7162,"390":-0.7481,"395":-0.7777,"400":-0.8046,"405":-0.8292,"410":-0.8513,"415":-0.8712,"420":-0.8889,"425":-0.9046,"430":-0.9183,"435":-0.9303,"440":-0.9409,"445":-0.95,"450":-0.9581,"455":-0.9649,"460":-0.9706,"465":-0.9756,"470":-0.9797},"civ":{"300":0.5126,"305":0.5048,"310":0.4992,"315":0.4946,"320":0.4876,"325":0.4818,"330":0.478,"335":0.474,"340":0.4704,"345":0.4663,"350":0.4629,"355":0.4606,"360":0.4576,"365":0.4558,"370":0.4535,"375":0.4516,"380":0.4508,"385":0.4496,"390":0.4503,"395":0.4501,"400":0.4496,"405":0.4505,"410":0.4524,"415":0.4543,"420":0.4565,"425":0.4588,"430":0.4617,"435":0.4648,"440":0.469,"445":0.4728,"450":0.4777,"455":0.4824,"460":0.4875,"465":0.4931,"470":0.4981},"piv":{"300":0.511,"305":0.5026,"310":0.4962,"315":0.4906,"320":0.4855,"325":0.4802,"330":0.476,"335":0.4709,"340":0.4675,"345":0.4635,"350":0.4608,"355":0.4572,"360":0.4554,"365":0.4528,"370":0.4514,"375":0.4498,"380":0.4484,"385":0.4467,"390":0.4466,"395":0.443,"400":0.4453,"405":0.4495,"410":0.4485,"415":0.4444,"420":0.4555,"425":0.443,"430":0.46,"435":0.4057,"440":0.4647,"445":0.5477,"450":0.4637,"455":0.5622,"460":0.5396,"465":0.5937,"470":0.5977},"cb0":{"300":56.75,"305":52.25,"310":48.15,"315":44.05,"320":40.35,"325":36.6,"330":33.05,"335":29.85,"340":26.7,"345":23.75,"350":21.0,"355":18.5,"360":16.15,"365":14.1,"370":12.2,"375":10.5,"380":9.05,"385":7.7,"390":6.6,"395":5.6,"400":4.75,"405":4.0,"410":3.4,"415":2.9,"420":2.46,"425":2.1,"430":1.79,"435":1.53,"440":1.32,"445":1.14,"450":1.0,"455":0.87,"460":0.76,"465":0.67,"470":0.6},"ca0":{"300":57.2,"305":53.1,"310":48.85,"315":44.95,"320":40.75,"325":37.0,"330":33.5,"335":30.0,"340":26.85,"345":23.85,"350":21.1,"355":18.6,"360":16.3,"365":14.2,"370":12.3,"375":10.6,"380":9.1,"385":7.8,"390":6.7,"395":5.7,"400":4.8,"405":4.1,"410":3.5,"415":2.95,"420":2.51,"425":2.14,"430":1.83,"435":1.57,"440":1.35,"445":1.17,"450":1.02,"455":0.89,"460":0.79,"465":0.7,"470":0.62},"pb0":{"300":3.4,"305":4.05,"310":4.85,"315":5.8,"320":6.9,"325":8.15,"330":9.6,"335":11.2,"340":13.05,"345":15.05,"350":17.35,"355":19.75,"360":22.5,"365":25.4,"370":28.55,"375":31.85,"380":35.35,"385":38.85,"390":42.85,"395":46.35,"400":50.85,"405":55.25,"410":59.55,"415":63.45,"420":68.75,"425":72.95,"430":78.2,"435":82.5,"440":87.85,"445":92.25,"450":97.55,"455":102.05,"460":107.4,"465":111.8,"470":116.75},"pa0":{"300":3.5,"305":4.15,"310":4.95,"315":5.9,"320":7.0,"325":8.25,"330":9.7,"335":11.3,"340":13.15,"345":15.2,"350":17.45,"355":19.95,"360":22.65,"365":25.55,"370":28.7,"375":32.05,"380":35.6,"385":39.45,"390":43.25,"395":47.6,"400":51.6,"405":56.0,"410":60.45,"415":65.55,"420":69.65,"425":74.45,"430":78.95,"435":84.2,"440":88.5,"445":93.8,"450":98.2,"455":103.55,"460":108.0,"465":113.4,"470":118.4}};
+
+/* 把逐日数据整形成页面其余部分用的形状：入场日那一列做成期权链，标的收盘做成路径 */
+const TSLA = {
+  quote_date: CASE.entry, snapshot: CASE.entry + " 收盘", expiry: CASE.expiry,
+  dte: 32, spot: CASE.spot0, settle: CASE.settle,
+  chain: Object.keys(CASE.c).map(Number).sort((a,b)=>a-b).map(k=>({
+    k, cb:CASE.cb0[k], ca:CASE.ca0[k], pb:CASE.pb0[k], pa:CASE.pa0[k],
+    civ:CASE.civ[k], piv:CASE.piv[k], cd:CASE.cd[k], pd:CASE.pd[k] })),
+  path: CASE.days.map((d,i)=>({d, c:CASE.u[i]}))
+};
+
+const po={k:'lc', stock:false, ki:TSLA.chain.findIndex(c=>c.k===350), ST:TSLA.settle, sell:CASE.days.length-1};
+const KIND={lc:'买 call',sc:'卖 call',lp:'买 put',sp:'卖 put'};
+const curK = () => TSLA.chain[po.ki];
+// 买方付卖一价，卖方收买一价 —— 真实成交就是这样，不是取中间价
+const premOf = (kind,row) => kind==='lc'?row.ca : kind==='sc'?row.cb : kind==='lp'?row.pa : row.pb;
+const curPrem = () => premOf(po.k, curK());
+const isBuy = k => k==='lc'||k==='lp';
+const STKCOST = 352.36;   // 入场日 TSLA 收盘价，当作这 100 股的成本
+const COMBO = {
+  sc:{n:'covered call（备兑开仓）', a:'收租',
+      s:'你手里有 100 股，把「涨过行权价就按行权价卖给我」这个权利<b>租</b>给别人，先收下租金。股票照拿、租金照收，代价是涨过行权价的部分不再归你。这是最标准的「收租」形态。'},
+  lp:{n:'protective put（保护性看跌）', a:'买保险',
+      s:'你手里有 100 股，怕跌，花一笔钱买「跌破行权价有人按行权价接盘」的<b>保险</b>。跌再多，你的底就是行权价。保费是确定付出的成本，和车险一模一样 —— 没出险就是白花，但那正是你买它的理由。'},
+  lc:{n:'持股 + 买 call', a:'加倍看涨',
+      s:'你已经有 100 股，还要再买一张 call，等于把看涨押注<b>加倍</b>。涨得多赚得多，但权利金是实打实的成本，横盘就白付。'},
+  sp:{n:'持股 + 卖 put', a:'往下加倍',
+      s:'你已经有 100 股，还答应「跌破行权价再按行权价接 100 股」，等于把多头仓位<b>往下加倍</b>。收了权利金，但真跌下去要吃两份亏。注意这不是「收租」—— 不持股时的卖 put 叫 cash-secured put，那是「答应低价接货、先收订金」。'}
+};
+const MULT = 100;                                   // 美股股票期权的合约乘数：一张 = 100 股
+const kFmt = v => (v%1===0) ? v.toFixed(0) : v.toFixed(2);   // 392.5 不能显示成 393
+const usd  = v => (v<0?'−':'')+'$'+Math.abs(v*MULT).toLocaleString('en-US',{maximumFractionDigits:0});
+
+function pay(k,S,X,pr){
+  const c=Math.max(S-X,0), p=Math.max(X-S,0);
+  return k==='lc'? c-pr : k==='sc'? pr-c : k==='lp'? p-pr : pr-p;
+}
+function breakeven(k,X,pr){ return (k==='lc'||k==='sc') ? X+pr : X-pr; }
+// 合计损益 = 期权腿 +（持股时）股票腿
+function payT(k,S,X,pr){ return pay(k,S,X,pr) + (po.stock ? S-STKCOST : 0); }
+// 用顶点扫描求零点，比逐种情况硬编码可靠
+function zeros(k,X,pr,lo,hi){
+  const vs=[lo,X,hi].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>a-b), out=[];
+  for(let i=0;i<vs.length-1;i++){
+    const a=vs[i], b=vs[i+1], fa=payT(k,a,X,pr), fb=payT(k,b,X,pr);
+    if(fa===0) out.push(a);
+    else if(fa*fb<0) out.push(a+(b-a)*(-fa)/(fb-fa));
+  }
+  return out;
+}
+
+function drawPayoff(){
+  const W=720, H=300;
+  const k=po.k, X=curK().k, pr=curPrem(), ST=po.ST;
+  const xlo=280, xhi=520;               // 固定坐标轴，换行权价时画面不跳，方便横向比较
+  const bes=zeros(k,X,pr,xlo,xhi);
+  const xs=[xlo,X,...bes,xhi].sort((a,b)=>a-b);
+  const pts=xs.map(v=>[v,payT(k,v,X,pr)]);
+  let ymin=Math.min(...pts.map(p=>p[1])), ymax=Math.max(...pts.map(p=>p[1]));
+  const ypad=Math.max((ymax-ymin)*0.14, 2);
+  ymin-=ypad; ymax+=ypad;
+  const L=54,R=W-20,T=18,B=H-46;
+  const X2=v=>L+(v-xlo)/(xhi-xlo)*(R-L);
+  const Y2=v=>B-(v-ymin)/(ymax-ymin)*(B-T);
+  const y0=Y2(0);
+  let g='';
+
+  // 盈利 / 亏损区域
+  const seg=(from,to)=>{
+    const vs=pts.filter(p=>p[0]>=from-1e-9&&p[0]<=to+1e-9);
+    if(vs.length<2) return '';
+    const mid=payT(k,(from+to)/2,X,pr);
+    const col=mid>=0?'var(--good)':'var(--warn)';
+    const d=`M ${X2(from)} ${y0} `+vs.map(p=>`L ${X2(p[0])} ${Y2(p[1])} `).join('')+`L ${X2(to)} ${y0} Z`;
+    return `<path d="${d}" fill="${col}" opacity=".13"/>`;
+  };
+  { const cut=[xlo,...bes,xhi]; for(let i=0;i<cut.length-1;i++) g+=seg(cut[i],cut[i+1]); }
+
+  // 零线与坐标
+  g+=`<line x1="${L}" y1="${y0}" x2="${R}" y2="${y0}" stroke="var(--ink-faint)" stroke-width="1.3"/>`;
+  g+=`<text x="${L-8}" y="${y0+4}" text-anchor="end" font-size="11" fill="var(--ink-faint)" font-family="IBM Plex Mono,monospace">0</text>`;
+  g+=`<text x="${L-8}" y="${Y2(ymax-ypad*0.5)+4}" text-anchor="end" font-size="11" fill="var(--good)" font-family="IBM Plex Mono,monospace">赚</text>`;
+  g+=`<text x="${L-8}" y="${Y2(ymin+ypad*0.5)+4}" text-anchor="end" font-size="11" fill="var(--warn)" font-family="IBM Plex Mono,monospace">亏</text>`;
+  // 横轴两端刻度，给个价格量级的参照
+  g+=`<text x="${L}" y="${B+17}" text-anchor="start" font-size="10.5" fill="var(--ink-faint)" font-family="IBM Plex Mono,monospace">${xlo.toFixed(0)}</text>`;
+  g+=`<text x="${R}" y="${B+17}" text-anchor="end" font-size="10.5" fill="var(--ink-faint)" font-family="IBM Plex Mono,monospace">${xhi.toFixed(0)}</text>`;
+
+  // 行权价虚线
+  g+=`<line x1="${X2(X)}" y1="${T}" x2="${X2(X)}" y2="${B}" stroke="var(--ink-faint)" stroke-width="1.2" stroke-dasharray="4 4"/>`;
+  g+=`<text x="${X2(X)}" y="${B+16}" text-anchor="middle" font-size="11" fill="var(--ink-faint)" font-family="IBM Plex Mono,monospace">行权价 ${kFmt(X)}</text>`;
+  // 盈亏平衡虚线（可能不止一条）
+  bes.forEach(be=>{ if(Math.abs(be-X)>0.4){
+    g+=`<line x1="${X2(be)}" y1="${T}" x2="${X2(be)}" y2="${B}" stroke="var(--result)" stroke-width="1.2" stroke-dasharray="2 4" opacity=".7"/>`;
+    g+=`<text x="${X2(be)}" y="${B+32}" text-anchor="middle" font-size="11" fill="var(--result)" font-family="IBM Plex Mono,monospace">平衡 ${be.toFixed(2)}</text>`;
+  }});
+  // 折线本体
+  g+=`<polyline points="${pts.map(p=>X2(p[0])+','+Y2(p[1])).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/>`;
+  // 真实结算价（标签放顶部，避开底下那两行标注）
+  g+=`<line x1="${X2(TSLA.settle)}" y1="${T}" x2="${X2(TSLA.settle)}" y2="${B}" stroke="var(--good)" stroke-width="1.5" stroke-dasharray="6 3"/>`;
+  g+=`<text x="${X2(TSLA.settle)-6}" y="${T+13}" text-anchor="end" font-size="11" fill="var(--good)" font-family="IBM Plex Mono,monospace">实际 ${TSLA.settle}</text>`;
+  // 到期价游标
+  const pl=payT(k,ST,X,pr);
+  g+=`<line x1="${X2(ST)}" y1="${T}" x2="${X2(ST)}" y2="${B}" stroke="var(--control)" stroke-width="1.8"/>`;
+  g+=`<circle cx="${X2(ST)}" cy="${Y2(pl)}" r="6" fill="var(--control)"/>`;
+  g+=`<text x="${X2(ST)}" y="${T-3}" text-anchor="middle" font-size="12" fill="var(--control)" font-family="IBM Plex Mono,monospace" font-weight="600">${ST.toFixed(2)}</text>`;
+  $('po').innerHTML=g;
+}
+
+/* TSLA 这 26 天的真实收盘路径 */
+/* 期权自己的逐日收盘序列（真实 EOD 中间价） */
+let pathMode='pct';
+const optSeries = () => (po.k==='lc'||po.k==='sc' ? CASE.c : CASE.p)[String(curK().k)];
+
+function drawPath(){
+  const W=720,H=300,L=58,R=W-62,T=28,B=H-34;
+  const K=curK().k, us=CASE.u, n=us.length, si=po.sell;
+  const isC=(po.k==='lc'||po.k==='sc'), raw=optSeries();
+  const os=raw.slice(); os[n-1]= isC ? Math.max(CASE.settle-K,0) : Math.max(K-CASE.settle,0);
+  const X2=i=>L+i/(n-1)*(R-L);
+  const lab=(x,y,t,c,a='start',s=10.5)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+  let g=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="var(--rule)" stroke-width="1"/>`;
+
+  if(pathMode==='pct'){
+    const uu=us.map(v=>(v/us[0]-1)*100), oo=os.map(v=>(v/os[0]-1)*100);
+    let lo=Math.min(0,...uu,...oo), hi=Math.max(0,...uu,...oo);
+    const pad=Math.max((hi-lo)*0.1,2); lo-=pad; hi+=pad;
+    const Y=v=>B-(v-lo)/(hi-lo)*(B-T);
+    g+=`<line x1="${L}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" stroke="var(--ink-faint)" stroke-width="1.2"/>`;
+    g+=lab(L-8,Y(0)+4,'0%','var(--ink-faint)','end');
+    [Math.max(...oo),Math.max(...uu)].forEach(v=>g+=lab(L-8,Y(v)+4,v.toFixed(0)+'%','var(--ink-faint)','end'));
+    g+=`<polyline points="${uu.map((v,i)=>X2(i)+','+Y(v)).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${oo.map((v,i)=>X2(i)+','+Y(v)).join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+    g+=lab(R-14,Y(oo[n-1])-9,'期权 '+(oo[n-1]>=0?'+':'')+oo[n-1].toFixed(0)+'%','var(--control)','end',11.5);
+    g+=lab(R-14,Y(uu[n-1])+16,'TSLA '+(uu[n-1]>=0?'+':'')+uu[n-1].toFixed(0)+'%','var(--ink)','end',11.5);
+    g+=`<line x1="${X2(si)}" y1="${T}" x2="${X2(si)}" y2="${B}" stroke="var(--result)" stroke-width="1.6"/>`;
+    g+=`<circle cx="${X2(si)}" cy="${Y(uu[si])}" r="4.5" fill="var(--ink)"/><circle cx="${X2(si)}" cy="${Y(oo[si])}" r="4.5" fill="var(--control)"/>`;
+  } else {
+    const uLo=Math.min(...us,K), uHi=Math.max(...us,K), uP=(uHi-uLo)*0.13;
+    const oLo=Math.min(...os), oHi=Math.max(...os), oP=Math.max((oHi-oLo)*0.13,0.4);
+    const YU=v=>B-(v-(uLo-uP))/((uHi+uP)-(uLo-uP))*(B-T);
+    const YO=v=>B-(v-(oLo-oP))/((oHi+oP)-(oLo-oP))*(B-T);
+    g+=lab(L-8,T-10,'TSLA 股价','var(--ink)','end');
+    [uLo,uHi].forEach(v=>g+=lab(L-8,YU(v)+4,v.toFixed(0),'var(--ink-faint)','end'));
+    g+=lab(R+8,T-10,'期权价','var(--control)');
+    [oLo,oHi].forEach(v=>g+=lab(R+8,YO(v)+4,v.toFixed(oHi<20?1:0),'var(--control)'));
+    g+=`<line x1="${L}" y1="${YU(K)}" x2="${R}" y2="${YU(K)}" stroke="var(--ink-faint)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
+    g+=lab(R-4,YU(K)-7,'行权价 '+kFmt(K),'var(--ink-faint)','end');
+    g+=`<polyline points="${us.map((v,i)=>X2(i)+','+YU(v)).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${os.map((v,i)=>X2(i)+','+YO(v)).join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+    g+=`<line x1="${X2(si)}" y1="${T}" x2="${X2(si)}" y2="${B}" stroke="var(--result)" stroke-width="1.6"/>`;
+    g+=`<circle cx="${X2(si)}" cy="${YU(us[si])}" r="4.5" fill="var(--ink)"/><circle cx="${X2(si)}" cy="${YO(os[si])}" r="4.5" fill="var(--control)"/>`;
+  }
+  g+=lab(L,B+18,CASE.days[0],'var(--ink-faint)');
+  g+=lab(R,B+18,CASE.days[n-1],'var(--ink-faint)','end');
+  $('path').innerHTML=g;
+}
+
+/* 卖出日读数 + 「不 1:1」那一节 */
+function renderSell(){
+  const k=po.k, K=curK().k, pr=curPrem(), buy=isBuy(k);
+  const us=CASE.u, raw=optSeries(), n=us.length, si=Math.min(po.sell,n-1), z=n-1;
+  // 到期那天一律用结算内在价值，不用收盘中间价 —— 后者含买卖价差噪音，会跟「真实结局」差几分钱
+  const isC=(k==='lc'||k==='sc');
+  const os=raw.slice(); os[z]= isC ? Math.max(CASE.settle-K,0) : Math.max(K-CASE.settle,0);
+  const sgn = buy?1:-1;                       // 卖方的盈亏方向相反
+  const plAt = i => sgn*(os[i]-pr);
+  $('vSell').textContent=CASE.days[si];
+  $('seU').textContent=us[si].toFixed(2);
+  $('seUD').textContent=(us[si]-us[0]>=0?'+':'−')+Math.abs(us[si]-us[0]).toFixed(2)+' vs 买入日';
+  $('seO').textContent=os[si].toFixed(2);
+  $('seOD').textContent=usd(os[si])+' / 张';
+  const now=plAt(si), end=plAt(z);
+  $('sePL').textContent=s2(now);
+  $('sePL').style.color = now>0.004?'var(--good)':(now<-0.004?'var(--warn)':'var(--ink)');
+  $('sePLD').textContent=usd(now)+' / 张';
+  $('seEnd').textContent=s2(end);
+  $('seEnd').style.color = end>0.004?'var(--good)':(end<-0.004?'var(--warn)':'var(--ink)');
+  $('seEndD').textContent=usd(end)+' / 张';
+
+  // 最优卖出日（对买方是期权价最高日，对卖方是最低日）
+  const best = buy ? os.indexOf(Math.max(...os)) : os.indexOf(Math.min(...os));
+  const gap = plAt(best)-end;
+  const box=$('pathSay');
+  box.className='say '+(now>0.004?'flat':(now<-0.004?'down':'plain'));
+  box.innerHTML =
+    `在 <b>${CASE.days[si]}</b> 平掉：期权卖 ${os[si].toFixed(2)}，${buy?'当初买入付了':'当初卖出收了'} ${pr.toFixed(2)}，`+
+    `这笔${now>=0?'赚':'亏'} <b>${Math.abs(now).toFixed(2)}/股（${usd(now)}/张）</b>。`+
+    (si===z
+      ? (best===z
+          ? `<br>这是持到到期的结果。这一次，<b>到期日恰好就是最好的了结时机</b> —— 但那是事后才知道的，事前你没法确定。`
+          : `<br>这是持到到期的结果。但看橙线：最好的了结时机是 <b>${CASE.days[best]}</b>，那天期权值 ${os[best].toFixed(2)}，`
+            + `平掉能拿 <b>${usd(plAt(best))}</b>。<b>硬扛到到期，比那天少拿 ${usd(Math.abs(gap))}。</b>`)
+      : `<br>持到到期则是 ${s2(end)}/股（${usd(end)}/张）。`+(now>end?`<b>这天走，比硬扛到到期多拿 ${usd(now-end)}。</b>`:(now<end?`硬扛到到期反而多拿 ${usd(end-now)}。`:`和持到到期一样。`)));
+
+  // 「不 1:1」
+  const du=us[z]-us[0], dopt=os[z]-os[0];
+  const dl = (k==='lc'||k==='sc') ? curK().cd : curK().pd;
+  $('dvU').textContent=s2(du);
+  $('dvUP').textContent=(du>=0?'+':'−')+Math.abs(du/us[0]*100).toFixed(1)+'%';
+  $('dvO').textContent=s2(dopt);
+  $('dvOP').textContent=(dopt>=0?'+':'−')+Math.abs(dopt/os[0]*100).toFixed(1)+'%';
+  $('dvR').textContent=(dopt/du).toFixed(3);
+  $('dvD').textContent=dl.toFixed(3);
+  // 单日样本：取标的日变动最大的那天
+  let bi=1, bd=0;
+  for(let i=1;i<n;i++){ if(Math.abs(us[i]-us[i-1])>bd){ bd=Math.abs(us[i]-us[i-1]); bi=i; } }
+  const dU1=us[bi]-us[bi-1], dO1=os[bi]-os[bi-1];
+  $('deltaSay').innerHTML =
+    `全程 TSLA 走了 ${s2(du)}（${(du/us[0]*100).toFixed(1)}%），期权走了 ${s2(dopt)}（<b>${(dopt/os[0]*100).toFixed(1)}%</b>）。`+
+    `<b>百分比差这么多，正是期权的杠杆</b> —— 但绝对值上期权只走了标的的 ${(dopt/du*100).toFixed(0)}%，不是 100%。<br>`+
+    `单日看得更清楚：${CASE.days[bi]} 那天 TSLA 一天动了 ${s2(dU1)}，这张期权只动了 ${s2(dO1)}，比值 <b>${(dO1/dU1).toFixed(2)}</b>。`+
+    `入场时 ORATS 给的 delta 是 ${dl.toFixed(3)}，全程实际捕获比却是 ${(dopt/du).toFixed(3)} —— <b>两个数不一样，因为 delta 一路上自己在变。</b>`;
+}
+
+function renderPayoff(){
+  const k=po.k, row=curK(), X=row.k, pr=curPrem(), ST=po.ST;
+  const isCall=(k==='lc'||k==='sc'), buy=isBuy(k);
+  const bid=isCall?row.cb:row.pb, ask=isCall?row.ca:row.pa;
+  const iv=isCall?row.civ:row.piv, dl=isCall?row.cd:row.pd;
+
+  $('vK').textContent=X.toFixed(2);
+  $('vST').textContent=ST.toFixed(2);
+  $('tsScen').innerHTML =
+    `<span>报价 <b>${TSLA.snapshot}</b></span><span>TSLA <b>${TSLA.spot.toFixed(2)}</b></span>`+
+    `<span>到期 <b>${TSLA.expiry}</b></span><span>剩余 <b>${TSLA.dte} 天</b></span>`;
+  const cb=$('poCombo');
+  if(po.stock){
+    const c=COMBO[k]; cb.hidden=false; cb.className='say plain';
+    cb.innerHTML=`<b>这个组合有名字：${c.n}</b>　生活里的类比是「<b>${c.a}</b>」。<br>${c.s}`;
+  } else cb.hidden=true;
+  $('btnStock').textContent = po.stock ? '－ 去掉那 100 股' : '＋ 同时持有 100 股';
+  $('btnStock').className = po.stock ? 'act' : 'ghost';
+  $('vPrem').innerHTML =
+    (po.stock?`已持有 <b>100 股 TSLA</b>，成本按入场日收盘 ${STKCOST}　·　`:'')+
+    `${KIND[k]} ${X.toFixed(2)} ${isCall?'call':'put'}：${buy?'付出卖一价':'收到买一价'} `+
+    `<b style="color:var(--control)">${pr.toFixed(2)}</b>　`+
+    `<span style="opacity:.75">当时真实买一 ${bid.toFixed(2)} / 卖一 ${ask.toFixed(2)}，隐含波动率 ${(iv*100).toFixed(1)}%，delta ${dl.toFixed(3)}</span>`;
+
+  const pl=payT(k,ST,X,pr);
+  const bes=zeros(k,X,pr,0,X*4), be=bes.length?bes[0]:NaN;
+  $('poPr').textContent = (buy?'−':'+')+pr.toFixed(2);
+  $('poPrD').textContent = (buy?'付出 ':'收到 ')+usd(pr)+' / 张';
+  $('poPL').textContent=s2(pl);
+  $('poPL').style.color = pl>0.004?'var(--good)':(pl<-0.004?'var(--warn)':'var(--ink)');
+  $('poPLD').textContent = usd(pl)+' / 张';
+  $('poBE').textContent = bes.length? bes.map(b=>b.toFixed(2)).join(' / ') : '—';
+  // 上下界：看行权价两侧的斜率，不逐种情况硬编码
+  const slopeHi = payT(k,X+1,X,pr)-payT(k,X,X,pr);
+  const slopeLo = payT(k,X,X,pr)-payT(k,X-1,X,pr);
+  const f0=payT(k,0,X,pr), fX=payT(k,X,X,pr);
+  const mx = slopeHi>0.001 ? null : Math.max(f0,fX);
+  const mn = slopeHi<-0.001 ? null : Math.min(f0,fX);
+  $('poMax').textContent = mx===null?'无上限':(mx>=0?'':'−')+Math.abs(mx).toFixed(2);
+  $('poMaxD').textContent = mx===null?'TSLA 涨多少赚多少':usd(mx)+' / 张';
+  $('poMin').textContent = mn===null?'无下限':(mn>=0?'':'−')+Math.abs(mn).toFixed(2);
+  $('poMinD').textContent = mn===null?'TSLA 涨多少亏多少':usd(mn)+' / 张';
+  drawPayoff();
+
+  const itm = isCall ? ST>X : ST<X;
+  const gap=Math.abs(ST-X), n=ST.toFixed(2), x=X.toFixed(2), p=pr.toFixed(2);
+  let s='';
+  if(k==='lc') s = itm
+    ? `到期 TSLA 收在 ${n}，<b>高于</b>行权价 ${x}，所以你行权：按 ${x} 买进、市价 ${n}，这一步赚 ${gap.toFixed(2)}。减去当初付出的权利金 ${p}，净${pl>=0?'赚':'亏'} ${Math.abs(pl).toFixed(2)}。`
+    : `到期 TSLA 收在 ${n}，<b>不高于</b>行权价 ${x}。按 ${x} 去买一个只值 ${n} 的东西是亏的，所以你<b>不行权</b>，权利作废。损失就是当初付的 ${p}，一分不多 —— 这就是买方的下跌保护。`;
+  if(k==='sc') s = itm
+    ? `到期 TSLA 收在 ${n}，高于行权价 ${x}，对方当然要行权。你必须按 ${x} 卖给他一个值 ${n} 的东西，这一步亏 ${gap.toFixed(2)}。加上当初收到的权利金 ${p}，净${pl>=0?'赚':'亏'} ${Math.abs(pl).toFixed(2)}。<b>TSLA 涨得越高你亏得越多，没有上限。</b>`
+    : `到期 TSLA 收在 ${n}，不高于行权价 ${x}，对方不会行权。权利作废，当初收到的 ${p} <b>全部落袋</b>。这是卖方最好的结果，也是他能拿到的全部。`;
+  if(k==='lp') s = itm
+    ? `到期 TSLA 收在 ${n}，<b>低于</b>行权价 ${x}，所以你行权：市价 ${n} 买进、按 ${x} 卖出，这一步赚 ${gap.toFixed(2)}。减去权利金 ${p}，净${pl>=0?'赚':'亏'} ${Math.abs(pl).toFixed(2)}。<b>这就是保险赔付。</b>`
+    : `到期 TSLA 收在 ${n}，<b>不低于</b>行权价 ${x}。按 ${x} 卖出一个值 ${n} 的东西是亏的，所以你不行权。损失就是权利金 ${p} —— 相当于买了保险没出险，保费白花，但那正是你买它的原因。`;
+  if(k==='sp') s = itm
+    ? `到期 TSLA 收在 ${n}，低于行权价 ${x}，对方要行权。你必须按 ${x} 买下一个只值 ${n} 的东西，这一步亏 ${gap.toFixed(2)}。加上收到的权利金 ${p}，净${pl>=0?'赚':'亏'} ${Math.abs(pl).toFixed(2)}。<b>TSLA 跌到 0 你就亏 ${(X-pr).toFixed(2)}，那是你的最大亏损。</b>`
+    : `到期 TSLA 收在 ${n}，不低于行权价 ${x}，对方不会行权。当初收到的 ${p} 全部落袋。你在卖保险，这次没出险。`;
+  if(po.stock){
+    const stk=ST-STKCOST, opt=pay(k,ST,X,pr);
+    s = `到期 TSLA 收在 ${n}。<b>股票那 100 股</b>：成本 ${STKCOST}，现在 ${n}，${stk>=0?'赚':'亏'} ${Math.abs(stk).toFixed(2)}/股。`
+      + `<b>期权那一腿</b>：${opt>=0?'赚':'亏'} ${Math.abs(opt).toFixed(2)}/股。`
+      + `两腿合计 ${pl>=0?'赚':'亏'} <b>${Math.abs(pl).toFixed(2)}/股（${usd(pl)}/张）</b>。`;
+    if(k==='sc' && ST>X) s += `<br>注意：TSLA 收在 ${n} 高于行权价 ${x}，<b>你的 100 股会被按 ${x} 拿走</b>。租金照收，但涨过 ${x} 的部分与你无关了 —— 这是收租的代价。`;
+    if(k==='lp' && ST<X) s += `<br>注意：TSLA 收在 ${n} 跌破行权价 ${x}，<b>保险起作用了</b>，你可以按 ${x} 把股票卖出去，亏损就此封住。`;
+    if(k==='lp' && ST>=X) s += `<br>这次没跌破 ${x}，保险没用上，保费 ${p} 白花了 —— 但那正是保险的常态。`;
+  }
+  $('poSay').innerHTML=s;
+
+  // 真实结局，不随滑块变动
+  const rp=payT(k,TSLA.settle,X,pr);
+  const intr = isCall ? Math.max(TSLA.settle-X,0) : Math.max(X-TSLA.settle,0);
+  const box=$('poReal');
+  box.className = 'say ' + (rp>0.004?'flat':(rp<-0.004?'down':'plain'));
+  box.innerHTML = `<b>真实结局</b>　TSLA 在 ${TSLA.expiry} 收于 <b>${TSLA.settle}</b>，`+
+    `这张 ${kFmt(X)} ${isCall?'call':'put'} 到期内在价值 <b>${intr.toFixed(2)}</b>/股。`+
+    `${buy?'你当初付了':'你当初收了'} ${p}/股（${usd(pr)}），`+
+    `所以这笔实际${rp>=0?'赚':'亏'} <b>${Math.abs(rp).toFixed(2)}/股</b>。`+
+    `一张合约 100 股，落到账上是 <b>${usd(rp)}</b>；做 10 张就是 <b>${usd(rp*10)}</b>。`;
+
+  drawPath(); renderSell();
+}
+document.querySelectorAll('#pathMode button').forEach(b=>b.addEventListener('click',()=>{
+  pathMode=b.dataset.m;
+  document.querySelectorAll('#pathMode button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===pathMode)));
+  drawPath();
+}));
+$('iSell').addEventListener('input',e=>{ po.sell=+e.target.value; drawPath(); renderSell(); });
+$('iK').addEventListener('input',e=>{ po.ki=+e.target.value; renderPayoff(); });
+$('iST').addEventListener('input',e=>{ po.ST=+e.target.value; renderPayoff(); });
+$('btnStock').addEventListener('click',()=>{ po.stock=!po.stock; renderPayoff(); });
+$('btnActual').addEventListener('click',()=>{ po.ST=TSLA.settle; $('iST').value=TSLA.settle; renderPayoff(); });
+document.querySelectorAll('#posSeg button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    po.k=b.dataset.k;
+    document.querySelectorAll('#posSeg button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.k===po.k)));
+    renderPayoff();
+  });
+});
+
+/* ══════════ 一 · 离散期望值 ══════════ */
+// 与 §0 同一张合约：TSLA 350 call，32 天到期，市场真实中间价 21.05
+const PROB=[0.10,0.20,0.40,0.20,0.10], DX=350, DR=0.05, DT=32/365, DMKT=21.05;
+function tv(mu,sp){
+  let ev=0;
+  const rows=PROB.map((p,i)=>{
+    const S=mu+(i-2)*sp, v=Math.max(S-DX,0), w=p*v;
+    ev+=w; return {S,p,v,w};
+  });
+  return {rows, ev, tv: ev/(1+DR*DT)};
+}
+function renderDisc(){
+  const mu=+$('iMu').value, sp=+$('iSp').value;
+  $('vMu').textContent=mu.toFixed(2); $('vSp').textContent=sp.toFixed(0);
+  const r=tv(mu,sp), up=tv(mu+1,sp);
+  $('disc').querySelector('tbody').innerHTML = r.rows.map(x=>
+    `<tr class="${x.v>0?'hot':''}"><td>${x.S.toFixed(2)}</td><td>${(x.p*100).toFixed(0)}%</td>`+
+    `<td>${x.v.toFixed(2)}</td><td>${x.w.toFixed(3)}</td></tr>`).join('')
+    + `<tr class="total"><td>加权求和</td><td>100%</td><td></td><td>${r.ev.toFixed(3)}</td></tr>`;
+  $('dEV').textContent=r.ev.toFixed(3);
+  $('dTV').textContent=r.tv.toFixed(3);
+  $('dSens').textContent=s2(up.tv-r.tv);
+  const inCount=r.rows.filter(x=>x.v>0).length;
+  const diff=r.tv-DMKT;
+  let verdict;
+  if(Math.abs(diff)<0.4) verdict=`<b style="color:var(--good)">这个宽度下模型给出 ${r.tv.toFixed(2)}，已经很接近市场真实的 ${DMKT}。</b>把间距记住：这就是市场当时认为 TSLA 26 天内可能走多远。`;
+  else if(diff<0)        verdict=`模型给出 ${r.tv.toFixed(2)}，<b>比市场真实的 ${DMKT} 低了 ${(-diff).toFixed(2)}</b>。不是中心错了，是这个分布<b>太窄</b>了 —— 把间距拖大。`;
+  else                   verdict=`模型给出 ${r.tv.toFixed(2)}，<b>比市场真实的 ${DMKT} 高了 ${diff.toFixed(2)}</b>。这个分布<b>太宽</b>了，把间距收小。`;
+  $('dSay').innerHTML = `行权价固定 350（和上一节同一张合约）。当前中心 ${mu.toFixed(2)}，五档里有 <b>${inCount}</b> 档到期时高于行权价、能带来正的到期值（表里高亮的行）。`
+    + `中心往上挪 1 元，理论价值就变 <b>${s2(up.tv-r.tv)}</b>。<br>${verdict}`;
+}
+$('iMu').addEventListener('input',renderDisc);
+$('iSp').addEventListener('input',renderDisc);
+
+/* ══════════ 二 · 远期价实验室 ══════════ */
+const lab={S:100, r:0.05, days:90, D:0};
+
+function drawWaterfall(S,interest,D,F){
+  const W=720, mid=S+interest;
+  let lo=Math.min(S,mid,F), hi=Math.max(S,mid,F);
+  const pad=Math.max((hi-lo)*0.42, S*0.008, 0.3);
+  lo-=pad; hi+=pad;
+  const x=v => 62 + (v-lo)/(hi-lo)*(W-124);
+  const y1=40, y2=68, bh=20, axY=104;
+  let g='';
+  const seg=(y,a,b,color,txt)=>{
+    const w=Math.abs(b-a), left=Math.min(a,b);
+    let s=`<rect x="${left}" y="${y}" width="${Math.max(w,2)}" height="${bh}" rx="3" fill="${color}" opacity=".85"/>`;
+    if(w>=62) s+=`<text x="${(a+b)/2}" y="${y+bh/2+4.2}" text-anchor="middle" font-size="11.5" fill="var(--paper)" font-family="IBM Plex Mono,monospace" font-weight="600">${txt}</text>`;
+    else if(b>=a) s+=`<text x="${Math.max(a,b)+7}" y="${y+bh/2+4.2}" text-anchor="start" font-size="11" fill="${color}" font-family="IBM Plex Mono,monospace">${txt}</text>`;
+    else s+=`<text x="${Math.min(a,b)-7}" y="${y+bh/2+4.2}" text-anchor="end" font-size="11" fill="${color}" font-family="IBM Plex Mono,monospace">${txt}</text>`;
+    return s;
+  };
+  g+=`<line x1="40" y1="${axY}" x2="${W-40}" y2="${axY}" stroke="var(--rule)" stroke-width="1.5"/>`;
+  if(Math.abs(interest)>0.004) g+=seg(y1, x(S), x(mid), 'var(--control)', '+'+interest.toFixed(2)+' 利息');
+  if(D>0.004){
+    g+=`<line x1="${x(mid)}" y1="${y1+bh}" x2="${x(mid)}" y2="${y2}" stroke="var(--ink-faint)" stroke-width="1.2"/>`;
+    g+=seg(y2, x(mid), x(F), 'var(--result)', '−'+D.toFixed(2)+' 分红');
+  }
+  g+=`<line x1="${x(S)}" y1="${y1-4}" x2="${x(S)}" y2="${axY}" stroke="var(--ink-faint)" stroke-width="1.4" stroke-dasharray="3 3"/>`;
+  g+=`<text x="${x(S)}" y="${y1-12}" text-anchor="middle" font-size="12" fill="var(--ink-faint)" font-family="IBM Plex Mono,monospace">S ${S.toFixed(2)}</text>`;
+  g+=`<line x1="${x(F)}" y1="${y2-4}" x2="${x(F)}" y2="${axY+9}" stroke="var(--ink)" stroke-width="2.2"/>`;
+  g+=`<text x="${x(F)}" y="${axY+29}" text-anchor="middle" font-size="13.5" fill="var(--ink)" font-family="IBM Plex Mono,monospace" font-weight="600">F ${F.toFixed(2)}</text>`;
+  $('wf').innerHTML=g;
+}
+
+function renderLab(){
+  const {S,r,days,D}=lab, t=days/365;
+  const interest=S*r*t, F=fwd(S,r,t,D), gap=F-S;
+  $('vS').textContent=S.toFixed(2); $('vR').textContent=(r*100).toFixed(2)+'%';
+  $('vT').textContent=days+' 天'; $('vD').textContent=D.toFixed(2);
+  $('oT').textContent=t.toFixed(4);
+  $('oI').textContent='+'+interest.toFixed(2);
+  $('oD').textContent=(D>0.004?'−':'')+D.toFixed(2);
+  $('oF').textContent=F.toFixed(2); $('oG').textContent=s2(gap);
+  drawWaterfall(S,interest,D,F);
+
+  const v=$('verdict');
+  if(gap>0.005){ v.className='say up';
+    v.innerHTML=`F 比现价高 ${gap.toFixed(2)}。利息把中心推到了现价右边，所以同一行权价的 <b>call 比 put 贵</b>。这是最常见的情形。`; }
+  else if(gap<-0.005){ v.className='say down';
+    v.innerHTML=`<b>倒挂</b>：F 比现价低 ${Math.abs(gap).toFixed(2)}。分红 ${D.toFixed(2)} 压过了利息 ${interest.toFixed(2)}，中心跑到现价左边，<b>put 反而比同行权价的 call 贵</b>。`; }
+  else { v.className='say flat';
+    v.innerHTML=`利息 ${interest.toFixed(2)} 与分红 ${D.toFixed(2)} 几乎精确抵消，F ≈ S。平值的 call 与 put 近乎等价。这是「成本 − 好处」最干净的一次演示。`; }
+
+  const cp=(F-S)/(1+r*t);
+  $('oCP').textContent='call − put = '+s2(cp);
+  $('oCP').style.color = cp>0.005?'var(--result)':(cp<-0.005?'var(--warn)':'var(--good)');
+  $('oCPsay').innerHTML = cp>0.005
+    ? `以 X = ${S.toFixed(2)} 为行权价，call 比 put 贵 ${cp.toFixed(2)}。`
+    : (cp<-0.005 ? `以 X = ${S.toFixed(2)} 为行权价，<b>put 比 call 贵 ${Math.abs(cp).toFixed(2)}</b>。「平值 call 和 put 应该一样贵」这句话在这里是错的。`
+                 : `以 X = ${S.toFixed(2)} 为行权价，call 与 put 价格几乎相同。`);
+
+  if(arb.linked){ arb.S=S; arb.r=r; arb.days=days; arb.D=D; syncArbRange(); }
+  renderArb();
+}
+[['iS','S',v=>+v],['iR','r',v=>+v/100],['iT','days',v=>+v],['iD','D',v=>+v]].forEach(([id,key,conv])=>{
+  $(id).addEventListener('input',e=>{ lab[key]=conv(e.target.value); renderLab(); });
+});
+const PRESETS={
+  reset:{S:352.36,r:5,days:32,D:0}, trap:{S:100,r:1,days:30,D:3},
+  rich:{S:60,r:1,days:365,D:4}
+};
+document.querySelectorAll('.presets button[data-p]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const p=PRESETS[b.dataset.p];
+    lab.S=p.S; lab.r=p.r/100; lab.days=p.days; lab.D=p.D;
+    $('iS').value=p.S; $('iR').value=p.r; $('iT').value=p.days; $('iD').value=p.D;
+    renderLab();
+  });
+});
+
+/* 用真实报价反解市场隐含利率：1+rt = X / (S − (C−P)) */
+function renderParity(){
+  const S=TSLA.spot, t=TSLA.dte/365;
+  const rows=[340,345,350,355,360].map(k=>{
+    const c=TSLA.chain.find(x=>x.k===k);
+    const cm=(c.cb+c.ca)/2, pm=(c.pb+c.pa)/2, d=cm-pm;
+    return {k, cm, pm, d, r:(k/(S-d)-1)/t};
+  });
+  $('parity').querySelector('tbody').innerHTML = rows.map(x=>
+    `<tr${x.k===350?' class="hot"':''}><td>${x.k}</td><td>${x.cm.toFixed(2)}</td><td>${x.pm.toFixed(2)}</td>`+
+    `<td>${s2(x.d)}</td><td style="color:var(--control);font-weight:600">${(x.r*100).toFixed(2)}%</td></tr>`).join('');
+  const rs=rows.map(x=>x.r*100);
+  $('paritySay').innerHTML =
+    `五个行权价反解出来的利率落在 <b>${Math.min(...rs).toFixed(2)}% 到 ${Math.max(...rs).toFixed(2)}%</b> 之间，几乎是同一个数。`+
+    `这不是巧合：parity 是<b>无套利关系</b>，市场必须让每个行权价都对上同一个利率，否则就有人能靠 box 套走无风险利润（第 5 站讲 box 怎么做）。`+
+    `<br>越往两翼数字越散，是因为深度虚值/实值期权的买卖价差更宽，中间价本身就不那么可靠。做市商盯的正是这张表 —— 哪一档明显偏离，哪一档就是报错了。`;
+}
+
+/* ══════════ 三 · 套利检验器 ══════════ */
+const arb={linked:true,S:100,r:0.05,days:90,D:0,Fm:100,solved:0,shown:false};
+const fairF = () => fwd(arb.S, arb.r, arb.days/365, arb.D);
+
+function syncArbRange(){
+  const span = arb.S*0.30 + arb.D*1.5 + 2;
+  const lo=Math.max(0, arb.S-span), hi=arb.S+span;
+  $('iFm').min=lo.toFixed(2); $('iFm').max=hi.toFixed(2);
+  $('nFm').min=lo.toFixed(2); $('nFm').max=hi.toFixed(2);
+  if(arb.Fm<lo||arb.Fm>hi) arb.Fm=arb.S;
+  $('iFm').value=arb.Fm.toFixed(2); $('nFm').value=arb.Fm.toFixed(2);
+}
+function renderArb(){
+  const S=arb.S, r=arb.r, t=arb.days/365, D=arb.D, Fm=arb.Fm;
+  const carry=S*(1+r*t), F=fairF(), prof=Math.abs(Fm-F), forward=Fm>=F;
+  const closed = prof<0.011;
+  if(closed && !arb.linked && !arb.shown){
+    arb.shown=true; arb.solved++; $('chalScore').textContent='已归零 '+arb.solved+' 组';
+  }
+  const show = arb.linked || arb.shown;
+  $('scen').innerHTML =
+    `<span>S <b>${S.toFixed(2)}</b></span><span>r <b>${(r*100).toFixed(2)}%</b></span>`+
+    `<span>期限 <b>${arb.days} 天</b> (t = ${t.toFixed(4)})</span><span>D <b>${D.toFixed(2)}</b></span>`+
+    (show?`<span style="color:var(--result)">公允 F <b style="color:var(--result)">${F.toFixed(2)}</b></span>`
+         :`<span>公允 F <b style="color:var(--ink-faint)">?</b></span>`);
+
+  const rows = forward ? [
+    ['今天：以 F<sub>市</sub> 卖出远期',0],['今天：按 r 借入 S',S],['今天：买入股票',-S],
+    ['期间：收到分红',D],['到期：交付股票、收远期价',Fm],['到期：偿还本息 S(1+rt)',-carry]
+  ] : [
+    ['今天：以 F<sub>市</sub> 买入远期',0],['今天：卖空股票',S],['今天：按 r 存出 S',-S],
+    ['期间：向出借方补付分红',-D],['到期：收到股票、付远期价',-Fm],['到期：收回本息 S(1+rt)',carry]
+  ];
+  const total = rows.reduce((a,[,v])=>a+v,0);
+  $('cf').querySelector('tbody').innerHTML =
+    rows.map(([k,v])=>`<tr><td>${k}</td><td class="${v>0.004?'pos':(v<-0.004?'neg':'')}">${Math.abs(v)<0.004?'0.00':s2(v)}</td></tr>`).join('')
+    + `<tr class="total"><td>合计（白捡的钱）</td><td>${s2(total)}</td></tr>`;
+
+  $('arbnum').textContent = total.toFixed(2);
+  const box=$('arbbox');
+  if(closed){
+    box.className='arbbox shut';
+    $('arbmsg').innerHTML = `套利关闭了。<b>F<sub>市</sub> = ${Fm.toFixed(2)} 就是公允远期价</b> —— 现货路和远期路的代价完全相同，两边都赚不到钱。`
+      + `<br>${S.toFixed(2)} × (1 + ${(r*100).toFixed(2)}% × ${t.toFixed(4)}) − ${D.toFixed(2)} = <b>${F.toFixed(2)}</b>`;
+  } else {
+    box.className='arbbox open';
+    $('arbmsg').innerHTML = forward
+      ? `F<sub>市</sub> 太高了。<b>卖远期、借钱买现货</b>持有到期，无风险赚走 ${prof.toFixed(2)}。这叫 cash and carry（持有套利）。`
+      : `F<sub>市</sub> 太低了。<b>买远期、卖空现货</b>并把钱存起来，无风险赚走 ${prof.toFixed(2)}。这叫 reverse cash and carry（反向持有套利）。`;
+  }
+}
+function setFm(v){
+  const lo=+$('iFm').min, hi=+$('iFm').max;
+  arb.Fm=Math.min(hi,Math.max(lo,+v||0));
+  $('iFm').value=arb.Fm.toFixed(2); $('nFm').value=arb.Fm.toFixed(2);
+  renderArb();
+}
+$('iFm').addEventListener('input',e=>setFm(e.target.value));
+$('nFm').addEventListener('input',e=>setFm(e.target.value));
+function setMode(chal){
+  arb.linked=!chal; arb.shown=false;
+  $('mPractice').setAttribute('aria-pressed',String(!chal));
+  $('mChallenge').setAttribute('aria-pressed',String(chal));
+  $('chalRow').hidden=!chal;
+  if(chal) newChallenge();
+  else { arb.S=lab.S; arb.r=lab.r; arb.days=lab.days; arb.D=lab.D; syncArbRange(); renderArb(); }
+}
+function newChallenge(){
+  const rnd=(a,b,d=2)=>+(a+Math.random()*(b-a)).toFixed(d);
+  arb.S=rnd(20,250); arb.r=rnd(0.5,9)/100; arb.days=Math.round(rnd(14,365,0)); arb.D=rnd(0,4);
+  arb.shown=false; arb.Fm=arb.S; syncArbRange(); renderArb();
+}
+$('mPractice').addEventListener('click',()=>setMode(false));
+$('mChallenge').addEventListener('click',()=>setMode(true));
+$('btnNew').addEventListener('click',newChallenge);
+$('btnGive').addEventListener('click',()=>{ arb.shown=true; setFm(fairF()); });
+
+/* ══════════ 四 · 分红日历 ══════════ */
+let cyc=3; const REC=6;
+function renderCal(){
+  const lastBuy=REC-cyc, ex=REC-cyc+1;
+  let g='';
+  for(let d=1;d<=8;d++){
+    let cls='day', tag='';
+    if(d===lastBuy){ cls+=' buy'; tag='最后可买入'; }
+    if(d===ex){ cls+=' ex'; tag='除息日'; }
+    if(d===REC){ cls+=(d===ex?'':' rec'); tag=(d===ex?'除息日 = 登记日':'登记日'); }
+    g+=`<div class="${cls}"><div class="dn">D${d}</div><div class="tag">${tag}</div></div>`;
+  }
+  $('days').innerHTML=g;
+  $('calSay').innerHTML =
+    `<b>T+${cyc} 交收</b>：今天买入，${cyc} 个营业日后股票才真正过户到你名下。要出现在登记日（D${REC}）的名册上，最晚必须在 <b>D${lastBuy}</b> 买入。`+
+    `所以 <b>D${ex}</b> 是第一个「买了也拿不到这次分红」的日子，这就是除息日。`+
+    (cyc===3?'<br>讲义写的是 T+3 时代。美股 2024 年 5 月起实行 T+1，除息日与登记日重合 —— 推导逻辑一模一样，变的只是 n。'
+            :'<br>换回 T+3，就能看到讲义那条公式是怎么来的。');
+  $('calFormula').innerHTML = `除息日 = 登记日 − ${cyc-1} 个营业日　　最后可买入日 = 登记日 − ${cyc} 个营业日`;
+}
+document.querySelectorAll('.seg button[data-n]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    cyc=+b.dataset.n;
+    document.querySelectorAll('.seg button[data-n]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.n===cyc)));
+    renderCal();
+  });
+});
+const PREV=56.40, EXCLOSE=56.60;
+function renderTrap(){
+  const d=+$('iXD').value, naive=EXCLOSE-PREV, real=naive+d;
+  $('vXD').textContent=d.toFixed(2);
+  $('xNaive').textContent=s2(naive); $('xTrue').textContent=s2(real);
+  $('xRn').textContent=s2(naive/PREV*100).replace(/^([+−])/,'$1')+'%';
+  $('xRt').textContent=s2(real/PREV*100)+'%';
+}
+$('iXD').addEventListener('input',renderTrap);
+
+
+/* ══════════ 五 · 费曼检验 ══════════ */
+const QS=[
+ {q:`为什么给期权定价时，那个「标的将来大概在哪」的中心点<b>不是今天的股价</b>？讲给一个只做股票、完全不碰期权的人听。<br><b>不许说「无套利」三个字，也不许写公式。</b>`,
+  a:['期权是到期才结算的，所以要问的是「到期那天标的公平地说该在哪」，而不是今天在哪。',
+     '今天就把股票买下来，钱被占住了，本来能吃的利息没了 —— 这是代价；但作为股东能收到分红 —— 这是好处。',
+     '远期合约今天一分钱不掏，钱还在自己手里生息，但也收不到分红。',
+     '两条路最后拿到的东西一模一样（都是那些股票），所以今天的代价必须相同。差出来的正好是「利息减分红」，这就是远期价和现价的差。'],
+  s:'「因为公式里写的是 F」或者「因为要考虑时间价值」—— 这是复述结论，没有解释任何一步。'},
+
+ {q:`远期价公式里，<b>利率是加的、分红是减的</b>。如果哪天你记混了方向，有什么办法当场把它推回来，而不是硬背？`,
+  a:['想一句话就够：「我现在借钱去买这只股票会怎样。」',
+     '要付利息 —— 那是持有成本，成本会把将来成交的公平价推高，所以加。',
+     '能收分红 —— 那是持有收益，收益会把将来成交的公平价压低，所以减。',
+     '换个说法也行：现在买的人多付了利息，所以将来成交理应更贵；现在买的人多拿了分红，所以将来成交理应更便宜。'],
+  s:'「就是记住加减号」—— 那等于承认自己没有推导手段，考场上一慌就会翻车。'},
+
+ {q:`某股票现价 <b>100</b>，下个月要除息 <b>3 元</b>，无风险利率只有 <b>1%</b>。<br>一个月期的 100 call 和 100 put，<b>哪个贵</b>？大约贵多少？<br>如果有人跟你说「平值期权的 call 和 put 应该一样贵」，他到底错在哪？`,
+  a:['先比两个量：利息大约 100 × 1% × 1/12 ≈ 0.08，分红是 3。分红压倒性地大。',
+     '所以远期价 F ≈ 100 + 0.08 − 3 ≈ 97.1，<b>低于</b>现价。分布中心跑到了 100 的左边。',
+     '中心在行权价左边，说明到期落在 100 以下的可能性占优，<b>put 比 call 贵</b>，贵大约 2.9。',
+     '「平值 call 和 put 一样贵」成立的条件是 <b>F = X</b>，也就是行权价正好落在远期价上。这里 F 是 97.1、X 是 100，前提根本不成立。他把「平值」误当成了「等于现价」。'],
+  s:'「call 贵，因为股票长期会涨」—— 这是拿方向观点去回答一个跟方向无关的问题。远期价由利息和分红决定，不由你看涨看跌决定。'},
+
+ {q:`一只股票除息日前一天收 <b>56.40</b>，除息日收 <b>56.60</b>，当天每股派息 <b>0.35</b>。<br>有人看着价格序列说「这天涨了 0.20」。他<b>漏掉了什么</b>？<br>更要紧的是：如果你就拿这条未调整的价格序列去算历史波动率，会出什么系统性的问题？`,
+  a:['持股人那天手里其实是 56.60 的股票<b>加上</b> 0.35 的现金，合计 56.95。相对前一天的 56.40，真实所得是 <b>+0.55</b>，不是 +0.20。',
+     '价格序列只记价格、不记你收到的那笔现金，所以每个除息日它都会把当天收益记少一个股息。',
+     '后果是<b>系统性</b>的，不是随机噪音：每个除息日都往同一个方向少记。日收益被压小，算出来的历史波动率就偏低。',
+     '波动率偏低，往下会让你把期权的理论价值也算低 —— 于是你会觉得市场报价「偏贵」，其实是自己的尺子短了。高股息标的上这个偏差最明显。'],
+  s:'「除息日股价本来就会跌掉一个股息」—— 说得对，但只答了一半：没说这件事对<b>测量</b>意味着什么，而测量才是会让你亏钱的地方。'},
+
+ {q:`在 T+3 交收的年代，除息日等于<b>登记日往前数 2 个营业日</b>。<br>请把这个 2 推出来，别背结论。<br>然后回答：现在美股改成 T+1 了，除息日会移到哪天？`,
+  a:['要领到这次分红，你必须在登记日 R 那天出现在股东名册上。上名册的前提是交易已经<b>交收完成</b>，不是下单就算。',
+     'T+3 意味着今天成交、3 个营业日后才过户。所以最晚必须在 <b>R−3</b> 买入，才来得及。',
+     '那么 R−2 就是第一个「买了也来不及上名册」的日子 —— 这一天开始买股票就不带分红权利了，它就是除息日。',
+     'T+1 下：最晚 R−1 买入，于是 <b>除息日 = R</b>，和登记日重合。这正是现在美股的情形。<b>那个 2 不是规定，是交收周期减 1。</b>'],
+  s:'「规定就是 R−2」—— 一旦交收制度改了（而它 2024 年真的改了），背下来的结论立刻是错的。'},
+
+ {q:`回到上面那张真实的 TSLA 350 call：买入时 ORATS 给的 <b>delta 是 0.557</b>，可整段持有下来，它实际捕获了标的涨幅的 <b>0.734</b>。<br>这两个数为什么不相等？哪个更大是必然的，还是碰巧？`,
+  a:['delta 是<b>此刻</b>的斜率：标的现在动 1 块，期权现在动 0.557 块。它是一个瞬时量，不是整段的平均。',
+     '这 32 天里 TSLA 从 352 涨到 422，期权一路从接近平值变成深度实值。<b>越实值，delta 越靠近 1。</b>',
+     '整段的捕获比是这一路上所有斜率的加权平均。起点斜率 0.557、终点接近 1，平均落在 0.734 完全合理。',
+     '所以对<b>买方而言方向做对时</b>，这个不等是必然的：delta 会朝着有利方向变大。delta 自己变化的速度就叫 <b>gamma</b>，这次 gamma 站在买方这边。反过来，如果 TSLA 跌了，delta 会朝 0 缩，亏损也会自动减速。'],
+  s:'「因为有时间价值」—— 答非所问。时间价值解释的是期权为什么比内在价值贵，不解释斜率为什么会变。'},
+
+ {q:`还是那张 350 call。<b>5 月 13 日</b>那天 TSLA 收 445.20、期权报 <b>95.38</b>；到期日 TSLA 收 422.32、期权只值 <b>72.32</b>。中间差了 <b>23.06</b>。<br>这 23.06 主要是被<b>时间</b>吃掉的，还是别的原因？<br>用「内在价值 + 时间价值」把它拆开，数字上面图里都有。`,
+  a:['先拆 5/13：内在价值 = 445.20 − 350 = <b>95.20</b>，而报价是 95.38，所以<b>时间价值只剩 0.18</b>。深度实值又临近到期，时间价值早就被磨没了。',
+     '再拆到期日：内在价值 = 422.32 − 350 = <b>72.32</b>，时间价值<b>必然</b>是 0（到期那一刻没有「将来」可言了）。',
+     '所以 23.06 的构成是：<b>时间价值只贡献了 0.18，剩下 22.88 全是标的自己从 445.20 跌回 422.32</b>。',
+     '结论：那两天里这张期权几乎就是股票的替身（delta 接近 1），涨跌完全跟着标的走。<b>「持到到期少拿 $2,296」是方向的代价，不是时间的代价。</b>'],
+  s:'「被 theta 吃掉了」—— 听起来很专业，但把数一拆就知道不是：时间价值总共才 0.18。这正是为什么要拆数，而不是套术语。'}
+];
+
+(function(){
+  const box=$('feynman'); if(!box) return;
+  box.innerHTML = QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">Q${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+
+  // 本地保存，刷新不丢；隐私模式下静默降级
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-1-1-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-1-1-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20)
+      ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  renderPayoff(); renderLab();
+});
+
+/* ══════════ 启动 ══════════ */
+renderPayoff();
+renderDisc();
+renderParity();
+syncArbRange();
+renderLab();
+renderCal();
+renderTrap();
+</script>
+</body>
+</html>
