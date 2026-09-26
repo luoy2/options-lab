@@ -232,7 +232,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 第 1 站 · 小节 1.1</p>
+  <p class="eyebrow">FIN 580 复习 · 节点 1.1</p>
   <h1>远期价格</h1>
   <p class="lede">给期权定价，要先定一个中心点：标的到期时大概值多少。这个中心点不是今天的股价。先从期权是什么讲起。</p>
 </header>
@@ -285,7 +285,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
   <div class="formula">
     <div class="math">一张合约的金额 = 每股报价 × 100</div>
     <div class="gloss">21.10 × 100 = 2,110 美元　　后面所有损益图的纵轴也都是「每股」，乘 100 才是真金白银</div>
-    <div class="note">行权时同理：行使一张 350 call，是按每股 350 美元买进 <b>100 股</b>，掏 35,000 美元。指数期权的乘数可能不同，而且多为现金结算，第 9 站会讲。</div>
+    <div class="note">行权时同理：行使一张 350 call，是按每股 350 美元买进 <b>100 股</b>，掏 35,000 美元。指数期权的乘数可能不同，而且多为现金结算。</div>
   </div>
 
   <h3>用真实数据走一遍：2026 年 4 月 13 日的特斯拉</h3>
@@ -345,7 +345,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
     </table>
   </div>
 
-  <p class="tiny">这四行就是你的第一批<b>组合</b>。后面的 straddle、strangle、butterfly、calendar、box 都是同一个做法：<b>把几条折线叠起来，拼出想要的形状。</b> collar 已经是两条腿了，第 5 站会把它拆开看。</p>
+  <p class="tiny">这四行就是你的第一批<b>组合</b>。后面的 straddle、strangle、butterfly、calendar、box 都是同一个做法：<b>把几条折线叠起来，拼出想要的形状。</b> collar 已经是两条腿了，节点 5.3 会把它拆开看。</p>
 
   <p>期权的损益图是折线。股票的损益图是一条 45 度直线，涨一块赚一块、跌一块亏一块。期权在行权价处拐弯：一边跟着标的走，另一边是平的。买方那个弯是「亏损被封住」，卖方那个弯是「盈利被封住」。</p>
   <p>后面的课都围绕这个弯：它值多少钱，怎么随时间和价格变化，几个弯怎么拼成想要的形状。</p>
@@ -388,7 +388,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
     <div class="say plain" id="deltaSay"></div>
   </div>
 
-  <p class="tiny">那个比例有名字，叫 <span class="sym" data-say="delta，期权价格对标的价格的敏感度。标的动 1 块，期权动 delta 块。买 call 的 delta 在 0 到 1 之间，买 put 在 −1 到 0 之间。">delta</span>。它不是常数：期权越深入实值，delta 越靠近 1（表现得越像股票本身）；越虚值越靠近 0。delta 自己变化的速度叫 <span class="sym" data-say="gamma，delta 变化的速度。越接近到期、越接近行权价，gamma 越大。">gamma</span>。另外就算标的原地不动，期权也会一天天变便宜，那个流失速度叫 <span class="sym" data-say="theta，时间价值的流逝速度。期权每天都在因为「离到期又近了一天」而变便宜。">theta</span>。<b>这三个东西就是第 2 站的全部内容</b>，而你已经在这张图上亲眼看见它们了。</p>
+  <p class="tiny">那个比例有名字，叫 <span class="sym" data-say="delta，期权价格对标的价格的敏感度。标的动 1 块，期权动 delta 块。买 call 的 delta 在 0 到 1 之间，买 put 在 −1 到 0 之间。">delta</span>。它不是常数：期权越深入实值，delta 越靠近 1（表现得越像股票本身）；越虚值越靠近 0。delta 自己变化的速度叫 <span class="sym" data-say="gamma，delta 变化的速度。越接近到期、越接近行权价，gamma 越大。">gamma</span>。另外就算标的原地不动，期权也会一天天变便宜，那个流失速度叫 <span class="sym" data-say="theta，时间价值的流逝速度。期权每天都在因为「离到期又近了一天」而变便宜。">theta</span>。<b>这三个是节点 2.1、2.2 的内容</b>，这张图上已经能看到它们。</p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
@@ -407,7 +407,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
 
   <div class="formula">
     <div class="math">中心在哪 → 本节（远期价格）　　分布多宽 → 下一节（波动率）</div>
-    <div class="gloss">这两件事定下来，期权价格就定下来了。第 1 站剩下的内容就是这两个问题。</div>
+    <div class="gloss">这两件事定下来，期权价格就定下来了。中心在本节讲，宽度在 1.2 讲。</div>
   </div>
 
   <h3>先感受一下：中心挪一点，价格差多少</h3>
@@ -505,7 +505,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
   <div class="formula">
     <div class="math">C − P = ( F − X ) / ( 1 + r·t )</div>
     <div class="gloss">同一行权价的 call 价格 减去 put 价格 ＝ (远期价 − 行权价) 折回今天</div>
-    <div class="note">这条叫 <b>put-call parity（买卖权平价）</b>，第 5 站会正式推导。现在只需要看它的后果：<b>F 落在行权价的哪一边，哪一边的期权就贵。</b></div>
+    <div class="note">这条叫 <b>put-call parity（买卖权平价）</b>，节点 5.2 会正式推导。现在只需要看它的后果：<b>F 落在行权价的哪一边，哪一边的期权就贵。</b></div>
   </div>
 
   <p class="tiny">这也是为什么实务里说的「平值」指的是 <b>ATMF（平值远期）</b>，而不是拿现价去找最近的行权价。在高股息标的上这两者能差出一整档，用现价当锚会在波动率曲面上造出一个根本不存在的倾斜。</p>
@@ -603,7 +603,7 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
       <div class="stat"><div class="k">表观日收益率</div><div class="d" id="xRn">+0.35%</div></div>
       <div class="stat"><div class="k">真实日收益率</div><div class="d" style="color:var(--good)" id="xRt">+0.98%</div></div>
     </div>
-    <p class="tiny" style="margin-top:1.1rem">用未做除息调整的价格序列算历史波动率，每个除息日都会给你一个偏低的日收益。分红越大，低估越多。<b>这个坑第 3 站算历史波动率时还会再遇到一次。</b></p>
+    <p class="tiny" style="margin-top:1.1rem">用未做除息调整的价格序列算历史波动率，每个除息日都会给你一个偏低的日收益。分红越大，低估越多。<b>1.2 算历史波动率时还会遇到这个问题。</b></p>
   </div>
 </section>
 
@@ -1117,7 +1117,7 @@ function renderParity(){
   const rs=rows.map(x=>x.r*100);
   $('paritySay').innerHTML =
     `五个行权价反解出来的利率落在 <b>${Math.min(...rs).toFixed(2)}% 到 ${Math.max(...rs).toFixed(2)}%</b> 之间，几乎是同一个数。`+
-    `这不是巧合：parity 是<b>无套利关系</b>，市场必须让每个行权价都对上同一个利率，否则就有人能靠 box 套走无风险利润（第 5 站讲 box 怎么做）。`+
+    `这不是巧合：parity 是<b>无套利关系</b>，市场必须让每个行权价都对上同一个利率，否则就有人能靠 box 套走无风险利润（节点 5.3 讲 box 怎么做）。`+
     `<br>越往两翼数字越散，是因为深度虚值/实值期权的买卖价差更宽，中间价本身就不那么可靠。哪一档明显偏离，哪一档就可能报错了。`;
 }
 
