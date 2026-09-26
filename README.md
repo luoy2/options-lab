@@ -8,6 +8,7 @@
 |---|---|
 | [路线图](https://luoy2.github.io/options-lab/) | 20 个学习节点的课程地图，带分叉与依赖 |
 | [1.1 远期价格](https://luoy2.github.io/options-lab/station-1-1-forward-price.html) | 期权是什么、合约乘数、损益图、远期价与无套利、分红日期、费曼检验 |
+| [1.2 波动率](https://luoy2.github.io/options-lab/station-1-2-volatility.html) | 标准差与 σ、√t 时间缩放（TSLA 日线实测）、从日涨跌量出波动率、正态与对数正态区间、离中心几个标准差、四种波动率、费曼检验 |
 
 每个页面都是单文件 HTML，没有构建步骤。
 

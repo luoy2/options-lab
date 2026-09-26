@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>波动率</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2023C10%2023%2011.5%208%2016%208S22%2023%2027%2023'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.pair .formula{margin:1rem 0}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.presets{display:flex;flex-wrap:wrap;gap:.5rem}
+.presets button,.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.presets button:hover,.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.3rem 2.2rem;margin-top:1.2rem}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;font-size:.87rem;color:var(--ink-soft)}
+.ctl .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1rem;color:var(--control);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--control);margin:.35rem 0 0;height:1.3rem}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+@media (pointer:fine){ #drag{touch-action:none;cursor:ns-resize} }
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.up{background:var(--result-bg);color:var(--result)}
+.say.down{background:var(--warn-bg);color:var(--warn)}
+.say.flat{background:var(--good-bg);color:var(--good)}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+tr.hot td{background:var(--control-bg)}
+
+.count{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem 1.2rem;margin-top:1rem}
+.count .big{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:2.1rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.count .cap{font-size:.9rem;color:var(--ink-soft)}
+.count.hit .big{color:var(--good)}
+
+.vbars{margin-top:1.2rem}
+.vb{display:grid;grid-template-columns:7.5rem 1fr 4.2rem;align-items:center;gap:.8rem;margin:.55rem 0}
+.vb .l{font-size:.9rem;color:var(--ink-soft)}
+.vb .track{height:.9rem;background:var(--panel2);border-radius:99px;overflow:hidden}
+.vb .fill{height:100%;border-radius:99px}
+.vb .n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.95rem;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  .pair{grid-template-columns:1fr}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .formula .math{font-size:1.05rem}
+  .vb{grid-template-columns:5.6rem 1fr 3.8rem;gap:.5rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 宽度</a><a href="#s1">一 时间缩放</a><a href="#s2">二 量出波动率</a>
+  <a href="#s3">三 两种区间</a><a href="#s4">四 离中心多远</a><a href="#s5">五 四种波动率</a><a href="#s6">六 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 1.2</p>
+  <h1>波动率</h1>
+  <p class="lede">1.1 定下了分布的中心：远期价。这一节定分布的宽度：到期时标的大概会离中心多远。案例还是同一笔交易，2026-04-13 收盘买入 TSLA 5/15 到期的 350 call。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>宽度是什么</h2>
+  <p class="sub">1.1 的玩具模型里，中心放在 352，五个价格的间距要拉到约 49，理论价值才追上市场的 21.05。那个间距是在猜：到期时 TSLA 大概会离中心多远。波动率就是量这段距离的尺子。</p>
+
+  <h3>先说标准差</h3>
+  <p>一组数有大有小。把每个数离中心的距离取一个典型值，就是<span class="sym" data-say="standard deviation。先把每个数离中心的距离平方，求平均，再开平方根。平方是为了让正负距离都算成正的。">标准差</span>。如果这组数是钟形分布（中间多、两头少），落在中心附近的比例是固定的：</p>
+  <div class="panel"><svg id="bell" viewBox="0 0 720 250" role="img" aria-label="钟形分布：一个标准差以内约 68%，两个标准差以内约 95%"></svg></div>
+  <p>记住两句就够：<b>三次里有两次落在一个标准差以内</b>；<b>二十次里只有一次落在两个标准差以外</b>，只算往上的那一边是四十次里一次。</p>
+
+  <h3>波动率的定义</h3>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="sigma，读作「西格玛」。年化波动率，写成百分比。">σ</span> ＝ 以一年为期、按百分比计的一个标准差</div>
+    <div class="gloss">TSLA 入场那天，市场给 350 call 定价用的 σ 是 46.3%。按这个报价，一年后 TSLA 大约三次里有两次落在远期价的 ±46.3% 以内。</div>
+  </div>
+  <p>期权的期限一般不是一年，要换成期限内的一个标准差，以美元计：</p>
+  <div class="formula">
+    <div class="math">一个标准差 ＝ <span class="sym" data-say="远期价。1.1 讲过：F = S(1 + r·t) − D，是分布的中心。">F</span> × <span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="到期时间 t（以年计）的平方根。32 天是 32/365 年，平方根约 0.296。为什么是平方根，下一节讲。">√t</span></div>
+    <div class="gloss">远期价 × 年化波动率 × 年数的平方根</div>
+    <div class="note" id="oneSd"></div>
+  </div>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>时间缩放</h2>
+  <p class="sub">一年的标准差是 46.3%，一天是多少？不是 46.3% 除以 365。</p>
+  <p>如果每天的涨跌互不相关，今天涨、明天跌会抵消掉一部分。n 天加起来，典型幅度不是一天的 n 倍，而是 <b>√n 倍</b>：4 天是 2 倍，25 天是 5 倍。</p>
+  <div class="formula">
+    <div class="math">t 年内的标准差 ＝ σ × √t</div>
+    <div class="gloss">独立的涨跌相加时，标准差的平方按天数相加，所以标准差本身按天数的平方根增长</div>
+  </div>
+  <p>一年约 256 个交易日，√256 ＝ 16。交易员心算用三个除数：</p>
+  <div class="panel">
+    <div class="ctl"><label><span>年化波动率 <span class="sym" data-say="年化波动率。">σ</span></span><span class="v" id="vSig1"></span></label>
+      <input type="range" id="iSig1" min="5" max="150" step="0.1" value="46.3"></div>
+    <table>
+      <thead><tr><th>期限</th><th>除以</th><th>来历</th><th>标准差</th><th>TSLA 352.36 折成美元</th></tr></thead>
+      <tbody id="mnem"></tbody>
+    </table>
+  </div>
+
+  <h3>用 TSLA 的真实日线检验 √t</h3>
+  <p class="sub">取 TSLA 每天的收盘价，算出每一段连续 1 天、2 天、直到 21 天的涨跌幅，每个期限各算一个标准差。√t 成立的话，点会落在曲线上。</p>
+  <div class="panel">
+    <div class="seg" id="sqWin">
+      <button data-w="1y" aria-pressed="true">最近 1 年</button>
+      <button data-w="2y" aria-pressed="false">最近 2 年</button>
+      <button data-w="all" aria-pressed="false">全部 5.7 年</button>
+    </div>
+    <svg id="sqrtChart" viewBox="0 0 720 330" role="img" aria-label="不同期限的实测标准差与 √t 曲线"></svg>
+    <div class="stats">
+      <div class="stat"><div class="k">一天实测</div><div class="d" id="sq1"></div><div class="d2" id="sq1b"></div></div>
+      <div class="stat"><div class="k">5 天实测</div><div class="d" id="sq5"></div><div class="d2" id="sq5b"></div></div>
+      <div class="stat"><div class="k">21 天实测</div><div class="d" id="sq21"></div><div class="d2" id="sq21b"></div></div>
+    </div>
+    <div class="say plain" id="sqSay"></div>
+  </div>
+  <p>√t 的前提是每天的涨跌互不相关。真实价格只是大致满足：有时涨了接着涨，有时涨了又跌回来。节点 7 专门讲这类模型假设在哪里失效。</p>
+  <p class="tiny">数据：IBKR 分钟线，取每个交易日 15:59 那根的收盘（半日市取 12:59），截止 2026-04-13 入场日。「连续 5 天」指每个交易日往后数 5 个交易日，所以相邻的窗口有重叠。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>从日涨跌里量出波动率</h2>
+  <p class="sub">讲义有一个心算法。按〇节的比例，大约三分之一的日子应该落在一个标准差以外。所以找一条线，让三分之一的日子在线外，这条线就是一天的标准差，再乘 16 就是年化波动率。</p>
+  <div class="panel">
+    <div class="seg" id="dsSeg">
+      <button data-d="tsla" aria-pressed="true">TSLA 4/14 – 5/15，24 天</button>
+      <button data-d="lec" aria-pressed="false">讲义例子，10 天</button>
+    </div>
+    <svg id="drag" viewBox="0 0 720 300" role="img" aria-label="每日涨跌幅柱状图与可调的一个标准差线"></svg>
+    <div class="ctl" style="margin-top:.6rem"><label><span>一天的标准差，线的位置 ±</span><span class="v" id="vLine"></span></label>
+      <input type="range" id="iLine" min="0.1" max="8" step="0.01" value="1"></div>
+    <div class="count" id="cnt"><span class="big" id="cntBig"></span><span class="cap" id="cntCap"></span></div>
+    <div class="say plain" id="dragSay"></div>
+  </div>
+
+  <h3>为什么数的是离 0 多远</h3>
+  <p>上面数的是每天离 0 有多远，没有先减掉平均值。这叫<b>零均值假设</b>。原因用一个例子就能说清：</p>
+  <div class="story">
+    <p>某股票连涨十天，每天都是 +1%。平均每天 +1%，每天离平均值的距离都是 0。</p>
+    <table>
+      <thead><tr><th>算法</th><th>一天的标准差</th><th>年化</th></tr></thead>
+      <tbody>
+        <tr><td>先减掉平均值（普通标准差）</td><td>0%</td><td>0%</td></tr>
+        <tr><td>直接量离 0 多远（零均值）</td><td>1%</td><td>16%</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:1rem">十天涨了约 10%，说它的波动率是 0，显然不对。普通标准差只量「围着平均值晃多少」，把稳定的趋势当成了不动。对期权持有人来说，价格朝一个方向稳定地走也是变动。</p>
+  </div>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>正态区间和对数正态区间</h2>
+  <p class="sub">有了宽度，就能写出 n 个标准差的价格区间。有两种写法，区别在于涨跌按加减算还是按乘除算。</p>
+  <div class="pair">
+    <div class="formula">
+      <div class="math">F ± <span class="sym" data-say="几个标准差。1 个标准差以内约三分之二，2 个以内约 95%。">n</span> × F × σ × √t</div>
+      <div class="gloss"><b>正态</b>：上下各伸出相同的美元距离</div>
+    </div>
+    <div class="formula">
+      <div class="math">F × <span class="sym" data-say="自然常数，约 2.718。e 的 x 次方可以读成「按连续复利涨 x」：e^0.1 ≈ 1.105，e^−0.1 ≈ 0.905。">e</span><sup>±n × σ × √t</sup></div>
+      <div class="gloss"><b>对数正态</b>：上下各伸出相同的比例</div>
+    </div>
+  </div>
+  <p>股价按比例变化：100 涨 10% 是 110，再跌 10% 是 99，回不到 100。按比例走的价格，分布叫对数正态：往下永远到不了 0，往上没有顶。涨到 2 倍和跌到一半，在它眼里一样远。</p>
+  <div class="panel">
+    <div class="presets" id="rgPre">
+      <button data-p="tsla">TSLA 本例：32 天</button>
+      <button data-p="lec">讲义例子：F 133.95，σ 18.61%，84 天</button>
+      <button data-p="long">TSLA 拉长到两年、两个标准差</button>
+    </div>
+    <div class="controls">
+      <div class="ctl"><label><span>年化波动率 σ</span><span class="v" id="vRgS"></span></label>
+        <input type="range" id="iRgS" min="5" max="150" step="0.1"></div>
+      <div class="ctl"><label><span>离到期天数</span><span class="v" id="vRgD"></span></label>
+        <input type="range" id="iRgD" min="1" max="730" step="1"></div>
+      <div class="ctl"><label><span>几个标准差 n</span><span class="v" id="vRgN"></span></label>
+        <div class="seg" id="rgN" style="margin-top:.35rem">
+          <button data-n="1" aria-pressed="true">1</button><button data-n="2" aria-pressed="false">2</button><button data-n="3" aria-pressed="false">3</button>
+        </div></div>
+    </div>
+    <svg id="rgChart" viewBox="0 0 720 330" role="img" aria-label="正态与对数正态分布及其区间" style="margin-top:1.2rem"></svg>
+    <div class="stats">
+      <div class="stat"><div class="k">远期价 F</div><div class="d" id="rgF"></div><div class="d2" id="rgFs"></div></div>
+      <div class="stat"><div class="k">正态区间</div><div class="d" id="rgNo"></div><div class="d2" id="rgNob"></div></div>
+      <div class="stat"><div class="k">对数正态区间</div><div class="d" id="rgLo" style="color:var(--result)"></div><div class="d2" id="rgLob"></div></div>
+    </div>
+    <div class="say plain" id="rgSay"></div>
+  </div>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>一个行权价离中心有多远</h2>
+  <p class="sub">离中心 50 美元，对一只年化波动 15% 的股票很远，对 TSLA 不算远。距离要用标准差的个数来量。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="离中心几个标准差。正数在中心上方，负数在下方。">z</span> ＝ <span class="sym" data-say="natural log，自然对数，e 的反运算。ln(X/F) 就是 X 比 F 高出的比例（按连续复利算）。ln(1.1) ≈ 0.095。">ln</span>(<span class="sym" data-say="行权价。">X</span> ÷ F) ÷ (σ × √t)</div>
+    <div class="gloss">行权价比远期价高出的比例，除以一个标准差的宽度</div>
+  </div>
+  <table style="max-width:34rem">
+    <thead><tr><th>离中心</th><th>单边落在外侧的概率</th><th>大约</th></tr></thead>
+    <tbody>
+      <tr><td>1 个标准差</td><td>15.9%</td><td>6 次里 1 次</td></tr>
+      <tr><td>2 个标准差</td><td>2.3%</td><td>40 次里 1 次</td></tr>
+      <tr><td>3 个标准差</td><td>0.13%</td><td>740 次里 1 次</td></tr>
+    </tbody>
+  </table>
+  <div class="panel">
+    <div class="controls" style="margin-top:0">
+      <div class="ctl"><label><span>行权价 X</span><span class="v" id="vK"></span></label>
+        <input type="range" id="iK" min="300" max="470" step="5" value="400"></div>
+      <div class="ctl"><label><span>离到期天数</span><span class="v" id="vKD"></span></label>
+        <input type="range" id="iKD" min="1" max="32" step="1" value="32"></div>
+    </div>
+    <svg id="ruler" viewBox="0 0 720 250" role="img" aria-label="以标准差个数为刻度的行权价标尺" style="margin-top:1.1rem"></svg>
+    <div class="stats">
+      <div class="stat"><div class="k">美元距离</div><div class="d" id="kDist"></div><div class="d2" id="kDistb"></div></div>
+      <div class="stat"><div class="k">标准差个数 z</div><div class="d" id="kZ" style="color:var(--control)"></div><div class="d2" id="kZb"></div></div>
+      <div class="stat"><div class="k">到期落在它外侧</div><div class="d" id="kP" style="color:var(--result)"></div><div class="d2" id="kPb"></div></div>
+    </div>
+    <div class="say plain" id="kSay"></div>
+  </div>
+  <p class="tiny">这里所有行权价都用同一个 σ = 46.3%。真实市场里每个行权价的隐含波动率不一样（TSLA 这天 300 是 51%，400 是 45%），那是节点 8 的内容。</p>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>四种波动率</h2>
+  <p class="sub">说「TSLA 的波动率」时，要先说清是哪一种。</p>
+  <table>
+    <thead><tr><th>名称</th><th style="text-align:left">意思</th><th>这笔交易</th></tr></thead>
+    <tbody id="fourVol"></tbody>
+  </table>
+  <div class="vbars" id="vbars"></div>
+  <p style="margin-top:1.6rem">讲义里有一句话：<b>隐含波动率是价格，未来波动率是价值。</b>买期权时付的是隐含波动率，事后拿到的是未来波动率。</p>
+  <p id="pvSay"></p>
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">σ</div><div class="t">读作「西格玛」，年化波动率：以一年为期、按百分比计的一个标准差。</div></div>
+      <div class="gl"><div class="s">标准差</div><div class="t">一组数离中心的典型距离。钟形分布里，三分之二的数落在一个标准差以内。</div></div>
+      <div class="gl"><div class="s">t, √t</div><div class="t">到期时间，以年计。32 天 = 32/365 年。√t 是它的平方根，标准差按 √t 随时间放大。</div></div>
+      <div class="gl"><div class="s">16, 7.2, 3.5</div><div class="t">√256、√52、√12。年化波动率除以它们，得到一天、一周、一个月的标准差。</div></div>
+      <div class="gl"><div class="s">F</div><div class="t">远期价，分布的中心（1.1）。</div></div>
+      <div class="gl"><div class="s">X</div><div class="t">行权价。</div></div>
+      <div class="gl"><div class="s">n</div><div class="t">几个标准差。</div></div>
+      <div class="gl"><div class="s">e</div><div class="t">自然常数，约 2.718。e 的 x 次方可以读成「按连续复利涨 x」。</div></div>
+      <div class="gl"><div class="s">ln</div><div class="t">自然对数，e 的反运算。ln(X/F) 是 X 比 F 高出的比例。</div></div>
+      <div class="gl"><div class="s">z</div><div class="t">离中心几个标准差。z = ln(X/F) ÷ (σ√t)。</div></div>
+      <div class="gl"><div class="s">正态分布</div><div class="t">钟形分布，涨跌按加减算，上下对称，可以跌到负数。</div></div>
+      <div class="gl"><div class="s">对数正态分布</div><div class="t">涨跌按乘除算，往下到不了 0，往上没有顶。股价更接近这一种。</div></div>
+      <div class="gl"><div class="s">零均值假设</div><div class="t">算波动率时不减平均值，直接量每天离 0 有多远。</div></div>
+      <div class="gl"><div class="s">隐含波动率</div><div class="t">从市场上的期权价格反推出来的 σ，相当于市场的报价。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节 <b>2.1 delta</b>：期权价格跟着标的动多少，以及为什么这个比例自己会变。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照，价格来自 IBKR 分钟线</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+const fm = n => (n<0?'−':'')+Math.abs(n).toFixed(2);          // 负数用真正的减号
+const pctP = p => p<0.001 ? '不到 0.1%' : (p*100).toFixed(p<0.01?2:1)+'%';
+const lab = (x,y,t,c,a='start',s=11)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+function ncdf(x){   // 标准正态累积分布，Abramowitz–Stegun 7.1.26
+  const z=Math.abs(x)/Math.SQRT2, t=1/(1+0.3275911*z);
+  const e=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-z*z);
+  return x>=0 ? 0.5*(1+e) : 0.5*(1-e);
+}
+const npdf = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+function oneIn(p){ if(p<0.001) return '不到千分之一'; const n=1/p; return '约 '+(n<10?n.toFixed(1):Math.round(n))+' 次里 1 次'; }
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 案例数据 ══════════
+   TSLA 收盘：ORATS 快照的 UNDERLYING_LAST，与 1.1 同一组（2026-04-13 入场，5/15 到期）
+   IV：350 call 入场日隐含波动率 46.29%
+   远期价用 1.1 从 parity 反解出的约 4.3% 利率，TSLA 不派息 */
+const DAYS=["2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15"];
+const U=[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83,378.75,376.14,373.02,381.77,390.83,392.48,389.52,398.62,411.74,428.45,445.06,433.7,445.2,443.36,422.32];
+const S0=352.36, RATE=0.043, IV=0.463, T0=32/365, SETTLE=422.32;
+const fwd = days => S0*(1+RATE*days/365);
+const F0 = fwd(32);
+const MOVES = U.slice(1).map((v,i)=>(v/U[i]-1)*100);
+const zeroMean = a => Math.sqrt(a.reduce((s,x)=>s+x*x,0)/a.length);
+const FUT = zeroMean(MOVES)*16;                     // 未来（事后）波动率
+/* √t 检验：IBKR 分钟线聚合成日收盘，每个期限 h 天的重叠窗口对数涨跌幅，零均值标准差（%） */
+const SQ={"1y":{"from":"2025-04-14","to":"2026-04-13","days":250,"sig":[3.084,4.323,5.255,5.97,6.485,7.108,7.637,8.045,8.46,8.746,9.142,9.517,9.927,10.444,10.904,11.289,11.649,11.928,12.109,12.256,12.505]},"2y":{"from":"2024-04-15","to":"2026-04-13","days":500,"sig":[3.902,5.444,6.666,7.648,8.396,9.099,9.804,10.459,11.143,11.815,12.376,12.966,13.547,14.185,14.732,15.226,15.706,16.129,16.534,16.913,17.342]},"all":{"from":"2020-08-03","to":"2026-04-13","days":1430,"sig":[3.857,5.377,6.599,7.622,8.568,9.366,10.149,10.921,11.654,12.431,13.122,13.784,14.429,15.076,15.651,16.181,16.683,17.118,17.566,17.992,18.417]}};
+const HIST = SQ['1y'].sig[0]*16;                    // 入场前一年的历史波动率
+
+/* ══════════ 〇 · 钟形图 ══════════ */
+function drawBell(){
+  const W=720,H=250,L=30,R=W-30,B=H-44,T=26, zr=3.4;
+  const X=z=>L+(z+zr)/(2*zr)*(R-L), Y=v=>B-v/npdf(0)*(B-T);
+  const curve=(a,b)=>{ let p=[]; for(let z=a;z<=b+1e-9;z+=0.02) p.push(X(z)+','+Y(npdf(z))); return p; };
+  const area=(a,b)=>`${X(a)},${B} ${curve(a,b).join(' ')} ${X(b)},${B}`;
+  let g='';
+  g+=`<polygon points="${area(-2,2)}" fill="var(--result-bg)"/>`;
+  g+=`<polygon points="${area(-1,1)}" fill="var(--control-bg)"/>`;
+  g+=`<polyline points="${curve(-zr,zr).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+  g+=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="var(--rule)"/>`;
+  [-2,-1,0,1,2].forEach(z=>{
+    g+=`<line x1="${X(z)}" y1="${B}" x2="${X(z)}" y2="${B+5}" stroke="var(--ink-faint)"/>`;
+    g+=lab(X(z),B+19,z===0?'中心':(z>0?'+':'−')+Math.abs(z)+' 个','var(--ink-faint)','middle');
+  });
+  g+=lab(X(0),Y(npdf(0))+58,'±1 以内','var(--control)','middle',12.5);
+  g+=lab(X(0),Y(npdf(0))+76,'68%，三次里两次','var(--control)','middle',12);
+  g+=lab(X(-1.5),B-12,'±2 以内合计 95%','var(--result)','middle',11);
+  g+=lab(X(2.75),B-44,'两个标准差以外','var(--ink-faint)','middle',11);
+  g+=lab(X(2.75),B-28,'两边合计 5%','var(--ink-faint)','middle',11);
+  $('bell').innerHTML=g;
+  const sd=F0*IV*Math.sqrt(T0);
+  $('oneSd').textContent=`TSLA 本例：F ≈ ${f2(F0)}，σ = 46.3%，t = 32/365 年。一个标准差 ≈ ${f2(F0)} × 0.463 × ${Math.sqrt(T0).toFixed(3)} ≈ ${f1(sd)} 美元，和玩具模型里约 49 的间距是同一个量级。`;
+}
+
+/* ══════════ 一 · 口诀表 + √t 检验 ══════════ */
+function renderMnem(){
+  const s=+$('iSig1').value; $('vSig1').textContent=f1(s)+'%';
+  const rows=[['一天',16,'√256'],['一周',7.2,'√52 ≈ 7.21'],['一个月',3.5,'√12 ≈ 3.46']];
+  $('mnem').innerHTML=rows.map(([n,d,w])=>`<tr><td>${n}</td><td>${d}</td><td>${w}</td><td>${f2(s/d)}%</td><td>${f2(S0*s/d/100)}</td></tr>`).join('');
+}
+let sqWin='1y';
+function drawSqrt(){
+  const d=SQ[sqWin], s=d.sig, s1=s[0];
+  const W=720,H=330,L=48,R=W-20,T=22,B=H-44;
+  const ymax=Math.max(...s, s1*Math.sqrt(21))*1.16;
+  const X=h=>L+(h-1)/20*(R-L), Y=v=>B-v/ymax*(B-T);
+  let g='';
+  const step=ymax>16?5:2;
+  for(let v=0; v<=ymax; v+=step){
+    g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.2:.8}"/>`;
+    g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',10.5);
+  }
+  [1,5,10,15,21].forEach(h=>g+=lab(X(h),B+18,h+' 天','var(--ink-faint)','middle',10.5));
+  g+=lab((L+R)/2,B+36,'连续几个交易日','var(--ink-faint)','middle',10.5);
+  // 按 t 线性放大：很快冲出图顶
+  const hEnd=Math.min(21, ymax/s1);
+  g+=`<line x1="${X(1)}" y1="${Y(s1)}" x2="${X(hEnd)}" y2="${Y(s1*hEnd)}" stroke="var(--ink-faint)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
+  g+=lab(X(hEnd)+6,Y(s1*hEnd)+12,'按 t 放大','var(--ink-faint)','start',11);
+  // 按 √t 放大
+  let p=[]; for(let h=1;h<=21.001;h+=0.25) p.push(X(h)+','+Y(s1*Math.sqrt(h)));
+  g+=`<polyline points="${p.join(' ')}" fill="none" stroke="var(--result)" stroke-width="2.4"/>`;
+  g+=lab(X(21)-4,Y(s1*Math.sqrt(21))+22,'按 √t 放大','var(--result)','end',11.5);
+  s.forEach((v,i)=>g+=`<circle cx="${X(i+1)}" cy="${Y(v)}" r="4.2" fill="var(--control)"/>`);
+  g+=lab(X(3),Y(s[2])+24,'实测','var(--control)','middle',11.5);
+  $('sqrtChart').innerHTML=g;
+
+  const p5=s1*Math.sqrt(5), p21=s1*Math.sqrt(21);
+  $('sq1').textContent=f2(s1)+'%'; $('sq1b').textContent='× 16 = 年化 '+f1(s1*16)+'%';
+  $('sq5').textContent=f2(s[4])+'%'; $('sq5b').textContent='√t 预测 '+f2(p5)+'%';
+  $('sq21').textContent=f2(s[20])+'%'; $('sq21b').textContent='√t 预测 '+f2(p21)+'%';
+  const dev=(s[20]/p21-1)*100;
+  const name={ '1y':'最近 1 年','2y':'最近 2 年','all':'全部 5.7 年'}[sqWin];
+  const extra={
+    '1y':'这一年 TSLA 常常涨一段又跌回来，一个月里的涨跌抵消得比「互不相关」更多。一年只有 250 个交易日，这个估计本身的误差也不小。',
+    '2y':'两年里包含 2024 年 11 月一周涨三成那一段，一天的标准差也被抬高到 3.9%。',
+    'all':'数据越长，点越贴近曲线。'
+  }[sqWin];
+  $('sqSay').textContent=`${name}（${d.from} 至 ${d.to}，${d.days} 个交易日）：21 天的实测标准差比 √t 预测${dev>=0?'高':'低'} ${Math.abs(dev).toFixed(0)}%，按 t 放大则会是 ${f1(s1*21)}%。${extra}`;
+}
+
+/* ══════════ 二 · 拖线实验 ══════════ */
+const LEC=[0.75,-1.55,-2.40,3.20,1.75,0.15,0.40,1.40,-1.00,-0.55];
+const DS={
+  tsla:{moves:MOVES, labels:DAYS.slice(1).map(d=>d.slice(5).replace('-','/')), start:1},
+  lec:{moves:LEC, labels:LEC.map((_,i)=>'第'+(i+1)+'天'), start:0.5}
+};
+let ds='tsla', line=DS.tsla.start, dragging=false;
+const DG={W:720,H:300,L:44,R:700,T:16,B:258};
+function dgScale(){ const m=DS[ds].moves, a=Math.max(...m.map(Math.abs))*1.12; return {a, Y:v=>DG.T+(a-v)/(2*a)*(DG.B-DG.T)}; }
+function drawDrag(){
+  const {W,H,L,R,T,B}=DG, m=DS[ds].moves, n=m.length, {a,Y}=dgScale();
+  const bw=(R-L)/n, x=line;
+  let g='';
+  g+=`<rect x="${L}" y="${Y(x)}" width="${R-L}" height="${Y(-x)-Y(x)}" fill="var(--control-bg)" opacity=".6"/>`;
+  g+=`<line x1="${L}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" stroke="var(--ink-faint)" stroke-width="1"/>`;
+  g+=lab(L-6,Y(0)+4,'0','var(--ink-faint)','end',10.5);
+  m.forEach((v,i)=>{
+    const out=Math.abs(v)>x, y0=Y(0), y1=Y(v);
+    g+=`<rect x="${L+i*bw+bw*.18}" y="${Math.min(y0,y1)}" width="${bw*.64}" height="${Math.max(Math.abs(y1-y0),1)}" rx="2" fill="${out?'var(--control)':'var(--ink-faint)'}" opacity="${out?1:.45}"/>`;
+    if(n<=12 || i%3===0) g+=lab(L+i*bw+bw/2,B+16,DS[ds].labels[i],'var(--ink-faint)','middle',n>12?9.5:10);
+    if(n<=12) g+=lab(L+i*bw+bw/2, v>=0?y1-5:y1+13, (v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(2),out?'var(--control)':'var(--ink-faint)','middle',9.5);
+  });
+  if(ds==='tsla' && solvedTsla()){
+    const d=IV*100/16;
+    [d,-d].forEach(v=>g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--result)" stroke-width="1.4" stroke-dasharray="5 4"/>`);
+    g+=lab(L+4,Y(-d)+14,'隐含波动率换算的一天：±'+d.toFixed(2)+'%','var(--result)','start',10.5);
+  }
+  [x,-x].forEach((v,k)=>{
+    g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--control)" stroke-width="2.2"/>`;
+    g+=`<circle cx="${R}" cy="${Y(v)}" r="7" fill="var(--paper)" stroke="var(--control)" stroke-width="2.2"/>`;
+    g+=`<line x1="${R-3}" y1="${Y(v)-1.5}" x2="${R+3}" y2="${Y(v)-1.5}" stroke="var(--control)" stroke-width="1.2"/><line x1="${R-3}" y1="${Y(v)+1.5}" x2="${R+3}" y2="${Y(v)+1.5}" stroke="var(--control)" stroke-width="1.2"/>`;
+    g+=lab(L-6,Y(v)+4,(k?'−':'+')+x.toFixed(2),'var(--control)','end',10.5);
+  });
+  $('drag').innerHTML=g;
+}
+const outsideCount = () => DS[ds].moves.filter(v=>Math.abs(v)>line).length;
+const targetK = () => Math.round(DS[ds].moves.length/3);
+function solvedTsla(){ return ds==='tsla' && outsideCount()===targetK(); }
+function renderDrag(){
+  const m=DS[ds].moves, n=m.length, k=outsideCount(), tk=targetK();
+  $('vLine').textContent=line.toFixed(2)+'%';
+  $('iLine').value=line;
+  drawDrag();
+  $('cntBig').textContent=`${k} / ${n}`;
+  $('cntCap').textContent=`天在线外，占 ${(k/n*100).toFixed(0)}%。三分之一是 ${(n/3).toFixed(n%3?1:0)} 天。`;
+  const hit = k===tk;
+  $('cnt').classList.toggle('hit',hit);
+  const say=$('dragSay');
+  if(!hit){
+    say.className='say plain';
+    say.textContent = k>tk ? `线外的日子多于三分之一，一天的标准差比 ${line.toFixed(2)}% 大。`
+                           : `线外的日子少于三分之一，一天的标准差比 ${line.toFixed(2)}% 小。`;
+    return;
+  }
+  const sorted=m.map(Math.abs).sort((a,b)=>b-a), hi=sorted[tk-1], lo=sorted[tk], mid=(hi+lo)/2, zm=zeroMean(m);
+  say.className='say flat';
+  let h=`线外 ${k} 天，${n%3?'最接近':'正好是'}三分之一。<br>你的线：${line.toFixed(2)}% × 16 = <b>${f1(line*16)}%</b>。`+
+        `讲义的取法是第 ${tk} 大（${hi.toFixed(2)}）和第 ${tk+1} 大（${lo.toFixed(2)}）取中点：${mid.toFixed(2)}% × 16 = <b>${f1(mid*16)}%</b>。<br>`+
+        `精确计算（零均值）：一天 ${zm.toFixed(2)}%，× 16 = <b>${f1(zm*16)}%</b>。`;
+  if(ds==='tsla'){
+    const d=IV*100/16, over=m.filter(v=>Math.abs(v)>d).length;
+    h+=`<br><br>入场那天市场给的隐含波动率是 46.3%，换算成一天是 ${d.toFixed(2)}%（虚线）。之后 ${n} 天里，有 ${over} 天超过它，也是三分之一。事后量出的 ${f1(zm*16)}% 和市场事前给的 46.3% 只差 ${(46.3-zm*16).toFixed(1)} 个点。`;
+  } else {
+    h+=`<br><br>讲义印的真值是 26.67%，那是普通样本标准差（先减掉平均值，再除以 n − 1）。算法不同差一个点左右，心算的 ${f1(mid*16)}% 落在两者之间。`;
+  }
+  say.innerHTML=h;
+}
+function setLine(v){ const a=dgScale().a; line=Math.max(0.05,Math.min(a*0.98,v)); renderDrag(); }
+$('iLine').addEventListener('input',e=>setLine(+e.target.value));
+(function(){
+  const svg=$('drag');
+  const toVal=e=>{ const r=svg.getBoundingClientRect(), y=(e.clientY-r.top)/r.height*DG.H, {a}=dgScale();
+    return Math.abs(a-(y-DG.T)/(DG.B-DG.T)*2*a); };
+  svg.addEventListener('pointerdown',e=>{ dragging=true; try{svg.setPointerCapture(e.pointerId);}catch(_){} setLine(toVal(e)); });
+  svg.addEventListener('pointermove',e=>{ if(dragging) setLine(toVal(e)); });
+  const stop=()=>{ dragging=false; };
+  svg.addEventListener('pointerup',stop); svg.addEventListener('pointercancel',stop);
+})();
+document.querySelectorAll('#dsSeg button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#dsSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  ds=b.dataset.d; const a=dgScale().a;
+  $('iLine').max=(a*0.98).toFixed(2); line=DS[ds].start; renderDrag();
+}));
+
+/* ══════════ 三 · 正态 vs 对数正态 ══════════ */
+const rg={S:S0, r:RATE, sig:46.3, days:32, n:1};
+const RG_PRE={ tsla:{S:S0,r:RATE,sig:46.3,days:32,n:1}, lec:{S:133.95,r:0,sig:18.61,days:84,n:1}, long:{S:S0,r:RATE,sig:46.3,days:730,n:2} };
+function drawRange(){
+  const F=rg.S*(1+rg.r*rg.days/365), s=rg.sig/100*Math.sqrt(rg.days/365), n=rg.n;
+  const nLo=F*(1-n*s), nHi=F*(1+n*s), lLo=F*Math.exp(-n*s), lHi=F*Math.exp(n*s);
+  const W=720,H=330,L=24,R=W-24,T=20,B=214;
+  let xmin=Math.min(F*(1-3*s), F*Math.exp(-3*s)); xmin=Math.max(xmin,-1.3*F);
+  let xmax=Math.max(F*(1+3*s), F*Math.exp((n+0.6)*s)); xmax=Math.min(xmax, F*Math.exp(3*s));
+  xmax=Math.max(xmax, lHi*1.04, nHi*1.04);
+  const pad=(xmax-xmin)*0.03; xmin-=pad; xmax+=pad;
+  const X=v=>L+(v-xmin)/(xmax-xmin)*(R-L);
+  const N=260, sdN=F*s;
+  const pn=x=>npdf((x-F)/sdN)/sdN;
+  const pl=x=>x<=0?0:npdf(Math.log(x/F)/s)/(x*s);
+  let ym=0; const xs=[]; for(let i=0;i<=N;i++){ const x=xmin+(xmax-xmin)*i/N; xs.push(x); ym=Math.max(ym,pn(x),pl(x)); }
+  const Y=v=>B-v/ym*(B-T)*0.94;
+  let g='';
+  if(xmin<0){
+    g+=`<rect x="${X(xmin)}" y="${T}" width="${X(0)-X(xmin)}" height="${B-T}" fill="var(--warn-bg)"/>`;
+    g+=lab((X(xmin)+X(0))/2,T+16,'负价格','var(--warn)','middle',11);
+  }
+  g+=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="var(--rule)"/>`;
+  if(xmin<0) g+=`<line x1="${X(0)}" y1="${T}" x2="${X(0)}" y2="${B}" stroke="var(--warn)" stroke-width="1.2"/>`;
+  g+=`<polyline points="${xs.map(x=>X(x)+','+Y(pn(x))).join(' ')}" fill="none" stroke="var(--ink-soft)" stroke-width="2"/>`;
+  g+=`<polyline points="${xs.map(x=>X(x)+','+Y(pl(x))).join(' ')}" fill="none" stroke="var(--result)" stroke-width="2.4"/>`;
+  g+=`<line x1="${X(F)}" y1="${T}" x2="${X(F)}" y2="${B+78}" stroke="var(--ink-faint)" stroke-dasharray="3 4"/>`;
+  g+=lab(X(F),B+96,'F '+f2(F),'var(--ink-faint)','middle',10.5);
+  const bar=(lo,hi,y,c,name)=>{
+    let t=`<line x1="${X(lo)}" y1="${y}" x2="${X(hi)}" y2="${y}" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`;
+    t+=lab(X(lo)-6,y+4,fm(lo),c,'end',10.5)+lab(X(hi)+6,y+4,f2(hi),c,'start',10.5);
+    t+=lab(L,y-9,name,c,'start',10.5);
+    return t;
+  };
+  g+=bar(nLo,nHi,B+28,'var(--ink-soft)','正态 ±'+n);
+  g+=bar(lLo,lHi,B+64,'var(--result)','对数正态 ±'+n);
+  if(rg.S===S0 && rg.days===32){
+    g+=`<line x1="${X(SETTLE)}" y1="${T+6}" x2="${X(SETTLE)}" y2="${B}" stroke="var(--control)" stroke-width="1.8"/>`;
+    g+=lab(X(SETTLE)+5,T+18,'5/15 实际收盘 '+SETTLE,'var(--control)','start',10.5);
+  }
+  $('rgChart').innerHTML=g;
+
+  $('vRgS').textContent=f1(rg.sig)+'%'; $('vRgD').textContent=rg.days+' 天'; $('vRgN').textContent=n+' 个';
+  $('iRgS').value=rg.sig; $('iRgD').value=rg.days;
+  document.querySelectorAll('#rgN button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.n===n));
+  $('rgF').textContent=f2(F); $('rgFs').textContent='一个标准差 σ√t = '+(s*100).toFixed(1)+'%';
+  $('rgNo').textContent=fm(nLo)+' – '+f2(nHi); $('rgNob').textContent='上下各 '+f2(F*n*s);
+  $('rgLo').textContent=f2(lLo)+' – '+f2(lHi); $('rgLob').textContent='往上 '+f2(lHi-F)+'，往下 '+f2(F-lLo);
+  const say=$('rgSay');
+  if(nLo<0){
+    say.className='say down';
+    say.textContent=`正态区间的下限是 ${fm(nLo)}：负的股价不存在。对数正态的下限是 ${f2(lLo)}，按比例往下走，永远到不了 0。`;
+  } else {
+    say.className='say plain';
+    let t=`对数正态区间往上伸 ${f2(lHi-F)}，往下只伸 ${f2(F-lLo)}：同样 ${n} 个标准差，涨的空间比跌的空间大。σ√t 越大，这个差距越明显。`;
+    if(rg.S===S0 && rg.days===32){
+      const z=Math.log(SETTLE/F)/s;
+      t+=`5/15 实际收在 ${SETTLE}，是对数正态下的 +${z.toFixed(2)} 个标准差，落在一个标准差区间之外。`;
+    }
+    say.textContent=t;
+  }
+}
+$('iRgS').addEventListener('input',e=>{ rg.sig=+e.target.value; drawRange(); });
+$('iRgD').addEventListener('input',e=>{ rg.days=+e.target.value; drawRange(); });
+document.querySelectorAll('#rgN button').forEach(b=>b.addEventListener('click',()=>{ rg.n=+b.dataset.n; drawRange(); }));
+document.querySelectorAll('#rgPre button').forEach(b=>b.addEventListener('click',()=>{ Object.assign(rg,RG_PRE[b.dataset.p]); drawRange(); }));
+
+/* ══════════ 四 · 标准差标尺 ══════════ */
+function zOf(K,days){ return Math.log(K/fwd(days))/(IV*Math.sqrt(days/365)); }
+function drawRuler(){
+  const K=+$('iK').value, d=+$('iKD').value, F=fwd(d), z=zOf(K,d);
+  const W=720,H=250,L=30,R=W-30,T=16,B=150, zr=3.6;
+  const X=v=>L+(Math.max(-zr,Math.min(zr,v))+zr)/(2*zr)*(R-L), Y=v=>B-v/npdf(0)*(B-T);
+  let g='';
+  const curve=(a,b)=>{ let p=[]; for(let t=a;t<=b+1e-9;t+=0.02) p.push(X(t)+','+Y(npdf(t))); return p; };
+  const zc=Math.max(-zr,Math.min(zr,z));
+  const tail = z>=0 ? `${X(zc)},${B} ${curve(zc,zr).join(' ')} ${X(zr)},${B}` : `${X(-zr)},${B} ${curve(-zr,zc).join(' ')} ${X(zc)},${B}`;
+  g+=`<polygon points="${tail}" fill="var(--result-bg)"/>`;
+  g+=`<polyline points="${curve(-zr,zr).join(' ')}" fill="none" stroke="var(--ink-soft)" stroke-width="1.8"/>`;
+  g+=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="var(--ink-faint)"/>`;
+  for(let k=-3;k<=3;k++){
+    g+=`<line x1="${X(k)}" y1="${B}" x2="${X(k)}" y2="${B+6}" stroke="var(--ink-faint)"/>`;
+    g+=lab(X(k),B+20,k===0?'0':(k>0?'+':'−')+Math.abs(k),'var(--ink-faint)','middle',10.5);
+  }
+  g+=lab(R,B+20,'个标准差','var(--ink-faint)','end',10);
+  // 行权价刻度
+  for(let k=300;k<=470;k+=5){
+    const zk=zOf(k,d); if(Math.abs(zk)>zr) continue;
+    const big=k%50===0;
+    g+=`<line x1="${X(zk)}" y1="${B+30}" x2="${X(zk)}" y2="${B+(big?44:37)}" stroke="var(--ink-faint)" stroke-width="${big?1.4:.8}"/>`;
+    if(big) g+=lab(X(zk),B+58,k,'var(--ink-faint)','middle',10);
+  }
+  g+=lab(L,B+58,'行权价','var(--ink-faint)','start',10);
+  // 选中的行权价
+  const out=Math.abs(z)>zr;
+  g+=`<line x1="${X(zc)}" y1="${T}" x2="${X(zc)}" y2="${B+44}" stroke="var(--control)" stroke-width="2.2"/>`;
+  g+=lab(X(zc)+(zc>2.4?-6:6),T+12,'X = '+K+(out?(z>0?' →':' ←'):''),'var(--control)',zc>2.4?'end':'start',11.5);
+  if(d===32){
+    const zs=Math.log(SETTLE/F)/(IV*Math.sqrt(d/365));
+    g+=`<line x1="${X(zs)}" y1="${T+30}" x2="${X(zs)}" y2="${B}" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+    g+=lab(X(zs)+(zs>2.4?-5:5),T+42,'5/15 收盘','var(--good)',zs>2.4?'end':'start',10.5);
+  }
+  $('ruler').innerHTML=g;
+
+  $('vK').textContent=K; $('vKD').textContent=d+' 天';
+  const dist=K-F, p= z>=0 ? 1-ncdf(z) : ncdf(z);
+  $('kDist').textContent=sgn(dist); $('kDistb').textContent='F = '+f2(F);
+  $('kZ').textContent=sgn(z); $('kZb').textContent='一个标准差 = '+f2(F*IV*Math.sqrt(d/365))+' 美元';
+  $('kP').textContent=pctP(p); $('kPb').textContent=oneIn(p);
+  const other = d>=10 ? 5 : 32, zo=zOf(K,other);
+  let t=`到期落在 ${K} ${K>=F?'上方':'下方'}的概率${p<0.001?'':'约 '}${pctP(p)}。同一个行权价，离到期 ${other} 天时是 ${sgn(zo)} 个标准差：美元距离几乎没变，时间${other<d?'越少':'越多'}，能走的幅度${other<d?'越小':'越大'}，它就显得${other<d?'越远':'越近'}。`;
+  if(d===32){ const zs=Math.log(SETTLE/F)/(IV*Math.sqrt(d/365)); t+=`5/15 TSLA 收在 ${SETTLE}，是 +${zs.toFixed(2)} 个标准差，事前看${oneIn(1-ncdf(zs))}。`; }
+  $('kSay').textContent=t;
+}
+$('iK').addEventListener('input',drawRuler);
+$('iKD').addEventListener('input',drawRuler);
+
+/* ══════════ 五 · 四种波动率 ══════════ */
+function renderFour(){
+  const rows=[
+    ['未来波动率','从现在到到期实际会发生的波动。事前没人知道。',`<b>${f1(FUT)}%</b><br><span class="tiny">4/14 – 5/15 的 24 天，事后才算得出</span>`],
+    ['历史波动率','过去某段时间实际发生的波动。',`<b>${f1(HIST)}%</b><br><span class="tiny">入场前一年，一天 ${f2(SQ['1y'].sig[0])}% × 16</span>`],
+    ['预测波动率','你自己对未来波动率的估计。','你给的数'],
+    ['隐含波动率','从市场上的期权价格反推出来的 σ，相当于市场的报价。',`<b>46.3%</b><br><span class="tiny">350 call 入场日的市价对应的 σ</span>`]
+  ];
+  $('fourVol').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="txt">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+  const bars=[['历史（入场前一年）',HIST,'var(--ink-faint)'],['隐含（入场时的价格）',46.3,'var(--control)'],['未来（事后的价值）',FUT,'var(--result)']];
+  const mx=60;
+  $('vbars').innerHTML=bars.map(([l,v,c])=>`<div class="vb"><span class="l">${l}</span><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${c}"></div></div><span class="n" style="color:${c}">${f1(v)}%</span></div>`).join('');
+  $('pvSay').innerHTML=`这笔交易里，价格是 46.3%，价值是 ${f1(FUT)}%，只差 ${(46.3-FUT).toFixed(1)} 个点：按波动率算，这张 350 call 的定价是公道的。1.1 里它赚了 244%，这笔钱来自方向，TSLA 到期时走到了 +1.29 个标准差。买 call 的同时用股票把方向风险对冲掉（节点 4.1 讲怎么做），剩下的盈亏就只来自隐含和未来波动率之差，这一次这个差很小。`;
+}
+
+/* ══════════ 六 · 费曼检验 ══════════ */
+const QS=[
+ {q:`不许用「标准差」这个词，向一个没学过统计的人解释：「TSLA 的波动率是 46%」这句话在说什么。`,
+  a:['这是在说典型的变动幅度，不说方向，涨和跌都算。',
+     '按这个数，一年后 TSLA 相对现在的变动，大约三次里有两次在 ±46% 以内，三次里有一次超出。',
+     '换成一天就是 46% ÷ 16，约 2.9%：普通的一天涨跌在 3% 上下，大约三天里有一天超过它。'],
+  s:'「说明 TSLA 风险很大」：这是评价，没说出这个数字能推出什么。'},
+ {q:`为什么时间变成 4 倍，价格区间只变宽 2 倍？用抛硬币或走路的例子讲。`,
+  a:['每天的涨跌互不相关时，相邻的日子会互相抵消一部分。',
+     '四天全部同方向的情况很少，大多数时候有涨有跌，加起来的幅度比四个一天小。',
+     '独立的变动相加时，标准差的平方按天数相加，所以标准差本身按天数的平方根增长。',
+     '真实数据只是大致符合：最近一年 TSLA 21 天的实测比 √t 预测低 12%，因为这一年涨了又跌回来的时候多。'],
+  s:'「公式里就是根号」：说出了结果，没说为什么是根号而不是天数本身。'},
+ {q:`某股票连涨十天，每天 +1%。用普通标准差算，它的波动率是多少？这个结果错在哪？零均值假设怎么修正它？`,
+  a:['平均每天 +1%，每天离平均值的距离都是 0，普通标准差是 0，波动率 0%。',
+     '但这只股票十天涨了约 10%，价格明显在动。普通标准差只量「围着平均值晃多少」，把稳定的趋势当成了不动。',
+     '零均值假设直接量每天离 0 有多远：一天 1%，年化 1% × 16 = 16%。'],
+  s:'「因为样本太少」：样本多少不是原因，一百天都是 +1% 结果还是 0。'},
+ {q:`为什么对数正态区间往上伸得比往下远？什么情况下正态区间会给出荒谬的结果？`,
+  a:['对数正态按比例算：涨一个标准差是乘以 e<sup>σ√t</sup>，跌一个标准差是除以同一个数。',
+     '同一个比例，乘出来的美元距离比除出来的大，所以上沿离中心更远。',
+     '正态按美元算，上下对称。σ√t 大的时候下沿会跌破 0，比如 σ 46%、两年、两个标准差。',
+     '股价不能是负数，按比例变化的价格也永远到不了 0，所以对数正态更接近真实的股价。'],
+  s:'「因为股票长期会涨」：这是方向观点。F 和 σ 固定时，不对称完全来自按比例计算。'},
+ {q:`同一个 400 的行权价，离到期 32 天时和只剩 5 天时，哪个时候它离中心「更远」？为什么量距离要除以 σ√t？`,
+  a:['美元距离几乎没变，都是 400 减去远期价。',
+     '5 天里 TSLA 能走的典型幅度只有 32 天的 √(5/32)，约 0.4 倍。同样的美元距离，折成标准差个数变大了。',
+     '所以到期越近，同一个虚值行权价越难到达，落在它外侧的概率越低。',
+     '除以 σ√t 是把距离换成「要走几个典型幅度」，不同股票、不同期限之间才能比较。'],
+  s:'「越近到期期权越便宜」：说的是期权价格，没回答距离为什么变了。'},
+ {q:`入场时隐含波动率 46.3%，之后 24 天的实际波动率 ${f1(FUT)}%，这张 350 call 却赚了 244%。买方赚的是什么？如果之后 TSLA 实际波动只有 30%，但 5/15 同样收在 422.32，持有到期的买方还赚钱吗？`,
+  a:['持有到期的 call 只看到期价：422.32 − 350 = 72.32，减去成本 21.10。这笔钱与路上波动大小无关，实际波动 30% 时照样赚。',
+     '赚的是方向：TSLA 走了 +1.29 个标准差，事前看大约 10 次里 1 次。',
+     '隐含 46.3% 是买方付出的价格，未来 ' + f1(FUT) + '% 是事后体现的价值，两者几乎相等：按波动率算，这张期权定价公道。',
+     '波动率本身的盈亏，要在把方向风险对冲掉之后才显出来，节点 4.1 讲。'],
+  s:'「因为波动大所以赚钱」：实际波动比隐含还低一点，赚钱的原因不是波动率。'},
+ {q:`入场前一年 TSLA 的历史波动率是 ${f1(HIST)}%，比隐含的 46.3% 高。能不能据此说这张期权「便宜」？`,
+  a:['不能直接这么说。期权的价值取决于从现在到到期的未来波动率，历史波动率只是过去。',
+     '历史是做预测的材料之一，但窗口选多长结果就不同：最近 1 年约 49%，全部 5.7 年约 62%。',
+     '该拿隐含去比的是你的预测。你预测未来波动高于 46.3%，才能说期权便宜。',
+     '这一次事后看，未来波动是 ' + f1(FUT) + '%，低于历史的 ' + f1(HIST) + '%。按历史波动率判断会觉得占了便宜，其实没有。'],
+  s:'「历史比隐含高，所以便宜」：把过去当成了未来。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-1-2-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-1-2-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+});
+
+/* ══════════ 启动 ══════════ */
+$('iSig1').addEventListener('input',renderMnem);
+document.querySelectorAll('#sqWin button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#sqWin button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  sqWin=b.dataset.w; drawSqrt();
+}));
+drawBell();
+renderMnem();
+drawSqrt();
+$('iLine').max=(dgScale().a*0.98).toFixed(2);
+renderDrag();
+drawRange();
+drawRuler();
+renderFour();
+</script>
+</body>
+</html>
