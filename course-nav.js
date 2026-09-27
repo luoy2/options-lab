@@ -15,7 +15,7 @@
     ['风险与对冲',[
       ['4.1','动态对冲','station-4-1-dynamic-hedging.html'],
       ['4.2','gamma scalping','station-4-2-gamma-scalping.html'],
-      ['6','风险的动态演化',''],
+      ['6','风险的动态演化','station-6-risk-dynamics.html'],
     ]],
     ['策略与组合',[
       ['3.1','价差家族','station-3-1-spreads.html'],
