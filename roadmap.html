@@ -274,10 +274,10 @@ const NODES=[
  can:['判断手里的实值期权该不该提前行权','预判自己卖出的期权会不会被指派、什么时候','避开除息日前夜被指派的典型坑'],
  src:'S8'},
 
-{id:'5.3',col:3,row:11,st:'todo',t:'box · roll · collar',d:'相对价值套利',deps:['5.2'],
+{id:'5.3',col:3,row:11,st:'done',t:'box · roll · collar',d:'相对价值套利',deps:['5.2'],
  teach:['box：反推无风险利率','roll（行业里也叫 jelly roll）：剥离掉方向与波动率，只剩持有成本','collar：用租金抵保费'],
  can:['拿一张缺了四个价格的报价表，先用 box 反推利率、再用 parity 反推股价、逐格补齐','做相对价值套利，而不是赌方向'],
- src:'S6 + S7'},
+ src:'S6 + S7',link:'station-5-3-box-roll-collar.html'},
 
 {id:'7',col:2,row:12,st:'todo',t:'模型假设怎么崩',d:'两条路在这里合流',deps:['6','5.3'],
  teach:['四条 BS 假设逐条打假：用 S&amp;P 与 Bund 的真实分布、历史波动率曲线、跳跃、down faster','替代模型：CEV 与 jump-diffusion','40% 规则：0.40 × S × σ × √t 能在心算里逼近 BS'],
