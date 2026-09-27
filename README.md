@@ -17,6 +17,7 @@
 | [3.1 价差家族](https://luoy2.github.io/options-lab/station-3-1-spreads.html) | 两条腿表达方向观点 |
 | [4.2 gamma scalping](https://luoy2.github.io/options-lab/station-4-2-gamma-scalping.html) | 盈亏平衡波动率 |
 | [3.2 波动率结构](https://luoy2.github.io/options-lab/station-3-2-vol-structures.html) | 教材里出现的全部组合 |
+| [3.3 四象限与选择](https://luoy2.github.io/options-lab/station-3-3-four-quadrants.html) | 市场观点 → 该用哪一族 |
 
 每个页面都是单文件 HTML，没有构建步骤；左侧课程目录由共用的 `course-nav.js` 生成。
 

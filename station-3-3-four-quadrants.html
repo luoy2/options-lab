@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>四象限与选择</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M16%206V26M6%2016H26'%20stroke='%23fdf6ec'%20stroke-width='2.4'%20stroke-linecap='round'/%3E%3Ccircle%20cx='21.5'%20cy='10.5'%20r='2.6'%20fill='%23fdf6ec'/%3E%3Ccircle%20cx='10.5'%20cy='21.5'%20r='2.6'%20fill='%23fdf6ec'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.2rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+.say:empty{display:none}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt,th.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+td.no{color:var(--control);font-weight:600}
+.tbl{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.8rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;vertical-align:-.1rem;border-radius:2px}
+.legend i.ln{height:3px;vertical-align:.2rem;border-radius:1px}
+ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+
+/* ── 3.3 ── */
+.quad{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin:1.3rem 0 .6rem;position:relative}
+.quad .c{border-radius:10px;padding:.95rem 1.05rem;font-size:.9rem;line-height:1.6;color:var(--ink-soft)}
+.quad .c .h{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;font-weight:600;margin-bottom:.25rem}
+.quad .c .w{display:block;color:var(--ink);margin-bottom:.35rem}
+.c.q1{background:var(--result-bg)} .c.q1 .h{color:var(--result)}
+.c.q2{background:var(--good-bg)} .c.q2 .h{color:var(--good)}
+.c.q3{background:var(--control-bg)} .c.q3 .h{color:var(--control)}
+.c.q4{background:var(--warn-bg)} .c.q4 .h{color:var(--warn)}
+.axes2{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;color:var(--ink-faint);margin-top:.2rem}
+.dot{display:inline-block;width:.62rem;height:.62rem;border-radius:50%;margin-right:.4rem;vertical-align:.04rem}
+.dot.q1{background:var(--result)} .dot.q2{background:var(--good)} .dot.q3{background:var(--control)} .dot.q4{background:var(--warn)}
+.gtab td,.gtab th{padding:.42rem .45rem}
+.gtab td:first-child{line-height:1.45}
+.lsub{display:block;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;color:var(--ink-faint);line-height:1.5;white-space:normal}
+.gtab tr.grp td{background:var(--panel2);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-soft);text-align:left;padding:.35rem .5rem}
+.pos{color:var(--result)} .neg{color:var(--control)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem .45rem;margin:.2rem 0 .6rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;min-height:1.7rem}
+.chips span{padding:.16rem .55rem;border-radius:6px;background:var(--panel2);color:var(--ink-faint);transition:.25s}
+.chips span.on{color:var(--ink)}
+.chips span.buy.on{background:var(--result-bg);color:var(--result)}
+.chips span.sell.on{background:var(--control-bg);color:var(--control)}
+.chips span.sum.on{background:var(--ink);color:var(--paper)}
+.chips span.hd{background:none;padding-left:0;padding-right:.1rem;color:var(--ink-faint)}
+#qdChips{min-height:3.9rem;align-content:flex-start}
+.vw{display:grid;grid-template-columns:1fr 11rem;gap:1.2rem;align-items:start}
+.steps{margin:0;padding:0;list-style:none;counter-reset:st}
+.steps li{display:grid;grid-template-columns:1.6rem 1fr;gap:.2rem .6rem;margin:0 0 .7rem;opacity:.12;transform:translateY(5px);transition:opacity .35s,transform .35s}
+.steps li.on{opacity:1;transform:none}
+.steps li::before{counter-increment:st;content:counter(st);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;
+  width:1.5rem;height:1.5rem;border-radius:50%;background:var(--panel2);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;margin-top:.2rem}
+.steps li.on::before{background:var(--control-bg);color:var(--control);font-weight:600}
+.steps .qq{font-size:.86rem;color:var(--ink-faint)}
+.steps .aa{font-size:.96rem;line-height:1.6}
+.steps .aa b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.86rem;padding:.05rem .4rem;border-radius:5px;background:var(--panel2);margin-left:.3rem;white-space:nowrap}
+.cands{display:grid;grid-template-columns:repeat(auto-fit,minmax(14.5rem,1fr));gap:.7rem;margin-top:.4rem;opacity:.12;transition:opacity .4s}
+.cands.on{opacity:1}
+.cand{background:var(--paper);border-radius:8px;padding:.75rem .9rem;font-size:.86rem;line-height:1.55}
+.cand .nm{font-weight:600;font-size:.95rem}
+.cand .lg{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;color:var(--ink-faint);margin:.1rem 0 .35rem}
+.cand .gk{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;color:var(--ink-soft)}
+.pickline{margin-top:.8rem;font-size:.93rem;color:var(--ink-soft);opacity:.12;transition:opacity .4s}
+.pickline.on{opacity:1}
+.drill{list-style:none;padding:0;margin:1rem 0 0}
+.drill li{background:var(--panel);border-radius:10px;padding:.9rem 1.05rem;margin:0 0 .6rem}
+.drill .dq{font-size:.96rem;line-height:1.65;margin-bottom:.5rem}
+.drill .opts{display:flex;flex-wrap:wrap;gap:.35rem}
+.drill .opts button{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;border:1px solid transparent;border-radius:6px;
+  padding:.3rem .6rem;cursor:pointer;background:var(--panel2);color:var(--ink-soft)}
+.drill .opts button.right{background:var(--good-bg);color:var(--good);border-color:var(--good)}
+.drill .opts button.wrong{background:var(--warn-bg);color:var(--warn)}
+.drill .fb{font-size:.88rem;color:var(--ink-soft);margin-top:.5rem;line-height:1.6}
+.drill .fb:empty{display:none}
+.hwt input,.hwt select{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;padding:.22rem .3rem;border:1px solid var(--rule);border-radius:5px;background:var(--paper);color:var(--ink)}
+.hwt .ok{border-color:var(--good);background:var(--good-bg)} .hwt .no{border-color:var(--warn);background:var(--warn-bg)}
+.hwt td.txt{font-size:.84rem}
+.hwrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem}
+.reveal{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.92rem;line-height:1.72}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .gtab td,.gtab th{padding:.36rem .22rem}
+  .formula .math{font-size:1rem}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .quad .c{padding:.75rem .8rem;font-size:.82rem}
+  .vw{grid-template-columns:1fr}
+  .vw .mini{max-width:12rem;margin:0 auto}
+  #qdChips{min-height:7.6rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 两个问题</a><a href="#s1">一 为什么同号</a><a href="#s2">二 四象限</a><a href="#s3">三 butterfly 与 strangle</a>
+  <a href="#s4">四 另外两格</a><a href="#s5">五 价格与价值</a><a href="#s6">六 从观点到结构</a><a href="#s7">七 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 3.3</p>
+  <h1>四象限与选择</h1>
+  <p class="lede">3.2 用 2026-04-13 收盘 TSLA 5/15 到期的真实报价，搭出了教材里的全部结构，按到期盈亏看它们押的是大动还是横盘。这一节把每个结构压成 gamma 和 vega 两个数，按正负号分进四个格子；再从一个市场观点出发，一步步定到该用哪一族结构。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>两个问题，四个格子</h2>
+  <p class="sub">不押方向的仓位，赌的是两件事：标的实际会动多少，隐含波动率会涨还是会跌。</p>
+  <p>3.2 的结构大多 delta 接近 0，不押方向（2.4：delta 是整个仓位相当于多少股）。剩下的赌注可以拆成两个问题，各由一个希腊字母回答：</p>
+  <ul>
+    <li><b>标的实际会动多少。</b>由 <span class="sym" data-say="gamma，读作「伽马」。标的涨 1 美元，delta 变多少（2.2）。gamma 为正的仓位，标的往哪边动都多赚一点；为负，往哪边动都多亏一点。">Γ</span> 回答。2.2 讲过，标的动了 <span class="sym" data-say="标的价格的变化，美元。涨为正，跌为负。">ΔS</span>，gamma 带来的那一块是 ½ × Γ × (ΔS)²：gamma 为正时涨跌都多赚，动得越多赚得越多；为负时涨跌都多亏。</li>
+    <li><b>隐含波动率会涨还是跌。</b>由 <span class="sym" data-say="vega，读作「维加」。隐含波动率涨 1 个点，仓位价值变多少美元（2.3）。">ν</span> 回答。vega 为正，隐含波动率涨就赚；为负，跌就赚（2.3）。</li>
+  </ul>
+  <p>theta 不用单独问。2.2 讲过模型里 <span class="sym" data-say="theta。别的都不变，过一天，仓位价值变多少美元。">Θ</span> ≈ −½<span class="sym" data-say="隐含波动率，年化，写成小数。">σ</span>²<span class="sym" data-say="标的现价。本页是 TSLA 4/13 收盘 352.36。">S</span>²Γ（这是一年的量，除以 365 是每天）：不计利息那一项时，theta 的正负号和 gamma 相反。第二节的表里，每个结构都核对了这一条，全部成立。</p>
+  <p>两个数，各有正负，就是四个格子。讲义把教材里的结构按这两个符号分成了四组。横着看是 gamma，竖着看是 vega：</p>
+  <div class="quad">
+    <div class="c q2"><span class="h">gamma − · vega ＋</span><span class="w">希望标的不动，隐含波动率涨</span>long <span class="sym" data-say="同一行权价、两个到期日的一对期权。买入 calendar 是买后到期的远月、卖先到期的近月（3.2）。">calendar spread</span></div>
+    <div class="c q1"><span class="h">gamma ＋ · vega ＋</span><span class="w">希望标的大动，隐含波动率涨</span>long <span class="sym" data-say="同一行权价、同一到期日的 call 和 put 各一张（3.2）。long 是两张都买，short 是两张都卖。">straddle</span>、long <span class="sym" data-say="同一到期日，一张行权价较低的 put 加一张行权价较高的 call（3.2）。">strangle</span>、<b>short</b> <span class="sym" data-say="三个等距行权价，张数 +1 −2 +1：两侧各买一张、中间卖两张是 long；反过来是 short（3.2）。">butterfly</span>、买多于卖的 <span class="sym" data-say="同一种期权（都是 call 或都是 put）、同一到期日，买卖张数不相等，例如卖 1 张 350 call、买 2 张 375 call（3.2）。">ratio spread</span></div>
+    <div class="c q3"><span class="h">gamma − · vega −</span><span class="w">希望标的不动，隐含波动率跌</span>short straddle、short strangle、<b>long</b> butterfly、卖多于买的 ratio spread</div>
+    <div class="c q4"><span class="h">gamma ＋ · vega −</span><span class="w">希望标的大动，隐含波动率跌</span>short calendar spread</div>
+  </div>
+  <div class="axes2"><span>← gamma 为负</span><span>gamma 为正 →</span></div>
+  <p class="tiny">上面一行 vega 为正，下面一行 vega 为负。表里的名字按讲义原样；long 是买入，short 是卖出。这些结构 3.2 都搭过。</p>
+  <p>这张表有三处要解释：同一到期日的结构为什么只落在右上和左下两格（第一节）；butterfly 为什么和 strangle 落在相反的格子（第三节）；左上、右下两格为什么只有 calendar（第四节）。第二节先把 TSLA 的真实数放上去，第五、六节讲怎么从观点选格子、选结构。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>同一到期日，gamma 和 vega 同号</h2>
+  <p class="sub">vega 可以从 gamma 算出来。两者量的是同一样东西：期权价值随标的价格弯了多少。</p>
+
+  <h3>分布变宽，为什么期权会变贵</h3>
+  <p>隐含波动率涨 1 个点，意思是市场认为到期时价格会散得更开（1.2：σ 是分布的宽度）。期权的价值是所有可能结果按概率的平均（1.1 定价四步）。散得更开，对这个平均有什么影响，要看价值随价格是直的还是弯的：</p>
+  <ul>
+    <li>如果价值随价格是一条直线（一股股票就是这样），价格往上多走一段多赚的，和往下多走一段多亏的一样多，平均起来不变。散得再开也不值钱。</li>
+    <li>如果价值向上弯（gamma 为正），往上多走一段多赚的，比往下多走一段多亏的多；往下走到很远时甚至不再亏。散得越开，平均越高。</li>
+  </ul>
+  <p>2.2 算过弯曲带来的那一块：标的动了 ΔS，多出 ½ × Γ × (ΔS)²。对所有可能的 ΔS 取平均，(ΔS)² 的平均就是价格的<span class="sym" data-say="variance。离中心的距离平方之后取平均，也就是标准差的平方（1.2）。">方差</span>，也就是一个标准差的平方。1.2 讲过一个标准差是 <span class="sym" data-say="远期价，分布的中心。1.1 算过：TSLA 4/13 到 5/15 是 353.69。">F</span> × σ × √<span class="sym" data-say="离到期的年数。4/13 到 5/15 是 32 天，32/365 年。">t</span>；这里用现价 S 近似 F（352.36 对 353.69），一个标准差是 S × σ × √t，平方是 S² × σ² × t。σ 涨 1 个点（0.01），方差多出 S² × t × [(σ + 0.01)² − σ²]，约等于 S² × t × 2σ × 0.01。期权价值多出一半 gamma 乘以这个数：</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="vega，隐含波动率涨 1 个点，期权价值变多少美元。">ν</span> ≈ <span class="sym" data-say="gamma，标的涨 1 美元，delta 变多少。">Γ</span> × <span class="sym" data-say="标的现价的平方。TSLA 4/13 收盘 352.36，平方是 124,157.6。">S²</span> × <span class="sym" data-say="这张期权自己的隐含波动率，写成小数。350 call 是 0.4629。">σ</span> × <span class="sym" data-say="离到期的年数。4/13 到 5/15 是 32 天，32/365 年。">t</span> ÷ 100</div>
+    <div class="gloss">vega ≈ gamma × 股价的平方 × 隐含波动率 × 离到期年数，再除以 100（vega 按 1 个点算，1 个点是 0.01）</div>
+    <div class="note">在 Black-Scholes 模型里这个等式是精确的；ORATS 的数用的是它自己的模型，下表里差 3% 以内</div>
+  </div>
+  <p>用 350 call 算一遍：S² = 124,157.6，σ = 46.29%，t = 32/365。σ 涨 1 个点，方差多出 124,157.6 × 32/365 × 2 × 0.4629 × 0.01 ≈ 100.77。gamma 是 0.0082，½ × 0.0082 × 100.77 ≈ <b>0.4132</b>。ORATS 给的 vega 是 <b>0.4125</b>。</p>
+  <div class="tbl"><table id="vgTab">
+    <thead><tr><th>4/13 收盘的 call，每股</th><th>隐含波动率 σ</th><th>gamma</th><th>vega<br>ORATS</th><th>vega<br>按上式</th><th>vega ÷ gamma</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p class="tiny">数据：ORATS 4/13 16:00 快照。最后一行是同一天、5/8 到期的 350 call，第四节用。</p>
+
+  <h3>加起来还是同号</h3>
+  <p>同一个到期日里，每条腿的 S² 和 t 都一样，只有 σ 不同。5/15 这一串的 σ 在 45% 到 51% 之间，所以每条腿的 vega 都是它 gamma 的 49 到 57 倍。把几条腿加起来：</p>
+  <div class="formula">
+    <div class="math">净 ν ≈ 净 Γ × 约 50</div>
+    <div class="gloss">同一到期日的仓位，净 vega 大约是净 gamma 的 50 倍（TSLA 4/13、5/15 到期），两者正负号相同</div>
+  </div>
+  <p>所以只用一个到期日，不管怎么搭，gamma 和 vega 的正负号基本都相同，只能落在右上或左下。要落到左上、右下，得用两个到期日：t 不同，倍数就不同（第四节）。</p>
+  <p class="tiny">这条规则是近似的。几条腿的 gamma 大半互相抵掉时，净 vega 的正负号可能由各条腿倍数的差别决定，和净 gamma 不同号。建仓这天 5/15 各行权价的倍数在 49 到 57 之间，差得不多。第三节的逐日回放里，后来这几个倍数差开了，同一只 butterfly 有 6 天翻了过去。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>TSLA 的结构落进四象限</h2>
+  <p class="sub">把 3.2 搭的每个结构压成两个数，放到平面上：横轴 gamma，纵轴 vega。全部用建仓那天（4/13 收盘）ORATS 的希腊字母，一张合约（100 股）。</p>
+  <div class="panel">
+    <div class="bar">
+      <button class="btn ghost" id="qdPlay">一条条再加一遍</button>
+      <div class="seg" id="qdZoom"><button data-z="0" aria-pressed="false">全景</button><button data-z="1" aria-pressed="true">放大原点附近</button></div>
+    </div>
+    <div class="chips" id="qdChips"></div>
+    <svg id="qd" viewBox="0 0 720 460" role="img" aria-label="每条腿是一支箭头，首尾相接加出结构的位置；各结构按净 gamma 与净 vega 落在四个象限里"></svg>
+    <div class="legend">
+      <span><i style="background:var(--result)"></i>gamma ＋ vega ＋</span>
+      <span><i style="background:var(--control)"></i>gamma − vega −</span>
+      <span><i style="background:var(--good)"></i>gamma − vega ＋</span>
+      <span><i style="background:var(--warn)"></i>gamma ＋ vega −</span>
+      <span><i class="ln" style="background:var(--result)"></i>买入的腿</span>
+      <span><i class="ln" style="background:var(--control)"></i>卖出的腿</span>
+      <span>虚线：vega ＝ 50.4 × gamma</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">当前</div><div class="d" id="qdN" style="font-size:1.05rem"></div><div class="d2" id="qdL"></div></div>
+      <div class="stat"><div class="k">gamma（股/美元）</div><div class="d" id="qdG"></div></div>
+      <div class="stat"><div class="k">vega（美元/点）</div><div class="d" id="qdV"></div></div>
+      <div class="stat"><div class="k">theta（美元/天）</div><div class="d" id="qdT"></div><div class="d2" id="qdD"></div></div>
+    </div>
+  </div>
+  <p>虚线是第一节的倍数：5/15 到期的平值 call，vega ÷ gamma ≈ 50.4。每条腿在平面上是一支箭头：买一张，箭头指向这张期权的 (gamma, vega)；卖一张，方向反过来。结构的位置是各条腿的箭头首尾相接加出来的终点。5/15 到期的每条腿，vega 是 gamma 的 49 到 57 倍（第一节的表），箭头几乎都沿着虚线，所以怎么加，终点都还在虚线附近：</p>
+  <ul>
+    <li><b>straddle</b>：两支箭头同向，走到 gamma 1.64、vega 82.50，离原点最远。</li>
+    <li><b>买入 butterfly</b>：先买 325 往右上走 0.636，再卖两张 350 往回退 1.64，最后买 375 又往右上走 0.794（都是 gamma），停在 −0.21、−9.51，大小约是 straddle 的八分之一，在全景里挤在原点附近。</li>
+    <li><b>买入 calendar</b>：第二支箭头是卖 5/8 到期的 350 call，它的倍数是 40.2，退回的方向和虚线不一样，终点离开了虚线：gamma −0.087、vega +4.75，落在左上。卖出 calendar 正好相反，落在右下。</li>
+  </ul>
+  <p>其余只用 5/15 的结构也是这样加出来的，净 vega 都是净 gamma 的 45 到 51 倍。离开虚线的只有两个 calendar。</p>
+  <p>几个点是重合的，原因都在 2.4 讲过的一条：同一行权价、同一到期日的 call 和 put，gamma、vega 相同。所以 <span class="sym" data-say="同一到期日，一张行权价较低的 call 加一张行权价较高的 put，两条腿都是实值（3.2）。本页是 325 call 加 375 put。">guts</span> 和 strangle 重合；call butterfly、put butterfly、卖出 <span class="sym" data-say="用 put 和 call 混着搭的 butterfly。卖出 iron butterfly 是卖中间行权价的 straddle、买两侧的 strangle，到期盈亏和买入 butterfly 一样（3.2）。">iron butterfly</span> 三个重合，3.2 讲过它们的到期盈亏也一样。</p>
+
+  <div class="tbl"><table class="gtab" id="gTab">
+    <thead><tr><th>结构（4/13，一张）</th><th>delta<br>股</th><th>gamma<br>股/美元</th><th>theta<br>美元/天</th><th>vega<br>美元/点</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p class="tiny">ORATS 只给 call 的 theta，put 的 theta 按 put-call parity 换算，同 2.4。delta 用 ORATS 给的 call、put 各自的 delta。</p>
+  <p>讲义的分组在 TSLA 上一条不差。表里还能读出两件事：</p>
+  <ul>
+    <li><b>theta 的正负号全都和 gamma 相反</b>，17 个结构没有例外。买 gamma 要付 theta（2.2）。</li>
+    <li><b>delta 不全是 0。</b>350 在 352.36 下面一点，straddle 的 delta 是 +11.48；两个 ratio spread 是 ±15.24。3.2 的结构只是近似不押方向。要把 delta 调到 0，买卖几股 TSLA 就行，gamma、vega、theta 一点不动（2.4：股票只能调 delta）。</li>
+  </ul>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>butterfly 为什么和 strangle 反号</h2>
+  <p class="sub">long strangle 是正 gamma，long butterfly 却是负 gamma，两个都要付钱买。从每条腿的 gamma 加起来看。</p>
+  <p>2.2 讲过：每张买入的期权 gamma 为正，在自己的行权价附近最大，离得越远越小，画出来像一座小山。卖出一张，曲线上下翻过来，处处为负。一个结构的 gamma，是各条腿的曲线在同一个价位上加起来。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="hlSeg">
+        <button data-p="stg" aria-pressed="true">325/375 strangle</button>
+        <button data-p="fly" aria-pressed="false">325/350/375 butterfly</button>
+        <button data-p="dec" aria-pressed="false">butterfly 拆开</button>
+      </div>
+      <button class="btn ghost" id="hlPlay">一条条再加一遍</button>
+    </div>
+    <div class="chips" id="hlChips"></div>
+    <svg id="hl" viewBox="0 0 720 330" role="img" aria-label="每条腿的 gamma 随 TSLA 价格变化的曲线，以及它们叠加后的曲线"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--result)"></i>买入的腿</span>
+      <span><i class="ln" style="background:var(--control)"></i>卖出的腿</span>
+      <span><i class="ln" style="background:var(--ink)"></i>加起来</span>
+      <span>点线：4/13 收盘 352.36</span>
+    </div>
+    <div class="say plain" id="hlSay"></div>
+  </div>
+  <p class="tiny">曲线是 Black-Scholes 模型：离到期 32 天，每条腿用自己 4/13 的隐含波动率。在 352.36 处和 ORATS 的数相差不到 1%。上面标签里的数是 ORATS 的，一张合约。</p>
+
+  <h3>数一数：352.36 处每条腿的 gamma</h3>
+  <p>325/350/375 butterfly：两边的 325、375 叫<span class="sym" data-say="wing。butterfly 两侧的行权价。买入 butterfly 是买两翼。">翼</span>，各买一张；中间的 350 叫<span class="sym" data-say="body。butterfly 中间的行权价，张数是每一翼的两倍。买入 butterfly 是卖身。">身</span>，卖两张。TSLA 在 352.36，身的行权价离它最近，每张 gamma 0.82，两张 1.64；翼离得远，0.636 和 0.794，合计 1.43。卖出的比买进的多 0.21，净 gamma 就是 −0.21。</p>
+  <p>换个拆法看得更清楚。3.2 讲过 325/350/375 butterfly 的到期盈亏，和卖出 iron butterfly 一模一样；而卖出 iron butterfly 的四条腿，正好是：</p>
+  <div class="formula">
+    <div class="math">买入 butterfly ＝ 卖出 350 straddle ＋ 买入 325/375 strangle</div>
+    <div class="gloss">gamma：−1.64 ＋ 1.43 ＝ −0.21　　vega：−82.50 ＋ 72.99 ＝ −9.51</div>
+  </div>
+  <p>也就是说，butterfly 可以拆成一个卖出的 straddle 加一个买入的 strangle。在 352.36，straddle 的两条腿都在平值，gamma、vega 都比 strangle 的大，加起来跟着卖出的 straddle 走。strangle 自己两条腿都是买入，没有卖出的部分，所以处处为正。</p>
+  <p>「买入 butterfly」的「买入」说的是付钱、买两翼，不是 gamma 的方向。数总张数也不管用：+1、−2、+1 加起来是 0。要按张数比较标的附近各条腿的 gamma：建仓时身离标的最近，又是两张，卖出的 gamma 比买入的多。这和 3.1 的「平值腿在买方还是卖方」是同一条规则。<span class="sym" data-say="四个行权价的 butterfly：中间一个行权价换成两个，张数 +1 −1 −1 +1。本页是 325/340/360/375（3.2）。">condor</span> 也一样：卖出的 340、360 离 352.36 最近，净 gamma −0.174。</p>
+
+  <h3>走过翼一段，butterfly 翻成正 gamma</h3>
+  <p>上面 butterfly 那条黑线（各条腿加起来的 gamma），中间一段在 0 下面，两头在 0 上面。按入场那天的模型，TSLA 在 297.82 到 394.77 之间时，这只 butterfly 的净 gamma 为负。这一段比两翼 325 到 375 宽。TSLA 涨过 362.5，离它最近的已经是买入的 375 翼，可身有两张：走到 375 时净 gamma 还是 −0.098，到 390 还是 −0.021。一张翼的 gamma 要超过两张身的合计，TSLA 得走过 375 翼约 20 美元（往下要走过 325 翼约 27 美元）。离到期越近、隐含波动率越低，每条曲线越窄，这一段也越窄：隐含波动率不变，剩 8 天时是 322.77 到 375.18。</p>
+  <p>TSLA 这 24 个交易日真的走出去了。下面是 4/13 建的这两个结构，每天收盘时 ORATS 给的净 gamma：</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="dyPlay">逐天重播</button></div>
+    <svg id="dy" viewBox="0 0 720 400" role="img" aria-label="TSLA 每日收盘，以及 butterfly 与 strangle 每天的净 gamma"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink)"></i>TSLA 收盘</span>
+      <span><i style="background:var(--result)"></i>gamma 为正</span>
+      <span><i style="background:var(--control)"></i>gamma 为负</span>
+      <span>两组柱子各用各的刻度</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="dyD"></div></div>
+      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="dyS"></div></div>
+      <div class="stat"><div class="k">butterfly 净 gamma</div><div class="d" id="dyF"></div><div class="d2" id="dyFv"></div></div>
+      <div class="stat"><div class="k">strangle 净 gamma</div><div class="d" id="dyG"></div></div>
+    </div>
+    <div class="say plain" id="dySay"></div>
+  </div>
+  <p>回放里有 6 天不守第一节的同号规则：4/15、4/16、4/27 到 4/30，ORATS 给这只 butterfly 的净 gamma 为正、净 vega 为负，落在右下格。按 ORATS 的数，原因在倍数：4/29 三个行权价的 vega ÷ gamma，325 是 32.7，350 是 28.3，375 是 22.9（建仓那天是 53.1、50.3、49.4）。三条腿的 gamma 大半抵掉之后，剩下那一点的正负由这些倍数的差别决定。第二节格子里的位置，说的都是建仓那天。</p>
+  <p class="tiny">按第一节的式子，同一到期日的倍数只因各条腿的隐含波动率不同而不同。改用 Black-Scholes、每条腿用当天自己的隐含波动率（4/29 是 43.27%、40.51%、40.07%），4/29 的倍数是 26.4、24.7、24.4，差得不多；这 6 天的净 gamma 和净 vega 都同号，除 4/30 外净 gamma 还是负的（4/29 是 −0.198、−4.68）。ORATS 的 gamma、vega 出自它自己的模型。净 gamma 只剩一点的时候，它的正负号、vega 跟不跟它同号，都会随模型而变。</p>
+  <p>讲义的符号表默认身在平值附近，建仓时通常就是这样。标的走远以后，结构的希腊字母会跟着变，节点 6 专门讲。</p>
+
+  <h3>一条判断规则</h3>
+  <p>把前三节合起来，看到一串腿就能说出它在哪一格：</p>
+  <table>
+    <thead><tr><th>这串腿</th><th class="txt">gamma 和 vega</th><th class="txt">例子（TSLA 4/13）</th></tr></thead>
+    <tbody>
+      <tr><td>同一到期日，净买入期权</td><td class="txt">都为正</td><td class="txt">straddle、strangle、买 2 卖 1 的 ratio（+0.768、+37.17）</td></tr>
+      <tr><td>同一到期日，净卖出期权</td><td class="txt">都为负</td><td class="txt">卖出 straddle、卖 2 买 1 的 ratio、<span class="sym" data-say="买一张 call，再在更高的两个行权价各卖一张 call。本页是 350/375/400（3.2）。">christmas tree</span>（−0.565、−26.92）</td></tr>
+      <tr><td>同一到期日，买卖张数相等</td><td class="txt">同号；建仓时跟着平值附近的腿（按张数算），标的走远后要重新数</td><td class="txt">butterfly、condor、iron butterfly、<span class="sym" data-say="用 put 和 call 混着搭的 condor。卖出 iron condor 是卖中间两个行权价的 put、call，买两侧更远的 put、call。本页是 325/340/360/375（3.2）。">iron condor</span></td></tr>
+      <tr><td>两个到期日</td><td class="txt">可以反号：gamma 跟<span class="sym" data-say="两个到期日里先到期的那个。本页的 calendar 是 5/8。">近月</span>，vega 跟<span class="sym" data-say="两个到期日里后到期的那个。本页的 calendar 是 5/15。">远月</span></td><td class="txt">calendar（第四节）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>另外两格：两个到期日</h2>
+  <p class="sub">第一节的倍数 S² × σ × t ÷ 100 里有 t。换一个到期日，倍数就变了。</p>
+  <p>离到期越近，期权的价值越接近到期时那条折线，弯曲全挤在行权价附近，平值期权的 gamma 就大。同时剩下的时间少，隐含波动率涨一个点，到期时的分布也宽不了多少，vega 就小。Black-Scholes 里，平值期权的 gamma 大致与 √t 成反比，vega 大致与 √t 成正比。</p>
+  <p>TSLA 4/13 同一个 350 call，两个到期日：5/15 那张（离到期 32 天）gamma 0.820、vega 41.25；5/8 那张（25 天）gamma 0.907、vega 36.50，一张合约。近月的 gamma 大一些，vega 小一些。</p>
+  <p>3.2 的 calendar 买 5/15、卖 5/8。gamma 跟着卖出的近月走，vega 跟着买入的远月走：</p>
+  <div class="formula">
+    <div class="math">calendar ＝ 买 5/15 的 350 call − 5/8 的 350 call</div>
+    <div class="gloss">gamma：0.820 − 0.907 ＝ −0.087　　vega：41.25 − 36.50 ＝ ＋4.75　　theta ＋4.71 每天</div>
+  </div>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="cvPlay">再做一次减法</button></div>
+    <svg id="cv" viewBox="0 0 720 380" role="img" aria-label="两个到期日的倍数线，远月点减近月点得到 calendar 的位置"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--result)"></i>5/15 到期：vega ≈ 50.4 × gamma</span>
+      <span><i class="ln" style="background:var(--ink-faint)"></i>5/8 到期：vega ≈ 40.2 × gamma</span>
+    </div>
+    <div class="say plain" id="cvSay"></div>
+  </div>
+  <p>在平面上看，每个到期日是一条过原点的线，斜率就是它的倍数：5/15 是 50.4，5/8 是 40.2。只用一个到期日，怎么搭都在自己那条线上。两个到期日的点一减，结果可以离开两条线，落进左上。卖出 calendar 是反过来的减法，落在右下：gamma +0.087、vega −4.75。</p>
+  <p>3.2 讲过讲义那三张 calendar 表：标的走远，价差塌下去（负 gamma）；波动率涨，价差变宽（正 vega）；时间过去，价差变宽（正 theta）。讲义批注写的是同一件事：同时到期，gamma 和 vega 同号；不同时到期，可以反号。</p>
+  <p class="tiny">calendar 的 gamma 和 vega 都很小（一张 −0.087、+4.75），因为两个到期日只差 7 天，两张期权的数差不多，大半抵掉。</p>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>选哪一格：价格与价值</h2>
+  <p class="sub">讲义的判据：大多数交易决策取决于价格与价值，价格高于价值就卖，低于价值就买。在期权里，价格是隐含波动率，价值是未来的实际波动率。</p>
+  <table>
+    <thead><tr><th>你的判断（讲义的例子）</th><th class="txt">要的仓位</th><th class="txt">可选结构</th></tr></thead>
+    <tbody>
+      <tr><td>未来实际波动率 25%，高于隐含 20%</td><td class="txt"><span class="dot q1"></span>正 gamma</td><td class="txt">long straddle、long strangle、short butterfly、买多于卖的 ratio spread</td></tr>
+      <tr><td>未来实际波动率 20%，低于隐含 25%</td><td class="txt"><span class="dot q3"></span>负 gamma</td><td class="txt">short straddle、short strangle、long butterfly、卖多于买的 ratio spread</td></tr>
+      <tr><td>隐含波动率涨得至少和实际波动率一样快</td><td class="txt"><span class="dot q2"></span>正 vega</td><td class="txt">买入 calendar spread</td></tr>
+      <tr><td>隐含波动率跌得至少和实际波动率一样快</td><td class="txt"><span class="dot q4"></span>负 vega</td><td class="txt">卖出 calendar spread</td></tr>
+    </tbody>
+  </table>
+
+  <h3>为什么拿实际和隐含比</h3>
+  <p>正 gamma 的仓位每天付 theta，每次标的动了收 ½ × Γ × (ΔS)²。theta 付多少，由隐含波动率定：Θ ≈ −½σ²S²Γ 里的 σ 就是隐含波动率。收多少，由之后真实动了多少定。所以实际波动率高于隐含，收的比付的多，正 gamma 划算；低于隐含，负 gamma 划算。4.2 把这条线叫盈亏平衡波动率，它就等于隐含波动率。</p>
+  <p>TSLA 4/13：350 call 的隐含波动率是 46.3%，入场前一年的历史波动率是 49.3%（1.2）。拿历史来预测，会觉得实际波动会高于隐含，该选右上格。事后量出这 24 天的实际波动率是 45.8%（1.2），和 46.3% 几乎一样：按波动率算，买方和卖方谁都没占到便宜。历史波动率只是做预测的材料，本身不是之后会发生的事。</p>
+
+  <h3>vega 那两行为什么要 calendar</h3>
+  <p>同一到期日的结构，gamma 和 vega 同号，等于同时押两件事：实际会动多少、隐含波动率往哪边走，而且押的方向一样。两个看法一致时，这没有问题。看法相反时，就要 calendar 把两件事拆开。</p>
+  <p>买入 calendar 是负 gamma、正 vega：标的实际动得多，它亏；隐含波动率涨，它赚。讲义说隐含波动率要「涨得至少和实际波动率一样快」，意思是隐含涨带来的钱，要够补标的动起来造成的亏损。卖出 calendar 反过来。</p>
+  <p>隐含波动率确实会自己动。4/22 收盘后 TSLA 发财报，第二天 350 call 的隐含波动率从 48.55% 降到 43.16%（2.3、3.1 讲过这一天）。对所有 vega 为正的仓位，这一跌都是亏损的一项；标的那天动得够多，gamma 那一项才可能补回来。</p>
+
+  <h3>同一格里挑哪个</h3>
+  <p>同一格里的结构，vega 与 gamma 的比例几乎一样（第二节：45 到 51 倍），在平面上方向相同。区别在大小、要付多少钱、盈亏有没有边界。讲义给了每一类的边界，下面配上 TSLA 4/13 一张的数（每股，按成交价：买入付卖一，卖出收买一，同 3.2）：</p>
+  <div class="tbl"><table id="rkTab">
+    <thead><tr><th>结构</th><th class="txt">讲义：下方 / 上方</th><th class="txt">TSLA 一张</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p>右上格里，straddle 和卖出 butterfly 押的是同一件事：TSLA 离开 350 越远越好。straddle 的 gamma 是 1.64，走得越远赚得越多，但先付 38.55；卖出 butterfly 的 gamma 只有 0.21，先收 4.90，TSLA 走出 325 到 375 这一段后最多就赚这 4.90，停在 350 最多亏 20.10。左下格里，卖出 straddle 收得最多（38.35），但跌到 0 时要亏 311.65；买入 butterfly 只付 5.60，最多亏 5.60。</p>
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>从观点到结构</h2>
+  <p class="sub">一个市场观点，按四个问题问下去：方向、实际会动多少、隐含波动率、要几个到期日。问完就落到一格，再从格里挑结构。</p>
+  <ol>
+    <li><b>方向。</b>看涨要 delta 为正，看跌为负，不知道就接近 0。3.1 讲过带方向的两种价差：看涨用<span class="sym" data-say="买低行权价、卖高行权价的一对 call（或 put），同一到期日。delta 为正（3.1）。">牛市价差</span>，看跌用<span class="sym" data-say="买高行权价、卖低行权价的一对 put（或 call），同一到期日。delta 为负（3.1）。">熊市价差</span>。</li>
+    <li><b>实际会动多少，和隐含比。</b>比隐含多，gamma 为正；比隐含少，为负。</li>
+    <li><b>隐含波动率会涨还是跌。</b>涨，vega 为正；跌，为负。</li>
+    <li><b>gamma 和 vega 同号吗。</b>同号，一个到期日就够；反号，要两个到期日。</li>
+  </ol>
+  <p>第 2、3 问有时只答得出一个。同一到期日时，另一个会跟着同号，要检查它是不是你能接受的。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="vwSeg"></div>
+    </div>
+    <div class="bar"><button class="btn ghost" id="vwPlay">从头推一遍</button></div>
+    <div class="vw">
+      <ol class="steps" id="vwSteps"></ol>
+      <div class="mini"><svg id="vwMini" viewBox="0 0 200 200" role="img" aria-label="四个格子，推到哪一格就标出哪一格"></svg></div>
+    </div>
+    <div class="cands" id="vwCands"></div>
+    <div class="pickline" id="vwPick"></div>
+  </div>
+  <p class="tiny">候选里的数都是 4/13 收盘、一张合约：delta 按股，gamma 按每 1 美元，vega 按每个波动率点美元，theta 按每天美元；成本按成交价，每股。牛市、熊市价差的四个希腊字母与 3.1 第四节相同；成本与 3.1 不同，3.1 按中间价（19.50、10.45），这里按成交价（19.75、10.55）。</p>
+
+  <h3>练一练：落在哪一格</h3>
+  <p>下面每一条是一个看法或一串腿，它该落在哪一格？</p>
+  <ul class="drill" id="drill"></ul>
+
+</section>
+
+<!-- ══════════ 七 ══════════ -->
+<section id="s7">
+  <h2><span class="n">七</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号与术语</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">Δ（delta）</div><div class="t">标的涨 1 美元，仓位价值变多少；一张合约按股计。正负号是方向（2.1）。</div></div>
+      <div class="gl"><div class="s">Γ（gamma）</div><div class="t">标的涨 1 美元，delta 变多少。为正时，标的往哪边动都多赚 ½ × Γ × (ΔS)²（2.2）。</div></div>
+      <div class="gl"><div class="s">Θ（theta）</div><div class="t">别的不变，过一天，仓位价值变多少美元。不计利息那一项时，正负号和 gamma 相反（2.2）。Θ ≈ −½σ²S²Γ 是一年的量，除以 365 是每天。</div></div>
+      <div class="gl"><div class="s">ν（vega）</div><div class="t">隐含波动率涨 1 个点，仓位价值变多少美元（2.3）。</div></div>
+      <div class="gl"><div class="s">ν ≈ Γ × S² × σ × t ÷ 100</div><div class="t">vega 由 gamma 算出来的式子。同一到期日，倍数 S² × σ × t ÷ 100 对每条腿差不多，所以净 gamma 与净 vega 同号。</div></div>
+      <div class="gl"><div class="s">S, ΔS</div><div class="t">标的现价（TSLA 4/13 收盘 352.36），以及它的变化。</div></div>
+      <div class="gl"><div class="s">σ</div><div class="t">隐含波动率，年化，写成小数。每个行权价、每个到期日各有一个。</div></div>
+      <div class="gl"><div class="s">t</div><div class="t">离到期的年数。4/13 到 5/15 是 32/365。</div></div>
+      <div class="gl"><div class="s">方差</div><div class="t">离中心的距离平方之后取平均，就是标准差的平方。价格在 t 年里的方差约是 S² × σ² × t。</div></div>
+      <div class="gl"><div class="s">四象限</div><div class="t">按净 gamma、净 vega 的正负号分成的四个格子。右上 ＋/＋，左下 −/−，左上 gamma − vega ＋，右下 gamma ＋ vega −。</div></div>
+      <div class="gl"><div class="s">隐含波动率 / 实际波动率</div><div class="t">隐含波动率从期权价格反推，是价格；未来实际波动率是标的之后真实动了多少，是价值（1.2）。</div></div>
+      <div class="gl"><div class="s">straddle / strangle / guts</div><div class="t">一张 call 加一张 put。同一行权价是 straddle；call 在高、put 在低是 strangle；反过来两条都是实值，是 guts（3.2）。</div></div>
+      <div class="gl"><div class="s">butterfly：身与翼</div><div class="t">三个等距行权价，张数 +1 −2 +1。中间是身，两侧是翼。买入 butterfly 是买翼、卖身（3.2）。</div></div>
+      <div class="gl"><div class="s">condor</div><div class="t">四个行权价的 butterfly：中间一个行权价换成两个，张数 +1 −1 −1 +1（3.2）。</div></div>
+      <div class="gl"><div class="s">iron butterfly / iron condor</div><div class="t">用 put 和 call 混着搭的 butterfly、condor。卖出 iron butterfly 的盈亏和买入 butterfly 一样（3.2）。</div></div>
+      <div class="gl"><div class="s">ratio spread / christmas tree</div><div class="t">买卖张数不相等的结构。净买入期权落在右上，净卖出落在左下（3.2）。</div></div>
+      <div class="gl"><div class="s">牛市价差 / 熊市价差</div><div class="t">同一到期日、两个行权价的一对期权。牛市价差买低卖高，delta 为正；熊市价差买高卖低，delta 为负（3.1）。</div></div>
+      <div class="gl"><div class="s">calendar：近月与远月</div><div class="t">同一行权价、两个到期日。到期早的叫近月，晚的叫远月。买入 calendar 是买远月、卖近月（3.2）。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节 <b>5.1 Synthetics</b>：用两条腿做出第三样东西，再用这些合成关系把任意多腿仓位化简成最简形式。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价与希腊字母来自 ORATS 历史快照</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);            // 负数用真正的减号
+const sgn = (n,d=2) => (n>0?'+':n<0?'−':'')+Math.abs(n).toFixed(d);
+const lab = (x,y,t,c,a='start',s=12,w=400)=>`<text x="${(+x).toFixed(1)}" y="${(+y).toFixed(1)}" text-anchor="${a}" font-size="${s}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=p=>p<0?0:p>1?1:1-Math.pow(1-p,3);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const narrow=()=>document.querySelector('.wrap').clientWidth<560;
+const QC={q1:'var(--result)',q2:'var(--good)',q3:'var(--control)',q4:'var(--warn)'};
+const QBG={q1:'var(--result-bg)',q2:'var(--good-bg)',q3:'var(--control-bg)',q4:'var(--warn-bg)'};
+const QS=(g,v)=> g>0 ? (v>0?'q1':'q4') : (v>0?'q2':'q3');
+const QTXT={q1:'gamma ＋ vega ＋',q2:'gamma − vega ＋',q3:'gamma − vega −',q4:'gamma ＋ vega −'};
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 案例数据 ══════════
+   由 scripts/data/station_3_3.py 生成：ORATS TSLA 2026-04-13 16:00 快照，5/15 到期（calendar 另用 5/8）。
+   ST：每个结构一张合约的 delta（股）、gamma（股/美元）、theta（美元/天）、vega（美元/点）；mid / exec 是每股成本
+       （中间价 / 成交价，买入付卖一、卖出收买一），max / min 是按成交价的到期最多赚、最多亏（每股）。
+   LEG：单腿一张合约的四个数与隐含波动率（%）。IVS：第三节模型曲线用的隐含波动率。
+   DAILY：4/13 建的 325/350/375 call butterfly 与 325/375 strangle，每天收盘的净 gamma（一张，ORATS）。 */
+/* data:start */
+const ST={"straddle":{"name":"买入 straddle","legs":[[1,"C",350],[1,"P",350]],"d":11.48,"g":1.64,"t":-59.69,"v":82.5,"mid":38.45,"exec":38.55,"max":"无上限","min":-38.55},"strangle":{"name":"买入 strangle","legs":[[1,"P",325],[1,"C",375]],"d":10.17,"g":1.43,"t":-52.9,"v":72.99,"mid":18.75,"exec":18.85,"max":"无上限","min":-18.85},"guts":{"name":"买入 guts","legs":[[1,"C",325],[1,"P",375]],"d":10.17,"g":1.43,"t":-52.31,"v":72.99,"mid":68.75,"exec":69.05,"max":"无上限","min":-19.05},"lifly":{"name":"买入 iron butterfly","legs":[[1,"C",350],[1,"P",350],[-1,"P",325],[-1,"C",375]],"d":1.31,"g":0.21,"t":-6.8,"v":9.51,"mid":19.7,"exec":19.9,"max":5.1,"min":-19.9},"sfly":{"name":"卖出 butterfly","legs":[[-1,"C",325],[2,"C",350],[-1,"C",375]],"d":1.31,"g":0.21,"t":-7.09,"v":9.51,"mid":-5.25,"exec":-4.9,"max":4.9,"min":-20.1},"ratioB":{"name":"ratio（买多于卖）","legs":[[-1,"C",350],[2,"C",375]],"d":15.24,"g":0.768,"t":-25.9,"v":37.17,"mid":0.05,"exec":0.2,"max":"无上限","min":-25.2},"sstraddle":{"name":"卖出 straddle","legs":[[-1,"C",350],[-1,"P",350]],"d":-11.48,"g":-1.64,"t":59.69,"v":-82.5,"mid":-38.45,"exec":-38.35,"max":38.35,"min":"无下限"},"sstrangle":{"name":"卖出 strangle","legs":[[-1,"P",325],[-1,"C",375]],"d":-10.17,"g":-1.43,"t":52.9,"v":-72.99,"mid":-18.75,"exec":-18.65,"max":18.65,"min":"无下限"},"cfly":{"name":"买入 call butterfly","legs":[[1,"C",325],[-2,"C",350],[1,"C",375]],"d":-1.31,"g":-0.21,"t":7.09,"v":-9.51,"mid":5.25,"exec":5.6,"max":19.4,"min":-5.6},"pfly":{"name":"买入 put butterfly","legs":[[1,"P",325],[-2,"P",350],[1,"P",375]],"d":-1.31,"g":-0.21,"t":7.09,"v":-9.51,"mid":5.35,"exec":5.6,"max":19.4,"min":-5.6},"sifly":{"name":"卖出 iron butterfly","legs":[[1,"P",325],[-1,"P",350],[-1,"C",350],[1,"C",375]],"d":-1.31,"g":-0.21,"t":6.8,"v":-9.51,"mid":-19.7,"exec":-19.5,"max":19.5,"min":-5.5},"condor":{"name":"买入 call condor","legs":[[1,"C",325],[-1,"C",340],[-1,"C",360],[1,"C",375]],"d":-1.06,"g":-0.174,"t":5.89,"v":-7.92,"mid":4.35,"exec":4.75,"max":10.25,"min":-4.75},"sicondor":{"name":"卖出 iron condor","legs":[[1,"P",325],[-1,"P",340],[-1,"C",360],[1,"C",375]],"d":-1.06,"g":-0.174,"t":5.71,"v":-7.92,"mid":-10.575,"exec":-10.35,"max":10.35,"min":-4.65},"tree":{"name":"christmas tree","legs":[[1,"C",350],[-1,"C",375],[-1,"C",400]],"d":0.71,"g":-0.565,"t":18.17,"v":-26.92,"mid":5.725,"exec":5.85,"max":19.15,"min":"无下限"},"ratioS":{"name":"ratio（卖多于买）","legs":[[1,"C",350],[-2,"C",375]],"d":-15.24,"g":-0.768,"t":25.9,"v":-37.17,"mid":-0.05,"exec":0.1,"max":24.9,"min":"无下限"},"cal":{"name":"买入 calendar","legs":[[1,"C",350,"05-15"],[-1,"C",350,"05-08"]],"d":0.22,"g":-0.087,"t":4.71,"v":4.75,"mid":2.0,"exec":2.1,"max":"","min":""},"scal":{"name":"卖出 calendar","legs":[[-1,"C",350,"05-15"],[1,"C",350,"05-08"]],"d":-0.22,"g":0.087,"t":-4.71,"v":-4.75,"mid":-2.0,"exec":-1.9,"max":"","min":""},"bull320":{"name":"牛市价差 320/350","legs":[[1,"C",320],[-1,"C",350]],"d":22.14,"g":-0.235,"t":5.6,"v":-9.75,"mid":19.5,"exec":19.75,"max":10.25,"min":-19.75},"bull350":{"name":"牛市价差 350/380","legs":[[1,"C",350],[-1,"C",380]],"d":23.91,"g":0.058,"t":-4.32,"v":3.59,"mid":11.975,"exec":12.05,"max":17.95,"min":-12.05},"sput":{"name":"卖出 325 put","legs":[[-1,"P",325]],"d":25.32,"g":-0.636,"t":24.0,"v":-33.78,"mid":-8.2,"exec":-8.15,"max":8.15,"min":-316.85},"bear350":{"name":"熊市价差 350/320","legs":[[1,"P",350],[-1,"P",320]],"d":-22.14,"g":0.235,"t":-5.25,"v":9.75,"mid":10.45,"exec":10.55,"max":19.45,"min":-10.55},"lput":{"name":"买入 350 put","legs":[[1,"P",350]],"d":-44.26,"g":0.82,"t":-27.79,"v":41.25,"mid":17.4,"exec":17.45,"max":332.55,"min":-17.45},"lcall":{"name":"买入 350 call","legs":[[1,"C",350]],"d":55.74,"g":0.82,"t":-31.9,"v":41.25,"mid":21.05,"exec":21.1,"max":"无上限","min":-21.1}};
+const LEG={"C325":{"delta":74.68,"gamma":0.636,"theta":-27.81,"vega":33.78,"iv":48.18},"C350":{"delta":55.74,"gamma":0.82,"theta":-31.9,"vega":41.25,"iv":46.29},"C375":{"delta":35.49,"gamma":0.794,"theta":-28.9,"vega":39.21,"iv":45.16},"P325":{"delta":-25.32,"gamma":0.636,"theta":-23.996,"vega":33.78,"iv":48.02},"P350":{"delta":-44.26,"gamma":0.82,"theta":-27.792,"vega":41.25,"iv":46.08},"C340":{"delta":63.79,"gamma":0.766,"theta":-31.08,"vega":39.25,"iv":47.04},"C360":{"delta":47.44,"gamma":0.838,"theta":-31.52,"vega":41.66,"iv":45.76},"C400":{"delta":19.54,"gamma":0.591,"theta":-21.17,"vega":28.96,"iv":44.96},"C350-0508":{"delta":55.52,"gamma":0.907,"theta":-36.61,"vega":36.5,"iv":47.3},"C320":{"delta":77.88,"gamma":0.585,"theta":-26.3,"vega":31.5,"iv":48.76},"C380":{"delta":31.83,"gamma":0.762,"theta":-27.58,"vega":37.66,"iv":45.08}};
+const IVS={"c325":0.4818,"c350":0.4629,"c375":0.4516,"p325":0.4802,"p350":0.4608};
+const DAILY={"days":["04-13","04-14","04-15","04-16","04-17","04-20","04-21","04-22","04-23","04-24","04-27","04-28","04-29","04-30","05-01","05-04","05-05","05-06","05-07","05-08","05-11","05-12","05-13","05-14"],"S":[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83,378.75,376.14,373.02,381.77,390.83,392.48,389.52,398.62,411.74,428.45,445.06,433.7,445.2,443.36],"fg":[-0.21,-0.163,0.024,0.013,0.017,0.089,-0.039,-0.038,-0.164,-0.052,0.083,0.068,0.058,0.209,0.243,0.287,0.401,0.344,0.384,0.169,0.065,0.114,0.037,0.001],"fv":[-9.51,-8.32,-1.31,-0.08,3.18,2.21,-4.14,-1.7,-5.26,-0.63,-1.1,-0.71,-3.95,-1.27,5.4,3.09,5.64,4.59,6.5,2.73,0.83,1.27,0.32,0.01],"sg":[1.43,1.335,0.968,1.025,0.841,1.069,1.069,1.068,1.42,1.5,1.507,1.624,1.762,1.573,1.177,1.219,1.387,1.012,0.544,0.265,0.077,0.152,0.039,0.001]};
+const VG=[[300,51.26,0.00376,0.2152,32],[325,48.18,0.00636,0.3378,32],[350,46.29,0.0082,0.4125,32],[375,45.16,0.00794,0.3921,32],[400,44.96,0.00591,0.2896,32],[350,47.3,0.00907,0.365,25]];
+/* data:end */
+const S0=352.36, R=0.043, T15=32/365;
+
+/* ══════════ 共用 ══════════ */
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+function segOn(id,fn){
+  const bs=document.querySelectorAll('#'+id+' button');
+  bs.forEach(b=>b.addEventListener('click',()=>{ bs.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(b.dataset); }));
+}
+/* 按帧推进：每 ms 毫秒走一步，直到 done() */
+function runLoop(s,ms,step,draw,done){
+  s.playing=true; s.last=0; s.acc=0; const id=(s.run=(s.run||0)+1);
+  const tick=t=>{
+    if(!s.playing || s.run!==id) return;
+    const dt=s.last?Math.min(t-s.last,100):ms; s.last=t; s.acc+=dt;
+    while(s.acc>=ms && !done()){ step(); s.acc-=ms; }
+    draw();
+    if(done()){ s.playing=false; if(s.onEnd) s.onEnd(); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function npdf(x){ return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI); }
+function bsG(S,K,s,T=T15){ const d1=(Math.log(S/K)+(R+s*s/2)*T)/(s*Math.sqrt(T)); return npdf(d1)/(S*s*Math.sqrt(T)); }
+const legTxt=legs=>legs.map(([q,cp,K,e])=>`${q>0?'买':'卖'}${Math.abs(q)>1?' '+Math.abs(q)+' 张':''} ${K} ${cp==='C'?'call':'put'}${e?'（'+(+e.slice(0,2))+'/'+(+e.slice(3))+'）':''}`).join('，');
+function ticks(a,b,n){   // 大约 n 格的整齐刻度
+  const raw=(b-a)/n, p=Math.pow(10,Math.floor(Math.log10(raw))), m=raw/p, st=(m<1.5?1:m<3.5?2:m<7.5?5:10)*p;
+  const out=[]; for(let v=Math.ceil(a/st)*st; v<=b+1e-9; v+=st) out.push(Math.abs(v)<1e-9?0:v); return {v:out,st};
+}
+const tf=(v,st)=>{ const d=st>=1?0:st>=0.1?1:2; return v===0?'0':fm(v,d); };
+
+/* ══════════ 一 · vega ÷ gamma 表 ══════════ */
+function renderVG(){   // VG：[行权价, 隐含波动率 %, gamma, vega（每股，ORATS）, 离到期天数]
+  $('vgTab').querySelector('tbody').innerHTML=VG.map(([K,iv,g,v,d])=>{
+    const f=g*S0*S0*iv/100*(d/365)/100;
+    return `<tr${K===350&&d===32?' style="font-weight:600"':''}><td>${K} call${d===32?'':'（5/8 到期）'}</td><td>${iv.toFixed(2)}%</td><td>${g.toFixed(5)}</td><td>${v.toFixed(4)}</td><td>${f.toFixed(4)}</td><td>${(v/g).toFixed(1)}</td></tr>`;
+  }).join('');
+}
+
+/* ══════════ 二 · 结构落进四象限：每条腿一支箭头，首尾相接 ══════════ */
+const PTS=[   // 同一坐标的结构合成一个点；标签相对点的位置 [dx, dy, 对齐]：全景 f，手机宽度的全景 n（没有就用 f），放大 z
+  {k:['straddle'],t:['买入 straddle'],f:[-10,-8,'end']},
+  {k:['strangle','guts'],t:['买入 strangle、guts'],f:[-10,16,'end']},
+  {k:['sstraddle'],t:['卖出 straddle'],f:[10,14,'start']},
+  {k:['sstrangle'],t:['卖出 strangle'],f:[10,-6,'start']},
+  {k:['ratioB'],t:['ratio（买 2 卖 1）'],f:[10,12,'start'],n:[-10,4,'end']},
+  {k:['ratioS'],t:['ratio（卖 2 买 1）'],f:[-10,4,'end'],n:[10,18,'start']},
+  {k:['tree'],t:['christmas tree'],f:[10,10,'start']},
+  {k:['cfly','pfly','sifly'],t:['买入 butterfly（call、put）','卖出 iron butterfly'],z:[10,16,'start']},
+  {k:['sfly','lifly'],t:['卖出 butterfly','买入 iron butterfly'],z:[-10,-14,'end']},
+  {k:['condor','sicondor'],t:['买入 condor','卖出 iron condor'],z:[28,4,'start']},
+  {k:['cal'],t:['买入 calendar'],z:[-10,-8,'end']},
+  {k:['scal'],t:['卖出 calendar'],z:[10,14,'start']}
+];
+/* 一条腿一条腿加出来的三个结构：[张数, LEG 的键, 名称]。每条腿是一支箭头 (张数 × gamma, 张数 × vega)，首尾相接 */
+const BUILD=[
+  {k:'straddle',legs:[[1,'C350','买 350 call'],[1,'P350','买 350 put']]},
+  {k:'cfly',legs:[[1,'C325','买 325 call'],[-2,'C350','卖 2 张 350 call'],[1,'C375','买 375 call']]},
+  {k:'cal',legs:[[1,'C350','买 5/15 的 350 call'],[-1,'C350-0508','卖 5/8 的 350 call']]}
+];
+const QD=(()=>{
+  const svg=$('qd'), s={k:0,zoom:0,playing:false};
+  const B0=1.0, HOLD=0.8;                        // 先画虚线（0 到 0.8），再逐个结构加腿；每条腿占 1
+  let tt=B0;
+  BUILD.forEach(b=>{ b.s=tt; b.n=b.legs.length; b.done=tt+b.n; tt+=b.n+HOLD;
+    let g=0,v=0; b.pts=[[0,0]]; b.legs.forEach(([q,key])=>{ g+=q*LEG[key].gamma; v+=q*LEG[key].vega; b.pts.push([g,v]); }); });
+  const REST=tt, ZS=REST+1.0, END=ZS+1.8;         // 其余的点一起出现，然后放大原点附近
+  PTS.forEach(p=>{ const a=ST[p.k[0]]; p.g=a.g; p.v=a.v; p.q=QS(a.g,a.v); p.big=Math.abs(a.g)>0.5;
+    const b=BUILD.find(b=>p.k.includes(b.k)); p.at=b?b.done:REST; p.fd=b?0.4:0.8; });
+  const Z0={x:2,y:100}, Z1={x:0.3,y:15};
+  function geo(){ const nw=narrow(); const W=nw?460:720, H=nw?460:460, L=nw?40:56, Rr=W-(nw?12:16), T=18, B=H-40; return {W,H,L,R:Rr,T,B,cx:(L+Rr)/2,cy:(T+B)/2}; }
+  function draw(){
+    const G=geo(), {W,H,L,R:Rr,T,B,cx,cy}=G, nw=narrow();
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const z=ease(s.zoom), xr=Z0.x*Math.pow(Z1.x/Z0.x,z), yr=Z0.y*Math.pow(Z1.y/Z0.y,z);
+    const X=g=>cx+g/xr*(Rr-L)/2, Y=v=>cy-v/yr*(B-T)/2;
+    const fs=nw?13:12;
+    const mk=(id,c)=>`<marker id="${id}" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`;
+    let g=`<defs><clipPath id="qdClip"><rect x="${L}" y="${T}" width="${Rr-L}" height="${B-T}"/></clipPath>${mk('qdAb','var(--result)')}${mk('qdAs','var(--control)')}</defs>`;
+    // 四个格子
+    g+=`<rect x="${cx}" y="${T}" width="${Rr-cx}" height="${cy-T}" fill="${QBG.q1}" opacity=".55"/>`;
+    g+=`<rect x="${L}" y="${T}" width="${cx-L}" height="${cy-T}" fill="${QBG.q2}" opacity=".55"/>`;
+    g+=`<rect x="${L}" y="${cy}" width="${cx-L}" height="${B-cy}" fill="${QBG.q3}" opacity=".55"/>`;
+    g+=`<rect x="${cx}" y="${cy}" width="${Rr-cx}" height="${B-cy}" fill="${QBG.q4}" opacity=".55"/>`;
+    const cap=nw?10.5:11;
+    // 手机宽度下右上格的格名放到右下角，给 straddle 的标签让位
+    g+=(nw?lab(Rr-6,cy-8,QTXT.q1,QC.q1,'end',cap,600):lab(cx+6,T+15,QTXT.q1,QC.q1,'start',cap,600))+lab(L+6,T+15,QTXT.q2,QC.q2,'start',cap,600)+lab(cx-6,B-8,QTXT.q3,QC.q3,'end',cap,600)+lab(Rr-6,B-8,QTXT.q4,QC.q4,'end',cap,600);
+    // 刻度
+    const tx=ticks(-xr,xr,nw?4:8), ty=ticks(-yr,yr,6);
+    tx.v.forEach(v=>{ const x=X(v); if(x<L-1||x>Rr+1) return; g+=`<line x1="${x}" y1="${T}" x2="${x}" y2="${B}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`; g+=lab(x,B+16,tf(v,tx.st),'var(--ink-faint)','middle',11); });
+    ty.v.forEach(v=>{ const y=Y(v); if(y<T-1||y>B+1) return; g+=`<line x1="${L}" y1="${y}" x2="${Rr}" y2="${y}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`; if(v!==0) g+=lab(L-5,y+4,tf(v,ty.st),'var(--ink-faint)','end',11); });
+    g+=lab(Rr,H-6,'gamma（一张，股/美元）→','var(--ink-soft)','end',11.5);
+    g+=lab(L+4,T-5,'↑ vega（一张，美元/点）','var(--ink-soft)','start',11.5);
+    g+=`<g clip-path="url(#qdClip)">`;
+    // 倍数线：先画出来，5/15 的腿都沿着它
+    const lp=ease(clamp(s.k/0.8,0,1));
+    if(lp>0){ const e=Math.min(xr,yr/50.4)*1.2*lp; g+=`<line x1="${X(-e)}" y1="${Y(-50.4*e)}" x2="${X(e)}" y2="${Y(50.4*e)}" stroke="var(--ink-soft)" stroke-width="1.4" stroke-dasharray="6 5"/>`; }
+    // 放大区域的框（全景时）
+    if(s.zoom<0.999){ const a=1-z; g+=`<rect x="${X(-Z1.x)}" y="${Y(Z1.y)}" width="${X(Z1.x)-X(-Z1.x)}" height="${Y(-Z1.y)-Y(Z1.y)}" fill="none" stroke="var(--ink-faint)" stroke-dasharray="3 3" opacity="${a}"/>`; }
+    // 正在加的结构：每条腿一支箭头，首尾相接。往回退的中间那条腿挪开 7 像素，免得和别的腿叠在一起
+    const ux=X(1)-X(0), uy=Y(50.4)-Y(0), ul=Math.hypot(ux,uy), px=-uy/ul*7, py=ux/ul*7;
+    BUILD.forEach((b,bi)=>{
+      if(s.k<b.s) return;
+      const nb=BUILD[bi+1], fade=1-clamp((s.k-(nb?nb.s:REST))/0.4,0,1); if(fade<=0) return;
+      const sh=j=>(j%2===1 && j<b.n-1)?1:0;
+      let h='';
+      b.legs.forEach(([q],j)=>{
+        const pr=ease(clamp((s.k-b.s-j)/0.85,0,1)); if(pr<=0) return;
+        const [g0,v0]=b.pts[j], [g1,v1]=b.pts[j+1], o=sh(j);
+        const x0=X(g0)+px*o, y0=Y(v0)+py*o, x1=X(g0+(g1-g0)*pr)+px*o, y1=Y(v0+(v1-v0)*pr)+py*o;
+        if(j>0 && sh(j-1)!==o) h+=`<line x1="${X(g0)+px*sh(j-1)}" y1="${Y(v0)+py*sh(j-1)}" x2="${x0}" y2="${y0}" stroke="var(--ink-faint)" stroke-width="1.2" stroke-dasharray="2 2"/>`;
+        h+=`<line x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${q>0?'var(--result)':'var(--control)'}" stroke-width="2.6" stroke-linecap="round" marker-end="url(#${q>0?'qdAb':'qdAs'})"/>`;
+      });
+      g+=`<g opacity="${fade.toFixed(3)}">${h}</g>`;
+    });
+    // 点：加出来的三个在终点出现，其余的最后一起出现
+    PTS.forEach(p=>{
+      const f=clamp((s.k-p.at)/p.fd,0,1); if(f<=0) return;
+      const x=X(p.g), y=Y(p.v), r=(nw?6.5:6)*(0.5+0.5*ease(f));
+      g+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${QC[p.q]}" stroke="var(--panel)" stroke-width="1.5" opacity="${(0.3+0.7*f).toFixed(3)}"/>`;
+      const o=(p.big? (1-z) : z)*f;
+      const off=p.big?(nw&&p.n?p.n:p.f):p.z;
+      if(o>0.02 && off) p.t.forEach((t,j)=>{ g+=`<g opacity="${o.toFixed(3)}">`+lab(x+off[0],y+off[1]+j*(fs+3),t,QC[p.q],off[2],fs,600)+'</g>'; });
+    });
+    if(s.zoom<0.5 && s.k>=REST+0.6) g+=`<g opacity="${1-2*s.zoom}">`+lab(X(Z1.x)+6,Y(-Z1.y)+14,'原点附近还有 5 个点','var(--ink-faint)','start',11)+'</g>';
+    g+='</g>';
+    svg.innerHTML=g;
+    // 读数与腿：正在加（或最后加完）的那个结构
+    const bi=BUILD.reduce((a,b,i)=>s.k>=b.s?i:a,0), b=BUILD[bi], a=ST[b.k], q=QS(a.g,a.v);
+    const chips=b.legs.map(([n,key,t],j)=>`<span class="${n>0?'buy':'sell'}${s.k>b.s+j+0.1?' on':''}">${t}：${sgn(n*LEG[key].gamma,3)}，${sgn(n*LEG[key].vega)}</span>`);
+    chips.push(`<span class="sum${s.k>=b.done?' on':''}">加起来：${sgn(a.g,3)}，${sgn(a.v)}</span>`);
+    $('qdChips').innerHTML='<span class="hd">每条腿一张（gamma，vega）</span>'+chips.join('');
+    $('qdN').innerHTML=`<span class="dot ${q}"></span>${a.name}`;
+    $('qdL').textContent=legTxt(a.legs);
+    $('qdG').textContent=sgn(a.g,3); $('qdV').textContent=sgn(a.v); $('qdT').textContent=sgn(a.t);
+    $('qdD').textContent='delta '+sgn(a.d);
+    $('qdG').style.color=$('qdV').style.color=QC[q];
+  }
+  function setZoomBtn(v){ document.querySelectorAll('#qdZoom button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.z===String(v))); }
+  function start(){
+    s.playing=false; s.k=0; s.zoom=0; setZoomBtn(0);
+    if(reduced){ s.k=END; s.zoom=1; setZoomBtn(1); draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(END,s.k+16.7/520); if(s.k>ZS) s.zoom=clamp((s.k-ZS)/1.6,0,1); },draw,()=>s.k>=END);
+    s.onEnd=()=>{ s.zoom=1; setZoomBtn(1); draw(); };
+  }
+  function zoomTo(v){
+    if(s.playing) return;
+    const from=s.zoom, to=+v; if(from===to) return;
+    if(reduced){ s.zoom=to; draw(); return; }
+    const t0=performance.now();
+    const f=t=>{ const p=clamp((t-t0)/900,0,1); s.zoom=from+(to-from)*p; draw(); if(p<1) requestAnimationFrame(f); };
+    requestAnimationFrame(f);
+  }
+  segOn('qdZoom',d=>zoomTo(d.z));
+  $('qdPlay').addEventListener('click',start);
+  s.k=END; s.zoom=1;
+  return {start,draw,svg};
+})();
+
+function renderGTab(){
+  const groups=[['q1','右上：gamma ＋ vega ＋',['straddle','strangle','guts','sfly','lifly','ratioB']],
+                ['q3','左下：gamma − vega −',['sstraddle','sstrangle','cfly','pfly','sifly','condor','sicondor','tree','ratioS']],
+                ['q2','左上：gamma − vega ＋',['cal']],['q4','右下：gamma ＋ vega −',['scal']]];
+  const c=v=>v>0?'pos':v<0?'neg':'';
+  $('gTab').querySelector('tbody').innerHTML=groups.map(([q,t,ks])=>
+    `<tr class="grp"><td colspan="5"><span class="dot ${q}"></span>${t}</td></tr>`+ks.map(k=>{ const a=ST[k];
+      return `<tr><td>${a.name}<span class="lsub">${legTxt(a.legs)}</span></td><td>${sgn(a.d)}</td><td class="${c(a.g)}">${sgn(a.g,3)}</td><td class="${c(a.t)}">${sgn(a.t)}</td><td class="${c(a.v)}">${sgn(a.v)}</td></tr>`; }).join('')).join('');
+}
+
+/* ══════════ 三 · gamma 的山叠起来 ══════════ */
+const HILL={
+  stg:{legs:[{p:[[1,325,IVS.p325]],t:'买 325 put',o:LEG.P325.gamma},{p:[[1,375,IVS.c375]],t:'买 375 call',o:LEG.C375.gamma}],
+       say:()=>`两条腿都是买入，两条曲线都在 0 上面，加起来处处为正。在 352.36，325 put 0.636 加 375 call 0.794，合计 <b>+1.43</b>。TSLA 走到哪里，这个 strangle 的 gamma 都不会变成负的。`},
+  fly:{legs:[{p:[[1,325,IVS.c325]],t:'买 325 call',o:LEG.C325.gamma},{p:[[-2,350,IVS.c350]],t:'卖 2 张 350 call',o:-2*LEG.C350.gamma},{p:[[1,375,IVS.c375]],t:'买 375 call',o:LEG.C375.gamma}],
+       say:()=>`在 352.36，卖出的两张 350 合计 −1.64，买入的两翼合计 0.636 + 0.794 ＝ +1.43，加起来 <b>−0.21</b>。黑线在 ${Z.lo.toFixed(2)} 到 ${Z.hi.toFixed(2)} 之间为负，比两翼 325 到 375 宽：身有两张，TSLA 走到翼那里，两张身的 gamma 还是比一张翼的多。`},
+  dec:{legs:[{p:[[-1,350,IVS.c350],[-1,350,IVS.p350]],t:'卖出 350 straddle',o:ST.sstraddle.g},{p:[[1,325,IVS.p325],[1,375,IVS.c375]],t:'买入 325/375 strangle',o:ST.strangle.g}],
+       say:()=>`先放卖出的 350 straddle，再加买入的 325/375 strangle。在 352.36，卖出的两张 350 合计 −1.64，买入的两翼合计 +1.43，加起来 <b>−0.21</b>。加出来的黑线和 325/350/375 butterfly 那条几乎重合（put 腿用的是 put 自己的隐含波动率，差一点点）。`}
+};
+const Z=(()=>{   // butterfly 模型净 gamma 过 0 的两个价位（二分法）
+  const f=S=>bsG(S,325,IVS.c325)-2*bsG(S,350,IVS.c350)+bsG(S,375,IVS.c375);
+  const root=(a,b)=>{ for(let i=0;i<80;i++){ const m=(a+b)/2; if(f(a)*f(m)<=0) b=m; else a=m; } return (a+b)/2; };
+  return {lo:root(280,350),hi:root(350,450)};
+})();
+const HL=(()=>{
+  const svg=$('hl'), s={key:'stg',k:0,playing:false};
+  const Smin=265, Smax=450;
+  const legG=(lg,S)=>lg.p.reduce((a,[q,K,iv])=>a+q*bsG(S,K,iv)*100,0);
+  function draw(){
+    const nw=narrow(), W=nw?460:720, H=nw?330:330, L=nw?40:48, Rr=W-12, T=16, B=H-40;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const P=HILL[s.key], n=P.legs.length, ym=1.85;
+    const X=S=>L+(S-Smin)/(Smax-Smin)*(Rr-L), Y=v=>T+(ym-v)/(2*ym)*(B-T);
+    let g='';
+    [-1.5,-1,-0.5,0,0.5,1,1.5].forEach(v=>{ g+=`<line x1="${L}" y1="${Y(v)}" x2="${Rr}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`; g+=lab(L-5,Y(v)+4,v===0?'0':fm(v,1),'var(--ink-faint)','end',11); });
+    for(let S=275;S<=450;S+=25){ g+=lab(X(S),B+16,S,'var(--ink-faint)','middle',11); g+=`<line x1="${X(S)}" y1="${B}" x2="${X(S)}" y2="${B+4}" stroke="var(--ink-faint)"/>`; }
+    g+=lab(Rr,H-4,'TSLA 价格 →','var(--ink-soft)','end',11.5);
+    g+=lab(L+4,T+10,'gamma，一张（股/美元）','var(--ink-soft)','start',11.5);
+    // 已加上的腿之和（最后一条按进度渐入）
+    const full=Math.floor(s.k), fr=s.k-full;
+    const pts=[]; const step=(Smax-Smin)/180;
+    for(let S=Smin;S<=Smax+1e-9;S+=step){
+      let v=0; for(let j=0;j<Math.min(full,n);j++) v+=legG(P.legs[j],S);
+      if(full<n && fr>0) v+=legG(P.legs[full],S)*ease((fr-0.45)/0.55);
+      pts.push([S,v]);
+    }
+    // 各条腿（逐条从左往右画出来）
+    P.legs.forEach((lg,j)=>{
+      const p=clamp((s.k-j)/0.5,0,1); if(p<=0) return;
+      const sell=lg.p[0][0]<0, col=sell?'var(--control)':'var(--result)', end=Smin+(Smax-Smin)*p;
+      const d=[]; for(let S=Smin;S<=end+1e-9;S+=step) d.push(X(S).toFixed(1)+','+Y(legG(lg,S)).toFixed(1));
+      g+=`<polyline points="${d.join(' ')}" fill="none" stroke="${col}" stroke-width="1.8" opacity=".8"/>`;
+    });
+    if(s.k>0.45){
+      // 和的正负面积
+      const area=pts.map(([S,v])=>X(S).toFixed(1)+','+Y(v).toFixed(1)).join(' ');
+      g+=`<clipPath id="hlPos"><rect x="${L}" y="${T}" width="${Rr-L}" height="${Y(0)-T}"/></clipPath><clipPath id="hlNeg"><rect x="${L}" y="${Y(0)}" width="${Rr-L}" height="${B-Y(0)}"/></clipPath>`;
+      g+=`<polygon points="${X(Smin)},${Y(0)} ${area} ${X(Smax)},${Y(0)}" fill="var(--result-bg)" clip-path="url(#hlPos)"/>`;
+      g+=`<polygon points="${X(Smin)},${Y(0)} ${area} ${X(Smax)},${Y(0)}" fill="var(--control-bg)" clip-path="url(#hlNeg)"/>`;
+      g+=`<polyline points="${area}" fill="none" stroke="var(--ink)" stroke-width="3"/>`;
+    }
+    // 352.36
+    g+=`<line x1="${X(S0)}" y1="${T}" x2="${X(S0)}" y2="${B}" stroke="var(--ink-soft)" stroke-dasharray="2 3"/>`;
+    if(s.k>=n && s.key!=='stg'){
+      [Z.lo,Z.hi].forEach(z=>{ g+=`<circle cx="${X(z)}" cy="${Y(0)}" r="4" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.6"/>`; g+=lab(X(z),Y(0)+(z<S0?-10:18),z.toFixed(2),'var(--ink)','middle',11,600); });
+    }
+    if(s.k>=n){ const v=pts.reduce((a,b)=>Math.abs(b[0]-S0)<Math.abs(a[0]-S0)?b:a)[1]; g+=`<circle cx="${X(S0)}" cy="${Y(v)}" r="4.5" fill="var(--ink)"/>`; }
+    svg.innerHTML=g;
+    // 标签
+    const chips=P.legs.map((lg,j)=>`<span class="${lg.p[0][0]<0?'sell':'buy'}${s.k>j+0.3?' on':''}">${lg.t}：${sgn(lg.o,3)}</span>`);
+    const sum=P.legs.reduce((a,lg)=>a+lg.o,0);
+    chips.push(`<span class="sum${s.k>=n?' on':''}">合计：${sgn(sum,3)}</span>`);
+    $('hlChips').innerHTML=chips.join('');
+    $('hlSay').innerHTML= s.k>=n ? P.say() : '';
+  }
+  function start(){
+    s.playing=false; s.k=0;
+    const n=HILL[s.key].legs.length;
+    if(reduced){ s.k=n; draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(n,s.k+16.7/1100); },draw,()=>s.k>=n);
+  }
+  segOn('hlSeg',d=>{ s.key=d.p; start(); });
+  $('hlPlay').addEventListener('click',start);
+  s.k=2;
+  return {start,draw,svg};
+})();
+
+/* ══════════ 三 · 逐天回放 ══════════ */
+const DY=(()=>{
+  const svg=$('dy'), s={k:0,playing:false}, n=DAILY.days.length;
+  const md=d=>+d.slice(0,2)+'/'+(+d.slice(3));
+  function draw(){
+    const nw=narrow(), W=nw?460:720, H=nw?420:400, L=nw?42:52, Rr=W-10, T=12;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const pb=nw?118:112, gap=14, r1=[T+14,T+pb], r2=[r1[1]+gap+14,r1[1]+gap+pb], r3=[r2[1]+gap+14,r2[1]+gap+pb];
+    const X=i=>L+(i+0.5)/n*(Rr-L), bw=(Rr-L)/n*0.62;
+    const kk=Math.floor(s.k), fr=s.k-kk;
+    let g='';
+    // ① TSLA 收盘
+    const sy=v=>r1[1]-(v-340)/(455-340)*(r1[1]-r1[0]);
+    g+=lab(L,r1[0]-4,'TSLA 收盘','var(--ink-soft)','start',11.5);
+    [[350,'身 350'],[375,'翼 375'],[400,'']].forEach(([v,t])=>{ g+=`<line x1="${L}" y1="${sy(v)}" x2="${Rr}" y2="${sy(v)}" stroke="${v===400?'var(--rule)':'var(--ink-faint)'}" stroke-dasharray="${v===400?'':'3 4'}" stroke-width=".8"/>`; g+=lab(L-5,sy(v)+4,v,'var(--ink-faint)','end',10.5); if(t) g+=lab(Rr-2,sy(v)-4,t,'var(--ink-faint)','end',10.5); });
+    const pts=[]; for(let i=0;i<=Math.min(kk,n-1);i++) pts.push(`${X(i).toFixed(1)},${sy(DAILY.S[i]).toFixed(1)}`);
+    if(kk<n-1 && fr>0){ const v=DAILY.S[kk]+(DAILY.S[kk+1]-DAILY.S[kk])*fr; pts.push(`${(X(kk)+(X(kk+1)-X(kk))*fr).toFixed(1)},${sy(v).toFixed(1)}`); }
+    g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>`;
+    // ② butterfly，③ strangle
+    const bars=(arr,r,lo,hi,title,dec)=>{
+      const y=v=>r[1]-(v-lo)/(hi-lo)*(r[1]-r[0]), y0=y(0);
+      let h=lab(L,r[0]-4,title,'var(--ink-soft)','start',11.5);
+      h+=`<line x1="${L}" y1="${y0}" x2="${Rr}" y2="${y0}" stroke="var(--ink-faint)" stroke-width="1"/>`;
+      h+=lab(L-5,y0+4,'0','var(--ink-faint)','end',10.5);
+      [hi,lo].forEach(v=>{ if(v!==0){ h+=`<line x1="${L}" y1="${y(v)}" x2="${Rr}" y2="${y(v)}" stroke="var(--rule)" stroke-width=".6"/>`; h+=lab(L-5,y(v)+4,fm(v,dec),'var(--ink-faint)','end',10.5); } });
+      arr.forEach((v,i)=>{ const f=clamp(s.k-i+1,0,1); if(f<=0) return; const yv=y(v*ease(f));
+        h+=`<rect x="${X(i)-bw/2}" y="${Math.min(y0,yv)}" width="${bw}" height="${Math.max(1,Math.abs(yv-y0))}" rx="1.5" fill="${v>0?'var(--result)':'var(--control)'}"/>`; });
+      return h;
+    };
+    g+=bars(DAILY.fg,r2,-0.3,0.45,'325/350/375 butterfly 净 gamma',2);
+    g+=bars(DAILY.sg,r3,0,1.8,'325/375 strangle 净 gamma',1);
+    // 日期刻度
+    DAILY.days.forEach((d,i)=>{ if(i%(nw?5:3)===0 || i===n-1) g+=lab(X(i),H-4,md(d),'var(--ink-faint)','middle',10.5); });
+    // 当前日
+    const ci=clamp(kk,0,n-1);
+    g+=`<line x1="${X(ci)}" y1="${r1[0]}" x2="${X(ci)}" y2="${r3[1]}" stroke="var(--ink-soft)" stroke-dasharray="2 3" opacity=".6"/>`;
+    svg.innerHTML=g;
+    $('dyD').textContent=md(DAILY.days[ci]); $('dyS').textContent=DAILY.S[ci].toFixed(2);
+    $('dyF').textContent=sgn(DAILY.fg[ci],3); $('dyF').style.color=DAILY.fg[ci]>0?'var(--result)':'var(--control)';
+    $('dyFv').textContent='净 vega '+sgn(DAILY.fv[ci])+(DAILY.fg[ci]*DAILY.fv[ci]<0?'（反号）':'');
+    $('dyG').textContent=sgn(DAILY.sg[ci],3); $('dyG').style.color='var(--result)';
+    if(s.k<n){ $('dySay').textContent=''; return; }
+    const pos=DAILY.fg.filter(v=>v>0).length, neg=DAILY.days.filter((d,i)=>DAILY.fg[i]<0).map(md);
+    const mi=DAILY.fg.indexOf(Math.max(...DAILY.fg)), f15=DAILY.days.indexOf('04-15');
+    const a=DAILY.days.indexOf('04-21'), b=DAILY.days.indexOf('04-30'), mid=DAILY.fg.slice(a,b+1), ms=DAILY.S.slice(a,b+1), may=DAILY.S.filter((v,i)=>DAILY.days[i].startsWith('05'));
+    $('dySay').textContent=`4/13 到 5/14 的 ${n} 个收盘里，butterfly 的净 gamma 有 ${pos} 天为正。开头两天 TSLA 在身 350 和翼 375 之间，是负的；4/15 TSLA 涨到 ${DAILY.S[f15].toFixed(2)}，第一次变成 ${sgn(DAILY.fg[f15],3)}。4/21 到 4/30 TSLA 在翼 375 附近（${Math.min(...ms).toFixed(2)} 到 ${Math.max(...ms).toFixed(2)}），一张翼和两张身的 gamma 差不多大，互相抵掉，净 gamma 在 ${sgn(Math.min(...mid),3)} 到 ${sgn(Math.max(...mid),3)} 之间，正负都有。5 月每个收盘都为正（TSLA ${Math.min(...may).toFixed(2)} 到 ${Math.max(...may).toFixed(2)}），最高是 ${md(DAILY.days[mi])} 的 ${sgn(DAILY.fg[mi],3)}（TSLA ${DAILY.S[mi].toFixed(2)}）。为负的一共 ${neg.length} 天：${neg.join('、')}。strangle 每天都是正的，TSLA 走得越远越小，5/14 只剩 ${sgn(DAILY.sg[n-1],3)}。`;
+  }
+  function start(){
+    s.playing=false; s.k=0;
+    if(reduced){ s.k=n; draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(n,s.k+16.7/330); },draw,()=>s.k>=n);
+  }
+  $('dyPlay').addEventListener('click',start);
+  s.k=n;
+  return {start,draw,svg};
+})();
+
+/* ══════════ 四 · calendar：远月点减近月点 ══════════ */
+const CV=(()=>{
+  const svg=$('cv'), s={k:0,playing:false};
+  const F=LEG.C350, Nn=LEG['C350-0508'], c=ST.cal, sc=ST.scal;
+  const m15=S0*S0*F.iv/100*T15/100, m08=S0*S0*Nn.iv/100*(25/365)/100;
+  const END=6;
+  function draw(){
+    const nw=narrow(), W=nw?460:720, H=nw?400:380, L=nw?40:52, Rr=W-14, T=14, B=H-38;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const x0=-0.25, x1=1.05, y0=-9, y1=48;
+    const X=g=>L+(g-x0)/(x1-x0)*(Rr-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+    let g='';
+    g+=`<rect x="${L}" y="${T}" width="${X(0)-L}" height="${Y(0)-T}" fill="var(--good-bg)" opacity="${0.35+0.4*clamp(s.k-4,0,1)}"/>`;
+    g+=`<rect x="${X(0)}" y="${Y(0)}" width="${Rr-X(0)}" height="${B-Y(0)}" fill="var(--warn-bg)" opacity="${0.35+0.4*clamp(s.k-5,0,1)}"/>`;
+    [-0.2,0,0.2,0.4,0.6,0.8,1].forEach(v=>{ g+=`<line x1="${X(v)}" y1="${T}" x2="${X(v)}" y2="${B}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`; g+=lab(X(v),B+16,v===0?'0':fm(v,1),'var(--ink-faint)','middle',11); });
+    [0,10,20,30,40].forEach(v=>{ g+=`<line x1="${L}" y1="${Y(v)}" x2="${Rr}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`; g+=lab(L-5,Y(v)+4,v,'var(--ink-faint)','end',11); });
+    g+=lab(Rr,H-4,'gamma（一张）→','var(--ink-soft)','end',11.5);
+    g+=lab(L+4,T+10,'↑ vega（一张）','var(--ink-soft)','start',11.5);
+    // ① 两条线
+    const lp=ease(clamp(s.k,0,1));
+    const line=(m,col,t,at,dx,dy,an)=>{ const gx=Math.min(x1,(y1-2)/m)*lp; let h=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(gx)}" y2="${Y(m*gx)}" stroke="${col}" stroke-width="1.6" stroke-dasharray="6 4"/>`; if(lp>0.95) h+=lab(X(at)+dx,Y(m*at)+dy,t,col,an,11,600); return h; };
+    g+=line(m15,'var(--result)',`5/15 到期：×${m15.toFixed(1)}`,0.36,-4,-8,'end');
+    g+=line(m08,'var(--ink-faint)',`5/8 到期：×${m08.toFixed(1)}`,0.5,6,18,'start');
+    // ② 远月点、③ 近月点
+    const pF=ease(clamp(s.k-1,0,1)), pN=ease(clamp(s.k-2,0,1));
+    if(pF>0){ g+=`<circle cx="${X(F.gamma)}" cy="${Y(F.vega)}" r="${6*pF}" fill="var(--result)"/>`; g+=`<g opacity="${pF}">`+lab(X(F.gamma)-10,Y(F.vega)-8,'买 5/15 的 350 call','var(--result)','end',nw?12:11.5,600)+'</g>'; }
+    if(pN>0){ g+=`<circle cx="${X(Nn.gamma)}" cy="${Y(Nn.vega)}" r="${6*pN}" fill="var(--paper)" stroke="var(--ink-soft)" stroke-width="2"/>`;
+      const lx=X(0.97), ly=Y(13);   // 标签放在 5/8 线下方的空白处，用引线连到点
+      g+=`<g opacity="${pN}"><line x1="${lx-20}" y1="${ly-14}" x2="${X(Nn.gamma)}" y2="${Y(Nn.vega)+7}" stroke="var(--ink-faint)" stroke-width="1"/>`+lab(lx,ly,'卖 5/8 的 350 call','var(--ink-soft)','end',nw?12:11.5,600)+'</g>'; }
+    // ④ 近月 → 远月的箭头，⑤ 平移到原点
+    const pA=ease(clamp(s.k-3,0,1)), pM=ease(clamp(s.k-4,0,1));
+    if(pA>0){
+      const ox=Nn.gamma*(1-pM), oy=Nn.vega*(1-pM);           // 箭头起点从近月点滑到原点
+      const ex=ox+(F.gamma-Nn.gamma)*pA, ey=oy+(F.vega-Nn.vega)*pA;
+      g+=`<defs><marker id="cvA" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="var(--good)"/></marker></defs>`;
+      g+=`<line x1="${X(ox)}" y1="${Y(oy)}" x2="${X(ex)}" y2="${Y(ey)}" stroke="var(--good)" stroke-width="2.4" marker-end="url(#cvA)"/>`;
+    }
+    if(pM>0.98){
+      g+=`<circle cx="${X(c.g)}" cy="${Y(c.v)}" r="6.5" fill="var(--good)" stroke="var(--panel)" stroke-width="1.5"/>`;
+      g+=lab(X(c.g)-10,Y(c.v)-10,'买入 calendar','var(--good)','end',nw?12:12,600);
+      g+=lab(X(c.g)-10,Y(c.v)+(nw?6:5),`${sgn(c.g,3)}，${sgn(c.v)}`,'var(--good)','end',11);
+    }
+    const pS=ease(clamp(s.k-5,0,1));
+    if(pS>0){ g+=`<g opacity="${pS}"><circle cx="${X(sc.g)}" cy="${Y(sc.v)}" r="6" fill="var(--warn)" stroke="var(--panel)" stroke-width="1.5"/>`+lab(X(sc.g)+10,Y(sc.v)+4,`卖出 calendar：${sgn(sc.g,3)}，${sgn(sc.v)}`,'var(--warn)','start',nw?12:11.5,600)+'</g>'; }
+    svg.innerHTML=g;
+    $('cvSay').textContent= s.k>=END ? `远月那张在 5/15 的线上，近月那张在 5/8 的线上。从近月点指向远月点的箭头，就是「买远月、卖近月」：gamma 少了 ${(Nn.gamma-F.gamma).toFixed(3)}，vega 多了 ${(F.vega-Nn.vega).toFixed(2)}。把箭头的起点挪到原点，终点就是 calendar 的位置，在左上格。` : '';
+  }
+  function start(){
+    s.playing=false; s.k=0;
+    if(reduced){ s.k=END; draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(END,s.k+16.7/900); },draw,()=>s.k>=END);
+  }
+  $('cvPlay').addEventListener('click',start);
+  s.k=END;
+  return {start,draw,svg};
+})();
+
+/* ══════════ 五 · 风险边界 ══════════ */
+function renderRisk(){
+  const E=k=>ST[k], pay=c=>c>=0?`付 ${c.toFixed(2)}`:`收 ${(-c).toFixed(2)}`;
+  const mx=v=>typeof v==='string'?v.replace('无上限','没有上限'):sgn(v);
+  const rows=[
+    ['q1','买入 straddle / strangle','两边都是无限收益',`350 straddle：${pay(E('straddle').exec)}，最多亏 ${(-E('straddle').min).toFixed(2)}；325/375 strangle：${pay(E('strangle').exec)}，最多亏 ${(-E('strangle').min).toFixed(2)}。上涨赚得没有上限`],
+    ['q1','卖出 butterfly','两边都是有限收益',`325/350/375：${pay(E('sfly').exec)}，最多赚 ${E('sfly').max.toFixed(2)}，停在 350 最多亏 ${(-E('sfly').min).toFixed(2)}`],
+    ['q1','call ratio（买多于卖）','下方有限收益，上方无限收益',`卖 1 张 350、买 2 张 375：${pay(E('ratioB').exec)}；停在 375 最多亏 ${(-E('ratioB').min).toFixed(2)}，上涨赚得没有上限。这一组按成交价付了 ${E('ratioB').exec.toFixed(2)}，跌到 350 以下是亏 ${E('ratioB').exec.toFixed(2)}（讲义的例子是收钱建的，所以下方是收益）`],
+    ['q3','卖出 straddle / strangle','两边都是无限风险',`350 straddle：${pay(E('sstraddle').exec)}，跌到 0 时亏 ${(350-(-E('sstraddle').exec)).toFixed(2)}，上涨亏得没有下限；325/375 strangle：${pay(E('sstrangle').exec)}`],
+    ['q3','买入 butterfly','两边都是有限风险',`325/350/375：${pay(E('cfly').exec)}，最多亏 ${(-E('cfly').min).toFixed(2)}，停在 350 最多赚 ${E('cfly').max.toFixed(2)}`],
+    ['q3','call ratio（卖多于买）','下方有限风险，上方无限风险',`买 1 张 350、卖 2 张 375：${pay(E('ratioS').exec)}；停在 375 最多赚 ${E('ratioS').max.toFixed(2)}，上涨亏得没有下限`],
+    ['q3','christmas tree','（讲义没列）',`350/375/400：${pay(E('tree').exec)}，最多赚 ${E('tree').max.toFixed(2)}，大涨亏得没有下限`]
+  ];
+  $('rkTab').querySelector('tbody').innerHTML=rows.map(([q,n,l,t])=>`<tr><td><span class="dot ${q}"></span>${n}</td><td class="txt">${l}</td><td class="txt">${t}</td></tr>`).join('');
+}
+
+/* ══════════ 六 · 从观点到结构 ══════════ */
+const VIEWS=[
+  {t:'会大动，方向不知道', steps:[['方向','不知道','delta ≈ 0'],['实际会动多少','比隐含多','gamma ＋'],['隐含波动率','没有看法；同一到期日它会跟着 gamma','vega ＋'],['gamma 和 vega','同号','一个到期日']],
+   q:'q1', c:['straddle','strangle','sfly','ratioB'],
+   pick:'四个都在右上格。愿意先付钱、要大动时赚得多，买 straddle（38.55）或 strangle（18.85，要动得更远）；只想要一笔有限的收益、最坏亏得少，卖出 butterfly；更可能往上大动，买 2 卖 1 的 ratio。'},
+  {t:'会横盘到到期', steps:[['方向','不知道','delta ≈ 0'],['实际会动多少','比隐含少','gamma −'],['隐含波动率','没有看法；同一到期日它会跟着 gamma','vega −'],['gamma 和 vega','同号','一个到期日']],
+   q:'q3', c:['sstraddle','sstrangle','cfly','condor'],
+   pick:'四个都在左下格。卖出 straddle、strangle 收得最多，但大涨大跌时亏损没有边界；买入 butterfly、condor 付一小笔钱，亏损封顶，赚钱的那一段窄一些（butterfly 在 350 附近，condor 在 340 到 360 之间）。'},
+  {t:'看涨，但隐含波动率会降', steps:[['方向','涨','delta ＋'],['隐含波动率','会降','vega −'],['实际会动多少','同一到期日，vega 为负就带着 gamma 为负：要慢慢涨，不能急涨','gamma −'],['gamma 和 vega','同号','一个到期日']],
+   q:'q3', c:['bull320','sput'],
+   pick:'要 delta 为正、落在左下格。3.1 的双判据（先按方向选牛市还是熊市价差，再按对隐含波动率的看法，选平值腿在买方还是卖方）选出的就是平值腿在卖方的牛市价差 320/350；卖出 325 put 的 delta、vega 更大，但 TSLA 大跌时亏损大得多（最多亏 316.85）。'},
+  {t:'看跌，而且会跌得又快又猛', steps:[['方向','跌','delta −'],['实际会动多少','比隐含多','gamma ＋'],['隐含波动率','认为会涨。这是看法，不是规律：4/23 TSLA 跌了 3.6%，350 call 的隐含波动率反而从 48.55% 降到 43.16%','vega ＋'],['gamma 和 vega','同号','一个到期日']],
+   q:'q1', c:['lput','bear350'],
+   pick:'要 delta 为负、落在右上格。买入 350 put 最直接；3.1 的熊市价差 350/320 平值腿在买方，同样是正 gamma、正 vega，只付 10.55（买 put 要付 17.45），但跌过 320 就不再多赚。'},
+  {t:'到 5/8 前停在 350 附近，之后隐含波动率会涨', steps:[['方向','不知道','delta ≈ 0'],['实际会动多少','到 5/8 前比隐含少','gamma −'],['隐含波动率','会涨','vega ＋'],['gamma 和 vega','反号','两个到期日']],
+   q:'q2', c:['cal'],
+   pick:'只有 calendar 能落在左上格：卖掉 5/8 的 350 call 收时间价值，留着 5/15 那张赚隐含波动率。TSLA 走远，两张都变成深度实值或虚值，价差塌下去（3.2 讲义那张表）。'},
+  {t:'会大动，但隐含波动率会降', steps:[['方向','不知道','delta ≈ 0'],['实际会动多少','比隐含多','gamma ＋'],['隐含波动率','会降','vega −'],['gamma 和 vega','反号','两个到期日']],
+   q:'q4', c:['scal'],
+   pick:'右下格只有卖出 calendar：买 5/8、卖 5/15。一张的 gamma 只有 +0.087，想押得大要做很多张。'}
+];
+const VW=(()=>{
+  const s={i:0,k:0,playing:false};
+  $('vwSeg').innerHTML=VIEWS.map((v,i)=>`<button data-i="${i}" aria-pressed="${i===0}">${v.t}</button>`).join('');
+  function mini(qOn,half){
+    const cx=100,cy=100, cells=[['q2',8,8],['q1',100,8],['q3',8,100],['q4',100,100]];
+    let g='';
+    cells.forEach(([q,x,y])=>{ const on=q===qOn, hl=!on && half && ((half==='R'&&x===100)||(half==='L'&&x===8));
+      g+=`<rect x="${x}" y="${y}" width="92" height="92" rx="8" fill="${on?QC[q]:QBG[q]}" opacity="${on?0.9:hl?1:0.6}" stroke="${hl?QC[q]:'none'}" stroke-width="1.5"/>`;
+      const t=QTXT[q].split(' vega ');
+      g+=lab(x+46,y+42,t[0],on?'var(--paper)':QC[q],'middle',11.5,600)+lab(x+46,y+60,'vega '+t[1],on?'var(--paper)':QC[q],'middle',11.5,600); });
+    return g;
+  }
+  function draw(){
+    const V=VIEWS[s.i], nOn=Math.floor(s.k);
+    $('vwSteps').innerHTML=V.steps.map(([q,a,r],j)=>`<li class="${j<nOn?'on':''}"><div><div class="qq">${q}</div><div class="aa">${a}<b>${r}</b></div></div></li>`).join('');
+    // gamma 那一步定左右，vega 那一步定格子
+    const gi=V.steps.findIndex(x=>x[2].startsWith('gamma')), vi=V.steps.findIndex(x=>x[2].startsWith('vega'));
+    const gr=V.steps[gi][2].includes('＋')?'R':'L';
+    const qOn= nOn>Math.max(gi,vi) ? V.q : null, half= !qOn && nOn>gi ? gr : null;
+    $('vwMini').innerHTML=mini(qOn,half);
+    const show=nOn>=V.steps.length+1;
+    $('vwCands').className='cands'+(show?' on':'');
+    $('vwCands').innerHTML=V.c.map(k=>{ const a=ST[k];
+      return `<div class="cand"><div class="nm"><span class="dot ${QS(a.g,a.v)}"></span>${a.name}</div><div class="lg">${legTxt(a.legs)}</div>`+
+      `<div class="gk">delta ${sgn(a.d)}　gamma ${sgn(a.g,3)}<br>vega ${sgn(a.v)}　theta ${sgn(a.t)}<br>${a.exec>=0?'付':'收'} ${Math.abs(a.exec).toFixed(2)}${a.max!==''?`　最多赚 ${typeof a.max==='string'?'没有上限':a.max.toFixed(2)}　最多亏 ${typeof a.min==='string'?'没有下限':(-a.min).toFixed(2)}`:''}</div></div>`; }).join('');
+    $('vwPick').className='pickline'+(nOn>=V.steps.length+2?' on':'');
+    $('vwPick').textContent=V.pick;
+  }
+  const END=()=>VIEWS[s.i].steps.length+2;
+  function start(){
+    s.playing=false; s.k=0;
+    if(reduced){ s.k=END(); draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(END(),s.k+16.7/900); },draw,()=>s.k>=END());
+  }
+  segOn('vwSeg',d=>{ s.i=+d.i; start(); });
+  $('vwPlay').addEventListener('click',start);
+  s.k=END();
+  return {start,draw,el:$('vwSteps')};
+})();
+
+/* ══════════ 六 · 练一练 ══════════ */
+const DRILL=[
+  {q:'你认为 TSLA 接下来实际的波动会比隐含波动率高，而且隐含波动率也会跟着涨。',a:'q1',e:'实际比隐含多要正 gamma，隐含会涨要正 vega，同号，一个到期日：straddle、strangle 这一格。'},
+  {q:'你认为 TSLA 会一直横盘到到期，隐含波动率会慢慢回落。',a:'q3',e:'实际比隐含少要负 gamma，隐含会跌要负 vega：卖出 straddle、买入 butterfly 这一格。'},
+  {q:'卖出 325/350/375 butterfly：买 2 张 350 call，卖 325、375 call 各一张。TSLA 在 352.36。',a:'q1',e:'TSLA 在 352.36，离它最近的是两张买入的 350，按张数算，买入的 gamma 比卖出的多，为正：+0.21、+9.51。'},
+  {q:'同一到期日，买 2 张 375 call、卖 1 张 350 call。',a:'q1',e:'净买入 1 张期权，gamma、vega 都为正：+0.768、+37.17。'},
+  {q:'买 350 call，卖 375 call 和 400 call 各一张（christmas tree）。',a:'q3',e:'净卖出 1 张期权，都为负：−0.565、−26.92。'},
+  {q:'你认为到近月到期前 TSLA 不会怎么动，但之后市场会重新紧张，隐含波动率会涨。',a:'q2',e:'负 gamma、正 vega，反号，要两个到期日：买入 calendar。'},
+  {q:'买 5/8 的 350 call，卖 5/15 的 350 call。',a:'q4',e:'买近月、卖远月是卖出 calendar：gamma 跟着买入的近月为正，vega 跟着卖出的远月为负。'},
+  {q:'卖出 325/340/360/375 iron condor：卖 340 put、360 call，买 325 put、375 call。',a:'q3',e:'卖出的 340、360 离 352.36 最近，净 gamma −0.174、vega −7.92。'}
+];
+(function(){
+  const order=['q1','q2','q3','q4'];
+  $('drill').innerHTML=DRILL.map((d,i)=>`<li><div class="dq">${i+1}. ${d.q}</div><div class="opts">${order.map(q=>`<button data-i="${i}" data-q="${q}">${QTXT[q]}</button>`).join('')}</div><div class="fb" id="dfb${i}"></div></li>`).join('');
+  $('drill').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const i=+b.dataset.i, d=DRILL[i], ok=b.dataset.q===d.a;
+    b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('right','wrong'));
+    b.classList.add(ok?'right':'wrong');
+    if(!ok) b.parentElement.querySelector(`[data-q="${d.a}"]`).classList.add('right');
+    $('dfb'+i).textContent=(ok?'对。':'应该是 '+QTXT[d.a]+'。')+d.e;
+  }));
+})();
+
+/* ══════════ 七 · 费曼检验 ══════════ */
+const FQ=[
+ {q:`不用公式，向一个没学过期权的人解释：为什么同一到期日的仓位，gamma 为正时 vega 通常也为正？什么时候会不一样？`,
+  a:['gamma 为正，说明仓位的价值随标的价格向上弯：标的往哪边动，都多赚一点（2.2 的 ½ × Γ × (ΔS)²）。',
+     '隐含波动率涨，意思是市场认为到期时价格会散得更开。',
+     '价值向上弯时，散得更开就更值钱：往两边多走的那一段都多赚。价值是直线时，往上多赚的和往下多亏的抵掉，散得再开也不值钱。',
+     '所以 vega 是 gamma 乘上一个正数：ν ≈ Γ × S² × σ × t ÷ 100。同一到期日，这个倍数对每条腿差不多（TSLA 建仓这天约 50），加起来正负号相同。',
+     '例外：几条腿的 gamma 大半抵掉时，剩下那一点的 vega 由各条腿倍数的差别决定，可能反号。第三节的 butterfly 按 ORATS 的数，有 6 天就是这样。'],
+  s:'「因为买期权两个都是正的」：只说了单腿，没说明多条腿加起来为什么还同号，也解释不了 calendar。'},
+ {q:`买入 325/350/375 butterfly 要付钱，两翼是买的，为什么它的 gamma 是负的？它和 325/375 strangle 差在哪？`,
+  a:['把 butterfly 拆开：它的到期盈亏和「卖出 350 straddle、买入 325/375 strangle」一样。',
+     '每张期权的 gamma 在自己的行权价附近最大。TSLA 在 352.36 时，卖出的两张 350 离得最近，合计 1.64；买入的 325、375 各一张，合计 1.43。',
+     '卖的比买的多 0.21，净 gamma 为负；vega 也一样，−82.50 + 72.99 ＝ −9.51。',
+     'strangle 两条腿都是买入，没有卖出的部分，gamma 处处为正。「买入」butterfly 的「买入」说的是付钱，不是 gamma 的方向。'],
+  s:'「butterfly 风险有限，所以 gamma 小」：风险有限说的是盈亏边界，没有回答正负号。'},
+ {q:`同一只 325/350/375 butterfly，什么时候 gamma 会变成正的？TSLA 这段时间发生过吗？`,
+  a:['gamma 为负，是因为建仓时卖出的身离标的最近，而且有两张。',
+     '标的走到翼那里还不够：离它最近的虽然变成了买入的翼，可翼只有一张。一张翼的 gamma 要超过两张身的合计，标的得走过翼一段。',
+     '按入场那天的模型，TSLA 在 297.82 到 394.77 之间时为负，比两翼 325 到 375 宽；离到期越近，这一段越窄。',
+     '发生过：ORATS 的收盘数里，4/15 TSLA 涨到 391.93，净 gamma 第一次转正（+0.024，很小）；5 月每个收盘都为正，最高 +0.401（5/5，TSLA 389.52）。24 个收盘里有 18 天为正。',
+     '讲义的符号表默认身在平值附近。strangle 两条腿都是买的，从头到尾都为正。'],
+  s:'「butterfly 永远是负 gamma」：只在身靠近标的时成立。「走到翼就转正」：身有两张，要走过翼一段。'},
+ {q:`你认为 TSLA 接下来一个月会大幅震荡，但隐含波动率现在偏高、之后会回落。只用一个到期日的期权，能表达这个看法吗？`,
+  a:['这个看法要正 gamma（实际会大动）和负 vega（隐含会降）。',
+     '同一到期日，每条腿的 vega 约是 gamma 的 50 倍，加起来正负号相同，做不出正 gamma、负 vega。',
+     '要两个到期日：买近月、卖远月，就是卖出 calendar。近月的 gamma 大、vega 小，远月反过来。',
+     'TSLA 4/13：卖出 350 calendar（买 5/8、卖 5/15），gamma +0.087，vega −4.75。'],
+  s:'「买 straddle 就行，大动就赚」：straddle 的 vega 是 +82.50，隐含波动率降的那部分会亏。'},
+ {q:`为什么离到期越近，平值期权的 gamma 越大、vega 越小？这和 calendar 的正负号有什么关系？`,
+  a:['离到期越近，期权的价值越接近到期时那条折线，弯曲全挤在行权价附近，平值附近的 gamma 就大。',
+     '剩下的时间少，隐含波动率涨一个点，到期时的分布也宽不了多少，vega 就小。ν ≈ Γ × S² × σ × t ÷ 100 里 t 变小，同样的 gamma 换来的 vega 就少。',
+     'TSLA 350 call：5/8 到期那张 gamma 0.907、vega 36.50；5/15 那张 gamma 0.820、vega 41.25（一张）。',
+     '买入 calendar 买远月、卖近月：gamma 跟着卖出的近月为负（−0.087），vega 跟着买入的远月为正（+4.75）。'],
+  s:'「远月更贵，所以 vega 大」：价格高低不是原因，原因是剩下的时间。'},
+ {q:`straddle 和卖出 butterfly 都在右上格。看法相同时，怎么在两者之间选？`,
+  a:['同一到期日，两者 vega 与 gamma 的比例差不多（约 50 倍和 45 倍），在平面上方向相同；差别在大小和盈亏边界。',
+     '一张 350 straddle：gamma 1.64，先付 38.55，最多亏 38.55，大涨时赚得没有上限。',
+     '一张卖出 325/350/375 butterfly：gamma 0.21，先收 4.90，最多赚 4.90，停在 350 最多亏 20.10。',
+     '想在大动时赚得多、能接受先付一大笔，选 straddle；只要 TSLA 走出 325 到 375 就满足、想让最坏的情况有底，选卖出 butterfly。'],
+  s:'「选收钱的那个」：卖出 butterfly 虽然先收钱，最多也只赚这 4.90，停在 350 要亏 20.10。'},
+ {q:`讲义说「认为未来实际波动率 25% 高于隐含 20%，就要正 gamma」。为什么拿实际波动率和隐含比，而不是拿历史波动率和隐含比？用 TSLA 4/13 的数说明。`,
+  a:['隐含波动率是价格：正 gamma 的仓位每天付的 theta 按它算（Θ ≈ −½σ²S²Γ 里的 σ）。',
+     '未来实际波动率是价值：正 gamma 每次收的 ½ × Γ × (ΔS)² 取决于之后真实动了多少。价值高于价格才划算。',
+     '历史波动率只是过去，可以拿来做预测，但它本身不是之后会发生的事。',
+     'TSLA 4/13：隐含 46.3%，前一年历史 49.3%，之后 24 天实际 45.8%。按历史会觉得正 gamma 占便宜，事后看价格和价值几乎相等。'],
+  s:'「历史比隐含高，所以买」：把过去当成了未来。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=FQ.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  FQ.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-3-3-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-3-3-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+const CHARTS=[QD,HL,DY,CV,VW];
+function recolor(){ CHARTS.forEach(c=>c.draw()); }
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+
+/* ══════════ 启动 ══════════ */
+renderVG(); renderGTab(); renderRisk();
+CHARTS.forEach(c=>c.draw());
+let lastNarrow=narrow();
+addEventListener('resize',()=>{ if(narrow()!==lastNarrow){ lastNarrow=narrow(); CHARTS.forEach(c=>c.draw()); } });
+/* 滚到眼前才开始播放 */
+onView(QD.svg,QD.start); onView(HL.svg,HL.start); onView(DY.svg,DY.start); onView(CV.svg,CV.start); onView(VW.el,VW.start);
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>
