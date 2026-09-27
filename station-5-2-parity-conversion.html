@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>parity 与 conversion</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M6%2012H26M6%2020H26'%20stroke='%23fdf6ec'%20stroke-width='2.8'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.2rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.pair .formula{margin:1rem 0}
+.steps{counter-reset:st;margin:1.4rem 0}
+.step{display:grid;grid-template-columns:2rem 1fr;gap:.2rem .8rem;align-items:start;padding:.85rem 0;border-top:1px solid var(--rule)}
+.step:last-child{border-bottom:1px solid var(--rule)}
+.step .k{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--control);font-weight:600;font-size:1rem;padding-top:.1rem}
+.step .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.02rem;font-weight:600;overflow-wrap:anywhere}
+.step .gloss{grid-column:2;font-size:.9rem;color:var(--ink-soft);line-height:1.6}
+.step.hot .math{color:var(--control)}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.presets{display:flex;flex-wrap:wrap;gap:.5rem}
+.presets button,.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.presets button:hover,.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.up{background:var(--result-bg);color:var(--result)}
+.say.down{background:var(--warn-bg);color:var(--warn)}
+.say.flat{background:var(--good-bg);color:var(--good)}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+.say:empty{display:none}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt,th.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+td.txt{color:var(--ink-soft);line-height:1.6}
+tr.hot td{background:var(--control-bg)}
+td.pos{color:var(--good);font-weight:600} td.neg{color:var(--control);font-weight:600}
+tr.tot td{border-top:1.5px solid var(--ink-faint);font-weight:600}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nw{white-space:nowrap}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.8rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;vertical-align:-.1rem;border-radius:1px}
+.legend i.ln{height:3px;vertical-align:.2rem;border-radius:0}
+.legend i.dsh{height:0;border-top:2px dashed;vertical-align:.25rem;background:none;border-radius:0}
+ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+
+.solver{display:grid;grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));gap:.8rem 1.2rem;margin-top:1rem}
+.solver label{display:block;font-size:.8rem;color:var(--ink-soft)}
+.solver input{width:100%;margin-top:.2rem;padding:.42rem .55rem;border:1px solid var(--rule);border-radius:7px;background:var(--paper);
+  color:var(--ink);font-size:.95rem}
+.solver input:focus{outline:none;border-color:var(--control)}
+.solver input.out{border-color:var(--control);color:var(--control);font-weight:600;background:var(--control-bg)}
+input.cell{width:5.4rem;padding:.3rem .4rem;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink);font-size:.85rem;text-align:right}
+input.cell:focus{outline:none;border-color:var(--control)}
+input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-color:var(--warn);color:var(--warn)}
+.btnrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem;align-items:center}
+.reveal{margin-top:1rem;padding:.9rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.72}
+.fb{font-size:.78rem;white-space:nowrap}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  .pair{grid-template-columns:1fr}
+  table{font-size:.78rem} th,td{padding:.4rem .28rem}
+  .formula .math{font-size:1rem}
+  .step .math{font-size:.9rem}
+  input.cell{width:3.9rem;padding:.28rem .3rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 conversion</a><a href="#s1">一 五步推导</a><a href="#s2">二 combo</a><a href="#s3">三 反推第四个</a>
+  <a href="#s4">四 找异常</a><a href="#s5">五 pin risk</a><a href="#s6">六 settlement risk</a><a href="#s7">七 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 5.2</p>
+  <h1>parity 与 conversion</h1>
+  <p class="lede">5.1 把几条腿拼成合成股票，只讲结构，留下两个小差额：合成多头比直接买股票少赚 1.29，<span class="sym" data-say="butterfly（3.2）：三个等距的行权价，买 1 张低的、卖 2 张中间的、买 1 张高的。TSLA 用的是 325 / 350 / 375。">butterfly</span> 加 <span class="sym" data-say="iron butterfly（3.2）：买一个 350 straddle、卖一个 325/375 strangle。5.1 说明了 butterfly 加它，到期固定值两个行权价的间距 25。">iron butterfly</span> 是 24.95 而不是 25。这一节给合成关系装上价格：把利息和分红算进去，「相当于」就变成一个等式，put-call parity。等式被打破，就有人能锁定利润。案例还是 2026-04-13 收盘的 TSLA 5/15 期权链，外加 5/15 到期日收盘前后的分钟线。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>conversion：三条腿拼成一条水平线</h2>
+  <p class="sub">5.1 讲过：买 call、卖 put（同一个行权价、同一个到期日），到期损益和持有股票一样，叫合成多头股票；反过来卖 call、买 put 是合成空头股票。把合成空头和一份真股票放在一起，涨跌就全部抵消。</p>
+
+  <p>讲义对<span class="sym" data-say="arbitrage。讲义的定义：在不同市场买卖同一种或密切相关的产品，利用两边的价格差赚钱。">套利</span>的定义是：同一样东西，或者几乎一样的东西，在两处价格不同，一边买、一边卖，赚中间的差。合成空头股票和真股票就是「几乎一样的东西」，由此有两个交易：</p>
+  <table>
+    <thead><tr><th>名称</th><th class="txt">三条腿（同一行权价、同一到期日）</th><th class="txt">等于</th></tr></thead>
+    <tbody>
+      <tr><td><span class="sym" data-say="conversion，转换套利。买股票、卖 call、买 put。到期时一定按行权价卖出股票。">conversion</span></td><td class="txt">买股票、卖 call、买 put</td><td class="txt">真股票多头 ＋ 合成股票空头</td></tr>
+      <tr><td><span class="sym" data-say="reversal，也叫 reverse conversion，反向转换。卖空股票、买 call、卖 put。到期时一定按行权价买回股票。">reversal</span></td><td class="txt">卖空股票、买 call、卖 put</td><td class="txt">真股票空头 ＋ 合成股票多头</td></tr>
+    </tbody>
+  </table>
+  <p>拿 conversion 来看到期时发生什么。设行权价是 <span class="sym" data-say="exercise price，行权价。合约里写死的买卖价格。">X</span>：</p>
+  <ul>
+    <li>TSLA 到期时在 X 上方：put 没用了，作废；call 的买方会行权，你被<span class="sym" data-say="assignment。卖出期权的一方被对手行权选中，必须履约。卖 call 被指派，就要按行权价交出股票。">指派</span>，按 X 交出股票。</li>
+    <li>TSLA 到期时在 X 下方：call 作废；你行权手里的 put，按 X 卖出股票。</li>
+  </ul>
+  <p>两种情况的结果一样：<b>股票按 X 卖掉，手里什么都不剩</b>。今天付多少钱是确定的，到期收多少钱也是确定的，和 TSLA 走到哪里无关。</p>
+
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="lgMode"><button data-m="conv" aria-pressed="true">conversion</button><button data-m="rev" aria-pressed="false">reversal</button></div>
+      <button class="btn ghost" id="lgPlay">再拼一遍</button>
+    </div>
+    <svg id="legs" viewBox="0 0 720 352" role="img" aria-label="三条腿的到期损益逐条相加，合成一条水平线"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink-faint)"></i>股票</span>
+      <span><i class="ln" style="background:var(--result)"></i>350 call</span>
+      <span><i class="ln" style="background:var(--warn)"></i>350 put</span>
+      <span><i class="ln" style="background:var(--control)"></i>三条腿合计</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k" id="lgK1"></div><div class="d" id="lgV1"></div><div class="d2" id="lgV1b"></div></div>
+      <div class="stat"><div class="k" id="lgK2"></div><div class="d" id="lgV2"></div><div class="d2" id="lgV2b"></div></div>
+      <div class="stat"><div class="k">到期比今天</div><div class="d" id="lgV3" style="color:var(--control)"></div><div class="d2" id="lgV3b"></div></div>
+    </div>
+    <div class="say plain" id="lgSay"></div>
+  </div>
+  <p>三条腿用 4/13 收盘的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价（3.1）。">中间价</span>：TSLA 352.36，350 call 21.05，350 put 17.40。水平线说明 conversion 没有方向，也不怕波动：<span class="sym" data-say="delta（2.1）：TSLA 涨 1 美元，仓位赚或亏多少。水平线不管 TSLA 在哪都一样高，所以是 0。">delta</span>、<span class="sym" data-say="gamma（2.2）：TSLA 涨 1 美元，delta 变多少。delta 一直是 0，gamma 也是 0。">gamma</span>、<span class="sym" data-say="vega（2.3）：隐含波动率涨 1 个点，仓位赚或亏多少。卖出的 call 和买入的 put 同一行权价，vega 正好抵消。">vega</span> 全是 0。它的盈亏在建仓那一刻就定了。</p>
+  <p>这条水平线高出 0 的 1.29，就是 5.1 里合成多头比直接买股票少赚的那 1.29：两者差的正是一笔 conversion。它看起来像白赚，其实不是。今天付出的 348.71 要占用 32 天，到 5/15 才换回 350。按 1.1 反解出的利率 4.3%，这笔钱 32 天的利息是 1.31。扣掉利息，每股 −0.02，一张 −2.46 美元，几乎正好是 0。下一节把这笔账列全。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>五步推导 put-call parity</h2>
+  <p class="sub">1.1 用 put-call parity 从 TSLA 的真实报价反解出市场用的利率，340 到 360 几个行权价在 4.1% 到 4.4% 之间，那时只用了结论。这里从 conversion 的每一笔钱出发，把它推出来。</p>
+
+  <p>讲义的做法是把 conversion 从建仓到到期的每一笔钱分成两栏：<span class="sym" data-say="credits。收到的钱，或者能拿来生息的钱。">贷方</span>记收到的钱，<span class="sym" data-say="debits。付出的钱，或者因为付了钱而少赚的利息。">借方</span>记付出的钱。钱放着会生息，所以每一笔今天发生的钱都要带上它到期前的利息。</p>
+  <p>利息用两个字母表示。<span class="sym" data-say="r：年利率。本页沿用 1.1 从 TSLA 报价反解出的 4.3%。">r</span> 是年利率，这里沿用 1.1 反解出的 4.3%；<span class="sym" data-say="t：从今天到到期的时间，以年计。4/13 到 5/15 是 32 天，t ＝ 32/365。">t</span> 是到期时间，以年计，32 天就是 32/365 年。讲义用单利，<span class="sym" data-say="r·t：这段时间的利息占本金的比例。4.3% × 32/365 ＝ 0.0038，每 100 美元 32 天的利息约 0.38 美元。">r·t</span> 就是这段时间的利息占本金的比例，所以一笔钱 C 放到到期，利息是 C·r·t。</p>
+  <table>
+    <thead><tr><th>贷方（收到）</th><th class="txt">为什么</th><th>借方（付出）</th><th class="txt">为什么</th></tr></thead>
+    <tbody>
+      <tr><td><span class="sym" data-say="call 价格。卖出 call 今天收到的钱。">C</span></td><td class="txt">卖 call 收到的钱</td><td><span class="sym" data-say="stock price，今天的股价。买股票今天付的钱。">S</span></td><td class="txt">买股票付的钱</td></tr>
+      <tr><td>C·r·t</td><td class="txt">C 存到到期的利息</td><td>S·r·t</td><td class="txt">买股票的钱是借来的，要付利息</td></tr>
+      <tr><td><span class="sym" data-say="dividend。持有股票期间收到的分红合计。">D</span></td><td class="txt">拿着股票收到的分红</td><td><span class="sym" data-say="put 价格。买入 put 今天付的钱。">P</span></td><td class="txt">买 put 付的钱</td></tr>
+      <tr><td>X</td><td class="txt">到期按行权价卖出股票</td><td>P·r·t</td><td class="txt">买 put 的钱也要付利息</td></tr>
+    </tbody>
+  </table>
+  <p class="tiny">分红本身到期前也能生息，讲义忽略这一小块。</p>
+
+  <h3>32 天的账</h3>
+  <p>用 TSLA 350 这一组把两栏填满。建仓当天净付出 352.36 − 21.05 ＋ 17.40 ＝ 348.71，这笔钱借来，每天按 4.3% 计息；5/15 收回 350。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="ldPlay">再走一遍</button></div>
+    <svg id="ledger" viewBox="0 0 720 290" role="img" aria-label="conversion 建仓后借款逐日计息，到期与收回的 350 比较"></svg>
+    <div class="tscroll">
+    <table id="ldTb">
+      <thead><tr><th>贷方</th><th></th><th>借方</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+    <div class="say plain" id="ldSay"></div>
+  </div>
+
+  <h3>五步</h3>
+  <p>两栏相等，市场上就没有人能靠 conversion 赚钱。从这个等式出发：</p>
+  <div class="steps">
+    <div class="step"><span class="k">①</span><div class="math">C ＋ C·r·t ＋ D ＋ X ＝ S ＋ S·r·t ＋ P ＋ P·r·t</div><div class="gloss">贷方合计 ＝ 借方合计</div></div>
+    <div class="step"><span class="k">②</span><div class="math">(C ＋ C·r·t) − (P ＋ P·r·t) ＝ (S ＋ S·r·t) − D − X</div><div class="gloss">期权放左边，股票、分红、行权价放右边：挪到等号另一边就变号</div></div>
+    <div class="step"><span class="k">③</span><div class="math">(C − P)(1 ＋ r·t) ＝ S(1 ＋ r·t) − D − X</div><div class="gloss">每一项都带着自己的利息，提出公因子 (<span class="sym" data-say="1 ＋ r·t：1 美元今天存进去，到期变成多少。TSLA 这 32 天是 1.0038。">1 ＋ r·t</span>)</div></div>
+    <div class="step"><span class="k">④</span><div class="math">(C − P)(1 ＋ r·t) ＝ <span class="sym" data-say="远期价，1.1 讲过：F = S(1 + r·t) − D。今天约定、到期交割的公平价格。">F</span> − X</div><div class="gloss">S(1 ＋ r·t) − D 就是 1.1 的远期价 F</div></div>
+    <div class="step hot"><span class="k">⑤</span><div class="math">C − P ＝ (F − X) ÷ (1 ＋ r·t)</div><div class="gloss">两边除以 (1 ＋ r·t)。1 美元今天存到到期变成 1 ＋ r·t，反过来，到期才拿到的钱除以 1 ＋ r·t，就是它今天值多少，叫<span class="sym" data-say="present value，现值：将来才收到的一笔钱今天值多少。单利下除以 1 ＋ r·t。本页说「折回今天」就是算现值。">现值</span>，也说「折回今天」。所以 call 与 put 之差，等于远期价超出行权价的部分的现值</div></div>
+  </div>
+  <p id="stepCheck"></p>
+  <p>5.1 另一个差额也在这里：butterfly 加 iron butterfly 到期固定拿到 25，折回今天是 25 ÷ (1 ＋ r·t) ＝ 24.91，和下表「不派息的股票」那一行里的 X ÷ (1 ＋ r·t) 是同一种折现。中间价合计 24.95 比 24.91 多出的 0.04，5.1 算过，在中间价的误差以内。</p>
+
+  <h3>不同标的上的样子</h3>
+  <p>同一条关系，按标的和结算方式不同，写法不同。期权的标的也可以是<span class="sym" data-say="futures，期货：约定到期按今天定下的价格买卖标的的合约。买期货不用付全款，只放一笔保证金；价格每天变，盈亏每天用现金结清。">期货</span>，这时 F 就是期货价。结算方式 2.3 讲过：<span class="sym" data-say="stock-type settlement（2.3）：买期权时全额付钱，盈亏到平仓或到期才兑现。美国的股票期权和期货期权都是这样。">股票型结算</span>买期权时全额付钱，<span class="sym" data-say="futures-type settlement（2.3）：买期权不付全款，每天按结算价把盈亏结清，不占用钱。美国以外多数交易所的期货期权是这样。">期货型结算</span>每天按结算价结清、不占用钱。</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th>标的</th><th class="nw">C − P ＝</th><th class="txt">为什么</th></tr></thead>
+    <tbody>
+      <tr><td>不计利息和分红</td><td class="nw">S − X</td><td class="txt">r ＝ 0、D ＝ 0 时的最简形式</td></tr>
+      <tr><td>股票</td><td class="nw">(F − X) ÷ (1 ＋ r·t)</td><td class="txt">上面推的就是这一种</td></tr>
+      <tr><td>不派息的股票</td><td class="nw">S − X ÷ (1 ＋ r·t)</td><td class="txt">D ＝ 0，F ＝ S(1 ＋ r·t)，化简后剩下这两项</td></tr>
+      <tr><td>期货期权，股票型结算</td><td class="nw">(F − X) ÷ (1 ＋ r·t)</td><td class="txt">F 是期货价；期权要全额付钱，所以还要折现</td></tr>
+      <tr><td>期货期权，期货型结算</td><td class="nw">F − X</td><td class="txt">期权也不占用钱，不用折现</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>心算用的近似式</h3>
+  <p>第 ⑤ 步要做一次除法，心算不方便。讲义先把它拆开，再做两步近似：</p>
+  <div class="steps">
+    <div class="step"><span class="k">a</span><div class="math"><span class="nw">C − P ＝ [S(1 ＋ r·t) − D − X]</span> <span class="nw">÷ (1 ＋ r·t)</span><br><span class="nw">＝ S − D ÷ (1 ＋ r·t)</span> <span class="nw">− X ÷ (1 ＋ r·t)</span></div><div class="gloss">把 F ＝ S(1 ＋ r·t) − D 代进第 ⑤ 步，三项分别除以 1 ＋ r·t。S 那一项的 (1 ＋ r·t) 约掉，只剩 S</div></div>
+    <div class="step"><span class="k">b</span><div class="math">D ÷ (1 ＋ r·t) ≈ D</div><div class="gloss">分红是几毛钱到一两块，再乘上 r·t（TSLA 这 32 天是 0.0038），差的不到一分钱</div></div>
+    <div class="step"><span class="k">c</span><div class="math">X ÷ (1 ＋ r·t) ≈ X − X·r·t</div><div class="gloss">反过来乘回去核对：<span class="nw">(X − X·r·t)(1 ＋ r·t)</span> ＝ <span class="nw">X − X·(r·t)²</span>。(r·t)² 只有 0.0038² ≈ 0.000014，乘上 350 是 0.005，所以 X − X·r·t 几乎就是 <span class="nw">X ÷ (1 ＋ r·t)</span></div></div>
+  </div>
+  <div class="formula">
+    <div class="math">C − P ≈ S − X ＋ X·r·t − D</div>
+    <div class="gloss">把 b、c 代进 a：现价算的内在价值 S − X，加上行权价晚付省下的利息，减去分红</div>
+    <div class="note" id="approxNote"></div>
+  </div>
+
+  <h3>conversion 还剩什么风险</h3>
+  <p>水平线说明股价怎么走都不影响 conversion。式子里除了价格只剩 r 和 D，风险也就只剩这两个（讲义的风险表）：</p>
+  <table>
+    <thead><tr><th>头寸</th><th class="txt">利率</th><th class="txt">分红</th></tr></thead>
+    <tbody>
+      <tr><td>conversion</td><td class="txt">利率上升就亏：借钱买的股票，利息多付</td><td class="txt">分红下调就亏：本来算好能收的钱少了</td></tr>
+      <tr><td>reversal</td><td class="txt">利率下降就亏：卖空股票收到的钱，利息少赚</td><td class="txt">分红上调就亏：卖空股票要替借出方补发分红</td></tr>
+    </tbody>
+  </table>
+  <p id="rhoSay"></p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>combo：call 减 put</h2>
+  <p class="sub">交易员把同一行权价、同一到期日的「买 call、卖 put」当成一个整体来报价，叫 <span class="sym" data-say="combo。同一行权价、同一到期日的 call 价格减 put 价格，C − P。买 combo 就是买合成股票。">combo</span>，价格就是 C − P。</p>
+  <p>第 ⑤ 步说 combo 等于 (F − X) ÷ (1 ＋ r·t)。F − X 是按远期价算的<span class="sym" data-say="intrinsic value。期权立刻行权能得到的钱。call 是标的价减行权价，put 是行权价减标的价，不够就是 0。">内在价值</span>，再折回今天。所以讲义说：<b>combo 是内在价值的现值</b>。不是按现价算的 S − X，也不是没折现的 F − X。</p>
+  <p>买 combo 等于约好到期按 X 买股票。和今天直接买股票比，X 到期才付，钱多留在手里 32 天，利息归自己；如果股票期间派息，分红拿不到。这两件事让 combo 比 S − X 高出利息、低掉分红。</p>
+
+  <table>
+    <thead><tr><th>例子</th><th>S − X</th><th>F − X</th><th>折回今天</th><th>C − P</th></tr></thead>
+    <tbody id="comboTb"></tbody>
+  </table>
+  <p id="comboSay"></p>
+  <div class="story">
+    <p><b>讲义的三个例子。</b>① r ＝ 0、D ＝ 0：100 call 6.00，100 put 2.25，combo 3.75，合成出的标的价是 100 ＋ 3.75 ＝ 103.75。② 期货 1216.50，3 个月，利率 6%，1250 combo ＝ (1216.50 − 1250) ÷ (1 ＋ 6% × 3/12) ＝ −33.50 ÷ 1.015 ＝ −33.00；内在价值是 −33.50，差的 0.50 就是折现。③ 股票 68.50，4 个月，6%，分红 0.22：F ＝ 68.50 × 1.02 − 0.22 ＝ 69.65，65 combo 精确值 (69.65 − 65) ÷ 1.02 ＝ 4.56，近似式 68.50 − 65 ＋ 65 × 6% × 4/12 − 0.22 ＝ 4.58，差 0.02。</p>
+  </div>
+  <p>有了 combo，conversion 和 reversal 可以换一种说法：conversion 是按市价卖出 combo、同时买股票；reversal 是买入 combo、同时卖空股票。套的是 combo 的市价和它该值的 (F − X) ÷ (1 ＋ r·t) 之间的差。</p>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>从三个价格反推第四个</h2>
+  <p class="sub">parity 把 call、put、股价、行权价四个数和利率、分红拴在一起。知道其中三个，第四个就定了。</p>
+  <div class="pair">
+    <div class="formula"><div class="math">C ≈ S − X ＋ X·r·t − D ＋ P</div><div class="gloss">由 put 和股票推 call</div></div>
+    <div class="formula"><div class="math">P ≈ C − S ＋ X − X·r·t ＋ D</div><div class="gloss">由 call 和股票推 put</div></div>
+  </div>
+  <div class="formula"><div class="math">S ≈ C − P ＋ X − X·r·t ＋ D</div><div class="gloss">由 call 和 put 推股价。讲义这三行用近似式；要精确就把 X − X·r·t 换回 X ÷ (1 ＋ r·t)</div></div>
+
+  <h3>TSLA 350：盖住一个，用另外三个算</h3>
+  <table>
+    <thead><tr><th>盖住</th><th class="txt">用精确式算</th><th>算出</th><th>屏幕上</th></tr></thead>
+    <tbody id="fourTb"></tbody>
+  </table>
+  <p id="fourSay"></p>
+
+  <div class="story">
+    <p><b>讲义例题：对不上的时候。</b>125 call 9.60，125 put 3.15，51 天，利率 4.2%，预期分红 0.88。股价应该是 9.60 − 3.15 ＋ 125 − 125 × 4.2% × 51/365 ＋ 0.88 ＝ 6.45 ＋ 125 − 0.73 ＋ 0.88 ＝ 131.60。可实际股价是 131.25，低了 0.35。</p>
+    <p>讲义的解释不是「市场错了」，而是先怀疑自己的输入：要么用的利率太低，要么用的分红太高。市场价格认的分红是 0.88 − 0.35 ＝ 0.53，这叫<span class="sym" data-say="implied dividend。从期权价格反推出来的、市场认定的分红。">隐含分红</span>。parity 除了定价，还能反推市场用的参数，1.1 反推利率是同一个用法。</p>
+  </div>
+
+  <h3>算一算</h3>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="svWhat"><button data-w="C" aria-pressed="false">求 call</button><button data-w="P" aria-pressed="false">求 put</button><button data-w="S" aria-pressed="true">求股价</button><button data-w="X" aria-pressed="false">求行权价</button></div>
+    </div>
+    <div class="presets" style="margin-top:.4rem">
+      <button data-p="tsla">TSLA 350</button><button data-p="lecG">讲义：合成 70 call</button><button data-p="lecD">讲义：131.60</button>
+    </div>
+    <div class="solver">
+      <label>call C<input type="number" step="0.01" id="svC"></label>
+      <label>put P<input type="number" step="0.01" id="svP"></label>
+      <label>股价 S<input type="number" step="0.01" id="svS"></label>
+      <label>行权价 X<input type="number" step="0.5" id="svX"></label>
+      <label>天数<input type="number" step="1" id="svD"></label>
+      <label>年利率 %<input type="number" step="0.01" id="svR"></label>
+      <label>分红 D<input type="number" step="0.01" id="svDiv"></label>
+    </div>
+    <div class="say plain" id="svSay"></div>
+  </div>
+
+  <h3>讲义的填空练习</h3>
+  <p class="sub">r ＝ 0、D ＝ 0，式子就是 C − P ＝ S − X。每行缺一个数。带 * 的四行是指数期权。</p>
+  <div class="panel">
+    <div class="tscroll">
+    <table id="exF">
+      <thead><tr><th>#</th><th>标的价</th><th>行权价</th><th>call</th><th>put</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    </div>
+    <div class="btnrow"><button class="btn" id="exFChk">检查</button><button class="btn ghost" id="exFGive">揭晓</button><span class="tiny" id="exFMsg"></span></div>
+  </div>
+
+  <h3>同一个东西，走哪条路买更便宜</h3>
+  <p>parity 还给了第二个用处：想买 call，可以直接买，也可以买 put 再买股票（合成 call）。哪条路便宜，要用<b>实际能成交的那一边的价格</b>来比：买按<span class="sym" data-say="卖一：市场上有人愿意卖的最低价。你要买，只能按它成交。">卖一</span>，卖按<span class="sym" data-say="买一：市场上有人愿意买的最高价。你要卖，只能按它成交。">买一</span>。</p>
+  <div class="story">
+    <p><b>讲义例题。</b>47 天，利率 5.2%，分红 0.39；股票 68.90 / 69.00，70 call 3.30 / 3.40，70 put 4.15 / 4.25。合成 call ＝ 69.00 − 70 ＋ 0.47 − 0.39 ＋ 4.25 ＝ 3.33，比直接按 3.40 买便宜。另一组 121 天、4.5%、分红 0.23，50 call 5.85 / 6.00，50 put 4.15 / 4.25，股票 51.30 / 51.40：合成买股票 6.00 − 4.15 ＋ 50 − 0.75 ＋ 0.23 ＝ 51.33，比直接按 51.40 买便宜；合成卖股票 5.85 − 4.25 ＋ 50 − 0.75 ＋ 0.23 ＝ 51.08，不如直接按 51.30 卖。合成不是总更好。</p>
+  </div>
+  <table>
+    <thead><tr><th>TSLA，4/13 收盘</th><th>直接</th><th>合成</th><th class="txt">合成怎么做</th></tr></thead>
+    <tbody id="execTb"></tbody>
+  </table>
+  <p id="execSay"></p>
+  <p class="tiny">数据里没有股票的买卖报价，股票一律按 352.36 成交。利率 4.3%，32 天。</p>
+
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>找定价异常，决定怎么套</h2>
+  <p class="sub">combo 的市价偏离 (F − X) ÷ (1 ＋ r·t)，就有一边能锁定利润。先定方向，再用 TSLA 4/13 收盘的整条链找一遍。</p>
+  <table>
+    <thead><tr><th>看到</th><th class="txt">意思</th><th class="txt">怎么套</th></tr></thead>
+    <tbody>
+      <tr><td>C − P 太高</td><td class="txt">call 相对 put 太贵</td><td class="txt">卖贵的：卖 call、买 put，再买股票补上方向，这是 conversion</td></tr>
+      <tr><td>C − P 太低</td><td class="txt">call 相对 put 太便宜</td><td class="txt">买便宜的：买 call、卖 put，再卖空股票，这是 reversal</td></tr>
+    </tbody>
+  </table>
+  <p>「太高」「太低」要按能成交的价格判断。做 conversion 时 call 只能按买一卖出、put 只能按卖一买入；做 reversal 反过来。下图每个行权价画一根竖条：下端是按 conversion 的价格卖出 combo 能收到的钱，上端是按 reversal 的价格买入 combo 要付的钱，都减掉 parity 算出的该值。竖条整根在 0 上方，conversion 有利润；整根在 0 下方，reversal 有利润；跨过 0，两边都没有。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="scPlay">重新扫一遍</button></div>
+    <svg id="scan" viewBox="0 0 720 372" role="img" aria-label="TSLA 各行权价按买卖价做 conversion 与 reversal 的利润区间"></svg>
+    <div class="legend">
+      <span><i style="background:var(--ink-faint)"></i>竖条跨过 0：两边都没利润</span>
+      <span><i style="background:var(--control)"></i>竖条整根在 0 下方：reversal 表面上有利润</span>
+      <span><i style="background:var(--ink);width:.45rem;height:.45rem;border-radius:50%"></i>中间价</span>
+      <span><i class="dsh" style="border-color:var(--result)"></i>put 提前行权的价值（模型，取负）</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">已扫到</div><div class="d" id="scK"></div><div class="d2" id="scKb"></div></div>
+      <div class="stat"><div class="k">conversion 有利润</div><div class="d" id="scC"></div><div class="d2">个行权价</div></div>
+      <div class="stat"><div class="k">reversal 表面有利润</div><div class="d" id="scR" style="color:var(--control)"></div><div class="d2" id="scRb"></div></div>
+    </div>
+    <div class="say plain" id="scSay"></div>
+  </div>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th class="nw">行权价</th><th>conversion<br>利润</th><th>reversal<br>利润</th><th>put 提前<br>行权价值（模型）</th></tr></thead>
+    <tbody id="scTb"></tbody>
+  </table>
+  </div>
+  <p class="tiny">利润按 4/13 的钱计，每股；负数就是亏。利率 4.3%，股票按 352.36。</p>
+
+  <h3>450 上的 0.58 是白捡的吗</h3>
+  <p>不是。parity 的推导默认期权只能在到期日行权，这叫<span class="sym" data-say="European option。只能在到期日行权。">欧式</span>。TSLA 的期权是<span class="sym" data-say="American option。到期前任何一天都可以行权。美国的个股期权都是美式。">美式</span>，买方到期前任何一天都能行权。</p>
+  <p>reversal 里卖出的是 put。450 put 深度实值（TSLA 352.36，行权价 450），它的买方有理由提前行权：今天就按 450 卖出股票，拿到 450 美元现金去生息，比等 32 天划算。节点 9 专门讲这套判据：股票 put 的提前行权靠的是利息。</p>
+  <p>这项权利值多少钱，要用模型算。这里用的是<span class="sym" data-say="binomial tree，二叉树模型：把到期前的时间切成很多小步，每一步标的要么涨一格、要么跌一格，从到期那一步往回算出期权今天的价值。节点 9 会再用到。">二叉树模型</span>：把到期前的 32 天切成 2000 小步，每一步 TSLA 要么涨一格、要么跌一格，一格多大由波动率决定。从到期那一步往回算，美式 put 在每一步都比较两个数，现在行权拿到的 X − S 和继续拿着的价值，取大的；欧式 put 只能继续拿着。两者今天的价值之差，就是提前行权这项权利的价值，图里的蓝色虚线。波动率用 <span class="sym" data-say="ORATS：期权数据商。本课的期权报价、隐含波动率、未平仓量都来自它的分钟快照。">ORATS</span> 给每个行权价算出的<span class="sym" data-say="implied volatility，隐含波动率（1.2）：从市场上的期权价格反推出来的波动率，相当于市场的报价。">隐含波动率</span>，利率 4.3%。</p>
+  <p id="amSay"></p>
+  <p>平值附近这块也不是 0。350 的提前行权价值是 0.08：put 因此贵了 0.08，C − P 就低了 0.08，1.1 从 C − P 反解出的利率跟着偏低，折成利率约 0.25 个百分点。340 到 360 五个行权价都加回这一块，反解出的 4.10% 到 4.43% 变成 4.46% 到 4.62%，行权价之间的差距也缩小一半。所以 1.1 反解出的利率略微偏低；全课用的 4.3% 就是从这些美式报价反解出来的，里面已经含着这一小块。</p>
+  <p>讲义那道 131.60 对 131.25 的例题说的是同一件事：parity 对不上时，先查输入。利率用得对不对，分红对不对，期权是欧式还是美式，股票借不借得到，报价是不是同一时刻。这些都查过还对不上，才轮到「市场错了」。</p>
+  <div class="story">
+    <p><b>练一题。</b>还是讲义那组数：股票 131.25，125 call 9.60，125 put 3.15，51 天，利率 4.2%，预期分红 0.88。假设你确信 4.2% 和 0.88 都对：C − P 是太高还是太低？该做 conversion 还是 reversal，每股锁定多少？这笔利润要靠什么才拿得到？</p>
+    <details>
+      <summary>参考答案</summary>
+      <ul>
+        <li>按近似式，C − P 该值 131.25 − 125 ＋ 125 × 4.2% × 51/365 − 0.88 ＝ 6.25 ＋ 0.73 − 0.88 ＝ 6.10。市场上是 9.60 − 3.15 ＝ 6.45，高了 0.35。</li>
+        <li>C − P 太高，call 相对 put 太贵。卖贵的：卖 125 call、买 125 put，再按 131.25 买股票补上方向，这是 conversion。每股锁定约 0.35，一张约 35 美元，没算买卖价差。</li>
+        <li>conversion 拿着股票收分红，这 0.35 要靠 0.88 的分红真的发下来。市场价格认的分红只有 0.53；真只发 0.53，少收的 0.35 正好把利润吃光。这就是一节风险表里的「分红下调就亏」。</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>pin risk：到期时恰好停在行权价上</h2>
+  <p class="sub">conversion 靠到期时「自己行权 put」或「call 被指派」把股票卖掉。股价收在行权价附近时，这一步会出问题。</p>
+  <p>讲义的问题：持有 100 行权价的 conversion，到期时标的恰好是 100，怎么办？</p>
+  <ul>
+    <li>call 被指派了，股票已经按 100 交出去，就不该再行权 put，否则会多卖一份，变成空头。</li>
+    <li>call 没被指派，就必须行权 put，否则股票留在手里，变成多头。</li>
+    <li>有没有被指派，要到到期<b>之后</b>才知道。</li>
+  </ul>
+  <p>讲义的定义：<span class="sym" data-say="pin risk。到期时手里有平值空头期权，不知道会不会被指派，结果可能意外留下标的头寸。">pin risk</span> 是到期时持有平值空头期权的风险，市场「钉」在了行权价上。conversion 空着 call，reversal 空着 put，两种都有。</p>
+  <p>美国股票期权还有两条惯例让它更难办：收盘时实值 0.01 美元以上的期权默认自动行权；持有人在到期日 17:30（美东）之前还可以改主意，收盘后的盘后价格仍然会影响对手的决定。</p>
+
+  <h3>5/15 收盘前后</h3>
+  <p>5/15 TSLA 开盘 433.98，半小时内跌到 426 附近（09:59 收 425.98），之后四个多小时按分钟收盘在 423.60 到 429.58 之间来回，最后一小时往 422.5 靠，15:54 到过全天最低 422.00。收盘附近有三个行权价：420、422.5、425，每一档都有几千到上万张<span class="sym" data-say="open interest，未平仓量：已经成交、还没有平掉的合约张数。到期时这些合约都要么行权，要么作废。">未平仓</span>合约。表里的期权报价是买一 / 卖一：15:59 是收盘前最后一分钟，16:00 是收盘那一刻的快照。</p>
+  <div class="tscroll">
+  <table id="oiTb"></table>
+  </div>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="pnPlay">重播</button></div>
+    <svg id="pin" viewBox="0 0 720 350" role="img" aria-label="5/15 下午三点到五点半 TSLA 每分钟价格与三个行权价，最后是周一开盘"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink)"></i>TSLA 每分钟收盘，正常交易时段</span>
+      <span><i class="ln" style="background:var(--ink-faint)"></i>收盘后到 17:30</span>
+      <span><i class="dsh" style="border-color:var(--control)"></i>422.5</span>
+      <span><i class="dsh" style="border-color:var(--ink-faint)"></i>420、425</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">时间（美东）</div><div class="d" id="pnT"></div><div class="d2" id="pnTb"></div></div>
+      <div class="stat"><div class="k">TSLA</div><div class="d" id="pnS"></div><div class="d2" id="pnSb"></div></div>
+      <div class="stat"><div class="k">422.5 call / put 中间价</div><div class="d" id="pnO"></div><div class="d2" id="pnOb"></div></div>
+      <div class="stat"><div class="k">穿过 422.5</div><div class="d" id="pnX" style="color:var(--control)"></div><div class="d2">次，按分钟收盘</div></div>
+    </div>
+    <div class="say plain" id="pnDo"></div>
+  </div>
+  <p id="pinSay"></p>
+  <p id="pinCost"></p>
+  <p id="pinEnd"></p>
+  <p>讲义的配套问答：恰好平值的期权，在到期那一刻理论价值是 0；有人还去行权它，理由是交易成本（行权换股票可能比在市场上买卖便宜）。所以对手会不会行权，没有理论答案。讲义给的是实务答案：<b>不要把平值空头期权带到到期</b>，收盘前把它买回来，代价大概是一个买卖价差。</p>
+  <p>讲义还提到一个现象：临近到期，平值的 conversion 和 reversal 常按 C − P ＝ S − X 这个价成交（讲义叫 <span class="sym" data-say="even money：按 C − P ＝ S − X 成交平值的 conversion 或 reversal，不算利息。临近到期利息只剩几分钱，这个价就是公平价。">even money</span>），持有的人借此把 pin risk 交给对手。讲义问：你该不该接？要看你手里的头寸和多数人一样还是相反。相反的话，接下这笔正好把自己的头寸平掉，自己的 pin risk 也没了，可以按 even money 接；一样的话，接过来等于同样的风险再加一份，要对方让价才值得接。</p>
+  <p>只有行权会产生标的头寸时才有 pin risk。<span class="sym" data-say="cash settlement。到期不交割标的，按结算价差额付现金。">现金结算</span>的品种没有：SPX、NDX、RUT 这类指数期权，以及季月到期的股指期货期权，到期只按差额付钱，不会留下股票或期货头寸。</p>
+  <p class="tiny">数据：IBKR 分钟线（美东时间，含盘后），每分钟取收盘；16:00 那一点用官方收盘价 422.32，与分钟线差几分钱。期权报价与未平仓量：ORATS 5/15 分钟快照。自动行权的门槛见 OCC 规则 805（exercise by exception，实值 0.01 美元）；到期日 17:30 的改主意截止时间见 FINRA 规则 2360(b)(23)(A)，券商常把自己客户的截止时间定得更早。</p>
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>settlement risk：期货期权的 conversion 不中性</h2>
+  <p class="sub">股票期权的 conversion 是精确中性的。换成美国交易所的期货期权，就不是了。</p>
+  <p>先看股票期权。350 conversion 里，卖 call、买 put 合起来是合成空头，delta 是 −100（按一张合约 100 股计，相当于空 100 股）；一份股票 ＋100。合计 0。</p>
+  <p>换成期货期权：卖 1 张 call、买 1 张 put、买 1 张期货。2.3 讲过，美国的期货期权按股票型结算：期权买的时候全额付钱，盈亏到平仓或到期才兑现。可期货本身每天按结算价结清。讲义的问题：三月期货跌 10 点，期权上的盈利能不能正好抵掉期货上的亏损？</p>
+  <ul>
+    <li>期货亏的 10 点当天就要从<span class="sym" data-say="margin account，保证金账户：交易期货时放在经纪商那里的钱。期货每天按结算价结算，亏了当天从这里扣，赚了当天存进来。">保证金账户</span>划走，这是<b>已实现</b>的亏损，钱不够就得借。</li>
+    <li>合成空头赚的 10 点要到期权到期才拿到，是<b>未实现</b>的盈利。</li>
+    <li>中间这段时间，借来的 10 点要付利息。</li>
+  </ul>
+  <p>反过来期货涨 10 点，账户当天收进 10 点现金，能生息。所以这个头寸总是希望期货涨：它带着正 delta。讲义给这个风险起名 <span class="sym" data-say="settlement risk。期货期权按股票型结算时，期货上已实现的亏损没法用期权上未实现的盈利抵掉，要借钱付息。">settlement risk</span>。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="stPlay">重播</button></div>
+    <svg id="settle" viewBox="0 0 720 294" role="img" aria-label="期货跌 10 点与涨 10 点两种情形下，保证金的利息逐日累积"></svg>
+    <div class="stats">
+      <div class="stat"><div class="k">过了</div><div class="d" id="stD"></div><div class="d2">共 3 个月</div></div>
+      <div class="stat"><div class="k">期货跌 10 点：付的利息</div><div class="d" id="stDn" style="color:var(--control)"></div><div class="d2">借来的 10 点</div></div>
+      <div class="stat"><div class="k">期货涨 10 点：收的利息</div><div class="d" id="stUp" style="color:var(--good)"></div><div class="d2">收进的 10 点</div></div>
+    </div>
+    <div class="say plain" id="stSay"></div>
+  </div>
+  <p>合成腿的 <span class="sym" data-say="合成 delta：买 call、卖 put 这一对（或反过来）合起来的 delta。股票期权里正好是 ±100。">delta</span> 不再是 100，而是：</p>
+  <div class="formula">
+    <div class="math">合成 delta ＝ 100 ÷ (1 ＋ r·t)</div>
+    <div class="gloss">期权的盈亏要等 t 年才拿到，所以按今天的钱只值 1 ÷ (1 ＋ r·t)</div>
+    <div class="note" id="stNote"></div>
+  </div>
+  <p>讲义的数字：卖 call 的 delta −60、买 put −39、期货 ＋100，合计 ＋1；另一组 −59、−38、＋100，合计 ＋3。利率越高、离到期越远，合计离 0 越远。</p>
+  <table>
+    <thead><tr><th>标的</th><th class="txt">conversion 的风险</th></tr></thead>
+    <tbody>
+      <tr><td>股票期权</td><td class="txt">利率（负 <span class="sym" data-say="rho（2.3）：利率涨 1 个百分点，仓位赚或亏多少。conversion 借钱买股票，利率涨就多付利息，所以 rho 是负的。">rho</span>）、分红</td></tr>
+      <tr><td>期货期权，股票型结算（美国）</td><td class="txt">settlement risk：带正 delta</td></tr>
+      <tr><td>期货期权，期货型结算（美国以外多数交易所）</td><td class="txt">没有 settlement risk，conversion 和 reversal 精确中性</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════ 七 ══════════ -->
+<section id="s7">
+  <h2><span class="n">七</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">C / P</div><div class="t">同一行权价、同一到期日的 call 价格与 put 价格。</div></div>
+      <div class="gl"><div class="s">S</div><div class="t">今天的股价。</div></div>
+      <div class="gl"><div class="s">X</div><div class="t">行权价。</div></div>
+      <div class="gl"><div class="s">r, t</div><div class="t">年利率；到期时间，以年计。32 天 ＝ 32/365 年。讲义用单利，r·t 是这段时间的利息比例。</div></div>
+      <div class="gl"><div class="s">1 ＋ r·t</div><div class="t">1 美元存到到期变成多少。一笔到期才收到的钱除以它，就是今天的价值（现值）。</div></div>
+      <div class="gl"><div class="s">D</div><div class="t">到期前股票派发的分红合计。</div></div>
+      <div class="gl"><div class="s">F</div><div class="t">远期价，F ＝ S(1 ＋ r·t) − D（1.1）。</div></div>
+      <div class="gl"><div class="s">put-call parity</div><div class="t">C − P ＝ (F − X) ÷ (1 ＋ r·t)。讲义也叫 synthetic relationship、conversion market。</div></div>
+      <div class="gl"><div class="s">套利</div><div class="t">同一种或几乎一样的东西两处价格不同，一边买一边卖，赚差价。</div></div>
+      <div class="gl"><div class="s">conversion</div><div class="t">买股票、卖 call、买 put。到期一定按 X 卖出股票。</div></div>
+      <div class="gl"><div class="s">reversal</div><div class="t">卖空股票、买 call、卖 put。到期一定按 X 买回股票。也叫 reverse conversion。</div></div>
+      <div class="gl"><div class="s">combo</div><div class="t">C − P，同一行权价的 call 减 put。等于按远期价算的内在价值的现值。</div></div>
+      <div class="gl"><div class="s">贷方 / 借方</div><div class="t">收到的钱 / 付出的钱。推导 parity 时每一笔都带上到期前的利息。</div></div>
+      <div class="gl"><div class="s">内在价值</div><div class="t">立刻行权能得到的钱，不够就是 0。</div></div>
+      <div class="gl"><div class="s">隐含分红</div><div class="t">从期权价格反推出来的、市场认定的分红。</div></div>
+      <div class="gl"><div class="s">买一 / 卖一</div><div class="t">市场上最高的买价 / 最低的卖价。卖出只能按买一，买入只能按卖一。</div></div>
+      <div class="gl"><div class="s">中间价</div><div class="t">（买一 ＋ 卖一）÷ 2（3.1）。</div></div>
+      <div class="gl"><div class="s">delta / gamma / vega / rho</div><div class="t">标的涨 1 美元仓位的盈亏（2.1）/ delta 的变化（2.2）/ 隐含波动率涨 1 个点的盈亏（2.3）/ 利率涨 1 个百分点的盈亏（2.3）。conversion 前三个都是 0，rho 为负。</div></div>
+      <div class="gl"><div class="s">butterfly / iron butterfly</div><div class="t">买 1 卖 2 买 1 三个等距行权价 / 买中间的 straddle、卖两翼的 strangle（3.2）。两者之和到期固定值行权价间距（5.1）。</div></div>
+      <div class="gl"><div class="s">期货</div><div class="t">约定到期按今天定下的价格买卖标的的合约，不付全款，盈亏每天用现金结清。</div></div>
+      <div class="gl"><div class="s">保证金账户</div><div class="t">交易期货时放在经纪商那里的钱，期货的盈亏每天从这里扣或存进来。</div></div>
+      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权价格反推出的波动率（1.2）。本页的二叉树用 ORATS 给每个行权价算的值。</div></div>
+      <div class="gl"><div class="s">二叉树模型</div><div class="t">把到期前的时间切成很多小步，每步标的涨一格或跌一格，从到期往回算期权今天的价值。美式 put 每一步都比较「现在行权」和「继续拿着」。</div></div>
+      <div class="gl"><div class="s">提前行权价值</div><div class="t">美式 put 比同样条件的欧式 put 多出的价值，本页用二叉树算。它让 C − P 偏低，从 parity 反解的利率随之偏低。</div></div>
+      <div class="gl"><div class="s">ORATS</div><div class="t">期权数据商，本课的期权报价、隐含波动率、未平仓量都来自它的分钟快照。</div></div>
+      <div class="gl"><div class="s">欧式 / 美式</div><div class="t">只能在到期日行权 / 到期前任何一天都能行权。parity 的等式按欧式推导。</div></div>
+      <div class="gl"><div class="s">指派</div><div class="t">卖出期权的一方被对手行权选中，必须履约。</div></div>
+      <div class="gl"><div class="s">未平仓量</div><div class="t">还没平掉的合约张数。</div></div>
+      <div class="gl"><div class="s">pin risk</div><div class="t">到期时手里有平值空头期权，不知道会不会被指派的风险。</div></div>
+      <div class="gl"><div class="s">现金结算</div><div class="t">到期不交割标的，按差额付现金。没有 pin risk。</div></div>
+      <div class="gl"><div class="s">已实现 / 未实现</div><div class="t">已经变成现金进出账户的盈亏 / 还只是账面上的盈亏。</div></div>
+      <div class="gl"><div class="s">股票型 / 期货型结算</div><div class="t">买期权时全额付钱、盈亏平仓才兑现 / 不付全款、每天按结算价结清（2.3）。</div></div>
+      <div class="gl"><div class="s">现值</div><div class="t">将来才收到的一笔钱今天值多少：除以 1 ＋ r·t。</div></div>
+      <div class="gl"><div class="s">合成 delta</div><div class="t">合成股票（call 减 put）的 delta。股票期权里正好 100；股票型结算的期货期权里是 100 ÷ (1 ＋ r·t)。</div></div>
+      <div class="gl"><div class="s">even money</div><div class="t">按 C − P ＝ S − X 成交平值的 conversion 或 reversal，临近到期时常见。</div></div>
+      <div class="gl"><div class="s">settlement risk</div><div class="t">股票型结算的期货期权里，期货的已实现亏损要借钱垫付，期权的盈利到期才到，conversion 因此带正 delta。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节 <b>5.3 box · roll · collar</b>：两个行权价上的 conversion 与 reversal 拼成 box，反推无风险利率；两个到期月拼成 roll，只剩持有成本；collar 用卖 call 的钱付 put。另一条支线是 <b>9 提前行权</b>：第四节那几个深度实值 put 为什么会被提前行权，三套判据。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照，价格来自 IBKR 分钟线</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
+const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);           // 负数用真正的减号
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+const NARROW=matchMedia('(max-width:620px)');
+let FK=NARROW.matches?1.55:1;   // 手机上图缩到四成多，字按 FK 放大；宽度跨过 620px 时重算并重画
+const lab = (x,y,t,c,a='start',s=12,w=400)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${(s*FK).toFixed(1)}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+const setVB=(id,w,h)=>$(id).setAttribute('viewBox',`0 0 ${w} ${Math.round(h)}`);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 案例数据 ══════════
+   由 scripts/data/station_5_2.py 生成，重跑加 --inject 会整段替换。
+   CONV：4/13 收盘 TSLA 与 5/15 到期 350 call / put 的买一、卖一（ORATS 16:00 快照）。
+   EXF：讲义 put-call parity 填空练习（r = 0，D = 0），null 是要填的格。
+   CH.rows：[行权价, call 买一, call 卖一, put 买一, put 卖一, put 提前行权价值]，4/13 收盘，5/15 到期；
+            最后一列是模型值：CRR 二叉树 2000 步，σ 取 ORATS smv_vol，美式 put 减欧式 put。
+   PIN：5/15 15:00–15:59 每分钟收盘（IBKR）加官方收盘 422.32；ah 是 16:00–17:30 的分钟收盘；mon 是 5/18 开盘；
+        optc / optp 是 422.5 call / put 每分钟中间价（ORATS，15:00–16:00）；q 是 15:59 三个行权价的报价与未平仓量。 */
+/* data:start */
+const CONV={"S":352.36,"K":350,"cb":21.0,"ca":21.1,"pb":17.35,"pa":17.45,"days":32,"r":0.043};
+const EXF=[[100.0,100,5.0,null],[100.0,110,null,12.0],[null,105,4.5,2.5],[106.4,null,18.0,1.6],[44.75,40,6.25,null],[44.75,45,null,2.5],[null,45,6.15,2.9],[48.0,null,1.0,8.0],[1460.0,1500,55.0,null],[null,1475,35.25,34.5],[1430.5,1450,null,29.5],[1452.0,null,38.0,11.0]];
+const CH={"S":352.36,"rows":[[250.0,102.7,105.3,0.72,0.75,0.001],[255.0,97.9,100.75,0.82,0.84,0.001],[260.0,93.1,95.7,0.93,0.95,0.001],[265.0,88.45,90.7,1.06,1.08,0.002],[270.0,83.85,85.65,1.22,1.25,0.002],[275.0,79.3,80.7,1.43,1.45,0.003],[280.0,74.65,75.6,1.68,1.71,0.004],[285.0,69.85,71.3,2.0,2.03,0.005],[290.0,65.3,66.65,2.38,2.42,0.006],[295.0,60.8,62.15,2.85,2.89,0.007],[300.0,56.75,57.2,3.4,3.5,0.009],[305.0,52.25,53.1,4.05,4.15,0.011],[310.0,48.15,48.85,4.85,4.95,0.014],[315.0,44.05,44.95,5.8,5.9,0.018],[320.0,40.35,40.75,6.9,7.0,0.022],[325.0,36.6,37.0,8.15,8.25,0.028],[330.0,33.05,33.5,9.6,9.7,0.034],[335.0,29.85,30.0,11.2,11.3,0.042],[340.0,26.7,26.85,13.05,13.15,0.052],[345.0,23.75,23.85,15.05,15.2,0.063],[350.0,21.0,21.1,17.35,17.45,0.077],[355.0,18.5,18.6,19.75,19.95,0.093],[360.0,16.15,16.3,22.5,22.65,0.111],[365.0,14.1,14.2,25.4,25.55,0.132],[370.0,12.2,12.3,28.55,28.7,0.156],[375.0,10.5,10.6,31.85,32.05,0.183],[380.0,9.05,9.1,35.35,35.6,0.213],[385.0,7.7,7.8,38.85,39.45,0.247],[390.0,6.6,6.7,42.85,43.25,0.284],[395.0,5.6,5.7,46.35,47.6,0.324],[400.0,4.75,4.8,50.85,51.6,0.37],[405.0,4.0,4.1,55.25,56.0,0.417],[410.0,3.4,3.5,59.55,60.45,0.466],[415.0,2.9,2.95,63.45,65.55,0.521],[420.0,2.46,2.51,68.75,69.65,0.574],[425.0,2.1,2.14,72.95,74.45,0.64],[430.0,1.79,1.83,78.2,78.95,0.692],[435.0,1.53,1.57,82.5,84.2,0.763],[440.0,1.32,1.35,87.85,88.5,0.823],[445.0,1.14,1.17,92.25,93.8,0.883],[450.0,1.0,1.02,97.55,98.2,0.94]]};
+const PIN={"last":[425.62,425.22,425.31,425.31,425.12,425.53,425.17,425.0,424.88,424.65,424.44,424.31,424.08,424.29,424.36,424.26,424.5,424.34,424.4,424.32,424.23,424.3,424.79,423.73,423.17,423.16,422.97,423.07,422.99,423.05,423.67,423.58,423.2,422.72,422.95,423.7,424.06,424.15,424.28,424.61,424.44,424.79,424.49,424.5,424.29,424.03,423.99,423.9,423.65,424.15,423.3,423.58,423.34,423.21,422.89,422.21,422.24,422.53,422.31,422.21,422.32],"ah":[421.9,421.5,421.83,421.67,421.5,421.21,421.13,421.4,421.41,420.91,420.87,420.98,421.39,421.65,421.74,421.61,421.4,421.7,422.36,422.01,421.8,421.85,422.01,421.77,421.71,421.79,422.2,421.98,421.84,422.01,421.97,421.65,421.71,422.16,422.02,422.1,421.96,422.02,422.02,421.91,421.9,421.75,421.65,421.77,421.7,421.81,421.73,421.88,421.94,421.9,421.91,421.8,421.78,421.74,421.7,421.78,421.86,421.6,421.8,421.83,421.53,421.61,421.68,421.75,421.86,421.83,421.62,421.56,421.48,421.46,421.45,421.44,421.44,421.37,421.35,421.25,421.19,421.12,421.07,421.04,420.99,420.63,420.96,420.81,420.58,420.84,420.55,420.99,421.29,421.15,421.15],"mon":419.27,"settle":422.32,"optc":[3.525,3.225,3.075,2.985,3.02,2.86,3.125,3.09,2.76,2.58,2.555,2.26,2.24,1.985,2.115,2.01,2.055,2.265,2.055,2.105,2.02,1.835,2.055,2.425,1.785,1.185,1.21,1.095,1.07,1.055,1.005,1.51,1.285,1.25,0.93,0.885,1.225,1.705,1.83,1.945,2.265,2.165,2.32,2.17,2.15,2.0,1.555,1.65,1.835,1.37,1.73,1.12,1.35,1.025,1.01,0.765,0.42,0.35,0.495,0.37,0.31],"optp":[0.155,0.2,0.25,0.25,0.23,0.25,0.16,0.17,0.22,0.265,0.245,0.3,0.3,0.38,0.29,0.32,0.3,0.22,0.245,0.21,0.22,0.26,0.2,0.12,0.26,0.555,0.53,0.575,0.49,0.515,0.525,0.265,0.315,0.315,0.485,0.52,0.295,0.16,0.135,0.125,0.095,0.09,0.095,0.105,0.11,0.115,0.155,0.16,0.135,0.19,0.125,0.195,0.175,0.225,0.23,0.33,0.63,0.615,0.46,0.53,0.575],"q":{"420.0":{"cb":2.29,"ca":2.51,"pb":0.01,"pa":0.03,"coi":12759,"poi":10732},"422.5":{"cb":0.35,"ca":0.39,"pb":0.5,"pa":0.56,"coi":3521,"poi":3271},"425.0":{"cb":0.03,"ca":0.04,"pb":2.6,"pa":2.74,"coi":7573,"poi":6526}},"q16":{"420.0":{"cb":2.09,"ca":2.41,"pb":0.01,"pa":0.02},"422.5":{"cb":0.28,"ca":0.34,"pb":0.49,"pa":0.66},"425.0":{"cb":0.02,"ca":0.03,"pb":2.67,"pa":2.94}},"ahmin":420.55,"ahmint":"17:26"};
+/* data:end */
+
+const S0=CONV.S, K0=CONV.K, R=CONV.r, NDAY=CONV.days, T0=NDAY/365, G=1+R*T0;
+const CM=(CONV.cb+CONV.ca)/2, PM=(CONV.pb+CONV.pa)/2;
+const COST=S0-CM+PM;                                   // conversion 建仓当天净付出
+const F0=S0*G;                                         // TSLA 不派息
+
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+function segOn(id,fn){
+  const bs=document.querySelectorAll('#'+id+' button');
+  bs.forEach(b=>b.addEventListener('click',()=>{ bs.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(b.dataset); }));
+}
+/* 按帧推进：每 ms 毫秒走一步，直到 done() */
+function runLoop(s,ms,step,draw,done){
+  s.playing=true; s.last=0; s.acc=0; const tok=s.tok=(s.tok||0)+1;
+  const tick=t=>{
+    if(!s.playing || s.tok!==tok) return;
+    const dt=s.last?Math.min(t-s.last,100):ms; s.last=t; s.acc+=dt;
+    while(s.acc>=ms && !done()){ step(); s.acc-=ms; }
+    draw();
+    if(done()){ s.playing=false; return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+/* ══════════ 〇 · 三条腿拼成水平线 ══════════ */
+const LEGS=(()=>{
+  const W=720,L=58,R2=700, X0=300,X1=400, Y0=-60,Y1=60;
+  let T=34,B=300;
+  const X=v=>L+(v-X0)/(X1-X0)*(R2-L), Y=v=>B-(v-Y0)/(Y1-Y0)*(B-T);
+  const st={prog:4,mode:'conv',playing:false};
+  const legs=()=>{ const s=st.mode==='conv'?1:-1;
+    return [
+      {f:x=>s*(x-S0), c:'var(--ink-faint)', t:s>0?'买股票 352.36':'卖空股票 352.36'},
+      {f:x=>s*(CM-Math.max(x-K0,0)), c:'var(--result)', t:s>0?'卖 350 call，收 21.05':'买 350 call，付 21.05'},
+      {f:x=>s*(Math.max(K0-x,0)-PM), c:'var(--warn)', t:s>0?'买 350 put，付 17.40':'卖 350 put，收 17.40'}
+    ]; };
+  function pl(f,frac){
+    const xe=X0+(X1-X0)*frac, pts=[];
+    for(let x=X0;x<=xe+1e-9;x+=0.5) pts.push(X(x).toFixed(1)+','+Y(f(x)).toFixed(1));
+    return pts.join(' ');
+  }
+  function draw(){
+    T=18+16*FK; B=T+266; const H=B+26+26*FK; setVB('legs',W,H);
+    const p=st.prog, lg=legs(), s=st.mode==='conv'?1:-1;
+    let g=lab(L,T-10-6*FK,'每股到期损益','var(--ink-soft)','start',12.5);
+    [-60,-40,-20,0,20,40,60].forEach(v=>{
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.7}"/>`;
+      g+=lab(L-8,Y(v)+4,v===0?'0':fm(v,0),'var(--ink-faint)','end',12);
+    });
+    [300,325,350,375,400].forEach(v=>g+=lab(X(v),B+14+6*FK,v,'var(--ink-faint)','middle',12));
+    g+=lab((L+R2)/2,H-6,'5/15 到期时 TSLA 的价格','var(--ink-soft)','middle',12.5);
+    g+=`<line x1="${X(350)}" y1="${T}" x2="${X(350)}" y2="${B}" stroke="var(--rule)" stroke-dasharray="3 4"/>`;
+    const fade=p>=3?.35:1;
+    lg.forEach((l,i)=>{
+      const fr=clamp(p-i,0,1); if(fr<=0) return;
+      g+=`<polyline points="${pl(l.f,fr)}" fill="none" stroke="${l.c}" stroke-width="2.4" opacity="${fade}"/>`;
+    });
+    // 标签：放在各自线的端点附近，线在 0 上方就写在线上面，在下方就写在线下面
+    const lp=[400,400,300];
+    lg.forEach((l,i)=>{
+      if(p<i+1) return;
+      const x=lp[i], v=l.f(x), yy=Y(v)+(v>=0?-9:6+12*FK);
+      g+=lab(x===400?X(400)-4:X(300)+4, yy, l.t, l.c, x===400?'end':'start', 12.5, 500);
+    });
+    if(p>=2 && p<3){                                    // 股票 + call：只在加第三条腿之前出现，图上直接标名字
+      const f=x=>lg[0].f(x)+lg[1].f(x);
+      g+=`<polyline points="${pl(f,1)}" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-dasharray="6 5"/>`;
+      g+=lab(X(362),Y(f(362))+(s>0?-10:6+14*FK),'股票 ＋ call','var(--ink-soft)','start',12);
+    }
+    if(p>=3){
+      const fr=clamp(p-3,0,1), f=x=>lg[0].f(x)+lg[1].f(x)+lg[2].f(x);
+      g+=`<polyline points="${pl(f,fr)}" fill="none" stroke="var(--control)" stroke-width="3.6"/>`;
+      if(fr>=1){                                        // 合计的字放在左下（conversion）或左上（reversal），那里没有别的线穿过
+        const v=f(300), x0=X(301.5), l1=`合计 ${sgn(v)}`, l2='TSLA 在哪都一样';
+        if(s>0){ g+=lab(x0,Y(v)+8+13.5*FK,l1,'var(--control)','start',13.5,600); g+=lab(x0,Y(v)+8+13.5*FK+16*FK,l2,'var(--control)','start',12,500); }
+        else   { g+=lab(x0,Y(v)-10-16*FK,l1,'var(--control)','start',13.5,600); g+=lab(x0,Y(v)-10,l2,'var(--control)','start',12,500); }
+      }
+    }
+    $('legs').innerHTML=g;
+  }
+  function stats(){
+    const c=st.mode==='conv';
+    $('lgK1').textContent= c?'今天付出':'今天收到';
+    $('lgV1').textContent=f2(COST); $('lgV1b').textContent=`${f2(S0)} − ${f2(CM)} ＋ ${f2(PM)}`;
+    $('lgK2').textContent= c?'到期收回':'到期付出';
+    $('lgV2').textContent=f2(K0); $('lgV2b').textContent= c?'按 350 卖出股票':'按 350 买回股票';
+    $('lgV3').textContent=sgn((K0-COST)*(c?1:-1)); $('lgV3b').textContent='每股，未算利息';
+    const it=COST*R*T0;
+    $('lgSay').textContent= c
+      ? `352.36 − 21.05 ＋ 17.40 ＝ ${f2(COST)} 今天付出去，32 天后换回 350，多出 ${f2(K0-COST)}。可这 ${f2(COST)} 要占用 32 天，按 4.3% 的利息是 ${f2(it)}，扣掉之后每股 ${fm(K0-COST*G)}。`
+      : `reversal 今天收到 ${f2(COST)}，32 天后付 350 买回股票，少 ${f2(K0-COST)}。可收到的 ${f2(COST)} 能存 32 天，按 4.3% 赚 ${f2(it)} 利息，扣掉之后每股 ${sgn(COST*G-K0)}。`;
+  }
+  function start(){
+    st.playing=false; stats();
+    if(reduced){ st.prog=4; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(4,st.prog+16.7/1100); },draw,()=>st.prog>=4);
+  }
+  $('lgPlay').addEventListener('click',start);
+  segOn('lgMode',d=>{ st.mode=d.m; start(); });
+  stats();
+  return {start,draw,el:$('legs')};
+})();
+
+/* ══════════ 一 · 32 天的账 ══════════ */
+const LEDGER=(()=>{
+  const W=720,T=18,B=238, YA=348.5, YB=350.3;
+  let L=70,R2=640;
+  const X=d=>L+d/NDAY*(R2-L), Y=v=>B-(v-YA)/(YB-YA)*(B-T);
+  const owe=d=>COST*(1+R*d/365);
+  const st={prog:NDAY,playing:false};
+  const TICK=[[0,'4/13'],[7,'4/20'],[14,'4/27'],[21,'5/4'],[28,'5/11'],[32,'5/15']];
+  function draw(){
+    L=FK>1?84:70; R2=FK>1?606:640; const H=B+28+24*FK; setVB('ledger',W,H);
+    const p=st.prog;
+    let g='';
+    for(let v=348.5; v<=350.31; v+=0.5){
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width=".7"/>`;
+      g+=lab(L-8,Y(v)+4,f2(v),'var(--ink-faint)','end',12);
+    }
+    TICK.forEach(([d,t])=>g+=lab(X(d),B+10+10*FK,t,'var(--ink-faint)','middle',12));
+    g+=`<line x1="${L}" y1="${Y(350)}" x2="${R2}" y2="${Y(350)}" stroke="var(--good)" stroke-width="1.8" stroke-dasharray="7 5"/>`;
+    g+=lab(R2+6,Y(350)-4,'到期收回','var(--good)','start',12,500);
+    g+=lab(R2+6,Y(350)+4+10*FK,'X ＝ 350','var(--good)','start',12,500);
+    const pts=[]; for(let d=0; d<=p+1e-9; d+=0.25) pts.push(X(d).toFixed(1)+','+Y(owe(d)).toFixed(1));
+    g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--control)" stroke-width="3"/>`;
+    g+=`<circle cx="${X(p)}" cy="${Y(owe(p))}" r="5" fill="var(--control)"/>`;
+    g+=lab(X(0)+6,Y(owe(0))+8+12*FK,`第 0 天借 ${f2(COST)}`,'var(--control)','start',12.5,500);
+    if(p>=NDAY){
+      g+=lab(X(NDAY)-6,Y(owe(NDAY))-12,`第 32 天欠 ${f2(owe(NDAY))}`,'var(--control)','end',12.5,600);
+    } else {
+      g+=lab(X(p)+8,Y(owe(p))+6+12*FK,f2(owe(p)),'var(--control)','start',12);
+    }
+    g+=lab((L+R2)/2,H-6,'4/13 建仓 → 5/15 到期','var(--ink-soft)','middle',12.5);
+    $('ledger').innerHTML=g;
+    table(p);
+  }
+  function table(p){
+    const k=R*p/365, done=p>=NDAY;
+    const cr=[['卖 call C',CM],['利息 C·r·t',CM*k],['分红 D',0],['到期收回 X',done?K0:null]];
+    const db=[['买股票 S',S0],['利息 S·r·t',S0*k],['买 put P',PM],['利息 P·r·t',PM*k]];
+    const n=v=> v===null?'到期才有':v===0?'0':(Math.abs(v)<10?v.toFixed(4):f2(v));
+    let h='';
+    for(let i=0;i<4;i++) h+=`<tr><td>${cr[i][0]}</td><td>${n(cr[i][1])}</td><td class="txt">${db[i][0]}</td><td>${n(db[i][1])}</td></tr>`;
+    const sc=cr.reduce((s,x)=>s+(x[1]||0),0), sd=db.reduce((s,x)=>s+x[1],0);
+    h+=`<tr class="tot"><td>贷方合计</td><td>${sc.toFixed(4)}</td><td class="txt">借方合计</td><td>${sd.toFixed(4)}</td></tr>`;
+    $('ldTb').querySelector('tbody').innerHTML=h;
+    $('ldSay').textContent= done
+      ? `第 32 天：贷方 ${sc.toFixed(2)}，借方 ${sd.toFixed(2)}，差 ${fm(sc-sd)}。两栏几乎相等：按 4/13 的市价，这笔 conversion 扣掉利息正好不赚不亏。欠款线在最后一天才越过 350，越过的那一点就是这 ${fm(sc-sd)}。`
+      : '';
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=NDAY; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(NDAY,st.prog+16.7/170); },draw,()=>st.prog>=NDAY);
+  }
+  $('ldPlay').addEventListener('click',start);
+  return {start,draw,el:$('ledger')};
+})();
+
+/* ══════════ 一 · 推导的核对、近似式、利率风险 ══════════ */
+function renderS1(){
+  const pv=(F0-K0)/G;
+  $('stepCheck').textContent=`TSLA 350：F ＝ 352.36 × (1 ＋ 4.3% × 32/365) ＝ ${f2(F0)}，(F − X) ÷ (1 ＋ r·t) ＝ ${f2(F0-K0)} ÷ ${G.toFixed(4)} ＝ ${f2(pv)}；市场上 C − P ＝ 21.05 − 17.40 ＝ ${f2(CM-PM)}，差 ${fm(CM-PM-pv)}，就是上面那 ${fm(K0-COST*G)} 折回今天。`;
+  const ap=S0-K0+K0*R*T0, ex=S0-K0/G;
+  $('approxNote').textContent=`TSLA 350：近似式 ${f2(S0)} − 350 ＋ 350 × 4.3% × 32/365 ＝ ${ap.toFixed(3)}，精确式 ${ex.toFixed(3)}，差 ${(ap-ex).toFixed(3)}。讲义的 65 combo 例子差 0.02。`;
+  const dr=COST*0.005*T0;
+  $('rhoSay').textContent=`TSLA 不派息，350 conversion 只剩利率风险。建仓后利率如果从 4.3% 升到 4.8%，借来的 ${f2(COST)} 32 天多付 ${f2(COST)} × 0.5% × 32/365 ＝ ${dr.toFixed(2)}，一张 ${f2(dr*100)} 美元。delta、gamma、vega 都是 0，这个盈亏不会被股价抵消。`;
+}
+
+/* ══════════ 二 · combo 表 ══════════ */
+function renderCombo(){
+  const ks=[300,330,350,370,400];
+  $('comboTb').innerHTML=ks.map(k=>{
+    const r=CH.rows.find(x=>x[0]===k), c=(r[1]+r[2])/2-(r[3]+r[4])/2;
+    return `<tr${k===350?' class="hot"':''}><td>TSLA ${k}</td><td>${fm(S0-k)}</td><td>${fm(F0-k)}</td><td><b>${fm((F0-k)/G)}</b></td><td><b>${fm(c)}</b></td></tr>`;
+  }).join('');
+  const lowBy=k=>{ const r=CH.rows.find(x=>x[0]===k); return f2((F0-k)/G-((r[1]+r[2])/2-(r[3]+r[4])/2)); };
+  const r350=CH.rows.find(x=>x[0]===350), c350=(r350[1]+r350[2])/2-(r350[3]+r350[4])/2;
+  $('comboSay').textContent=`最后两列贴在一起，S − X 那一列差得远。350 这一行，C − P 是 ${f2(c350)}，按现价算的内在价值只有 ${f2(S0-350)}，多出的 ${f2(c350-(S0-350))} 差不多就是 350 美元晚付 32 天省下的利息 350 × 4.3% × 32/365 ＝ ${f2(350*R*T0)}。370、400 两行 C − P 比折回今天的值分别低 ${lowBy(370)} 和 ${lowBy(400)}，第四节解释。`;
+}
+
+/* ══════════ 三 · 盖住一个 ══════════ */
+function renderFour(){
+  const pvx=K0/G;
+  const rows=[
+    ['股价 S','C − P ＋ X ÷ (1 ＋ r·t)',CM-PM+pvx,'352.36'],
+    ['put P','C − S ＋ X ÷ (1 ＋ r·t)',CM-S0+pvx,'17.35 / 17.45'],
+    ['call C','S − X ÷ (1 ＋ r·t) ＋ P',S0-pvx+PM,'21.00 / 21.10'],
+    ['行权价 X','(S − C ＋ P)(1 ＋ r·t)',COST*G,'350']
+  ];
+  $('fourTb').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="txt">${r[1]}</td><td><b>${f2(r[2])}</b></td><td>${r[3]}</td></tr>`).join('');
+  $('fourSay').textContent=`X ÷ (1 ＋ r·t) ＝ 350 ÷ ${G.toFixed(4)} ＝ ${f2(pvx)}。四个都算回到屏幕上的数附近：股价差 ${f2(S0-(CM-PM+pvx))}，call 和 put 算出来都落在买一和卖一之间。一张期权报价表自己就带着股价和利率的信息。`;
+}
+
+/* ══════════ 三 · 求解器 ══════════ */
+const SV={what:'S',preset:null};
+const SVP={tsla:{C:21.05,P:17.40,S:352.36,X:350,d:32,r:4.3,D:0,w:'S'},
+           lecG:{C:'',P:4.25,S:69.00,X:70,d:47,r:5.2,D:0.39,w:'C'},
+           lecD:{C:9.60,P:3.15,S:'',X:125,d:51,r:4.2,D:0.88,w:'S'}};
+function svFill(k){
+  const p=SVP[k]; SV.what=p.w; SV.preset=k;
+  const v=x=>x===''?'':f2(x);
+  $('svC').value=v(p.C); $('svP').value=v(p.P); $('svS').value=v(p.S); $('svX').value=p.X;
+  $('svD').value=p.d; $('svR').value=p.r; $('svDiv').value=p.D;
+  document.querySelectorAll('#svWhat button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.w===p.w));
+  svRun();
+}
+function svRun(){
+  const g=id=>{ const v=$(id).value; return v===''?NaN:+v; };
+  const C=g('svC'), P=g('svP'), S=g('svS'), X=g('svX'), d=g('svD'), r=g('svR')/100, D=g('svDiv')||0;
+  const t=d/365, gg=1+r*t, w=SV.what;
+  ['svC','svP','svS','svX'].forEach(id=>$(id).classList.remove('out'));
+  let ex, ap, name;
+  if(w==='S'){ ex=C-P+X/gg+D/gg; ap=C-P+X-X*r*t+D; name='股价'; }
+  if(w==='C'){ ex=S-D/gg-X/gg+P; ap=S-X+X*r*t-D+P; name='call'; }
+  if(w==='P'){ ex=C-S+D/gg+X/gg; ap=C-S+X-X*r*t+D; name='put'; }
+  if(w==='X'){ ex=(S-D/gg-(C-P))*gg; ap=NaN; name='行权价'; }
+  const id={S:'svS',C:'svC',P:'svP',X:'svX'}[w];
+  if(!isFinite(ex)){ $('svSay').textContent='缺数，算不出来。'; return; }
+  $(id).value=f2(ex); $(id).classList.add('out');
+  let say=`${name}：精确式 <b>${f2(ex)}</b>`+(isFinite(ap)?`，近似式 ${f2(ap)}`:'')+`。1 ＋ r·t ＝ ${gg.toFixed(4)}。`;
+  if(D) say+=` 这里的精确式按第 ⑤ 步把分红也折回今天，用 D ÷ (1 ＋ r·t)。`;
+  if(SV.preset==='tsla') say+=' 屏幕上的股价是 352.36。';
+  if(SV.preset==='lecG') say+=' 讲义用近似式得 3.33，比直接按卖一 3.40 买 call 便宜。';
+  if(SV.preset==='lecD') say+=` 屏幕上的股价是 131.25，比算出的低 ${f2(ap-131.25)}。讲义的解释：市场认的分红只有 0.88 − 0.35 ＝ 0.53。`;
+  $('svSay').innerHTML=say;
+}
+segOn('svWhat',d=>{ SV.what=d.w; SV.preset=null; svRun(); });
+document.querySelectorAll('.presets button[data-p]').forEach(b=>b.addEventListener('click',()=>svFill(b.dataset.p)));
+['svC','svP','svS','svX','svD','svR','svDiv'].forEach(id=>$(id).addEventListener('input',()=>{
+  const out={S:'svS',C:'svC',P:'svP',X:'svX'}[SV.what];
+  if(id!==out){ SV.preset=null; svRun(); }
+}));
+
+/* ══════════ 三 · 讲义填空练习 ══════════ */
+(function(){
+  const miss=r=>r.findIndex(v=>v===null);
+  const ans=r=>{ const [s,k,c,p]=r; const m=miss(r);
+    return m===0? c-p+k : m===1? s-c+p : m===2? s-k+p : c-s+k; };
+  $('exF').querySelector('tbody').innerHTML=EXF.map((r,i)=>{
+    const m=miss(r);
+    const cell=j=> j===m ? `<input class="cell" type="number" step="0.01" id="xf${i}" placeholder="?">` : (j===1&&r[j]!==null? r[j] : r[j].toFixed(2));
+    return `<tr><td>${i+1}${i>=8?'*':''}</td><td>${cell(0)}</td><td>${cell(1)}</td><td>${cell(2)}</td><td>${cell(3)}</td></tr>`;
+  }).join('');
+  $('exFChk').addEventListener('click',()=>{
+    let ok=0, filled=0;
+    const wrong=[];
+    EXF.forEach((r,i)=>{ const el=$('xf'+i); if(el.value===''){ el.className='cell'; return; }
+      filled++; const d=+el.value-ans(r);
+      if(Math.abs(d)<=0.005){ el.className='cell ok'; ok++; }
+      else { el.className='cell no'; wrong.push(`第 ${i+1} 行差 ${sgn(d)}`); } });
+    $('exFMsg').textContent= filled? `对了 ${ok} / ${filled}`+(wrong.length?'；'+wrong.join('，'):'') : '';
+  });
+  $('exFGive').addEventListener('click',()=>{
+    EXF.forEach((r,i)=>{ $('xf'+i).value=f2(ans(r)); $('xf'+i).className='cell ok'; });
+    $('exFMsg').textContent='第 4、8、12 行求的是行权价：S − C ＋ P。';
+  });
+})();
+
+/* ══════════ 三 · 哪条路便宜 ══════════ */
+function renderExec(){
+  const row=k=>CH.rows.find(x=>x[0]===k), pv=k=>k/G;
+  const out=[];
+  [250,350,400].forEach(k=>{ const r=row(k), syn=S0+r[4]-pv(k);
+    out.push([`买 ${k} call`,r[2],syn,`买股票 ＋ 按卖一 ${f2(r[4])} 买 ${k} put`,r[2]-syn]); });
+  const r=row(350);
+  out.push(['买股票',S0,r[2]-r[3]+pv(350),`按卖一 ${f2(r[2])} 买 350 call ＋ 按买一 ${f2(r[3])} 卖 350 put`,S0-(r[2]-r[3]+pv(350))]);
+  out.push(['卖股票',S0,r[1]-r[4]+pv(350),`按买一 ${f2(r[1])} 卖 350 call ＋ 按卖一 ${f2(r[4])} 买 350 put`,(r[1]-r[4]+pv(350))-S0]);
+  $('execTb').innerHTML=out.map(o=>`<tr><td>${o[0]}</td><td>${f2(o[1])}</td><td class="${o[4]>0?'pos':''}">${f2(o[2])}</td><td class="txt">${o[3]}</td></tr>`).join('');
+  const a=out[0];
+  $('execSay').textContent=`只有第一行合成更好：买 250 call 直接付 ${f2(a[1])}，合成只要 ${f2(a[2])}，一股省 ${f2(a[4])}，一张约 ${(a[4]*100).toFixed(0)} 美元。深度实值的 250 call 买卖价差有 ${f2(row(250)[2]-row(250)[1])}，对应的 250 put 只有 ${f2(row(250)[4]-row(250)[3])}，合成绕开了宽的那一边。350 附近两边价差都只有 0.10，直接交易更便宜；400 call 合成要多付 ${f2(-out[2][4])}，因为 400 put 的价差有 ${f2(row(400)[4]-row(400)[3])}。`;
+}
+
+/* ══════════ 四 · 全链扫描 ══════════ */
+const SCAN=(()=>{
+  const W=720,R2=704, YA=-1.8, YB=1.5;
+  let L=56,T=36,B=320;
+  const rows=CH.rows.map(r=>{ const [k,cb,ca,pb,pa,prem]=r, pv=S0-k/G;
+    return {k, lo:cb-pa-pv, hi:ca-pb-pv, mid:(cb+ca)/2-(pb+pa)/2-pv, prem}; });
+  const n=rows.length, X=i=>L+(i+.5)/n*(R2-L), Y=v=>B-(v-YA)/(YB-YA)*(B-T);
+  const st={prog:n,playing:false};
+  function draw(){
+    L=FK>1?62:56; T=20+16*FK; B=T+284; const H=B+26+26*FK; setVB('scan',W,H);
+    const p=st.prog, shown=Math.floor(p+1e-9);
+    let g=lab(L,T-10-6*FK,'combo 价格 − parity 价值，每股','var(--ink-soft)','start',12.5);
+    for(let v=-1.5; v<=1.51; v+=0.5){
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${Math.abs(v)<1e-9?1.6:.7}"/>`;
+      g+=lab(L-8,Y(v)+4,Math.abs(v)<1e-9?'0':fm(v,1),'var(--ink-faint)','end',12);
+    }
+    rows.forEach((r,i)=>{ if(r.k%50===0) g+=lab(X(i),B+14+6*FK,r.k,'var(--ink-faint)','middle',12); });
+    g+=lab((L+R2)/2,H-6,'行权价','var(--ink-soft)','middle',12.5);
+    g+=lab(R2,Y(1.35),'整根在上方：conversion 赚','var(--ink-faint)','end',12);
+    g+=lab(L+4,Y(-1.62),'整根在下方：reversal 赚','var(--ink-faint)','start',12);
+    // 模型：提前行权价值（取负），只画已扫过的
+    const pts=[]; rows.forEach((r,i)=>{ if(i<shown) pts.push(X(i).toFixed(1)+','+Y(-r.prem).toFixed(1)); });
+    if(pts.length>1) g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--result)" stroke-width="2" stroke-dasharray="5 4"/>`;
+    const bw=(R2-L)/n*.5;
+    rows.forEach((r,i)=>{
+      if(i>=shown) return;
+      const rev=r.hi<-0.0005, col=rev?'var(--control)':'var(--ink-faint)';
+      g+=`<rect x="${X(i)-bw/2}" y="${Y(clamp(r.hi,YA,YB))}" width="${bw}" height="${Math.max(1.5,Y(clamp(r.lo,YA,YB))-Y(clamp(r.hi,YA,YB)))}" rx="1.5" fill="${col}" opacity="${rev?.95:.55}"/>`;
+      g+=`<circle cx="${X(i)}" cy="${Y(r.mid)}" r="2.6" fill="var(--ink)"/>`;
+    });
+    if(shown>0 && shown<n) g+=`<line x1="${X(shown-1)}" y1="${T}" x2="${X(shown-1)}" y2="${B}" stroke="var(--control)" stroke-width="1" opacity=".5"/>`;
+    if(p>=n){
+      const i450=rows.findIndex(r=>r.k===450);
+      const ia=rows.findIndex(r=>r.k===300);
+      g+=lab(X(ia),Y(-1.08),'450：reversal 表面 '+sgn(-rows[i450].hi),'var(--control)','start',12.5,600);
+      g+=lab(X(ia),Y(-1.08)+4+15*FK,'450 put 提前行权价值 '+f2(rows[i450].prem),'var(--result)','start',12.5,600);
+      g+=lab(X(rows.findIndex(r=>r.k===300)),Y(1.05),'← 250 到 295：深度实值 call 买卖价差宽','var(--ink-soft)','start',12);
+    }
+    $('scan').innerHTML=g;
+    const sh=rows.slice(0,shown), nc=sh.filter(r=>r.lo>0.0005).length, rv=sh.filter(r=>r.hi<-0.0005);
+    $('scK').textContent= shown? rows[shown-1].k : '';
+    $('scKb').textContent=`${shown} / ${n} 个行权价`;
+    $('scC').textContent=nc; $('scR').textContent=rv.length;
+    $('scRb').textContent= rv.length? '最多 '+f2(Math.max(...rv.map(r=>-r.hi))) : '个行权价';
+    $('scSay').textContent= p>=n
+      ? `41 个行权价里，没有一个能做 conversion 赚钱。250 到 365 的竖条都跨过 0，250 到 295 那几根特别长，是深度实值 call 的买卖价差宽（0.95 到 2.85）。从 375 往上有 ${rv.length} 个行权价，竖条整根掉到 0 下方，按报价做 reversal 表面上能赚，450 最多，0.58。这些竖条越往右越低，贴着蓝色虚线走。`
+      : '';
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=n; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(n,st.prog+16.7/120); },draw,()=>st.prog>=n);
+  }
+  $('scPlay').addEventListener('click',start);
+  $('scTb').innerHTML=[300,350,375,400,420,440,450].map(k=>{ const r=rows.find(x=>x.k===k), rv=-r.hi;
+    return `<tr${rv>0.0005?' class="hot"':''}><td>${k}</td><td>${fm(r.lo,3)}</td><td class="${rv>0.0005?'neg':''}">${fm(rv,3)}</td><td>${r.prem.toFixed(3)}</td></tr>`; }).join('');
+  const rv=rows.filter(r=>r.hi<-0.0005), r450=rows.find(r=>r.k===450);
+  const c450=CH.rows.find(r=>r[0]===450), recv=S0-c450[2]+c450[3];
+  $('amSay').textContent=`提前行权对 reversal 意味着什么：put 被行权，你按 450 买进股票，平掉卖空的股票，手里只剩那张 450 call。原本 5/15 才付的 450 提前付了，这 450 美元 32 天的利息 450 × 4.3% × 32/365 ＝ ${f2(450*R*T0)} 就拿不到；那张 call 还值一点钱，所以实际少赚的比 ${f2(450*R*T0)} 小。按 4/13 的报价算：建仓收到 ${f2(S0)} − ${f2(c450[2])} ＋ ${f2(c450[3])} ＝ ${f2(recv)}，当场被行权就付出 450，剩 ${fm(recv-450)}；再按买一 ${f2(c450[1])} 卖掉那张 call，合计 ${fm(recv-450+c450[1])}，比计划的 ${sgn(-r450.hi)} 少 ${f2(-r450.hi-(recv-450+c450[1]))}。模型算出 450 put 提前行权这项权利值 ${f2(r450.prem)}，比表面利润 ${f2(-r450.hi)} 大。表面有利润的 ${rv.length} 个行权价，每一个都是这样：利润小于提前行权的价值。put 的报价按美式定价，parity 按欧式推，差的就是这一块。`;
+  return {start,draw,el:$('scan')};
+})();
+
+/* ══════════ 五 · pin risk 回放 ══════════ */
+const PINR=(()=>{
+  const W=720,L=54,T=16,B=292, YA=418.8, YB=426.4;
+  const XR0=L, XR1=452, XA1=610, XM=676;                // 正常时段 60 分钟；盘后 90 分钟压窄；周一开盘
+  const last=PIN.last, ah=PIN.ah.slice(1), K=422.5;       // ah[0] 是 16:00 那根，16:00 这一点用官方收盘价
+  const N=60+ah.length;                                   // 分钟 0..150（0 = 15:00，60 = 16:00，150 = 17:30）
+  const priceAt=m=> m<=60 ? last[m] : ah[m-61];
+  const X=m=> m<=60 ? XR0+m/60*(XR1-XR0) : XR1+(m-60)/(N-60)*(XA1-XR1);
+  const Y=v=>B-(v-YA)/(YB-YA)*(B-T);
+  const st={prog:N+1,playing:false};
+  const hm=m=>{ const t=15*60+m; return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; };
+  function crosses(m){ let c=0; for(let i=1;i<=Math.min(m,60);i++) if((last[i]>K)!==(last[i-1]>K)) c++; return c; }
+  function draw(){
+    const H=B+40+18*FK, r1=B+14+6*FK, r2=B+30+14*FK; setVB('pin',W,H);
+    const p=st.prog, m=Math.min(Math.floor(p),N);
+    let g='';
+    for(let v=419; v<=426.01; v+=1){
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${XM+20}" y2="${Y(v)}" stroke="var(--rule)" stroke-width=".6"/>`;
+      g+=lab(L-8,Y(v)+4,v,'var(--ink-faint)','end',12);
+    }
+    g+=`<rect x="${XR1}" y="${T}" width="${XA1-XR1}" height="${B-T}" fill="var(--panel2)" opacity=".7"/>`;
+    [[420,'var(--ink-faint)'],[425,'var(--ink-faint)'],[422.5,'var(--control)']].forEach(([k,c])=>{
+      g+=`<line x1="${L}" y1="${Y(k)}" x2="${XM+20}" y2="${Y(k)}" stroke="${c}" stroke-width="${k===K?1.8:1.2}" stroke-dasharray="6 4"/>`;
+    });
+    g+=lab(L+4,Y(422.5)-6,'行权价 422.5','var(--control)','start',12,600);
+    g+=lab(XR1-6,Y(425)-6,'425','var(--ink-faint)','end',12);
+    g+=lab(XA1-4,Y(420)+4+12*FK,'420','var(--ink-faint)','end',12);
+    [[0,'15:00'],[30,'15:30'],[60,'16:00'],[90,'16:30'],[120,'17:00'],[150,'17:30']].forEach(([mm,t])=>{
+      g+=`<line x1="${X(mm)}" y1="${B}" x2="${X(mm)}" y2="${B+5}" stroke="var(--ink-faint)"/>`;
+      if(FK===1 || mm<=60 || mm===150) g+=lab(X(mm),r1,t,'var(--ink-faint)','middle',12);   // 手机上盘后只标 16:00 与 17:30
+    });
+    g+=lab((XR0+XR1)/2,r2,'正常交易时段','var(--ink-soft)','middle',12);
+    g+=lab((XR1+XA1)/2,r2,'收盘后','var(--ink-soft)','middle',12);
+    g+=lab(XM,r1,'周一','var(--ink-faint)','middle',12);
+    g+=lab(XM,r2,'09:30','var(--ink-soft)','middle',12);
+    g+=`<line x1="${XA1+14}" y1="${T}" x2="${XA1+14}" y2="${B}" stroke="var(--rule)" stroke-dasharray="2 3"/>`;
+    // 价格线
+    const upto=Math.min(p,N);
+    const pr=[], pa=[];
+    for(let i=0;i<=Math.floor(upto);i++) (i<=60?pr:pa).push(X(i).toFixed(1)+','+Y(priceAt(i)).toFixed(1));
+    if(pa.length) pa.unshift(X(60).toFixed(1)+','+Y(last[60]).toFixed(1));
+    if(pr.length>1) g+=`<polyline points="${pr.join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>`;
+    if(pa.length>1) g+=`<polyline points="${pa.join(' ')}" fill="none" stroke="var(--ink-faint)" stroke-width="2"/>`;
+    const cur=priceAt(m);
+    g+=`<circle cx="${X(m)}" cy="${Y(cur)}" r="4.5" fill="${Math.abs(cur-K)<0.5?'var(--control)':'var(--ink)'}"/>`;
+    if(m>=60) g+=lab(X(60)+6,Y(last[60])-6-4*FK,'收盘 422.32','var(--ink)','start',12.5,600);
+    if(p>N){
+      g+=`<circle cx="${XM}" cy="${Y(PIN.mon)}" r="5" fill="var(--control)"/>`;
+      g+=lab(FK>1?W-2:XM,Y(PIN.mon)-11,f2(PIN.mon),'var(--control)',FK>1?'end':'middle',12.5,600);
+    }
+    $('pin').innerHTML=g;
+    // 读数
+    const isMon=p>N;
+    $('pnT').textContent= isMon?'周一 09:30':hm(m);
+    $('pnTb').textContent= isMon?'5/18 开盘' : m<60?'正常交易时段':m===60?'收盘':'收盘后';
+    const px=isMon?PIN.mon:cur;
+    $('pnS').textContent=f2(px); $('pnSb').textContent=`离 422.5 ${sgn(px-K)}`;
+    if(!isMon && m<=60){ $('pnO').textContent=`${f2(PIN.optc[m])} / ${f2(PIN.optp[m])}`; $('pnOb').textContent=m===60?'16:00 快照':'ORATS 分钟快照'; }
+    else { $('pnO').textContent='停止交易'; $('pnOb').textContent='股票期权 16:00 收盘'; }
+    $('pnX').textContent=crosses(m);
+    const d=$('pnDo');
+    if(isMon){
+      d.textContent=`周一开盘 ${f2(PIN.mon)}，比周五收盘低 ${f2(PIN.settle-PIN.mon)}。如果周末意外拿着 100 股，一张亏 ${((PIN.settle-PIN.mon)*100).toFixed(0)} 美元。`;
+    } else if(m<60){
+      d.textContent= cur<K
+        ? `此刻若收盘：put 实值 ${f2(K-cur)}，行权 put，按 422.5 卖出股票；call 虚值，不会被自动行权。`
+        : `此刻若收盘：call 实值 ${f2(cur-K)}，会被自动行权，股票按 422.5 被交走；put 作废，不该行权。`;
+    } else {
+      d.textContent=`收盘价定在 422.32，put 实值 0.18，按规则会自动行权；call 虚值 0.18。可 call 的买方到 17:30 前还能改主意，此刻盘后价格 ${f2(cur)}。`;
+    }
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=N+1; draw(); return; }
+    st.prog=0;
+    runLoop(st,16.7,()=>{ const sp= st.prog<60 ? 16.7/150 : st.prog<N ? 16.7/45 : 16.7/900; st.prog=Math.min(N+1,st.prog+sp); },draw,()=>st.prog>=N+1);
+  }
+  $('pnPlay').addEventListener('click',start);
+  return {start,draw,el:$('pin')};
+})();
+function renderPin(){
+  const q=PIN.q, q6=PIN.q16, S=PIN.settle, ks=['420.0','422.5','425.0'];
+  const hc=i=>ks[i]==='422.5'?' class="nw" style="background:var(--control-bg)"':' class="nw"';
+  const row=(name,fn)=>`<tr><td>${name}</td>${ks.map((k,i)=>`<td${hc(i)}>${fn(k,+k)}</td>`).join('')}</tr>`;
+  const ba=(b,a)=>`${f2(b)} / ${f2(a)}`;
+  $('oiTb').innerHTML=`<thead><tr><th>行权价</th>${ks.map((k,i)=>`<th${hc(i)}>${+k===422.5?'422.5':(+k).toFixed(0)}</th>`).join('')}</tr></thead><tbody>`+
+    row('收盘时',(k,kk)=>kk<S?`call 实值 ${f2(S-kk)}`:`put 实值 ${f2(kk-S)}`)+
+    row('未平仓 call',k=>q[k].coi.toLocaleString('en-US'))+
+    row('未平仓 put',k=>q[k].poi.toLocaleString('en-US'))+
+    row('15:59 call',k=>ba(q[k].cb,q[k].ca))+
+    row('15:59 put',k=>ba(q[k].pb,q[k].pa))+
+    row('16:00 call',k=>ba(q6[k].cb,q6[k].ca))+
+    row('16:00 put',k=>ba(q6[k].pb,q6[k].pa))+'</tbody>';
+  const last=PIN.last; let above=0; for(let i=0;i<60;i++) if(last[i]>422.5) above++;
+  $('pinSay').textContent=`15:00 TSLA 还在 ${f2(last[0])}，在 425 上方；15:08 起跌到 425 下方就没再回去。最后一小时有 ${above} 分钟在 422.5 上方，可最后 5 分钟按分钟收盘穿过 422.5 三次（15:55、15:57、15:58），收在 422.32，比 422.5 低 0.18。持有 422.5 conversion 的人，最后 5 分钟里「该不该行权 put」的答案换了三次。收盘后 TSLA 继续往下，${PIN.ahmint} 到过 ${f2(PIN.ahmin)}，离 420 只剩 ${f2(PIN.ahmin-420)}；周一开盘 ${f2(PIN.mon)}。`;
+  const k6=q6['422.5'], k9=q['422.5'], pm6=(k6.pb+k6.pa)/2;
+  $('pinCost').textContent=`市场给这份不确定定了价。16:00 收盘那一刻，正常交易已经结束，股价定在 422.32。422.5 call 按这个价一分钱内在价值都没有，买一还有 ${f2(k6.cb)}；put 内在价值 0.18，买一 ${f2(k6.pb)}，中间价 ${f2(pm6)} 比内在价值多约 ${f2(pm6-(422.5-S))}。同一刻 420 call 的买一 ${f2(q6['420.0'].cb)}、425 put 的买一 ${f2(q6['425.0'].pb)}，都不高于各自的内在价值 ${f2(S-420)}、${f2(425-S)}。422.5 多出来的这些钱，买的是收盘后那一个半小时：对手还能改主意，股价还在动。持有 conversion 的人可以在收盘前付掉它：15:59 按卖一 ${f2(k9.ca)} 买回空头 call，一张 ${(k9.ca*100).toFixed(0)} 美元，就不用赌周末。`;
+  const ahMax=Math.max(...PIN.ah), ahMaxI=PIN.ah.indexOf(ahMax);
+  $('pinEnd').textContent=`这一天实际的结果：收在 422.5 下方，盘后 TSLA 按分钟收盘最高只到 ${f2(ahMax)}（16:${String(ahMaxI).padStart(2,'0')}），再没回到 422.5 上方，call 的买方没有理由行权；put 自动行权，按 422.5 卖出股票，conversion 正好平掉。如果收盘停在 15:57 那样的 ${f2(last[57])}，事情就反过来：put 虚值不会行权，持有人等着 call 被指派；盘后价格跌回 422.5 下方，call 的买方放弃行权，股票留在手里，周末多出 100 股。按这一天的走势，周一开盘 ${f2(PIN.mon)}，比周五收盘 ${f2(S)} 低 ${f2(S-PIN.mon)}，一张亏 ${((S-PIN.mon)*100).toFixed(0)} 美元。`;
+}
+
+/* ══════════ 六 · settlement risk ══════════ */
+const SETTLE=(()=>{
+  const W=720, DAYS=91, RR=0.06, TT=3/12, YA=-0.18, YB=0.18;
+  let L=80,R2=600,T=36,B=256;
+  const X=d=>L+d/DAYS*(R2-L), Y=v=>B-(v-YA)/(YB-YA)*(B-T);
+  const intAt=d=>10*RR*TT*d/DAYS;                       // 10 点保证金按单利逐日计息，3 个月合计 0.15
+  const st={prog:DAYS,playing:false};
+  function draw(){
+    L=FK>1?88:80; R2=FK>1?520:600; T=20+16*FK; B=T+220; const H=B+26+12*FK; setVB('settle',W,H);
+    const p=st.prog;
+    let g=lab(L,T-10-6*FK,'累计利息，每单位','var(--ink-soft)','start',12.5);
+    [-0.15,-0.1,-0.05,0,0.05,0.1,0.15].forEach(v=>{
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`;
+      g+=lab(L-8,Y(v)+4,v===0?'0':fm(v),'var(--ink-faint)','end',12);
+    });
+    [[0,'建仓'],[30,'1 个月'],[61,'2 个月'],[91,'到期']].forEach(([d,t])=>g+=lab(X(d),B+14+6*FK,t,'var(--ink-faint)','middle',12));
+    const up=[], dn=[];
+    for(let d=0; d<=p+1e-9; d+=0.5){ up.push(X(d).toFixed(1)+','+Y(intAt(d)).toFixed(1)); dn.push(X(d).toFixed(1)+','+Y(-intAt(d)).toFixed(1)); }
+    g+=`<polyline points="${up.join(' ')}" fill="none" stroke="var(--good)" stroke-width="3"/>`;
+    g+=`<polyline points="${dn.join(' ')}" fill="none" stroke="var(--control)" stroke-width="3"/>`;
+    g+=lab(X(p)+8,Y(intAt(p))+4,`涨 10 点 ${sgn(intAt(p))}`,'var(--good)','start',12.5,600);
+    g+=lab(X(p)+8,Y(-intAt(p))+4,`跌 10 点 ${fm(-intAt(p))}`,'var(--control)','start',12.5,600);
+    g+=lab(X(4),Y(0.165),'期货涨：保证金账户收进 10 点，存着生息','var(--good)','start',12);
+    g+=lab(X(4),Y(-0.155),'期货跌：付出 10 点，借来的钱要付息','var(--control)','start',12);
+    $('settle').innerHTML=g;
+    const mo=p/DAYS*3;
+    $('stD').textContent= p>=DAYS?'3 个月':(mo<1?Math.round(p)+' 天':mo.toFixed(1)+' 个月');
+    $('stDn').textContent=fm(-intAt(p),3); $('stUp').textContent=sgn(intAt(p),3);
+    $('stSay').textContent= p>=DAYS
+      ? `两种情形里，期权到期时都正好补回期货的 10 点，差别只在利息：跌的一边付 0.15，涨的一边收 0.15。同样幅度的涨跌结果不对称，这个头寸偏向上涨，也就是带正 delta。每 10 点差 0.15，相当于 100 份里 1.5 份的方向头寸。`
+      : '';
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=DAYS; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(DAYS,st.prog+16.7/60); },draw,()=>st.prog>=DAYS);
+  }
+  $('stPlay').addEventListener('click',start);
+  const g6=1+RR*TT;
+  $('stNote').textContent=`沿用讲义例题 B 的利率 6%、3 个月：合成 delta ＝ 100 ÷ 1.015 ＝ ${(100/g6).toFixed(2)}，conversion 合计 100 − ${(100/g6).toFixed(2)} ＝ ${sgn(100-100/g6)}。同样 6%，期限拉到 12 个月是 ${sgn(100-100/1.06)}。`;
+  return {start,draw,el:$('settle')};
+})();
+
+/* ══════════ 七 · 费曼检验 ══════════ */
+const QS=[
+ {q:`不写公式，向一个只买卖股票的人解释 conversion：为什么买股票、卖 350 call、买 350 put 放在一起，到期时不管 TSLA 在哪，股票都正好按 350 卖掉？这笔交易最后赚不赚钱，由什么决定？`,
+  a:['到期在 350 上方，call 被行权，股票按 350 交出去；在下方，自己行权 put，按 350 卖出。两种情况都按 350 卖掉，手里什么都不剩。',
+     '今天付出 352.36 − 21.05 ＋ 17.40 ＝ 348.71，到期收回 350，多 1.29，和 TSLA 涨跌、波动大小都无关。',
+     '但 348.71 要占用 32 天。按 4.3% 算利息 1.31，扣掉后约等于 0。赚不赚只看「今天付出的钱加上利息」是不是少于 X。',
+     '剩下的风险只有利率和分红：利率升了利息多付，分红降了少收。'],
+  s:'「因为 put 和 call 互相对冲了」：没说出为什么结果恰好是 X，也没提利息，看不出它什么时候会赚钱。'},
+ {q:`推导 parity 时，为什么卖 call 收到的钱的利息记在贷方，而股票和 put 的利息记在借方？如果 TSLA 这 32 天里派 1 美元分红，C − P 会怎么变？`,
+  a:['卖 call 今天收到钱，可以存到到期生息，是收入。',
+     '买股票、买 put 今天付出钱，这钱要么是借的要付利息，要么本来能存着生息，都是成本。',
+     '分红是拿着股票收到的钱，记在贷方。它让远期价 F ＝ S(1 ＋ r·t) − D 少 1。',
+     'C − P ＝ (F − X) ÷ (1 ＋ r·t)，所以 C − P 下降约 1：call 变便宜、put 变贵。'],
+  s:'「利息都算在借方，因为要借钱」：只有付出的钱才是成本，收到的期权费能生息。'},
+ {q:`TSLA 350 的 C − P 是 3.65，按现价算的内在价值 S − X 只有 2.36。差的 1.3 是什么？为什么说 combo 是「内在价值的现值」？`,
+  a:['买 call、卖 put 等于约好到期按 350 买股票，这 350 到期才付。',
+     '和今天直接买股票比，350 晚付 32 天，省下利息约 350 × 4.3% × 32/365 ＝ 1.32，所以合成股票值得多付这么多。',
+     '准确地说，C − P ＝ (F − X) ÷ (1 ＋ r·t)：按远期价算的内在价值，再折回今天。',
+     '期货期权例子里 1250 combo 是 −33.00 而不是 −33.50，差的就是折现。'],
+  s:'「call 比 put 多了时间价值」：同一行权价的 call 和 put 时间价值差不多，差额来自利息。'},
+ {q:`已知 TSLA 350 call 21.05、put 17.40、利率 4.3%、32 天。不看股价，怎么知道股价大约多少？如果算出来比屏幕上高 0.35，第一反应应该是什么？`,
+  a:['S ＝ C − P ＋ X ÷ (1 ＋ r·t) ＝ 3.65 ＋ 348.69 ＝ 352.34，屏幕上是 352.36。',
+     '差 0.35 时先怀疑自己的输入，不是市场：利率用低了，或者分红用高了。',
+     '讲义例题就是这样反推出隐含分红：0.88 − 0.35 ＝ 0.53。',
+     '还要查：期权是不是美式、报价是不是同一时刻、股票借不借得到。'],
+  s:'「差了 0.35，赶紧套利」：多数时候是参数没对上。'},
+ {q:`4/13 收盘，按报价在 TSLA 450 上做 reversal，表面能赚 0.58。这是白捡的钱吗？为什么 350 附近没有这种现象？`,
+  a:['reversal 卖出 put。TSLA 期权是美式，450 put 深度实值，买方可以今天就行权，拿到 450 美元去生息。',
+     '被提前行权时，reversal 按 450 买进股票、平掉卖空的股票，手里还剩那张 450 call。原本 5/15 才付的 450 提前付了，32 天的利息 450 × 4.3% × 32/365 ＝ 1.70 拿不到；减去那张 call 还值的钱，才是少赚的部分。4/13 当场被行权的话，比计划少 0.69。',
+     '模型算这项提前行权的权利值 0.94，比 0.58 大。0.58 是在补偿这个风险，不是白捡。',
+     '平值附近提前行权的价值很小（350 约 0.08），所以 parity 在那里最准。但不是 0：它让 1.1 反解出的利率偏低约 0.25 个百分点。'],
+  s:'「报价错了，能套」：没看到期权是美式，parity 的等式只对欧式成立。'},
+ {q:`5/15 TSLA 收在 422.32，离 422.5 只有 0.18。持有 422.5 conversion 的人收盘后还面对什么不确定？16:00 收盘那一刻，422.5 call 还报 0.28 / 0.34，按收盘价它没有内在价值，这 0.31 是什么的价格？`,
+  a:['put 实值 0.18，自己会行权，按 422.5 卖出股票；按规则 call 虚值，不会被自动行权。',
+     '可 call 的买方到 17:30 前还能改主意，盘后价格还在动。call 被行权加上自己行权 put，股票卖了两次，变成空 100 股；两样都没发生，变成多 100 股。',
+     '要到到期之后才知道自己有没有被指派。周末意外多出 100 股，周一开盘 419.27，一张亏 305 美元。',
+     '0.31 就是收盘后这段不确定的价格：对手还能改主意，股价还在动。实务解法是收盘前买回空头 call，15:59 按卖一 0.39，一张 39 美元。'],
+  s:'「平值期权到期值 0，没有风险」：理论价值是 0，可对手会不会行权不知道，结果是一整份股票头寸。'},
+ {q:`为什么在美国交易期货期权，conversion 带正 delta？为什么期限越长、利率越高越明显？股票期权为什么没有这个问题？`,
+  a:['期货每天结算：跌的时候亏损当天就要付现金，钱得借，要付利息；涨的时候收到现金，能生息。',
+     '美国的期货期权按股票型结算，期权上的盈利要到期才兑现，抵不上中间的利息。',
+     '所以同样涨跌 10 点，跌亏利息、涨赚利息，头寸偏向上涨，就是正 delta。合成腿的 delta 是 100 ÷ (1 ＋ r·t)，6%、3 个月时 conversion 合计 ＋1.48。',
+     'r·t 越大，100 ÷ (1 ＋ r·t) 离 100 越远。股票期权里股票本身不逐日结算，合成空头的 delta 正好 −100，合计 0。'],
+  s:'「因为期货期权的 delta 算法不同」：没说出已实现与未实现的差别，也没说利息从哪来。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-5-2-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-5-2-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+const ANIMS=[LEGS,LEDGER,SCAN,PINR,SETTLE];
+function recolor(){ ANIMS.forEach(a=>a.draw()); }
+NARROW.addEventListener('change',e=>{ FK=e.matches?1.55:1; recolor(); });
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+
+/* ══════════ 启动 ══════════ */
+renderS1(); renderCombo(); renderFour(); renderExec(); renderPin();
+svFill('tsla');
+ANIMS.forEach(a=>a.draw());
+/* 滚到眼前才开始播放 */
+ANIMS.forEach(a=>onView(a.el,a.start));
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>

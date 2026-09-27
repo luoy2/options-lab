@@ -20,6 +20,7 @@
 | [6 风险的动态演化](https://luoy2.github.io/options-lab/station-6-risk-dynamics.html) | 今天中性不等于明天中性 |
 | [3.3 四象限与选择](https://luoy2.github.io/options-lab/station-3-3-four-quadrants.html) | 市场观点 → 该用哪一族 |
 | [5.1 Synthetics](https://luoy2.github.io/options-lab/station-5-1-synthetics.html) | 合成关系与化简 |
+| [5.2 parity 与 conversion](https://luoy2.github.io/options-lab/station-5-2-parity-conversion.html) | 把合成关系装上价格 |
 
 每个页面都是单文件 HTML，没有构建步骤；左侧课程目录由共用的 `course-nav.js` 生成。
 
