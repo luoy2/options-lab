@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Synthetics 合成</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2024H16L27%2013'%20stroke='%23fdf6ec'%20stroke-opacity='.55'%20stroke-width='2.2'%20fill='none'%20stroke-linecap='round'/%3E%3Cpath%20d='M5%2027L27%207'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+code{font-size:.86em;background:var(--panel);padding:.08em .35em;border-radius:4px}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.2rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:1rem;margin-top:1.1rem;
+  border-top:1px solid var(--rule);padding-top:1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.28rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.1rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+.say:empty{display:none}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .8rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt,th.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+td.txt{color:var(--ink-soft)}
+tr.hot td{background:var(--control-bg)}
+tr.sum td{font-weight:600;border-top:1.5px solid var(--rule)}
+tr.blk td{padding-top:1rem;color:var(--ink-faint);font-size:.76rem;letter-spacing:.04em}
+.tbl{overflow-x:auto}
+td.pos{font-family:"IBM Plex Mono",ui-monospace,monospace;text-align:left;font-size:.84rem;color:var(--ink);white-space:nowrap}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+td details{margin:0;background:none;padding:0}
+td details summary{padding:0;font-weight:400;font-size:.84rem;color:var(--result)}
+td details[open]{padding-bottom:0}
+td details div{margin-top:.3rem;color:var(--ink);font-size:.86rem;line-height:1.6}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.02rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.btns{display:flex;gap:.5rem;flex-wrap:wrap}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.7rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.9rem;height:3px;margin-right:.4rem;vertical-align:.22rem;border-radius:1px}
+.legend i.fat{height:.55rem;vertical-align:.05rem;opacity:.45}
+.legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)!important}
+ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+
+/* 化简器：一行一张合约卡片 */
+.simp{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:1.1rem 1.5rem;align-items:start;margin-top:.3rem}
+.cards{position:relative;transition:height .5s}
+.card{position:absolute;top:0;left:0;width:100%;height:2rem;display:flex;align-items:center;gap:.45rem;padding:0 .6rem;
+  border-radius:7px;background:var(--paper);border:1px solid var(--rule);font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:.8rem;white-space:nowrap;overflow:hidden;
+  transition:transform .75s cubic-bezier(.3,.7,.3,1),left .75s,width .75s,opacity .55s,background-color .3s,border-color .3s}
+.card .cq{font-weight:600;min-width:2.6rem;text-align:right;color:var(--ink)}
+.card .ct{color:var(--ink-soft)}
+.card.C .ct{color:var(--result)} .card.P .ct{color:var(--good)}
+.card.cash{background:var(--warn-bg);border-color:transparent} .card.cash .ct{color:var(--warn);font-weight:600}
+.card.hl{border-color:var(--control);background:var(--control-bg)}
+.card.zero .cq,.card.zero .ct{color:var(--ink-faint)}
+.stepcap{margin-top:.9rem;font-size:.93rem;line-height:1.7;color:var(--ink);min-height:3.4em}
+.stepn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint)}
+.chk{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);margin-top:.3rem;line-height:1.5}
+.ctitle{font-size:.78rem;color:var(--ink-faint);margin-bottom:.2rem}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .formula .math{font-size:1rem}
+  .simp{grid-template-columns:1fr}
+  .card{font-size:.72rem;padding:0 .4rem;gap:.3rem} .card .cq{min-width:2.1rem}
+}
+@media (prefers-reduced-motion: reduce){ .card,.cards{transition:none} }
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 合成标的</a><a href="#s1">一 四条合成</a><a href="#s2">二 就是标的</a><a href="#s3">三 拆</a>
+  <a href="#s4">四 化简</a><a href="#s5">五 蝴蝶互补</a><a href="#s6">六 认等价</a><a href="#s7">七 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 5.1</p>
+  <h1>Synthetics：合成与化简</h1>
+  <p class="lede">3.1 和 3.2 各留下一个问题。TSLA 350/380 <span class="sym" data-say="bull call spread（3.1）：同一到期，买一张低行权价的 call、卖一张高行权价的 call。开仓付钱，TSLA 涨就赚，最多赚两个行权价之差减去付的钱。">牛市 call 价差</span>开仓付 11.975，同样两个行权价的<span class="sym" data-say="bull put spread（3.1）：同一到期，买一张低行权价的 put、卖一张高行权价的 put。开仓收钱，TSLA 涨上去两张都作废，收的钱留下。">牛市 put 价差</span>开仓收 18.075，到期盈亏几乎一样；325/350/375 <span class="sym" data-say="butterfly（3.2）：三个等距行权价，买 1 张低的、卖 2 张中间的、买 1 张高的，同一种期权。到期停在中间那个行权价时最值钱，离开越远越不值钱，最少是 0。">butterfly</span> 买入付 5.60，<span class="sym" data-say="iron butterfly（3.2）：同样三个行权价，call 和 put 混着用：中间行权价的 straddle 与两边的 strangle 一买一卖。卖出 iron butterfly 开仓收钱，盈亏和买入 butterfly 一样。">iron butterfly</span> 卖出收 19.50，盈亏也一样。这一节讲合成关系：用两条腿做出第三样东西，把一堆腿化简到最简形式。案例仍是 2026-04-13 收盘、5/15 到期的 TSLA 期权。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>合成多头标的</h2>
+  <p class="sub">讲义这一课（Session 5，11 页）没有一个定价公式，只讲一件事：几张合约放在一起，到期时等于另一张合约。先看最基本的一对。</p>
+
+  <h3>记法</h3>
+  <p>讲义这样写仓位：<code>+1 December 100 call</code> 是买入 1 张 12 月到期、行权价 100 的 call，<code>−1</code> 是卖出。一张期权对应一份<span class="sym" data-say="underlying contract。期权到期时买卖的那样东西。讲义的例子是期货期权，一张期权对应一张期货合约；TSLA 期权对应 100 股 TSLA 股票。本页 TSLA 的数都按每股算。">标的合约</span>。本页 TSLA 的例子里，标的就是 TSLA 股票，一张期权对应 100 股，下面的钱数都按每股算。</p>
+
+  <h3>买 call、卖 put，到期会怎样</h3>
+  <p>讲义的第一个例子是 +1 December 100 call、−1 December 100 put。换成 1.1 那笔交易用的 TSLA 5/15 到期、行权价 350：买 1 张 350 call，卖 1 张 350 put。到期时 TSLA 只有三种情况：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>5/15 TSLA 收在</th><th class="txt">买入的 350 call</th><th class="txt">卖出的 350 put</th><th class="txt">结果</th></tr></thead>
+    <tbody>
+      <tr><td>高于 350，比如 400</td><td class="txt">值 50，你行权：按 350 买入</td><td class="txt">没人行权，作废</td><td class="txt"><b>按 350 买入</b></td></tr>
+      <tr><td>低于 350，比如 300</td><td class="txt">作废</td><td class="txt">买 put 的人行权，把股票按 350 卖给你，你被<span class="sym" data-say="assignment。卖出期权的一方，在对方行权时必须履约：卖了 put 就必须按行权价买入，卖了 call 就必须按行权价卖出。">指派</span>，必须接</td><td class="txt"><b>按 350 买入</b></td></tr>
+      <tr><td>正好 350</td><td class="txt">值 0</td><td class="txt">值 0</td><td class="txt">按 350 买不买都一样</td></tr>
+    </tbody>
+  </table></div>
+  <p>不管 TSLA 到期在哪，结果都是按 350 买入 TSLA。这就是 1.1 讲的远期：今天谈好价格，到期按这个价成交。讲义把这两条腿叫做<b>合成多头标的</b>（synthetic long underlying），也叫合成远期多头（synthetic long forward）。</p>
+  <p>讲义的例子是<span class="sym" data-say="European option：只能在到期日行权。">欧式期权</span>。TSLA 期权是<span class="sym" data-say="American option：到期日之前的任何一个交易日都可以行权。">美式期权</span>，到期前任何一天都能行权，所以卖出的 put 可能在到期前就被指派。结果仍是按 350 买入，只是时间提前。什么时候会被提前指派，节点 9 讲。</p>
+  <div class="formula">
+    <div class="math">+1 call(<span class="sym" data-say="行权价。两条腿必须是同一个 X。">X</span>) − 1 put(X) ＝ 到期按 X 买入 1 份标的</div>
+    <div class="gloss">买一张 call、卖一张同行权价同到期的 put，到期一定按行权价买到标的</div>
+  </div>
+
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="ov0Seg"></div>
+      <button class="btn ghost" id="ov0Play">再合成一遍</button>
+    </div>
+    <svg id="ov0Svg" role="img" aria-label="买入 call 与卖出 put 的到期价值，叠加成一条直线"></svg>
+    <div class="legend" id="ov0Lg"></div>
+    <div class="tbl"><table id="ov0Tb"></table></div>
+    <div class="say plain" id="ov0Say"></div>
+  </div>
+  <p class="tiny">不含开仓时付出或收到的钱。标的腿按行权价成交计。</p>
+
+  <h3>两个硬条件</h3>
+  <p>讲义特意写明：两条腿必须<b>同一行权价、同一到期日</b>。错开行权价，比如 350 call 配 330 put，330 到 350 之间两张都没人行权，这一段你既没买也没卖，线是平的，不再是标的。错开到期日，一张先到期、另一张还活着，先到期那天你手里只剩半个仓位。</p>
+
+  <h3>TSLA 的真实价格</h3>
+  <p>4/13 收盘，350 call 中间价 21.05，350 put 中间价 17.40，做一个合成多头要付 3.65。5/15 TSLA 收在 422.32：合成多头值 72.32，赚 68.67；4/13 直接按 352.36 买股票，到 5/15 赚 69.96，多 1.29。合成多头的<span class="sym" data-say="breakeven：到期时 TSLA 在这个价，仓位不赚不亏（3.1）。这里是行权价加上开仓付的钱。">盈亏平衡点</span>是 350 ＋ 3.65 ＝ 353.65，贴着 1.1 算出的远期价 353.69。为什么是 3.65、差的 1.29 从哪来，是 5.2 的内容。这一节只讲结构，不讲价格。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>四条基本合成</h2>
+  <p class="sub">〇节写成一个等式，就是 call − put ＝ 标的。等式里的一项挪到另一边，就得到另外几条。每一条都是用两条腿做出第三样东西。</p>
+  <div class="formula">
+    <div class="math">call − put ＝ 标的</div>
+    <div class="gloss">同一行权价、同一到期日。三样东西里任取两样，就能做出第三样</div>
+  </div>
+  <p>挪项的规则和解方程一样：一项从等号一边挪到另一边，买变卖，卖变买。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>想要</th><th class="txt">用这两条腿（同行权价、同到期）</th><th class="txt">从等式怎么来</th></tr></thead>
+    <tbody>
+      <tr><td>买入 call</td><td class="txt">买入 put ＋ 买入标的</td><td class="txt">call ＝ put ＋ 标的</td></tr>
+      <tr><td>卖出 call</td><td class="txt">卖出 put ＋ 卖出标的</td><td class="txt">上一行整行取反</td></tr>
+      <tr><td>买入 put</td><td class="txt">买入 call ＋ 卖出标的</td><td class="txt">put ＝ call − 标的</td></tr>
+      <tr><td>卖出 put</td><td class="txt">卖出 call ＋ 买入标的</td><td class="txt">上一行整行取反</td></tr>
+      <tr class="blk"><td colspan="3">〇节那一对</td></tr>
+      <tr><td>买入标的</td><td class="txt">买入 call ＋ 卖出 put</td><td class="txt">原式</td></tr>
+      <tr><td>卖出标的</td><td class="txt">卖出 call ＋ 买入 put</td><td class="txt">原式取反</td></tr>
+    </tbody>
+  </table></div>
+  <p>讲义第 6 页把前四条列成一张清单，加上〇节那一对，一共六条，都是同一个等式。合成里的标的腿，意思都是「到期按行权价成交」。</p>
+
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="ov1Seg"></div>
+      <button class="btn ghost" id="ov1Play">再合成一遍</button>
+    </div>
+    <svg id="ov1Svg" role="img" aria-label="两条腿的到期价值叠加成第三样东西"></svg>
+    <div class="legend" id="ov1Lg"></div>
+    <div class="tbl"><table id="ov1Tb"></table></div>
+    <div class="say plain" id="ov1Say"></div>
+  </div>
+
+  <h3>为什么说得通</h3>
+  <p><b>买 put ＋ 买标的 ＝ 买 call。</b>持有股票，再买一张 put 当保险：TSLA 跌破 350，put 把跌掉的部分补回来，损失停在 350；涨上去 put 作废，股票涨多少都归你。左边平、右边往上，就是一张 call 的形状。</p>
+  <p><b>买 call ＋ 卖标的 ＝ 买 put。</b>卖空股票，再买一张 call 当保险：涨过 350，call 把亏的部分补回来；跌下去 call 作废，卖空赚的都归你。左边往上、右边平，就是一张 put 的形状。</p>
+
+  <h3>delta 一正一负</h3>
+  <p>合成出来的 call 或 put，<span class="sym" data-say="delta：标的动 1 美元，期权价格动多少（2.1）。买 call 为正，买 put 为负；卖出时符号反过来。标的本身的 delta 是 1。">delta</span> 在 0 和 ±1 之间；标的的 delta 是 1。所以用期权配标的时，两条腿的 delta 必须<b>一正一负</b>，互相抵掉一部分：买 put（负）配买标的（正），买 call（正）配卖标的（负）。两条腿同号，比如买 call 又买标的，delta 加起来绝对值超过 1，合成不出单张期权，也合成不出标的。它仍是一个正常的仓位（把标的换成 call − put，就是 2 张 call 减 1 张 put），只是不在上面这张表里。六节有两道题就是这种陷阱。</p>
+  <p>call 配 put 合成标的时正好反过来：买 call 为正，卖 put 也为正（卖出把 put 的负 delta 翻成正），两个加起来才能到 1。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>不是像标的，就是标的</h2>
+  <p class="sub">〇、一两节说的是到期那一刻。到期之前，合成多头每天是不是也和标的一样动？讲义用 delta、gamma、vega 三张表验证；这里再用 TSLA 的 24 个交易日验证。</p>
+
+  <h3>讲义的三张表</h3>
+  <p>讲义按一张标的合约记 delta ＝ 100（本页 TSLA 的数是每股 0 到 1，乘 100 就是讲义的记法）。标的合约的 <span class="sym" data-say="gamma：标的动 1 美元，delta 变多少（2.2）。标的的 delta 永远是 1，不会变，所以标的的 gamma 是 0。">gamma</span> 和 <span class="sym" data-say="vega：隐含波动率变 1 个点，价格变多少（2.3）。股票价格本身不随期权的隐含波动率变，所以标的的 vega 是 0。">vega</span> 都是 0：它的 delta 永远是 100，不会变；它的价格也不随隐含波动率变。讲义给了两种情形，买 1 张 December 100 call、卖 1 张 December 100 put：</p>
+  <div class="tbl"><table style="max-width:36rem">
+    <thead><tr><th></th><th>情形 1</th><th>情形 2</th><th>标的合约</th></tr></thead>
+    <tbody>
+      <tr class="blk"><td colspan="4">delta</td></tr>
+      <tr><td>买入 call</td><td>+30</td><td>+80</td><td></td></tr>
+      <tr><td>卖出 put（put 的 delta 是 −70 / −20，卖出取反）</td><td>+70</td><td>+20</td><td></td></tr>
+      <tr class="sum"><td>合计</td><td>100</td><td>100</td><td>100</td></tr>
+      <tr class="blk"><td colspan="4">gamma</td></tr>
+      <tr><td>买入 call</td><td>5</td><td>2</td><td></td></tr>
+      <tr><td>卖出 put</td><td>−5</td><td>−2</td><td></td></tr>
+      <tr class="sum"><td>合计</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr class="blk"><td colspan="4">vega</td></tr>
+      <tr><td>买入 call</td><td>0.15</td><td>0.40</td><td></td></tr>
+      <tr><td>卖出 put</td><td>−0.15</td><td>−0.40</td><td></td></tr>
+      <tr class="sum"><td>合计</td><td>0</td><td>0</td><td>0</td></tr>
+    </tbody>
+  </table></div>
+  <p>两种情形里 call 离行权价远近不同，三项照样对上：合成多头的 delta 是 100，gamma 和 vega 是 0，和标的合约一模一样。它在风险上不是像标的，就是标的。</p>
+  <p>反过来读，这张表说了一件单独有用的事：<b>同一行权价、同一到期的 call 和 put，gamma 相同，vega 也相同</b>（情形 1 是 5 和 5、0.15 和 0.15，情形 2 是 2 和 2、0.40 和 0.40）。原因在等式里，但要多走一步：〇、一两节的等式说的是到期那一刻。到期之前，call − put 等于「标的 − 行权价」再加一笔利息（下面 24 天的图里那条虚线）。这笔利息只看利率和离到期还有几天，不随 TSLA 涨跌，也不随波动率变，所以它的 gamma、vega 是 0；标的的 gamma、vega 也是 0。于是 call − put 的 gamma、vega 都是 0，call 和 put 的 gamma 只能相等，vega 也只能相等。想从标的大动里赚钱（3.3），用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。</p>
+  <p>讲义的表是欧式期权。TSLA 期权是美式的，put 多一点提前行权的价值（3.1 量过：4/13 的 380 put 比按合成关系算出的欧式价贵 0.19），所以在 TSLA 上，call − put 和标的只是近似相等，gamma、vega 也只是近似相同。</p>
+
+  <h3>TSLA：ORATS 给的 delta、gamma、vega</h3>
+  <div class="tbl"><table style="max-width:40rem">
+    <thead><tr><th>4/13 收盘，5/15 到期</th><th>call delta</th><th>put delta</th><th>两者之差</th><th>gamma</th><th>vega</th></tr></thead>
+    <tbody>
+      <tr><td>行权价 300</td><td>0.8825</td><td>−0.1175</td><td>1.0000</td><td>0.00376</td><td>0.2152</td></tr>
+      <tr class="hot"><td>行权价 350</td><td>0.5574</td><td>−0.4426</td><td>1.0000</td><td>0.00820</td><td>0.4125</td></tr>
+      <tr><td>行权价 400</td><td>0.1954</td><td>−0.8046</td><td>1.0000</td><td>0.00591</td><td>0.2896</td></tr>
+    </tbody>
+  </table></div>
+  <p>这一天 ORATS 列了 161 个行权价，每一档 call delta 减 put delta 都是 1.0000。它的表里 gamma 和 vega 各只有一列，call 和 put 共用，正是因为这两个数本来相同。这些都是 ORATS 用模型算出来的，还算不上独立的证据。独立的证据是价格本身怎么动。</p>
+
+  <h3>24 个交易日的真实价格</h3>
+  <p>每天收盘，把 350 call 的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价，卖一减买一叫买卖价差（3.1）。">中间价</span>减去 350 put 的中间价，就是这一天合成多头的价值；把它和「TSLA 收盘 − 350」画在一起，下面单独画出两者之差：</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="srPlay">逐天重放</button></div>
+    <svg id="srSvg" role="img" aria-label="合成多头的价值与 TSLA 收盘减 350 逐天对照，下方是两者之差"></svg>
+    <div class="legend">
+      <span><i class="fat" style="background:var(--ink-faint)"></i>TSLA 收盘 − 350</span>
+      <span><i style="background:var(--control)"></i>合成多头：350 call − 350 put（中间价）</span>
+      <span><i class="dash" style="color:var(--result)"></i>下图虚线：350 美元晚付款省下的利息</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="srD"></div><div class="d2" id="srDb"></div></div>
+      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="srS"></div><div class="d2" id="srSb"></div></div>
+      <div class="stat"><div class="k">合成多头</div><div class="d" id="srY" style="color:var(--control)"></div><div class="d2" id="srYb"></div></div>
+      <div class="stat"><div class="k">两者之差</div><div class="d" id="srG"></div><div class="d2" id="srGb"></div></div>
+    </div>
+    <div class="say plain" id="srSay"></div>
+  </div>
+  <p class="tiny">数据：ORATS 快照，每天 16:00 那一行，中间价 ＝（买一 ＋ 卖一）÷ 2。5/15 到期当天按到期价值算：350 call 值 422.32 − 350 ＝ 72.32，350 put 值 0。利息按 1.1 反解出的 4.3%，单利。</p>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>拆</h2>
+  <p class="sub">讲义说：任何策略都可以用合成的办法做出来。替换本身只是查一节那张表；化简的关键是先决定哪几张配成一对去换，讲义管这一步叫「拆」。</p>
+
+  <h3>讲义第 7 页：两张 call，卖一份标的</h3>
+  <p>仓位是 +2 December 100 call，−1 标的合约。只把 call 换成 put 不行：+2 call ＝ +2 put ＋ 买 2 份标的，再加上原来卖出的 1 份，得到 +2 put、+1 标的。还是两行，只是从 call 的写法换成了 put 的写法，没有变简单。</p>
+  <p>能化出来的做法有两种。讲义的做法是先拆：两张 call 里拿出一张，和卖出的那份标的配成一对。买 call ＋ 卖标的，正是一节的合成 put；剩下那张 call 原样不动。另一种做法是换掉标的那一行：一节表里最后一行，卖出标的 ＝ 卖出 call ＋ 买入 put，换完是 +2 call、−1 call、+1 put，两行 call 合并成 +1。两种做法结果一样，都是 +1 call、+1 put：买入 December 100 <span class="sym" data-say="straddle：同一行权价、同一到期，买一张 call 加一张 put（3.2）。标的往哪边大动都赚。">straddle</span>。</p>
+  <p>两种做法都先决定了哪几张配成一对：拆出一张 call 配标的，或者让标的自己换成一对期权，再和已有的 call 合并。只把两张 call 一起换，标的那一行消不掉，从 −1 变成 +1，还是两行。这就是讲义强调「拆」的原因。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="smASeg"></div>
+      <div class="btns"><button class="btn ghost" id="smAPlay">再化简一遍</button><button class="btn ghost" id="smAPrev">上一步</button><button class="btn ghost" id="smANext">下一步</button></div>
+    </div>
+    <div class="simp">
+      <div><div class="stepn" id="smAStep"></div><div class="cards" id="smACards"></div><div class="stepcap" id="smACap"></div></div>
+      <div><div class="ctitle">整个仓位的到期价值</div><svg id="smASvg" role="img" aria-label="仓位到期价值，每一步都不变"></svg><div class="chk" id="smAChk"></div></div>
+    </div>
+    <div class="say plain" id="smASay"></div>
+  </div>
+
+  <h3>同一个 straddle，三种写法</h3>
+  <div class="tbl"><table style="max-width:34rem">
+    <thead><tr><th>写法</th><th class="txt">仓位</th></tr></thead>
+    <tbody>
+      <tr><td style="white-space:nowrap">写法 1</td><td class="pos">+1 December 100 call<br>+1 December 100 put</td></tr>
+      <tr><td style="white-space:nowrap">写法 2</td><td class="pos">+2 December 100 call<br>−1 标的合约</td></tr>
+      <tr><td style="white-space:nowrap">写法 3</td><td class="pos">+2 December 100 put<br>+1 标的合约</td></tr>
+    </tbody>
+  </table></div>
+  <p>三种写法到期完全一样。讲义说，报价时哪一种写法的<span class="sym" data-say="bid-ask spread：卖一减买一。买入按卖一成交、卖出按买一成交，每条腿都要多付半个买卖价差（3.1）。">买卖价差</span>更窄，就用哪一种成交：合成关系在实务里的用处，是多给你几条成交路径。</p>
+
+  <h3>牛市价差：call 版就是 put 版</h3>
+  <p>讲义第 8 页：<span class="sym" data-say="bull spread，牛市价差（3.1）：同一种期权、同一到期，买低行权价、卖高行权价。标的涨就赚，最多赚两个行权价之差。">牛市价差</span> +1 December 90 call、−1 December 100 call，两条腿都换成 put：买 90 call ＝ 买 90 put ＋ 按 90 买入标的；卖 100 call ＝ 卖 100 put ＋ 按 100 卖出标的。标的一买一卖，张数对消，剩下 +1 90 put、−1 100 put，也是买低卖高，put 版的牛市价差。同行权价、同到期的 call 价差和 put 价差，是同一个东西。上面化简器的最后一个例子就是这一题。</p>
+  <p>张数对消了，钱没有对消：按 90 买、按 100 卖，到期固定多出 10。所以 call 版 ＝ put 版 ＋ 到期那笔固定的 10。这回答了 3.1 留下的问题：TSLA 350/380 牛市 call 价差开仓付 11.975，牛市 put 价差开仓收 18.075，加起来 30.05，约等于间距 30。call 版多付的钱，买的就是到期那笔固定的 30；扣掉之后，两者 5/15 的盈亏是 +18.025 和 +18.075。30.05 为什么比 30 <span class="sym" data-say="折回今天：到期才拿到的钱，按利率算出今天值多少，也叫现值（1.1）。30 按 4.3% 折 32 天是 29.89。">折回</span>今天的 29.89 还多，3.1 讲过。</p>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>化简一堆腿</h2>
+  <p class="sub">腿一多，换法就固定下来：选一种期权，把另一种全部换掉，再按行权价合并。标的腿常常会自己对消，结构就露出来了。</p>
+
+  <h3>讲义第 9 页：买 strangle、卖 straddle</h3>
+  <p>仓位是 +1 December 95 put、−1 December 100 call、−1 December 100 put、+1 December 105 call，也就是买一个 95/105 <span class="sym" data-say="strangle：同一到期，买一张低行权价的 put、一张高行权价的 call（3.2）。比 straddle 便宜，要动得更多才赚。">strangle</span>、卖一个 100 straddle。只换两张 put，两张 call 原样不动。讲义把换出来的 −1 100 call 单独写一行，和原来就有的 −1 100 call 并排，合并时正好看出 <span class="sym" data-say="butterfly：三个等距行权价，买 1 张低的、卖 2 张中间的、买 1 张高的（3.2）。中间的行权价叫身，两边的叫翼。">butterfly</span> 身上那个 −2 是怎么来的。</p>
+  <p>讲义只写到 butterfly。换出来的两份标的，一份按 95 卖、一份按 100 买，张数对消，到期还固定少 5。这个 5 就是五节那条关系里的间距。</p>
+
+  <h3>讲义第 11 页：九行化成三行</h3>
+  <p>讲义这一课的最后一题：标的 981.50，下面这个仓位的 delta 是正、是负还是 0？</p>
+  <div class="tbl"><table style="max-width:22rem">
+    <tbody>
+      <tr><td class="pos">+29 标的合约</td><td class="pos">&nbsp;</td></tr>
+      <tr><td class="pos">−44 June 950 call</td><td class="pos">+44 June 950 put</td></tr>
+      <tr><td class="pos">+18 June 975 call</td><td class="pos">+24 June 975 put</td></tr>
+      <tr><td class="pos">−33 June 1000 call</td><td class="pos">−51 June 1000 put</td></tr>
+      <tr><td class="pos">+30 June 1025 call</td><td class="pos">+12 June 1025 put</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="smBSeg"></div>
+      <div class="btns"><button class="btn ghost" id="smBPlay">再化简一遍</button><button class="btn ghost" id="smBPrev">上一步</button><button class="btn ghost" id="smBNext">下一步</button></div>
+    </div>
+    <div class="simp">
+      <div><div class="stepn" id="smBStep"></div><div class="cards" id="smBCards"></div><div class="stepcap" id="smBCap"></div></div>
+      <div><div class="ctitle">整个仓位的到期价值</div><svg id="smBSvg" role="img" aria-label="仓位到期价值，每一步都不变"></svg><div class="chk" id="smBChk"></div></div>
+    </div>
+    <div class="say plain" id="smBSay"></div>
+  </div>
+  <p>讲义把 4 行 put 逐行换成 call，按行权价合并：950 那一条整个消失，标的 29 − 44 − 24 ＋ 51 − 12 ＝ 0 全部对消，剩下 +42 975 call、−84 1000 call、+42 1025 call，是 42 手 975/1000/1025 买入 butterfly。</p>
+  <p>讲义没有印 delta 的答案，化简之后一眼能看出来：butterfly 到期在身 1000 上最值钱，标的 981.50 在身的下方，处在线往上走的一段。标的往 1000 靠，仓位变值钱，所以 <b>delta 为正</b>。九行原样摆着，很难看出这一点。</p>
+  <p class="tiny">第 11 页这一题和随机题的原仓位里有标的合约，它的买入价只让整条线上下平移，图里把最低处记为 0，只比形状。第 9 页那一题没有原始的标的腿，线是真实的到期价值。</p>
+
+  <h3>化简的步骤</h3>
+  <ol>
+    <li>选定一种期权，把另一种全部换掉：<span class="sym" data-say="q：这一行的张数。">q</span> 张 put 换成 q 张 call 加卖出 q 份标的；q 张 call 换成 q 张 put 加买入 q 份标的。哪一种行数少，就换掉哪一种。</li>
+    <li>按行权价合并同一种期权，张数相加。</li>
+    <li>把所有标的腿加起来。</li>
+    <li>标的合计不是 0 时，把剩下的标的也换掉：买 1 份标的 ＝ 买 1 张 call ＋ 卖 1 张 put，行权价用仓位里已有的那一个（和标的原来的成交价差出来的，只是到期一笔固定的钱），再合并一次，看能不能并成 straddle 这类已知结构。三节第 7 页的 +2 call −1 标的，把 −1 标的换成 −1 call +1 put，合并后是 +1 call +1 put。</li>
+    <li>读出结构：butterfly、价差、<span class="sym" data-say="ratio spread（3.2）：同一种期权、两个行权价，买卖张数不相等，比如买 1 张、卖 2 张（1×2）。多出来的那几张决定哪一边亏损没有边界。">ratio spread</span>、straddle。</li>
+    <li>每一步换完，到期价值那条线都不能变；变了，就是哪一步换错了。</li>
+  </ol>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>butterfly ＋ iron butterfly ＝ 间距</h2>
+  <p class="sub">3.2 里 TSLA 325/350/375 butterfly 买入付 5.60，同样三个行权价的 iron butterfly 卖出收 19.50，收付的钱差很多，盈亏却一样。原因是一条不用任何定价模型的关系。</p>
+  <p>3.2 讲过：butterfly 买两翼、卖两张身；<span class="sym" data-say="iron butterfly：同样三个行权价，call 和 put 混着用。买入（讲义 long iron butterfly）= 买身上的 straddle、卖两翼的 strangle；卖出反过来。">iron butterfly</span> 买入是买身上的 straddle、卖两翼的 strangle（讲义叫 long iron butterfly），卖出反过来。讲义第 10 页给了这条关系，例子里间距是 5：</p>
+  <div class="formula">
+    <div class="math">butterfly ＋ 买入 iron butterfly ＝ 相邻行权价的<span class="sym" data-say="相邻两个行权价之差。325/350/375 的间距是 25；讲义例子 95/100/105 的间距是 5。">间距</span></div>
+    <div class="gloss">到期时两者的价值加起来处处等于间距，所以今天的价格加起来，就是「到期一定拿到间距」这件事今天的价格</div>
+  </div>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="fcPlay">再叠一遍</button></div>
+    <svg id="fcSvg" role="img" aria-label="butterfly 的三角形与买入 iron butterfly 的形状叠成一条水平线"></svg>
+    <div class="legend">
+      <span><i class="dash" style="color:var(--result)"></i>butterfly：买 325、375 call，卖 2 张 350 call</span>
+      <span><i style="background:var(--good)"></i>买入 iron butterfly：买 350 straddle，卖 325/375 strangle</span>
+      <span><i style="background:var(--control)"></i>两者合计</span>
+    </div>
+    <div class="tbl"><table id="fcTb"></table></div>
+  </div>
+  <p>butterfly 到期的价值是一个三角形：在身 350 最高，是 25，离开 350 每 1 美元少 1，到 325 和 375 变成 0。买入 iron butterfly 正好相反：straddle 的价值是 TSLA 离 350 的距离，卖出的 strangle 在 325 以下和 375 以上把超过 25 的部分收走，所以它的价值是「离 350 的距离，最多 25」。butterfly 少多少，它就多多少，加起来处处是 25。</p>
+
+  <h3>用化简的办法再看一遍</h3>
+  <div class="panel">
+    <div class="bar">
+      <div class="btns"><button class="btn ghost" id="smCPlay">再化简一遍</button><button class="btn ghost" id="smCPrev">上一步</button><button class="btn ghost" id="smCNext">下一步</button></div>
+    </div>
+    <div class="simp">
+      <div><div class="stepn" id="smCStep"></div><div class="cards" id="smCCards"></div><div class="stepcap" id="smCCap"></div></div>
+      <div><div class="ctitle">整个仓位的到期价值</div><svg id="smCSvg" role="img" aria-label="butterfly 加 iron butterfly 的到期价值，处处是 25"></svg><div class="chk" id="smCChk"></div></div>
+    </div>
+    <div class="say plain" id="smCSay"></div>
+  </div>
+  <p>七行、八张期权全部对消，只剩两份标的，一份按 325 买、一份按 350 卖，到期固定多出 25。按两个行权价一买一卖两个合成标的，这个组合叫 <span class="sym" data-say="box：一个行权价上的合成多头标的，加另一个行权价上的合成空头标的，同一到期。到期一定拿到两个行权价之差。5.3 专门讲。">box</span>，5.3 讲。</p>
+
+  <h3>讲义那个约等号</h3>
+  <p>讲义写的是 long butterfly ≈ short iron butterfly（买入 butterfly 约等于卖出 iron butterfly）。约等号来自那个固定的数：买入 butterfly ＝ 25 − 买入 iron butterfly，也就是卖出一个 iron butterfly，再加上到期固定拿到的 25。四节讲义第 9 页那一题化简后多出的 −5 也是它。</p>
+  <p>3.2 的成交价：买 butterfly 付 5.60，卖 iron butterfly 收 19.50，合计 25.10，接近 25。所以买 butterfly 最多赚 25 − 5.60 ＝ 19.40，卖 iron butterfly 最多赚 19.50；最多亏的是 5.60 和 25 − 19.50 ＝ 5.50。两种挂法开仓的现金差了 25 左右，盈亏只差 0.10。</p>
+
+  <h3>TSLA 的 24 个交易日</h3>
+  <p>4/13 收盘按中间价，butterfly 5.25，买入 iron butterfly 19.70，合计 24.95。25 要到 5/15 才拿到，按 1.1 的 4.3% 折回 4/13 是 24.91，差 0.04。之后每一天：</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="fdPlay">逐天重放</button></div>
+    <svg id="fdSvg" role="img" aria-label="butterfly、买入 iron butterfly 与两者之和的逐日中间价"></svg>
+    <div class="legend">
+      <span><i class="dash" style="color:var(--result)"></i>butterfly</span>
+      <span><i style="background:var(--good)"></i>买入 iron butterfly</span>
+      <span><i style="background:var(--control)"></i>两者合计</span>
+      <span><i class="fat" style="background:var(--control)"></i>浅色带：两个都按报价卖能收的钱，到两个都按报价买要付的钱</span>
+      <span><i class="dash" style="color:var(--ink-soft)"></i>25 折回当天</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="fdD"></div><div class="d2" id="fdDb"></div></div>
+      <div class="stat"><div class="k">butterfly</div><div class="d" id="fdF" style="color:var(--result)"></div></div>
+      <div class="stat"><div class="k">买入 iron butterfly</div><div class="d" id="fdI" style="color:var(--good)"></div></div>
+      <div class="stat"><div class="k">两者合计</div><div class="d" id="fdSum" style="color:var(--control)"></div><div class="d2" id="fdSumb"></div></div>
+    </div>
+    <div class="say plain" id="fdSay"></div>
+  </div>
+
+  <h3>用这条关系查报价</h3>
+  <p>同一天、同一个身 350，两翼放在 350 减、加间距的位置，间距从 5 到 50，十组 butterfly 和 iron butterfly（间距 25 那一行就是 325/350/375）：</p>
+  <div class="tbl"><table id="wTb"></table></div>
+  <p id="wSay"></p>
+  <p>一个真实的例子。同一天 250/255/260 call butterfly 按中间价算是 −0.25。butterfly 到期最少值 0，价格不可能是负的。毛病在报价上：这三张 call <span class="sym" data-say="实值：现在行权就值钱，call 是行权价低于现价（3.2）。深度实值是离现价很远的实值，价格几乎全是内在价值，交易少，买卖价差宽。">深度实值</span>，买卖价差 2.60 到 2.85，三张中间价的误差叠起来比 butterfly 本身还大。同样三个行权价的 put butterfly 是 0.015，这三张 put 的买卖价差只有 0.02 到 0.03。算 butterfly 时，用<span class="sym" data-say="虚值：现在行权不值钱，call 是行权价高于现价，put 是行权价低于现价（3.2）。250/255/260 的 put 离现价 352 很远，价格很小，买卖价差也窄。">虚值</span>那一边的期权，数更可靠。上面逐天重放里 5/14 那天 butterfly 是 −0.38，原因相同：325 call 那天买一 116.80、卖一 119.20。</p>
+  <p class="tiny">讲义 Session 4 的价格表（标的 100）上，95/100/105 butterfly 是 1.00，买入 iron butterfly 是 4.60 ＋ 3.40 − 1.60 − 2.50 ＝ 3.90，合计 4.90 不是 5。3.1 讲过：这张表按约 2% 折了现，5 要到期才拿到。</p>
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>认出等价的头寸</h2>
+  <p class="sub">讲义最后列了六组两条腿的仓位，左右各一个，幻灯片上没有题目要求，也没有答案。两种读法都做：每一边是什么，左右是否等价。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>组</th><th class="txt">左边</th><th class="txt">右边</th><th class="txt">答案</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td class="pos">+1 Jun 100 call<br>−1 Jun 100 put</td><td class="pos">+1 标的<br>+1 Aug 70 put</td><td class="txt"><details><summary>展开</summary><div>左：合成多头标的。右：合成多头 Aug 70 call。不等价：一条直线，一条先平后涨。</div></details></td></tr>
+      <tr><td>2</td><td class="pos">−1 Sep 80 call<br>−1 Sep 80 put</td><td class="pos">+1 Jul 40 call<br>+1 标的</td><td class="txt"><details><summary>展开</summary><div>左：卖出 Sep 80 straddle。右：两条腿 delta 都为正，合成不出单张期权，也合成不出标的（它等于 2 张 Jul 40 call 减 1 张 Jul 40 put）。不等价。</div></details></td></tr>
+      <tr><td>3</td><td class="pos">−1 Oct 50 put<br>−1 标的</td><td class="pos">+1 Nov 65 call<br>−1 标的</td><td class="txt"><details><summary>展开</summary><div>左：合成空头 Oct 50 call。右：合成多头 Nov 65 put。不等价。</div></details></td></tr>
+      <tr><td>4</td><td class="pos">−1 May 75 call<br>+1 标的</td><td class="pos">−1 标的<br>−1 Dec 90 put</td><td class="txt"><details><summary>展开</summary><div>左：合成空头 May 75 put。右：合成空头 Dec 90 call。不等价。</div></details></td></tr>
+      <tr><td>5</td><td class="pos">+1 Jun 55 call<br>+1 Jun 55 put</td><td class="pos">−1 Jul 45 call<br>+1 Jul 45 put</td><td class="txt"><details><summary>展开</summary><div>左：买入 Jun 55 straddle。右：合成空头标的。不等价。</div></details></td></tr>
+      <tr><td>6</td><td class="pos">−1 Nov 50 put<br>+1 标的</td><td class="pos">+1 Oct 65 put<br>+1 标的</td><td class="txt"><details><summary>展开</summary><div>左：卖 put 的 delta 为正，标的也为正，合成不出单张期权，也合成不出标的（它等于 1 张 Nov 50 call 减 2 张 Nov 50 put）。右：合成多头 Oct 65 call。不等价。</div></details></td></tr>
+    </tbody>
+  </table></div>
+  <p>六组没有一组左右等价，所以这套练习的用意更可能是逐个叫出名字。要留意的是第 2 组右边和第 6 组左边：期权配标的，两条腿 delta 同号，这是一节说的陷阱。快速判断用下面这张表。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>两条腿</th><th class="txt">delta 符号</th><th class="txt">合成出来的</th></tr></thead>
+    <tbody>
+      <tr><td>期权 ＋ 标的</td><td class="txt">一正一负</td><td class="txt">一张期权：买 put ＋ 买标的 ＝ 买 call，等等</td></tr>
+      <tr><td>期权 ＋ 标的</td><td class="txt">同号</td><td class="txt">合成不出单张期权或标的（delta 加起来绝对值超过 1）</td></tr>
+      <tr><td>同行权价的 call、put，一买一卖</td><td class="txt">同号</td><td class="txt">标的：买 call 卖 put 是多头，卖 call 买 put 是空头</td></tr>
+      <tr><td>同行权价的 call、put，同买或同卖</td><td class="txt">一正一负</td><td class="txt">straddle，不是合成</td></tr>
+    </tbody>
+  </table></div>
+  <p class="tiny">这六组里凡是两张期权配在一起的，行权价和到期都相同，所以没有考〇节那两个硬条件。</p>
+
+  <h3>补两组等价的</h3>
+  <p>讲义的六组都不等价。下面两组取自三节和四节，左右看起来不同，先各自化简再比。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>组</th><th class="txt">左边</th><th class="txt">右边</th><th class="txt">答案</th></tr></thead>
+    <tbody>
+      <tr><td>7</td><td class="pos">+2 Dec 100 call<br>−1 标的</td><td class="pos">+2 Dec 100 put<br>+1 标的</td><td class="txt"><details><summary>展开</summary><div>左边拆出一张 call 配卖出的标的，换成一张 put；右边拆出一张 put 配买入的标的，换成一张 call。两边都是 +1 call +1 put，买入 Dec 100 straddle。等价。</div></details></td></tr>
+      <tr><td>8</td><td class="pos">+1 Dec 95 call<br>−2 Dec 100 call<br>+1 Dec 105 call</td><td class="pos">+1 Dec 95 put<br>−1 Dec 100 call<br>−1 Dec 100 put<br>+1 Dec 105 call</td><td class="txt"><details><summary>展开</summary><div>左：买入 butterfly。右：买 95/105 strangle、卖 100 straddle，也就是卖出 iron butterfly。把右边两张 put 换成 call，化简后是同一个 butterfly，另外到期固定少 5（四节讲义第 9 页）。形状完全一样，右边处处比左边少 5；右边加上到期固定拿到的 5，才和左边等价，讲义因此写约等号。</div></details></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ══════════ 七 ══════════ -->
+<section id="s7">
+  <h2><span class="n">七</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号与术语</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">+1 / −1</div><div class="t">讲义写仓位的记法：+ 是买入，− 是卖出，数字是张数。+1 December 100 call ＝ 买入 1 张 12 月到期、行权价 100 的 call。</div></div>
+      <div class="gl"><div class="s">X</div><div class="t">行权价。合成的两条腿必须同一个 X、同一个到期日。</div></div>
+      <div class="gl"><div class="s">q</div><div class="t">化简步骤里一行的张数。</div></div>
+      <div class="gl"><div class="s">标的合约</div><div class="t">期权到期时买卖的那样东西。讲义是期货合约，TSLA 期权是 100 股股票。</div></div>
+      <div class="gl"><div class="s">指派</div><div class="t">卖出期权的一方在对方行权时必须履约。卖了 put 被指派，就要按行权价买入。</div></div>
+      <div class="gl"><div class="s">欧式 / 美式期权</div><div class="t">欧式只能在到期日行权；美式到期前任何一天都能行权。讲义的例子是欧式，TSLA 期权是美式，put 因此多一点提前行权的价值，本页的合成关系在 TSLA 上近似成立。提前行权在节点 9 讲。</div></div>
+      <div class="gl"><div class="s">合成（synthetic）</div><div class="t">用别的合约拼出一张合约的到期损益。call − put ＝ 标的，三样里任取两样做出第三样。</div></div>
+      <div class="gl"><div class="s">合成多头标的</div><div class="t">买 call、卖同行权价同到期的 put，到期一定按行权价买入标的。也叫合成远期多头。</div></div>
+      <div class="gl"><div class="s">delta</div><div class="t">标的动 1 美元，期权价格动多少。讲义按一张标的合约记 100，本页 TSLA 按每股记 1。</div></div>
+      <div class="gl"><div class="s">gamma, vega</div><div class="t">delta 的变化速度；隐含波动率每变 1 个点的价格变化。标的的这两个数都是 0，所以同行权价同到期的 call 和 put 这两个数相同。</div></div>
+      <div class="gl"><div class="s">拆</div><div class="t">化简时先决定哪几张配成一对去换。可以从一行里拆出一张和标的腿配对，也可以把标的换成 call − put，再和已有的期权合并。</div></div>
+      <div class="gl"><div class="s">straddle</div><div class="t">同行权价同到期，一张 call 加一张 put。</div></div>
+      <div class="gl"><div class="s">strangle</div><div class="t">同到期，一张低行权价的 put 加一张高行权价的 call。</div></div>
+      <div class="gl"><div class="s">butterfly</div><div class="t">三个等距行权价，+1 / −2 / +1。中间叫身，两边叫翼。到期价值在 0 和间距之间。</div></div>
+      <div class="gl"><div class="s">iron butterfly</div><div class="t">身上的 straddle 与两翼的 strangle 一买一卖。买 straddle、卖 strangle 是买入（long）。</div></div>
+      <div class="gl"><div class="s">间距</div><div class="t">相邻两个行权价之差。butterfly ＋ 买入 iron butterfly ＝ 间距。</div></div>
+      <div class="gl"><div class="s">牛市价差</div><div class="t">同一种期权，买低行权价、卖高行权价（3.1）。call 版 ＝ put 版 ＋ 到期固定的间距。</div></div>
+      <div class="gl"><div class="s">熊市价差</div><div class="t">同一种期权，买高行权价、卖低行权价，标的跌才赚（3.1）。随机题里会出现。</div></div>
+      <div class="gl"><div class="s">condor</div><div class="t">四个等距行权价、同一种期权，+1 / −1 / −1 / +1，到期停在中间两个行权价之间时拿满（3.2）。随机题里会出现。</div></div>
+      <div class="gl"><div class="s">ratio spread（1×2）</div><div class="t">同一种期权、两个行权价，买卖张数不相等，1×2 是买 1 张、卖 2 张（3.2）。多出来的那几张决定哪一边亏损没有边界。</div></div>
+      <div class="gl"><div class="s">box</div><div class="t">两个行权价上一买一卖两个合成标的，到期固定拿到两个行权价之差。5.3 讲。</div></div>
+      <div class="gl"><div class="s">中间价</div><div class="t">（买一 ＋ 卖一）÷ 2。买一是有人愿意买的最高价，卖一是有人愿意卖的最低价。</div></div>
+      <div class="gl"><div class="s">买卖价差</div><div class="t">卖一减买一。买入按卖一成交、卖出按买一成交，每条腿多付半个买卖价差（3.1）。深度实值期权的买卖价差宽，中间价的误差也大。</div></div>
+      <div class="gl"><div class="s">实值 / 虚值 / 深度实值</div><div class="t">现在行权就值钱的叫实值，不值钱的叫虚值（3.2）。call 行权价低于现价是实值，put 行权价高于现价是实值。深度实值是离现价很远的实值。</div></div>
+      <div class="gl"><div class="s">盈亏平衡点</div><div class="t">到期时标的在这个价，仓位不赚不亏（3.1）。合成多头 350 是 350 ＋ 3.65 ＝ 353.65。</div></div>
+      <div class="gl"><div class="s">折回（现值）</div><div class="t">到期才拿到的钱，按利率算出今天值多少（1.1）。本页用 4.3%、单利：25 折 32 天是 24.91。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节 <b>5.2 parity 与 conversion</b>：把合成关系装上价格。合成多头比直接买股票少赚的 1.29 在 5.2 算清楚；butterfly 加 iron butterfly 的 24.95 不到 25，化简后是一个 box，在 5.3 讲。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f2 = n => n.toFixed(2), f3 = n => n.toFixed(3);
+const fm = (n,d=2) => (n<0&&Math.abs(n)>=0.5*Math.pow(10,-d)?'−':'')+Math.abs(n).toFixed(d);   // 负数用真正的减号
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+const si = n => (n>0?'+':n<0?'−':'')+Math.abs(n);
+const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+const lab = (x,y,t,c,a='start',s=12,w=400)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+const hline = (x1,x2,y,c='var(--rule)',w=0.8,dash='') => `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${c}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:''}/>`;
+const RATE = 0.043;
+const NARROW = matchMedia('(max-width:620px)');
+let FK = NARROW.matches ? 1.55 : 1;   // 手机上宽图的字放大，图缩小后仍看得清；宽度跨过 620px 时重算并重画
+const pv = (x,tau) => x/(1+RATE*tau/365);
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 案例数据 ══════════
+   scripts/data/station_5_1.py 生成。ORATS TSLA 快照，5/15 到期，每天 16:00，中间价 = (买一 + 卖一) / 2。
+   SYN：4/13 至 5/15 共 25 个交易日；tau 是离 5/15 的自然日；5/15 当天按到期价值；
+        lo / hi：butterfly 与买入 iron butterfly「两个都按报价卖」能收的钱与「两个都按报价买」要付的钱。
+   CH：4/13 的 300 到 420 各行权价中间价（call / put）。 */
+/* data:start */
+const SYN={"days":["04-13","04-14","04-15","04-16","04-17","04-20","04-21","04-22","04-23","04-24","04-27","04-28","04-29","04-30","05-01","05-04","05-05","05-06","05-07","05-08","05-11","05-12","05-13","05-14","05-15"],"tau":[32,31,30,29,28,25,24,23,22,21,18,17,16,15,14,11,10,9,8,7,4,3,2,1,0],"S":[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83,378.75,376.14,373.02,381.77,390.83,392.48,389.52,398.62,411.74,428.45,445.06,433.7,445.2,443.36,422.32],"C":{"325":[36.8,45.875,70.8,67.85,78.35,70.2,64.35,65.325,51.7,53.825,55.9,52.875,49.45,57.95,66.675,68.2,65.725,74.225,87.1,103.625,120.225,108.875,120.25,118.0,97.32],"350":[21.05,28.2,49.675,46.125,55.775,47.925,42.925,43.4,30.6,32.0,33.475,30.875,27.55,35.025,42.7,43.95,40.725,49.75,62.425,78.55,95.175,83.725,95.375,93.4,72.32],"375":[10.55,15.4,32.25,29.05,36.3,29.55,25.7,25.85,15.275,15.8,16.6,14.4,11.9,16.6,22.05,22.65,19.85,27.025,38.2,53.7,70.25,58.9,70.55,68.425,47.32]},"P":{"325":[8.2,5.55,2.8,2.585,1.575,1.665,2.205,1.705,1.925,1.555,1.25,1.08,1.005,0.63,0.455,0.365,0.28,0.215,0.135,0.1,0.07,0.055,0.04,0.035,0.0],"350":[17.4,12.7,6.55,6.25,3.9,4.4,5.725,4.925,5.9,4.875,4.1,4.0,4.05,2.39,1.415,1.125,1.0,0.59,0.285,0.155,0.1,0.105,0.065,0.025,0.0],"375":[31.95,24.875,14.025,13.875,9.45,10.925,13.425,12.4,15.525,13.7,12.15,12.55,13.325,8.95,5.7,4.75,4.95,2.705,1.11,0.34,0.165,0.23,0.125,0.05,0.0]},"lo":[24.4,23.75,23.08,22.69,22.61,22.77,22.73,22.65,23.81,23.63,23.39,23.51,23.73,22.33,22.99,22.64,23.25,21.96,21.43,21.49,20.66,20.38,20.85,21.91,25.0],"hi":[25.5,25.9,26.67,28.09,27.19,27.25,27.16,27.64,26.34,26.66,27.16,26.33,26.16,27.04,26.88,27.38,28.19,27.74,28.22,28.77,29.5,30.02,28.95,27.27,25.0]};
+const CH={"K":[300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420],"cm":[56.975,52.675,48.5,44.5,40.55,36.8,33.275,29.925,26.775,23.8,21.05,18.55,16.225,14.15,12.25,10.55,9.075,7.75,6.65,5.65,4.775,4.05,3.45,2.925,2.485],"pm":[3.45,4.1,4.9,5.85,6.95,8.2,9.65,11.25,13.1,15.125,17.4,19.85,22.575,25.475,28.625,31.95,35.475,39.15,43.05,46.975,51.225,55.625,60.0,64.5,69.2]};
+/* data:end */
+
+/* ══════════ 共用 ══════════ */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+/* 按帧推进：每 ms 毫秒走一步，直到 done() */
+function runLoop(s,ms,step,draw,done){
+  s.playing=true; s.last=0; s.acc=0; s.gen=(s.gen||0)+1; const gen=s.gen;
+  const tick=t=>{
+    if(!s.playing || s.gen!==gen) return;
+    const dt=s.last?Math.min(t-s.last,100):ms; s.last=t; s.acc+=dt;
+    while(s.acc>=ms && !done()){ step(); s.acc-=ms; }
+    draw();
+    if(done()){ s.playing=false; if(s.onEnd) s.onEnd(); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function makeSeg(id,labels,fn,sel=0){
+  const el=$(id);
+  el.innerHTML=labels.map((l,i)=>`<button data-i="${i}" aria-pressed="${i===sel}">${l}</button>`).join('');
+  const bs=el.querySelectorAll('button');
+  bs.forEach(b=>b.addEventListener('click',()=>{ bs.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(+b.dataset.i); }));
+}
+/* 一张合约到期时的价值（每股）。U：标的；k 是成交价（合成里是行权价），off 是合并后的成交额；cash：固定的钱 */
+function cardVal(c,S){
+  if(c.t==='C') return c.q*Math.max(S-c.k,0);
+  if(c.t==='P') return c.q*Math.max(c.k-S,0);
+  if(c.t==='U') return c.q*S-(c.off!=null?c.off:(c.k==null?0:c.q*c.k));
+  if(c.t==='cash') return c.q;
+  return 0;
+}
+const legVal=(legs,S)=>legs.reduce((a,l)=>a+cardVal({q:l[0],t:l[1],k:l[2]},S),0);
+const md=d=>+d.slice(0,2)+'/'+(+d.slice(3));
+
+/* ══════════ 〇 / 一 · 两条腿叠成第三样 ══════════
+   先画第一条腿，再画第二条，最后把第二条逐渐加到第一条上 */
+function Overlay(p,rels){
+  const W=640,L=46,Rr=626,T=34,B=264,X0=290,X1=410,YM=65;
+  const X=s=>L+(s-X0)/(X1-X0)*(Rr-L), Y=v=>T+(YM-v)/(2*YM)*(B-T);
+  const svg=$(p+'Svg');
+  const st={prog:3,i:0};
+  const pts=(f,s1)=>{ const a=[]; for(let s=X0;s<s1;s+=1) a.push(X(s).toFixed(1)+','+Y(f(s)).toFixed(1)); a.push(X(s1).toFixed(1)+','+Y(f(s1)).toFixed(1)); return a.join(' '); };
+  const line=(f,s1,c,w)=>`<polyline points="${pts(f,s1)}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/>`;
+  function draw(){
+    const r=rels[st.i], pr=st.prog, A=s=>legVal(r.a.legs,s), Bf=s=>legVal(r.b.legs,s);
+    svg.setAttribute('viewBox',`0 0 ${W} ${FK>1?326:308}`);
+    let g=lab(L,T-14,'到期价值（每股美元）','var(--ink-soft)','start',11.5*FK);
+    for(let v=-50;v<=50;v+=25){ g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,fm(v,0),'var(--ink-faint)','end',12*FK); }
+    for(let s=300;s<=400;s+=25) g+=lab(X(s),B+20,s,'var(--ink-faint)','middle',12*FK);
+    g+=lab(Rr,B+22+20*FK,'到期时 TSLA','var(--ink-faint)','end',12*FK);
+    r.ks.forEach(k=>g+=`<line x1="${X(k)}" y1="${T}" x2="${X(k)}" y2="${B}" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 4"/>`);
+    const a=clamp(pr,0,1), b=clamp(pr-1,0,1), c=clamp(pr-2,0,1);
+    if(pr>2) g+=line(s=>A(s)+c*Bf(s),X1,'var(--control)',7).replace('/>',' stroke-opacity=".55"/>');
+    if(a>0) g+=line(A,X0+(X1-X0)*a,'var(--result)',2.4);
+    if(b>0) g+=line(Bf,X0+(X1-X0)*b,'var(--good)',2.4);
+    if(pr>=3){ const s=r.lx; g+=lab(X(s),Y(A(s)+Bf(s))+r.ly,r.short,'var(--control)',r.la||'end',13.5*FK,600); }
+    svg.innerHTML=g;
+    $(p+'Say').innerHTML= pr>=3 ? r.say : '';
+  }
+  function info(){
+    const r=rels[st.i];
+    $(p+'Lg').innerHTML=`<span><i style="background:var(--result)"></i>${r.a.name}</span><span><i style="background:var(--good)"></i>${r.b.name}</span><span><i style="background:var(--control)"></i>合计：${r.sum}</span>`;
+    const Ss=[300,325,350,375,400];
+    $(p+'Tb').innerHTML=`<thead><tr><th>到期时 TSLA</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`+
+      [[r.a.name,r.a.legs],[r.b.name,r.b.legs]].map(([n,l])=>`<tr><td>${n}</td>${Ss.map(s=>`<td>${fm(legVal(l,s),0)}</td>`).join('')}</tr>`).join('')+
+      `<tr class="sum"><td>合计</td>${Ss.map(s=>`<td>${fm(legVal(r.a.legs,s)+legVal(r.b.legs,s),0)}</td>`).join('')}</tr></tbody>`;
+  }
+  function start(){
+    st.playing=false; info();
+    if(reduced){ st.prog=3; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(3,st.prog+16.7/950); },draw,()=>st.prog>=3);
+  }
+  makeSeg(p+'Seg',rels.map(r=>r.label),i=>{ st.i=i; start(); });
+  $(p+'Play').addEventListener('click',start);
+  info();
+  return {start,draw,el:svg};
+}
+const OV0=Overlay('ov0',[
+  {label:'同一行权价 350',a:{name:'买入 350 call',legs:[[1,'C',350]]},b:{name:'卖出 350 put',legs:[[-1,'P',350]]},sum:'按 350 买入 TSLA',ks:[350],short:'合计 ＝ 按 350 买入',lx:400,ly:-14,
+   say:'两条线各有一个弯，都在 350。左边 call 是 0，卖出的 put 每跌 1 亏 1；右边 put 是 0，call 每涨 1 赚 1。拼起来是一条穿过 350 的直线：TSLA 到期每高 1 美元，合计就多 1 美元，和持有股票一样。'},
+  {label:'错开：350 call 配 330 put',a:{name:'买入 350 call',legs:[[1,'C',350]]},b:{name:'卖出 330 put',legs:[[-1,'P',330]]},sum:'中间一段是平的',ks:[330,350],short:'330 到 350 是平的',lx:398,ly:-14,
+   say:'行权价错开 20：TSLA 到期在 330 和 350 之间时，call 和 put 都没人行权，合计是 0，这一段 TSLA 动多少都与你无关。线不再是直的，就不是标的。'}
+]);
+const OV1=Overlay('ov1',[
+  {label:'合成买入 call',a:{name:'买入 350 put',legs:[[1,'P',350]]},b:{name:'买入标的（按 350）',legs:[[1,'U',350]]},sum:'买入 350 call',ks:[350],short:'合计 ＝ 买入 350 call',lx:398,ly:-14,
+   say:'350 以下，put 每多 1 美元正好补上股票跌掉的 1 美元，合计停在 0；350 以上 put 作废，股票涨多少合计就涨多少。先平后涨，就是 350 call。'},
+  {label:'合成卖出 call',a:{name:'卖出 350 put',legs:[[-1,'P',350]]},b:{name:'卖出标的（按 350）',legs:[[-1,'U',350]]},sum:'卖出 350 call',ks:[350],short:'合计 ＝ 卖出 350 call',lx:398,ly:22,
+   say:'上一个例子整个取反：卖出的 put 与卖出的标的在 350 以下互相抵掉，350 以上卖空每涨 1 亏 1。先平后跌，就是卖出一张 350 call。'},
+  {label:'合成买入 put',a:{name:'买入 350 call',legs:[[1,'C',350]]},b:{name:'卖出标的（按 350）',legs:[[-1,'U',350]]},sum:'买入 350 put',ks:[350],short:'合计 ＝ 买入 350 put',lx:296,ly:-14,la:'start',
+   say:'350 以上，call 每多 1 美元正好补上卖空亏掉的 1 美元，合计停在 0；350 以下 call 作废，TSLA 每跌 1 卖空赚 1。这是 350 put 的形状。'},
+  {label:'合成卖出 put',a:{name:'卖出 350 call',legs:[[-1,'C',350]]},b:{name:'买入标的（按 350）',legs:[[1,'U',350]]},sum:'卖出 350 put',ks:[350],short:'合计 ＝ 卖出 350 put',lx:296,ly:22,la:'start',
+   say:'持有股票、卖出 350 call：涨过 350 的部分被 call 拿走，合计停在 0；跌下去股票亏多少合计就亏多少。这是卖出 350 put 的形状，也就是备兑卖 call（5.3 的 collar 会再用到它）。'},
+  {label:'合成卖出标的',a:{name:'卖出 350 call',legs:[[-1,'C',350]]},b:{name:'买入 350 put',legs:[[1,'P',350]]},sum:'按 350 卖出 TSLA',ks:[350],short:'合计 ＝ 按 350 卖出',lx:296,ly:-14,la:'start',
+   say:'〇节整个取反：TSLA 到期在 350 以上，你被 call 指派，按 350 卖出；在 350 以下，你行权 put，也按 350 卖出。一条向下的直线，和卖空股票一样。'}
+]);
+
+/* ══════════ 二 · 合成多头与 TSLA 逐天对照 ══════════ */
+const SR=(()=>{
+  const W=640,H=372,L=46,Rr=626,T1=12,B1=178,T2=252,B2=336;
+  const n=SYN.days.length-1, S=SYN.S, SY=SYN.C[350].map((c,i)=>c-SYN.P[350][i]);
+  const US=S.map(x=>x-350), GAP=SY.map((y,i)=>y-US[i]), INT=SYN.tau.map(t=>350-pv(350,t));
+  const X=i=>L+i/n*(Rr-L), Y1=v=>B1-v/100*(B1-T1), G0=-0.2, G1=1.4, Y2=v=>B2-(v-G0)/(G1-G0)*(B2-T2);
+  const st={prog:n};
+  function poly(arr,Yf,upto){
+    const k=Math.floor(upto), a=[];
+    for(let i=0;i<=k;i++) a.push(X(i).toFixed(1)+','+Yf(arr[i]).toFixed(1));
+    if(upto>k && k<n){ const f=upto-k; a.push(X(k+f).toFixed(1)+','+Yf(arr[k]+(arr[k+1]-arr[k])*f).toFixed(1)); }
+    return a.join(' ');
+  }
+  /* 每天的变动：TSLA 动 1 美元，合成多头平均动多少（最小二乘斜率） */
+  const dS=S.slice(1).map((v,i)=>v-S[i]), dY=SY.slice(1).map((v,i)=>v-SY[i]);
+  const mS=dS.reduce((a,b)=>a+b,0)/dS.length, mY=dY.reduce((a,b)=>a+b,0)/dY.length;
+  const slope=dS.reduce((a,x,i)=>a+(x-mS)*(dY[i]-mY),0)/dS.reduce((a,x)=>a+(x-mS)**2,0);
+  const big=dS.reduce((b,x,i)=>Math.abs(x)>Math.abs(dS[b])?i:b,0);
+  const dev=GAP.map((g,i)=>Math.abs(g-INT[i])), devMean=dev.reduce((a,b)=>a+b,0)/dev.length, devMax=Math.max(...dev), devDay=dev.indexOf(devMax);
+  function draw(){
+    const pr=st.prog; let g='';
+    for(let v=0;v<=100;v+=25) g+=hline(L,Rr,Y1(v))+lab(L-7,Y1(v)+4,v,'var(--ink-faint)','end',12*FK);
+    [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B1+18,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
+    [0,0.5,1].forEach(v=>g+=hline(L,Rr,Y2(v),'var(--rule)',v?0.8:1.4)+lab(L-7,Y2(v)+4,v.toFixed(1),'var(--ink-faint)','end',12*FK));
+    g+=lab(L,T2-18,'两者之差：合成多头 − (TSLA − 350)','var(--ink-soft)','start',12.5*FK);
+    [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B2+18,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
+    g+=`<polyline points="${poly(US,Y1,pr)}" fill="none" stroke="var(--ink-faint)" stroke-opacity=".38" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${poly(SY,Y1,pr)}" fill="none" stroke="var(--control)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${poly(INT,Y2,pr)}" fill="none" stroke="var(--result)" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+    g+=`<polyline points="${poly(GAP,Y2,pr)}" fill="none" stroke="var(--control)" stroke-width="1.8" stroke-linejoin="round"/>`;
+    const k=Math.min(n,Math.floor(pr));
+    for(let i=0;i<=k;i++) g+=`<circle cx="${X(i)}" cy="${Y2(GAP[i])}" r="2.6" fill="var(--control)"/>`;
+    const hx=X(pr), hy=Y1(SY[k]+(k<n?(SY[k+1]-SY[k])*(pr-k):0));
+    g+=`<circle cx="${hx}" cy="${hy}" r="4" fill="var(--control)"/>`;
+    svg.innerHTML=g;
+    $('srD').textContent=md(SYN.days[k]); $('srDb').textContent=`第 ${k} 个交易日`;
+    $('srS').textContent=f2(S[k]); $('srSb').textContent='减 350 是 '+fm(US[k]);
+    $('srY').textContent=fm(SY[k],3); $('srYb').textContent=k<n?`${f3(SYN.C[350][k])} − ${f3(SYN.P[350][k])}`:'到期价值 72.32 − 0';
+    $('srG').textContent=fm(GAP[k],3); $('srGb').textContent='利息 '+f3(INT[k]);
+    $('srSay').textContent= pr<n ? '' :
+      `${md(SYN.days[big+1])} TSLA 一天涨 ${f2(dS[big])}，合成多头同一天涨 ${f3(dY[big])}。24 个交易日里，TSLA 每动 1 美元，合成多头平均动 ${slope.toFixed(4)} 美元。`+
+      `两者之差从 4/13 的 ${f2(GAP[0])} 一路缩到到期的 0，贴着虚线走：虚线是 350 美元晚到 5/15 才付、按 4.3% 省下的利息，4/13 是 ${f2(INT[0])}，5.2 讲。差额离虚线平均 ${f2(devMean)}，到期前 24 天里有 23 天在 350 call、350 put 各半个买卖价差之和以内，是报价误差。最多的一天是 ${md(SYN.days[devDay])}，差 ${f2(devMax)}，超出了这个范围：快照里 TSLA 的价格和期权报价不在同一瞬间。那天 340 到 390 各行权价按合成关系反推的 TSLA 都在 376.16 到 376.26 之间，快照记的是 ${f2(S[devDay])}。`;
+  }
+  const svg=$('srSvg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=n; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(n,st.prog+16.7/240); },draw,()=>st.prog>=n);
+  }
+  $('srPlay').addEventListener('click',start);
+  return {start,draw,el:svg};
+})();
+
+/* ══════════ 三 / 四 / 五 · 化简器 ══════════
+   每一步是一组卡片；同一个 id 的卡片在步与步之间移动，新卡片从 from 那张的位置长出来，fade 里的卡片移到指定行后消失。
+   右边的线是整个仓位的到期价值：exact 为真时是真实价值（标的腿按行权价成交），否则把最低处记为 0，只比形状。 */
+const TY={C:'call',P:'put'};
+function terms(qs){
+  if(qs.length===1) return si(qs[0]).replace('+','');
+  const s=qs.map((q,i)=> i===0 ? (q<0?'−':'')+Math.abs(q) : (q<0?' − ':' + ')+Math.abs(q)).join('');
+  return s+' = '+(qs.reduce((a,b)=>a+b,0)<0?'−':'')+Math.abs(qs.reduce((a,b)=>a+b,0));
+}
+function autoFrames(pr){
+  const to=pr.to, other=to==='C'?'P':'C', F=[];
+  const legs=pr.legs.map((l,i)=>({id:'o'+i,q:l[0],t:l[1],k:l[2]}));
+  F.push({cards:legs.map((c,i)=>({...c,row:i})), cap:pr.cap0});
+  const f1=[], fade1={}; let r=0, nO=0;
+  legs.forEach(c=>{
+    if(c.t===other){
+      nO++;
+      f1.push({id:'c'+c.id,q:c.q,t:to,k:c.k,row:r,half:1,col:0,from:c.id,hl:1});
+      f1.push({id:'u'+c.id,q:to==='C'?-c.q:c.q,t:'U',k:c.k,row:r,half:1,col:1,from:c.id,hl:1});
+      fade1[c.id]=r; r++;
+    } else f1.push({...c,row:r++});
+  });
+  F.push({cards:f1,fade:fade1,cap: to==='C'
+    ? `换：${nO} 行 put 各换成同行权价的 call，再卖出同样张数的标的（买 put ＝ 买 call ＋ 卖标的）。call 那几行原样不动。`
+    : `换：${nO} 行 call 各换成同行权价的 put，再买入同样张数的标的（买 call ＝ 买 put ＋ 买标的）。put 那几行原样不动。`});
+  const opts=f1.filter(c=>c.t===to), unds=f1.filter(c=>c.t==='U');
+  const ks=[...new Set(opts.map(c=>c.k))].sort((a,b)=>a-b), f2=[], fade2={}, parts=[];
+  ks.forEach((k,j)=>{
+    const g=opts.filter(c=>c.k===k), s=g.reduce((a,c)=>a+c.q,0);
+    f2.push({id:g[0].id,q:s,t:to,k,row:j,hl:g.length>1?1:0});
+    g.slice(1).forEach(c=>fade2[c.id]=j);
+    parts.push(`${k} ${TY[to]}：${terms(g.map(c=>c.q))}`);
+  });
+  if(unds.length){
+    const j=ks.length, Q=unds.reduce((a,c)=>a+c.q,0), off=unds.reduce((a,c)=>a+(c.k==null?0:c.q*c.k),0);
+    f2.push({id:unds[0].id,q:Q,t:'U',off,merged:1,row:j,hl:unds.length>1?1:0});
+    unds.slice(1).forEach(c=>fade2[c.id]=j);
+    parts.push(`标的：${terms(unds.map(c=>c.q))}`);
+  }
+  F.push({cards:f2,fade:fade2,cap:'合并：同一个行权价的张数相加，标的也相加。'+parts.join('；')+'。'});
+  const f3=[], fade3={}; let rr=0;
+  f2.forEach(c=>{
+    if(c.q!==0){ f3.push({...c,row:rr++,hl:0}); return; }
+    if(c.t==='U' && pr.exact && Math.abs(c.off)>1e-9){ f3.push({id:'cash',t:'cash',q:-c.off,row:rr,from:c.id,hl:1}); fade3[c.id]=rr; rr++; return; }
+    fade3[c.id]=c.row;
+  });
+  F.push({cards:f3,fade:fade3,cap:pr.name});
+  return F;
+}
+function Simp(p,presets,sel=0){
+  const box=$(p+'Cards'), svg=$(p+'Svg'), RH=2.35;
+  const CW=360,CH=200,L=42,Rr=348,T=12,B=164;
+  svg.setAttribute('viewBox',`0 0 ${CW} ${CH}`);
+  let pr=null, frames=[], fi=0, timer=null, els={}, grid=[], base=[], yr=[0,1];
+  const lbl=(c)=>{
+    if(c.t==='C'||c.t==='P') return `${pr.mon} ${c.k} ${TY[c.t]}`;
+    if(c.t==='U') return c.merged?'标的合计':(c.k==null?'标的合约':`标的（${c.k}）`);
+    return `到期固定${c.q>=0?'多出':'少'} ${Math.abs(c.q)}`;
+  };
+  const html=c=> c.t==='cash' ? `<span class="ct">${lbl(c)}</span>` : `<span class="cq">${c.q===0?'0':si(c.q)}</span><span class="ct">${lbl(c)}</span>`;
+  function setPos(el,pos,op,instant){
+    if(instant) el.style.transition='none';
+    el.style.transform=`translateY(${pos.row*RH}rem)`;
+    el.style.left=pos.half&&pos.col?'calc(50% + .2rem)':'0';
+    el.style.width=pos.half?'calc(50% - .2rem)':'100%';
+    el.style.opacity=op; el._pos=pos;
+    if(instant){ void el.offsetWidth; el.style.transition=''; }
+  }
+  function curve(f){
+    const ys=grid.map(s=>f.cards.reduce((a,c)=>a+cardVal(c,s),0));
+    if(pr.exact) return ys;
+    const m=Math.min(...ys); return ys.map(y=>y-m);
+  }
+  function load(i){
+    clearTimeout(timer);
+    pr=presets[i]; if(pr.make) Object.assign(pr,pr.make());
+    frames=pr.frames||autoFrames(pr);
+    const ks=[...new Set(pr.legs?pr.legs.filter(l=>l[1]!=='U').map(l=>l[2]):pr.ks)].sort((a,b)=>a-b);
+    pr.kk=ks; const d=ks.length>1?ks[1]-ks[0]:10, lo=ks[0]-2*d, hi=ks[ks.length-1]+2*d;
+    const dd=ks.length>1?Math.min(...ks.slice(1).map((k,j)=>k-ks[j])):d, stp=dd/20;
+    grid=[]; for(let s=lo;s<=hi+1e-9;s+=stp) grid.push(Math.round(s*1000)/1000);
+    base=curve(frames[0]);
+    const mn=Math.min(0,...base), mx=Math.max(0,...base), pad=(mx-mn||1)*0.14;
+    yr=[mn-(mn<0?pad:0), mx+pad];
+    box.innerHTML=''; els={};
+    $(p+'Play').textContent = pr.make ? '换一题' : '再化简一遍';
+  }
+  function drawChart(f){
+    const lo=grid[0], hi=grid[grid.length-1], X=s=>L+(s-lo)/(hi-lo)*(Rr-L), Y=v=>B-(v-yr[0])/(yr[1]-yr[0])*(B-T);
+    const ys=curve(f); let g='';
+    g+=hline(L,Rr,Y(0),'var(--ink-faint)',1);
+    const top=Math.max(...base), bot=Math.min(...base);
+    g+=lab(L-6,Y(0)+4,'0','var(--ink-faint)','end',11);
+    if(top>0.01) g+=hline(L,Rr,Y(top),'var(--rule)',0.8,'3 3')+lab(L-6,Y(top)+4,Math.round(top*100)/100,'var(--ink-faint)','end',11);
+    if(bot<-0.01) g+=hline(L,Rr,Y(bot),'var(--rule)',0.8,'3 3')+lab(L-6,Y(bot)+4,fm(bot,0),'var(--ink-faint)','end',11);
+    pr.kk.forEach((k,j)=>{ g+=`<line x1="${X(k)}" y1="${B}" x2="${X(k)}" y2="${B+4}" stroke="var(--ink-faint)"/>`; if(pr.kk.length<=5||j%2===0) g+=lab(X(k),B+17,k,'var(--ink-faint)','middle',11); });
+    g+=`<polyline points="${grid.map((s,j)=>X(s).toFixed(1)+','+Y(ys[j]).toFixed(1)).join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+    if(pr.mark!=null){
+      const j=grid.reduce((b,s,i)=>Math.abs(s-pr.mark)<Math.abs(grid[b]-pr.mark)?i:b,0);
+      g+=`<line x1="${X(pr.mark)}" y1="${T}" x2="${X(pr.mark)}" y2="${B}" stroke="var(--result)" stroke-dasharray="3 3"/>`;
+      g+=`<circle cx="${X(pr.mark)}" cy="${Y(ys[j])}" r="4" fill="var(--result)"/>`+lab(X(pr.mark)-6,T+10,'现价 '+pr.mark.toFixed(2),'var(--result)','end',11);
+    }
+    svg.innerHTML=g;
+    const dmax=Math.max(...ys.map((y,j)=>Math.abs(y-base[j])));
+    $(p+'Chk').textContent= fi===0 ? (pr.exact?'原仓位到期时的价值（每股）':'原仓位到期价值的形状（最低处记为 0）') : `与第 1 步逐点相比，最大差 ${f2(dmax)}`;
+  }
+  function show(i,instant){
+    fi=i; const f=frames[i], present=new Set(f.cards.map(c=>c.id));
+    f.cards.forEach(c=>{
+      let el=els[c.id];
+      if(!el){
+        el=document.createElement('div'); box.appendChild(el); els[c.id]=el;
+        const src=c.from&&els[c.from]?els[c.from]._pos:{row:c.row,col:c.col||0,half:c.half};
+        setPos(el,src,0,true);
+      }
+      el.className='card '+c.t+(c.hl?' hl':'')+(c.q===0&&c.t!=='cash'?' zero':'');
+      el.innerHTML=html(c);
+      setPos(el,{row:c.row,col:c.col||0,half:c.half},1,instant);
+    });
+    Object.keys(els).forEach(id=>{ if(present.has(id)) return; const el=els[id];
+      const to=f.fade&&f.fade[id]!=null?{row:f.fade[id],col:0,half:0}:el._pos; setPos(el,to,0,instant); });
+    box.style.height=(Math.max(0,...f.cards.map(c=>c.row))+1)*RH+'rem';
+    $(p+'Cap').innerHTML=f.cap; $(p+'Step').textContent=`第 ${i+1} / ${frames.length} 步`;
+    drawChart(f);
+    $(p+'Say').innerHTML= i===frames.length-1 && pr.say ? pr.say : '';
+  }
+  function play(){
+    clearTimeout(timer); box.innerHTML=''; els={}; show(0,true);
+    if(reduced){ show(frames.length-1,true); return; }
+    let k=0; const next=()=>{ if(++k<frames.length){ show(k); timer=setTimeout(next,2300); } };
+    timer=setTimeout(next,1300);
+  }
+  function pick(i){ load(i); if(pr.manual){ show(0,true); } else play(); }
+  if(presets.length>1) makeSeg(p+'Seg',presets.map(x=>x.label),pick,sel);
+  $(p+'Play').addEventListener('click',()=>{ if(pr.make){ load(presets.indexOf(pr)); } play(); });
+  $(p+'Prev').addEventListener('click',()=>{ clearTimeout(timer); if(fi>0) show(fi-1); });
+  $(p+'Next').addEventListener('click',()=>{ clearTimeout(timer); if(fi<frames.length-1) show(fi+1); });
+  load(sel); show(0,true);
+  return {start:()=>{ if(!pr.manual) play(); }, draw:()=>drawChart(frames[fi]), el:box};
+}
+
+/* 三：讲义第 7 页（两张 call 卖一份标的）与第 8 页的牛市价差 */
+const C_SPLIT=[
+  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'u',q:-1,t:'U',k:null,row:1}],cap:'讲义第 7 页：+2 December 100 call，−1 标的合约。两张 call 一模一样。'},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'b',q:1,t:'C',k:100,row:1,from:'a',hl:1},{id:'u',q:-1,t:'U',k:null,row:2,hl:1}],cap:'拆：两张 call 拿出一张，和卖出的那份标的放在一起。另一张原样不动。'},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1,from:'b',hl:1}],fade:{b:1,u:1},cap:'换：买 call ＋ 卖标的 ＝ 买 put（一节第三条），这一对换成一张 put。'},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1}],cap:'剩下 +1 call、+1 put：买入 December 100 straddle。'}
+];
+const C_OTHER=[
+  {cards:[{id:'a',q:2,t:'P',k:100,row:0},{id:'u',q:1,t:'U',k:null,row:1}],cap:'讲义第 7 页第二例：+2 December 100 put，+1 标的合约。'},
+  {cards:[{id:'a',q:1,t:'P',k:100,row:0},{id:'b',q:1,t:'P',k:100,row:1,from:'a',hl:1},{id:'u',q:1,t:'U',k:null,row:2,hl:1}],cap:'拆：两张 put 拿出一张，和买入的那份标的放在一起。'},
+  {cards:[{id:'a',q:1,t:'P',k:100,row:0},{id:'c',q:1,t:'C',k:100,row:1,from:'b',hl:1}],fade:{b:1,u:1},cap:'换：买 put ＋ 买标的 ＝ 买 call（一节第一条）。'},
+  {cards:[{id:'c',q:1,t:'C',k:100,row:0},{id:'a',q:1,t:'P',k:100,row:1}],cap:'剩下 +1 call、+1 put：还是买入 December 100 straddle。'}
+];
+const C_UND=[
+  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'u',q:-1,t:'U',k:null,row:1}],cap:'还是 +2 December 100 call、−1 标的合约。这次两张 call 不动，换标的那一行。'},
+  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'c',q:-1,t:'C',k:100,row:1,half:1,col:0,from:'u',hl:1},{id:'p',q:1,t:'P',k:100,row:1,half:1,col:1,from:'u',hl:1}],fade:{u:1},cap:'换：卖出标的 ＝ 卖出 call ＋ 买入 put（一节表里最后一行）。'},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0,hl:1},{id:'p',q:1,t:'P',k:100,row:1}],fade:{c:0},cap:'合并：100 call 2 − 1 ＝ 1。'},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1}],cap:'剩下 +1 call、+1 put：买入 December 100 straddle，和先拆再换的结果一样。'}
+];
+const SMA=Simp('smA',[
+  {label:'第 7 页：先拆再换',mon:'Dec',ks:[100],frames:C_SPLIT,exact:false,
+   say:'整个过程只用了一节的一条关系。难的是第 2 步：把 +2 拆成 1 ＋ 1，才有一对能换的腿。'},
+  {label:'换掉标的',mon:'Dec',ks:[100],frames:C_UND,exact:false,
+   say:'这一次换的是标的那一行。和先拆再换一样，都是先决定哪几张配成一对：这里是让标的自己变成一对期权，再和已有的 call 合并。'},
+  {label:'只把 call 换成 put',mon:'Dec',legs:[[2,'C',100],[-1,'U',null]],to:'P',exact:false,
+   cap0:'还是 +2 December 100 call、−1 标的合约，这次不拆，两张 call 一起换成 put。',
+   name:'换完还是两行：+2 put、+1 标的。只是换了一种写法（下一个例子），没有变简单。'},
+  {label:'第 7 页第二例',mon:'Dec',ks:[100],frames:C_OTHER,exact:false,
+   say:'+2 call −1 标的、+2 put +1 标的、+1 call +1 put，是同一个 straddle 的三种写法。'},
+  {label:'牛市价差：call 版换 put 版',mon:'Dec',legs:[[1,'C',90],[-1,'C',100]],to:'P',exact:true,
+   cap0:'讲义第 8 页：+1 December 90 call、−1 December 100 call，call 版的牛市价差。',
+   name:'剩下 +1 90 put、−1 100 put，是 put 版的牛市价差；两份标的一份按 90 买、一份按 100 卖，到期固定多出 10。call 版 ＝ put 版 ＋ 10。',
+   say:'右边的线从头到尾没动：call 版牛市价差到期值 0 到 10。put 版自己值 −10 到 0，加上那笔固定的 10，正好是同一条线。'}
+]);
+
+/* 四：讲义第 9 页、第 11 页、随机一题 */
+function randomPuzzle(){
+  const rnd=mulberry32((Math.random()*2**31)|0), pick=a=>a[Math.floor(rnd()*a.length)];
+  const d=pick([5,5,10]), b0=pick([40,45,50,55,60,65,70,75,80,85,90]), n=5+Math.floor(rnd()*36), to=rnd()<0.6?'C':'P';
+  const TN=TY[to];
+  const SH=[
+    {q:[n,-2*n,n],nm:ks=>`${n} 手买入 ${TN} butterfly（${ks.join(' / ')}）`},
+    {q:[-n,2*n,-n],nm:ks=>`${n} 手卖出 ${TN} butterfly（${ks.join(' / ')}）`},
+    {q:[n,-n],nm:ks=>`${n} 手 ${TN} 牛市价差（买 ${ks[0]}、卖 ${ks[1]}）`},
+    {q:[-n,n],nm:ks=>`${n} 手 ${TN} 熊市价差（买 ${ks[1]}、卖 ${ks[0]}）`},
+    {q:[n,-2*n],nm:ks=>`${TN} 1×2 ratio spread：买 ${n} 张 ${ks[0]}、卖 ${2*n} 张 ${ks[1]}`},
+    {q:[n,-n,-n,n],nm:ks=>`${n} 手买入 ${TN} condor（${ks.join(' / ')}）`}
+  ];
+  const sh=pick(SH), ks=sh.q.map((_,i)=>b0+i*d);
+  const st=sh.q.map((q,i)=>({k:ks[i],q}));
+  if(rnd()<0.5) st.push({k:rnd()<0.5?ks[0]-d:ks[ks.length-1]+d,q:0});
+  st.sort((a,b)=>a.k-b.k);
+  const other=to==='C'?'P':'C', legs=[]; let und=0;
+  st.forEach(({k,q})=>{
+    let p; do{ p=Math.round((rnd()*2-1)*55); }while(p===0||p===q);
+    const same=q-p, row=[];
+    if(same!==0) row.push([same,to,k]);
+    row.push([p,other,k]);
+    row.sort((a,b)=>a[1]==='C'?-1:1).forEach(l=>legs.push(l));
+    und+= to==='C' ? p : -p;
+  });
+  if(und!==0) legs.unshift([und,'U',null]);
+  return {legs,to,mon:pick(['Mar','May','Jun','Jul','Sep','Dec']),exact:und===0,
+    cap0:`随机一题：${legs.length} 行。先自己在纸上化简，再对照后面几步。`,
+    name:'结果：'+sh.nm(ks)+'。', say:''};
+}
+const PRE_B=[
+  {label:'讲义第 9 页',mon:'Dec',legs:[[1,'P',95],[-1,'C',100],[-1,'P',100],[1,'C',105]],to:'C',exact:true,
+   cap0:'讲义第 9 页：买 95/105 strangle（+1 95 put、+1 105 call），卖 100 straddle（−1 100 call、−1 100 put）。',
+   name:'+1 95 call、−2 100 call、+1 105 call：买入 butterfly。两份标的一份按 95 卖、一份按 100 买，到期固定少 5。',
+   say:'到期价值从头到尾是同一条线：最高 0，在 100；离开 95 到 105 之间是 −5。把 butterfly 的三角形整个往下挪 5，就是这个仓位，所以讲义说它「约等于」butterfly。'},
+  {label:'讲义第 11 页',mon:'Jun',legs:[[29,'U',null],[-44,'C',950],[44,'P',950],[18,'C',975],[24,'P',975],[-33,'C',1000],[-51,'P',1000],[30,'C',1025],[12,'P',1025]],to:'C',exact:false,mark:981.5,
+   cap0:'讲义第 11 页：九行，标的现价 981.50。',
+   name:'剩下 +42 975 call、−84 1000 call、+42 1025 call：42 手买入 call butterfly。950 那一条和标的全部消失。',
+   say:'981.50 在身 1000 的下方，线在这一段往上走：标的往 1000 靠，仓位变值钱，delta 为正。到期时 981.50 这一点的价值是身上最高点的 26%（42 × 6.5 ＝ 273，对 42 × 25 ＝ 1,050）。'},
+  {label:'随机一题',manual:true,make:randomPuzzle}
+];
+const SMB=Simp('smB',PRE_B,1);
+
+/* 五：butterfly + 买入 iron butterfly */
+const SMC=Simp('smC',[
+  {label:'butterfly ＋ iron butterfly',mon:'May',to:'C',exact:true,
+   legs:[[1,'C',325],[-2,'C',350],[1,'C',375],[1,'C',350],[1,'P',350],[-1,'P',325],[-1,'C',375]],
+   cap0:'前三行是 325/350/375 butterfly，后四行是买入 iron butterfly（买 350 straddle、卖 325/375 strangle）。',
+   name:'期权全部对消，只剩一笔固定的钱：一份标的按 325 买、一份按 350 卖，到期多出 25。',
+   say:'七行、八张期权，两种期权、三个行权价，化简到最后什么期权都不剩。到期价值是一条 25 的水平线，TSLA 到哪都一样。'}
+]);
+
+/* ══════════ 五 · butterfly 的三角形与它的补 ══════════ */
+const FC=(()=>{
+  const W=640,H=282,L=46,Rr=626,T=32,B=242,X0=300,X1=400,Y0=-2,Y1=30;
+  const fly=[[1,'C',325],[-2,'C',350],[1,'C',375]], ib=[[1,'C',350],[1,'P',350],[-1,'P',325],[-1,'C',375]];
+  const X=s=>L+(s-X0)/(X1-X0)*(Rr-L), Y=v=>B-(v-Y0)/(Y1-Y0)*(B-T);
+  const svg=$('fcSvg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const st={prog:3};
+  const pts=(f,s1)=>{ const a=[]; for(let s=X0;s<s1;s+=1) a.push(X(s).toFixed(1)+','+Y(f(s)).toFixed(1)); a.push(X(s1).toFixed(1)+','+Y(f(s1)).toFixed(1)); return a.join(' '); };
+  const F=s=>legVal(fly,s), I=s=>legVal(ib,s);
+  function draw(){
+    const pr=st.prog, a=clamp(pr,0,1), b=clamp(pr-1,0,1), c=clamp(pr-2,0,1);
+    let g=lab(L,T-14,'到期价值（每股美元）','var(--ink-soft)','start',11.5*FK);
+    [0,10,25].forEach(v=>g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',12*FK));
+    [300,325,350,375,400].forEach(s=>g+=lab(X(s),B+20,s,'var(--ink-faint)','middle',12*FK));
+    [325,350,375].forEach(k=>g+=`<line x1="${X(k)}" y1="${T}" x2="${X(k)}" y2="${B}" stroke="var(--ink-faint)" stroke-dasharray="2 4"/>`);
+    if(a>0) g+=`<polyline points="${pts(F,X0+(X1-X0)*a)}" fill="none" stroke="var(--result)" stroke-width="2.6" stroke-dasharray="7 4" stroke-linejoin="round"/>`;
+    if(b>0) g+=`<polyline points="${pts(I,X0+(X1-X0)*b)}" fill="none" stroke="var(--good)" stroke-width="2.6" stroke-linejoin="round" ${pr>2?'stroke-opacity=".45"':''}/>`;
+    if(pr>2){
+      /* 把 iron butterfly 那条线一点点抬到 butterfly 上面 */
+      const lo=pts(s=>c*F(s),X1).split(' '), up=pts(s=>I(s)+c*F(s),X1).split(' ').reverse();
+      g+=`<polygon points="${lo.join(' ')} ${up.join(' ')}" fill="var(--good)" fill-opacity=".16"/>`;
+      g+=`<polyline points="${pts(s=>I(s)+c*F(s),X1)}" fill="none" stroke="var(--control)" stroke-width="3.6" stroke-linejoin="round"/>`;
+    }
+    if(pr>=3) g+=lab(X(398),Y(25)-9,'合计 ＝ 25 ＝ 间距','var(--control)','end',13.5*FK,600);
+    svg.innerHTML=g;
+  }
+  const Ss=[300,325,340,350,360,375,400];
+  $('fcTb').innerHTML=`<thead><tr><th>到期时 TSLA</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`+
+    `<tr><td>butterfly</td>${Ss.map(s=>`<td>${F(s)}</td>`).join('')}</tr><tr><td>买入 iron butterfly</td>${Ss.map(s=>`<td>${I(s)}</td>`).join('')}</tr>`+
+    `<tr class="sum"><td>合计</td>${Ss.map(s=>`<td>${F(s)+I(s)}</td>`).join('')}</tr></tbody>`;
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=3; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(3,st.prog+16.7/1000); },draw,()=>st.prog>=3);
+  }
+  $('fcPlay').addEventListener('click',start);
+  return {start,draw,el:svg};
+})();
+
+/* ══════════ 五 · 24 个交易日的 butterfly 与 iron butterfly ══════════ */
+const FD=(()=>{
+  const W=640,H=320,L=46,Rr=626,T=32,B=278,Y0=-2,Y1=32;
+  const n=SYN.days.length-1, C=SYN.C, P=SYN.P;
+  const FL=C[325].map((_,i)=>C[325][i]-2*C[350][i]+C[375][i]);
+  const IB=C[350].map((_,i)=>C[350][i]+P[350][i]-P[325][i]-C[375][i]);
+  const SM=FL.map((f,i)=>f+IB[i]), PV=SYN.tau.map(t=>pv(25,t));
+  const X=i=>L+i/n*(Rr-L), Y=v=>B-(v-Y0)/(Y1-Y0)*(B-T);
+  const svg=$('fdSvg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const st={prog:n};
+  const at=(arr,x)=>{ const k=Math.floor(x); return k>=n?arr[n]:arr[k]+(arr[k+1]-arr[k])*(x-k); };
+  const poly=(arr,upto)=>{ const k=Math.floor(upto), a=[]; for(let i=0;i<=k;i++) a.push(X(i).toFixed(1)+','+Y(arr[i]).toFixed(1)); if(upto>k&&k<n) a.push(X(upto).toFixed(1)+','+Y(at(arr,upto)).toFixed(1)); return a; };
+  const inside=SYN.lo.slice(0,n).filter((l,i)=>l<=PV[i]&&PV[i]<=SYN.hi[i]).length;
+  const im=a=>a.slice(0,n).reduce((b,x,i)=>x<a[b]?i:b,0), iM=a=>a.slice(0,n).reduce((b,x,i)=>x>a[b]?i:b,0);
+  function draw(){
+    const pr=st.prog; let g=lab(L,T-14,'每股价格（中间价，美元）','var(--ink-soft)','start',11.5*FK);
+    [0,10,20,30].forEach(v=>g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',12*FK));
+    [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B+20,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
+    const up=poly(SYN.hi,pr), dn=poly(SYN.lo,pr).reverse();
+    g+=`<polygon points="${up.join(' ')} ${dn.join(' ')}" fill="var(--control)" fill-opacity=".12"/>`;
+    g+=`<polyline points="${poly(PV,pr).join(' ')}" fill="none" stroke="var(--ink-soft)" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+    g+=`<polyline points="${poly(FL,pr).join(' ')}" fill="none" stroke="var(--result)" stroke-width="2.2" stroke-dasharray="7 4" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${poly(IB,pr).join(' ')}" fill="none" stroke="var(--good)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${poly(SM,pr).join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+    const k=Math.min(n,Math.floor(pr));
+    g+=`<circle cx="${X(pr)}" cy="${Y(at(SM,pr))}" r="4" fill="var(--control)"/>`;
+    svg.innerHTML=g;
+    $('fdD').textContent=md(SYN.days[k]); $('fdDb').textContent=`TSLA ${f2(SYN.S[k])}`;
+    $('fdF').textContent=fm(FL[k],3); $('fdI').textContent=f3(IB[k]); $('fdSum').textContent=f3(SM[k]);
+    $('fdSumb').textContent= k<n ? `25 折回当天 ${f3(PV[k])}` : '到期：0 ＋ 25';
+    const a=im(FL), b=iM(FL), c=im(SM), d=iM(SM);
+    $('fdSay').textContent= pr<n ? '' :
+      `这 24 天 TSLA 从 352.36 最高涨到 445.20，离身 350 越来越远。butterfly 的中间价最高 ${f2(FL[b])}（${md(SYN.days[b])}），之后跌到接近 0；iron butterfly 在 ${f2(Math.min(...IB.slice(0,n)))} 到 ${f2(Math.max(...IB.slice(0,n)))} 之间；两者之和一直在 ${f2(SM[c])} 到 ${f2(SM[d])} 之间。`+
+      `25 折回当天的值，${n} 个交易日里有 ${inside} 天落在浅色带里：按真实报价成交，这条关系没有给出白拿的钱。带子越往后越宽，是因为 325、350 call 越来越深度实值，买卖价差变宽（4/13 带宽 ${f2(SYN.hi[0]-SYN.lo[0])}，5/12 是 ${f2(SYN.hi[21]-SYN.lo[21])}）。`;
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.prog=n; draw(); return; }
+    st.prog=0; runLoop(st,16.7,()=>{ st.prog=Math.min(n,st.prog+16.7/240); },draw,()=>st.prog>=n);
+  }
+  $('fdPlay').addEventListener('click',start);
+  return {start,draw,el:svg};
+})();
+
+/* ══════════ 五 · 身 350，翼宽 5 到 50 ══════════ */
+(function(){
+  const cm=k=>CH.cm[CH.K.indexOf(k)], pm=k=>CH.pm[CH.K.indexOf(k)];
+  let rows='', mx=0, dmin=Infinity, dmax=-Infinity;
+  for(let w=5;w<=50;w+=5){
+    const fl=cm(350-w)-2*cm(350)+cm(350+w), ib=cm(350)+pm(350)-pm(350-w)-cm(350+w), s=fl+ib, v=pv(w,32);
+    mx=Math.max(mx,Math.abs(s-v)); dmin=Math.min(dmin,s-v); dmax=Math.max(dmax,s-v);
+    rows+=`<tr${w===25?' class="hot"':''}><td>${w}</td><td>${f3(fl)}</td><td>${f3(ib)}</td><td>${f3(s)}</td><td>${f3(v)}</td><td>${sgn(s-v,3)}</td></tr>`;
+  }
+  $('wTb').innerHTML=`<thead><tr><th style="white-space:nowrap">间距</th><th>butterfly</th><th>买入 iron<br>butterfly</th><th>合计</th><th>间距<br>折回 4/13</th><th>差</th></tr></thead><tbody>${rows}</tbody>`;
+  $('wSay').textContent=`十组的合计与间距折回今天，差在 ${sgn(dmin,2)} 到 ${sgn(dmax,2)} 之间，十行全是正的，不像随机的报价误差。合计里的 put 只有两张：买入的 350 put 和卖出的低行权价 put。TSLA 期权是美式的，put 多一点提前行权的价值，行权价越高、越实值，多得越多，所以合计系统地高出一点，方向和二节说的一致。报价表里如果有哪一个 butterfly 或 iron butterfly 让这一列差出去很多，要么报价错了，要么有钱可赚；先怀疑报价。`;
+})();
+
+/* ══════════ 七 · 费曼检验 ══════════ */
+const QS=[
+ {q:'不用公式，向没学过期权的人解释：为什么「买一张 350 call、卖一张 350 put」到期时一定等于按 350 买入 TSLA？',
+  a:['到期 TSLA 在 350 以上：call 值钱，你行权，按 350 买入；put 没人行权。',
+     '在 350 以下：call 作废；买 put 的人会行权，把股票按 350 卖给你，你必须接。',
+     '正好 350：两张都不值钱，按 350 买和不买没有差别。',
+     '三种情况结局都是按 350 买入，所以到期盈亏是一条穿过 350 的 45 度直线，和持有股票一样。'],
+  s:'「因为 call 的 delta 加 put 的 delta 等于 1」：这是到期前某一刻的性质，没讲到期时发生了什么。'},
+ {q:'为什么合成的两条腿必须同一行权价、同一到期？如果用 350 call 配 330 put，会怎样？',
+  a:['330 到 350 之间两张都没人行权，没有买入发生，那一段线是平的，不再是一条直线。',
+     '所以它不是标的：TSLA 在那一段里动多少都与你无关。',
+     '到期日不同时，一张先到期，另一张还活着，先到期那天你只剩半个仓位。'],
+  s:'「规则就是这么定的」：没说出错开之后到期损益哪里变了。'},
+ {q:'同一行权价、同一到期的 call 和 put，为什么 gamma 一定相等、vega 也一定相等？',
+  a:['call − put ＝ 标的，这个关系在到期前也成立（差的只是一个不随标的和波动率变的利息）。',
+     '标的的 delta 永远是 1，不会变，所以 gamma 是 0；股价不随隐含波动率变，所以 vega 是 0。',
+     '两者之差的 gamma、vega 都是 0，只能是 call 和 put 的 gamma 相等、vega 相等。',
+     '所以想从标的大动里赚钱，用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。TSLA 这类美式期权上，put 多一点提前行权的价值，这些只是近似成立。'],
+  s:'「因为 call 和 put 是对称的」：它们的形状并不对称，相等来自合成关系。'},
+ {q:'+2 December 100 call −1 标的合约，为什么是 straddle？只把两张 call 都换成 put，为什么换不出来？',
+  a:['只换 call：+2 call ＝ +2 put ＋ 买 2 份标的，再加原来卖出的 1 份，得到 +2 put +1 标的，标的那一行消不掉，只是换了一种写法。',
+     '做法一，先拆：两张 call 拿出一张，和卖出的那份标的配成一对。买 call ＋ 卖标的 ＝ 买 put，剩下那张 call 不动。',
+     '做法二，换标的：卖出标的 ＝ 卖出 call ＋ 买入 put，换完是 +2 call −1 call +1 put，call 合并成 +1。',
+     '两种做法都得到 +1 call +1 put，就是 100 straddle。替换只是查表，先决定哪几张配成一对才是要想的。'],
+  s:'「只把 call 换成 put」：两张 call 一起换，得到 +2 put +1 标的，从一种写法变到另一种写法，没有变简单。'},
+ {q:'面对一个九行的 call、put、标的混合仓位，化简的步骤是什么？怎么知道自己没换错？',
+  a:['选一种期权，把另一种全部换掉：q 张 put 换成 q 张 call 加卖出 q 份标的。',
+     '按行权价合并同一种期权，张数相加；把标的腿加起来。',
+     '标的合计不为 0 时，把剩下的标的换成同行权价的 call − put 再合并一次，看能不能并成 straddle 这类已知结构。',
+     '读出结构，并检查：每一步到期价值那条线都不能变。讲义第 11 页那一题化简后是 42 手 975/1000/1025 butterfly，981.50 在身的下方，delta 为正。'],
+  s:'「把相同行权价的加起来」：call 和 put 不先统一成一种，加不到一起。'},
+ {q:'butterfly ＋ 买入 iron butterfly ＝ 行权价间距。不用任何定价公式，怎么说明这件事？TSLA 4/13 两者中间价加起来是 24.95，不是 25，为什么不算错？',
+  a:['到期时 butterfly 值「25 减去离 350 的距离」，最少 0；买入 iron butterfly 值「离 350 的距离，最多 25」。',
+     '一个少多少，另一个就多多少，加起来处处是 25。',
+     '到期处处一样的东西，今天的价格也一样：两者加起来就是「到期一定拿到 25」今天的价格。',
+     '25 要等 32 天才拿到，按 4.3% 今天值 24.91；再加上中间价的误差，24.95 在合理范围里。'],
+  s:'「因为 butterfly 最多值 25」：只说了一边的上限，没说两者为什么处处互补。'},
+ {q:'3.1 里 TSLA 350/380 牛市 call 价差开仓付 11.975，牛市 put 价差开仓收 18.075，到期盈亏几乎一样。为什么一个付钱、一个收钱，盈亏还一样？两个数加起来为什么接近 30？',
+  a:['把 call 价差的两条腿换成合成形式：买 350 call ＝ 买 350 put ＋ 按 350 买标的；卖 380 call ＝ 卖 380 put ＋ 按 380 卖标的。',
+     '标的一买一卖，张数对消，只剩一个固定的结果：低买高卖，到期一定多出 30。',
+     '所以 call 价差 ＝ put 价差 ＋ 到期的 30。开仓时 call 版多付的钱，就是这 30 今天的价格：11.975 ＋ 18.075 ＝ 30.05。',
+     '到期时这 30 抵掉了开仓多付的钱，两者盈亏一样。'],
+  s:'「因为两者形状一样」：形状一样只说明盈亏跟着 TSLA 变的方式一样，没说明开仓现金为什么差 30。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-5-1-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-5-1-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════
+   图都是 SVG，颜色直接引用 CSS 变量；切换明暗时仍全部重画一遍 */
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+const ANIMS=[OV0,OV1,SR,SMA,SMB,SMC,FC,FD];
+function recolor(){ ANIMS.forEach(a=>a.draw()); }
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+NARROW.addEventListener('change',e=>{ FK=e.matches?1.55:1; recolor(); });
+
+/* ══════════ 启动：先画最后一帧，滚到眼前才开始播放 ══════════ */
+ANIMS.forEach(a=>a.draw());
+ANIMS.forEach(a=>onView(a.el,a.start));
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>
