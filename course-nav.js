@@ -32,7 +32,7 @@
     ]],
     ['支线',[
       ['M','做市报价','station-m-market-making.html'],
-      ['V','波动率合约与 VIX',''],
+      ['V','波动率合约与 VIX','station-v-vix.html'],
     ]],
   ];
   window.COURSE=COURSE;

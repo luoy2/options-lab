@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>波动率合约与 VIX</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2020L10%2014L14%2018L19%207L23%2016L27%2012'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.2rem;font-weight:600;letter-spacing:.02em;line-height:1.9}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.pair .formula{margin:1rem 0}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+.say:empty{display:none}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt,th.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+tr.hot td{background:var(--control-bg)}
+td.no{color:var(--control);font-weight:600}
+td.ok{color:var(--good);font-weight:600}
+
+.vbars{margin-top:1.2rem}
+.vb{display:grid;grid-template-columns:11rem 1fr 4.2rem;align-items:center;gap:.8rem;margin:.55rem 0}
+.vb .l{font-size:.9rem;color:var(--ink-soft);line-height:1.35}
+.vb .track{height:.9rem;background:var(--panel2);border-radius:99px;overflow:hidden}
+.vb .fill{height:100%;border-radius:99px}
+.vb .n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.95rem;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.8rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;vertical-align:-.1rem;border-radius:1px}
+.legend i.ln{height:2px;vertical-align:.22rem;width:1.1rem}
+.legend i.dash{height:0;border-top:2px dashed currentColor;vertical-align:.22rem;width:1.1rem;background:none!important}
+ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  .pair{grid-template-columns:1fr}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .formula{padding:1rem .8rem}
+  .formula .math{font-size:1rem}
+  .vb{grid-template-columns:7rem 1fr 3.8rem;gap:.5rem}
+  .vb .l{font-size:.8rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 直接交易波动率</a><a href="#s1">一 方差合约</a><a href="#s2">二 为什么 1/K²</a><a href="#s3">三 VIX 公式</a>
+  <a href="#s4">四 TSLA 算一遍</a><a href="#s5">五 VIX 与隐含</a><a href="#s6">六 真实的 VIX</a><a href="#s7">七 VIX 期货</a><a href="#s8">八 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 V</p>
+  <h1>波动率合约与 VIX</h1>
+  <p class="lede">8 把隐含波动率读成一张曲面：每个行权价、每个到期日各有一个数。这一节讲两件事：直接按波动率结算的合约有哪几种、到期怎么结算；VIX 怎样把一整排期权的价格压成一个数。案例是 2026-04-13 收盘的 TSLA 期权链，和 2020 年 8 月以来的标普 500 与 VIX。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>为什么要直接交易波动率</h2>
+  <p class="sub">4.2 讲过：买一张期权，用标的做动态对冲，盈亏大体看实际波动和隐含波动差多少，但还要看大涨大跌落在哪几天。4.2 那 24 天按日历折算的实际波动 47.4%，比买入时的隐含波动 46.3% 还高，账本却亏了 34.53，因为对冲的收入只在 gamma 大的日子进账。讲义 S10 接着问：这条路靠得住吗？</p>
+  <p>讲义的回答是：要靠得住，定价模型的几条假设都得成立。它列了四条，每一条在前面的节点里都已经看到不成立：</p>
+  <table>
+    <thead><tr><th>讲义的假设</th><th class="txt">在哪里见过它不成立</th></tr></thead>
+    <tbody>
+      <tr><td>① 涨跌是钟形分布</td><td class="txt">1.2 与 7：TSLA 和 SPX 的日涨跌，两条尾巴都比钟形长</td></tr>
+      <tr><td>② 能连续地对冲</td><td class="txt">7：TSLA 财报那一晚，盘后三分钟涨了 4.1%，中间来不及调仓</td></tr>
+      <tr><td>③ 存续期内波动率不变</td><td class="txt">7：SPX 的 50 日历史波动率不到一年从 8.6% 走到 34.7%</td></tr>
+      <tr><td>④ 波动率与方向无关</td><td class="txt">7：SPX 每涨 1%，VIX 平均跌 1.38 点</td></tr>
+    </tbody>
+  </table>
+  <p>讲义的结论：模型有这些弱点，所以即使你对波动率的判断是对的，动态对冲不但要花交易成本，结果也常常和模型预测的不一样，有时差得很远。于是讲义问：<b>能不能不用期权、不靠定价模型，直接交易波动率？</b></p>
+
+  <h3>两类波动率合约</h3>
+  <table>
+    <thead><tr><th>名称</th><th class="txt">到期时结算成什么</th><th class="txt">例子</th></tr></thead>
+    <tbody>
+      <tr><td>已实现波动率合约</td><td class="txt">这段时间里标的实际走出来的波动率，或者它的平方：方差</td><td class="txt">方差互换（variance swap）</td></tr>
+      <tr><td>隐含波动率合约</td><td class="txt">到期那一刻，从标的的期权价格反推出来的隐含波动率</td><td class="txt">VIX 期货与期权；VSTOXX（欧洲 Stoxx 50 指数的波动率指数）期货与期权</td></tr>
+    </tbody>
+  </table>
+  <p>前一种结算的是这段时间真实发生了什么，要等到期才知道。后一种结算的是到期那天市场给之后一段时间报的价。第一节讲前一种；第二到第六节讲 VIX 是什么；第七节讲以 VIX 结算的期货和期权。期货是今天约定一个价、到期按结算值和约定价的差额收付现金的合约，第七节细讲。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>已实现的合约怎么结算</h2>
+  <p class="sub">方差互换在开始那天约定一个价。到期时，买方拿到这段时间实际的方差，付出约定的价；卖方正好相反。</p>
+  <div class="formula">
+    <div class="math">结算值 ＝ <span class="sym" data-say="一年大约 252 个交易日。前面算的是平均每天的方差，乘 252 换成每年。">252</span> ÷ <span class="sym" data-say="这段时间里一共有几个日涨跌。21 个交易日就是 21。">n</span> × <span class="sym" data-say="sigma 的大写，读作「西格玛」，意思是把后面那一项对每一天都算一遍再加起来。">Σ</span> <span class="sym" data-say="第 i 天的对数涨跌：ln(今天收盘 ÷ 昨天收盘)。涨 1% 约等于 +0.995%，跌 1% 约等于 −1.005%，小的时候和百分比涨跌几乎一样。">r<sub>i</sub></span>²</div>
+    <div class="gloss">每个交易日的对数涨跌先平方，全部加起来，除以天数得到平均每天的方差，再乘一年的交易日数</div>
+  </div>
+  <div class="pair">
+    <div class="formula">
+      <div class="math">r<sub>i</sub> ＝ <span class="sym" data-say="自然对数。ln(今天 ÷ 昨天) 是按连续复利算的涨幅。涨 10% 再跌回原价，两天的对数涨跌是 +9.53% 和 −9.53%，正好抵消。">ln</span>(<span class="sym" data-say="第 i 天的收盘价。">p<sub>i</sub></span> ÷ p<sub>i−1</sub>)</div>
+      <div class="gloss">今天收盘比昨天收盘涨了多少，按对数算</div>
+    </div>
+    <div class="formula">
+      <div class="math">波动率合约 ＝ √(252 ÷ n × Σ r<sub>i</sub>²)</div>
+      <div class="gloss">结算方差的叫方差互换；把它开平方，结算的就是波动率</div>
+    </div>
+  </div>
+  <p>和 1.2 量波动率的办法比，有三处要注意：</p>
+  <ul>
+    <li><b>不减平均值。</b>1.2 第四节讲过零均值：连涨十天、每天 +1% 的股票，普通标准差是 0，直接量离 0 多远才是年化 16%。合约用的就是量离 0 多远。</li>
+    <li><b>用对数涨跌。</b>涨 10% 再跌回原价，按百分比算是 +10% 和 −9.09%，按对数算正好一正一负。</li>
+    <li><b>年化用 252。</b>1.2 的心算口诀用 256（√256 ＝ 16），两者只差 0.8%。TSLA 4/14 到 5/15 这 24 天，1.2 的算法得 45.8%，按合约的公式是 44.90%。</li>
+  </ul>
+  <p>为什么常见的是方差合约，不直接结算波动率：1.2 第三节讲过，互不相关的涨跌相加时，方差按天数相加。每天的平方涨跌是这一天的方差，一个月的方差就是逐日加起来的和。方差合约把每天涨跌的平方直接相加，大涨大跌落在哪一天都算一样多，不像 4.2 的对冲账本，要看那天期权的 gamma 大不大。第二节还会看到，一排期权再加上每天的对冲，能复制出来的也正是方差。</p>
+
+  <h3>两个真实的月份</h3>
+  <p>下面用标普 500 指数（SPX）的日收盘结算两份 30 天的方差合约。约定价取开始那天的 VIX：第三节讲它怎么算，这里先当作市场在那天给之后 30 天报的波动率。按方差结算，约定价就是 VIX 的平方，单位叫<span class="sym" data-say="波动率点的平方。VIX 是 17.07 时，方差合约的约定价是 17.07² ＝ 291.4 方差点。">方差点</span>。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="vsSeg">
+        <button data-k="crash" aria-pressed="true">2025-03-25 起</button>
+        <button data-k="calm" aria-pressed="false">2026-07-01 起</button>
+      </div>
+      <button class="btn ghost" id="vsPlay">逐天结算</button>
+    </div>
+    <svg id="vs" viewBox="0 0 720 392" role="img" aria-label="30 天里每天的对数涨跌，以及到这一天为止的实际波动率与约定价"></svg>
+    <div class="legend">
+      <span><i style="background:var(--control)"></i>超过约定价折成的一天</span>
+      <span><i style="background:var(--ink-faint)"></i>没超过</span>
+      <span><i class="ln" style="background:var(--control)"></i>到这一天为止的实际波动率</span>
+      <span style="color:var(--result)"><i class="dash"></i>约定价：开始那天的 VIX</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="vsD"></div><div class="d2" id="vsDb"></div></div>
+      <div class="stat"><div class="k">当天的对数涨跌</div><div class="d" id="vsR"></div></div>
+      <div class="stat"><div class="k">到这一天为止</div><div class="d" id="vsV" style="color:var(--control)"></div><div class="d2">√(252 ÷ 已过天数 × Σr²)</div></div>
+      <div class="stat"><div class="k">约定价</div><div class="d" id="vsK" style="color:var(--result)"></div><div class="d2" id="vsKb"></div></div>
+    </div>
+    <div class="say plain" id="vsSay"></div>
+  </div>
+  <p class="tiny">数据：IBKR 分钟线，SPX 取每个交易日美东 15:59 那根的收盘，VIX 取同一分钟。30 天指开始那天之后 30 个日历日内的全部交易日。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>一排期权，每个行权价买多少</h2>
+  <p class="sub">讲义把 VIX 的设计写成两个问题：怎样用期权搭一个 vega 头寸，让它的价值等于一份波动率合约？怎样让这个头寸的 vega 不随行情变，到期时两者对得上？</p>
+  <p>2.3 讲过 vega：隐含波动率变 1 个点，期权价格变多少。一份波动率合约对波动率的敞口是固定的；要用期权复制它，期权头寸的 vega 也得固定，不能随标的价格变。讲义分三步走到答案。</p>
+
+  <h3>第一步：一张期权不够</h3>
+  <p>这一步起要用三个词。行权价正好在标的现价附近的期权叫<b>平值</b>。call 的行权价高于现价、put 的行权价低于现价，叫<b>虚值</b>：现在行权拿不到钱，价格全是时间价值。反过来，call 的行权价低于现价、put 的行权价高于现价，叫<b>实值</b>：现在行权就能拿到钱，这部分叫内在价值。离现价越远，就叫深实值、深虚值。</p>
+  <p>一张期权的 vega 在标的正好在行权价附近时最大，标的往哪边走远，vega 都变小。TSLA 在 350 时，350 的期权 vega 最大；TSLA 涨到 450，它成了深实值，vega 所剩无几。想让 vega 一直都在，手里就得一直有一张平值期权。标的会走到哪里事先不知道，所以每个行权价都要买。</p>
+
+  <h3>第二步：每个行权价各买一张，还是不平</h3>
+  <p>讲义说，这样仍然得不到恒定的 vega：行权价高的平值期权，vega 比行权价低的平值期权大。原因有两个，两个都和价格成正比：</p>
+  <ul>
+    <li><b>平值期权的 vega 和价格成正比。</b>σ ＝ 46.3%、30 天，标的 200 时 200 的平值期权 vega 是 0.228，标的 400 时 400 的平值期权是 0.456。价格翻倍，vega 翻倍。</li>
+    <li><b>同时起作用的行权价，档数也和价格成正比。</b>行权价按美元等距排（下图每 10 美元一档），而一个标准差的美元宽度和价格成正比：价格 200 时约 26.5 美元，400 时约 53.1 美元。落在标的 ±1 个标准差以内的行权价，200 时约 5 档，400 时约 11 档。</li>
+  </ul>
+  <p>两个因素相乘，每档一张时的总 vega 按价格的<b>平方</b>变：以标的 350 时为 1，标的 250 时是 0.51，450 时是 1.65。</p>
+
+  <h3>第三步：按 1/K² 配</h3>
+  <p>要抵掉价格的平方，每个行权价买的数量就按行权价平方的倒数配：低行权价多买，高行权价少买。以 350 买 1 张为准，175 买 (350 ÷ 175)² ＝ 4 张，700 买 0.25 张。这样总 vega 在标的 250、350、450 时是同一个数。讲义公式页顶上单独写着的 1/strike²，就是这个配方。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="vgPlay">逐档再加一遍</button></div>
+    <svg id="vg" viewBox="0 0 720 452" role="img" aria-label="逐个行权价加入期权，两种买法下总 vega 随标的价格的变化"></svg>
+    <div class="legend">
+      <span><i style="background:var(--result);opacity:.5"></i>每一层是一个行权价的 vega，一层层叠上去</span>
+      <span><i style="background:var(--control)"></i>刚加入的一档；350 那一档只在标的靠近 350 时厚</span>
+      <span><i class="ln" style="background:var(--ink)"></i>合计 vega</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">已加入的行权价</div><div class="d" id="vgN"></div><div class="d2">100 到 800，每 10 美元一档</div></div>
+      <div class="stat"><div class="k">每档一张：标的 250 / 350 / 450</div><div class="d" id="vgA"></div><div class="d2">以 350 为 1</div></div>
+      <div class="stat"><div class="k">按 (350/K)²：标的 250 / 350 / 450</div><div class="d" id="vgB" style="color:var(--good)"></div><div class="d2">以 350 为 1</div></div>
+    </div>
+  </div>
+  <p class="tiny">模型值：Black-Scholes，σ ＝ 46.3%，30 天，利率取 0。vega 以每股、每 1 个波动率点计。</p>
+  <p>这一排按 1/K² 配好的期权，vega 不随标的价格变。按 Black-Scholes，gamma 乘股价的平方和 vega 成正比，所以它也不变：同一个模型里，每档一张时是 0.51 : 1 : 1.65，按 1/K² 配后是 1.00 : 1 : 1.00。</p>
+  <p>光买下这排期权还不是方差合约：它有 delta，标的一动，它的价值就跟着变。还要像 4.2 那样每天用标的把 delta 对冲掉。4.2 的账本缺的正是「gamma 乘股价的平方每天一样」这个条件，在这排期权上它自动成立，于是对冲下来的盈亏只看每天涨跌的平方加起来，比买入时的隐含方差多还是少，这就复制了一份方差合约。这一步是推导的结论，讲义给了配方，没有给证明。VIX 就是按这个配方，给一整排真实期权算出来的价值。</p>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>VIX 的公式</h2>
+  <p class="sub">讲义说，VIX 和所有指数一样，是一串成分按各自的权重加起来：Σ(权重 × 成分)。它的成分是期权的价格，权重就是第二节的 1/K²。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="这一个到期日算出来的方差，年化。开平方就是波动率。">σ²</span> ＝ (2 ÷ <span class="sym" data-say="离到期的时间，以年计。32 天是 32/365 年。">T</span>) × <span class="sym" data-say="对每个用到的行权价算一遍再加起来。">Σ</span> (<span class="sym" data-say="这个行权价「管」多宽：前后两个行权价之差的一半。最两头的，取它和唯一邻居之差。TSLA 平值附近每 5 美元一档，ΔK 就是 5。">ΔK<sub>i</sub></span> ÷ <span class="sym" data-say="第 i 个行权价。">K<sub>i</sub></span>²) × <span class="sym" data-say="把今天付的期权价格换算成到期那天的价值：利率 r，时间 T。T 很短时约等于 1 ＋ r·T，TSLA 5/15 这串是 1.00378。">e<sup>rT</sup></span> × <span class="sym" data-say="这个行权价上虚值期权的买一与卖一的中间价。">Q(K<sub>i</sub>)</span><br>− (1 ÷ T) × (<span class="sym" data-say="远期价，用 parity 从期权价格反推。">F</span> ÷ <span class="sym" data-say="不高于 F 的第一个行权价。讲义的公式里有它，说明里没有定义，这里按 Cboe 的规则取。">K<sub>0</sub></span> − 1)²</div>
+    <div class="gloss">每张虚值期权的价格，乘上它的权重 ΔK/K²，全部加起来，换算成一年的方差；再减掉一个很小的修正</div>
+  </div>
+  <p>为什么乘 2 ÷ T：按 1/K² 配好的这一排虚值期权，如果每个行权价的隐含波动率都是同一个 σ，它们的价值 Σ(ΔK/K²)·e<sup>rT</sup>·Q 加起来约等于 σ² × T ÷ 2，也就是到期前总方差的一半。乘 2 还原成到期前的总方差，再除以 T 换成每年的方差。拿第四节 TSLA 5/15 这一串验证：每档都按平值的 46.07% 定价，Σ 只比 σ² × T ÷ 2 多 0.8%，代进公式算回 46.11%。为什么正好是一半，是推导的结论，讲义没有给证明。</p>
+  <p>每一项怎么取，讲义给了记号，Cboe（芝加哥期权交易所，编制 VIX 的机构）的规则给了细节：</p>
+  <table>
+    <thead><tr><th>这一项</th><th class="txt">怎么取</th><th class="txt">为什么</th></tr></thead>
+    <tbody>
+      <tr><td>用哪些期权</td><td class="txt">只用虚值的：K<sub>0</sub> 以下用 put，K<sub>0</sub> 以上用 call，K<sub>0</sub> 那一档取 call 与 put 中间价的平均</td><td class="txt">实值期权的价格大部分是内在价值，与波动率无关。8 讲过，实值那一张报价差几分钱，反推出来的 σ 就差很多。虚值期权的价格全是时间价值</td></tr>
+      <tr><td>取到哪里为止</td><td class="txt">从 K<sub>0</sub> 往两边走，买价为 0 的跳过；连续碰到两个买价为 0 的就停</td><td class="txt">没人肯出价的期权，价格说明不了什么</td></tr>
+      <tr><td>Q(K)</td><td class="txt">买一与卖一的中间价</td><td class="txt">1.1 起一直这样取</td></tr>
+      <tr><td>F</td><td class="txt">找 call 与 put 中间价最接近的行权价 K，F ＝ K ＋ e<sup>rT</sup> × (call − put)</td><td class="txt">5.2 讲的 parity</td></tr>
+      <tr><td>修正项</td><td class="txt">(F ÷ K<sub>0</sub> − 1)² ÷ T</td><td class="txt">F 比 K<sub>0</sub> 高一点，K<sub>0</sub> 那一档的 call 是实值的，平均进去的那一半多算了，这一项把它扣掉</td></tr>
+    </tbody>
+  </table>
+
+  <h3>两个到期日插值到 30 天</h3>
+  <p>每个到期日照上面的公式各算一个 σ²。VIX 取离到期 23 到 30 天的一个（近月）和 30 到 37 天的一个（次月），按时间插值到正好 30 天：</p>
+  <div class="formula">
+    <div class="math">VIX ＝ 100 × √{ [ <span class="sym" data-say="近月到期前总的方差：年化方差 σ₁² 乘上年数 T₁。">T<sub>1</sub>σ<sub>1</sub>²</span> × (<span class="sym" data-say="次月离到期的时间。Cboe 以分钟计，这里用天数。">N<sub>2</sub></span> − <span class="sym" data-say="30 天。">N<sub>30</sub></span>) ÷ (N<sub>2</sub> − <span class="sym" data-say="近月离到期的时间。">N<sub>1</sub></span>) ＋ T<sub>2</sub>σ<sub>2</sub>² × (N<sub>30</sub> − N<sub>1</sub>) ÷ (N<sub>2</sub> − N<sub>1</sub>) ] × <span class="sym" data-say="一年的天数 365。前面算出的是 30 天里总的方差，乘 365/30 换回每年。">N<sub>365</sub></span> ÷ N<sub>30</sub> }</div>
+    <div class="gloss">两个到期日各自到期前的总方差，按离 30 天的远近加权平均，换回每年，开平方，乘 100</div>
+  </div>
+  <p>插值之后，VIX 说的永远是「从现在起 30 天」，不管今天离哪个到期日近。一张期权的到期日是固定的，离到期的天数每天少一天；VIX 每天都往前看 30 天。</p>
+  <p class="tiny">Cboe 算真实的 VIX 用标普 500 指数期权，包括每周到期的那些，离到期的时间精确到分钟，两个到期日各用各的国债利率。</p>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>用 TSLA 4/13 收盘的期权链算一遍</h2>
+  <p class="sub">TSLA 没有官方的 VIX。把 4/13 收盘的真实报价放进同一套算法，得到一个「TSLA 30 天波动率指数」，拿它和 1.2 用的 46.3% 比。</p>
+  <p>4/13 收盘，TSLA 有这些到期日：<span id="expList"></span>。离到期 23 到 30 天的是 5/8（25 天），30 到 37 天的是 5/15（32 天），1.1 起用的就是 5/15 这一串。</p>
+  <p>先看 5/15。call 与 put 中间价最接近的行权价是 355：call 18.55，put 19.85，F ＝ 355 ＋ 1.00378 × (18.55 − 19.85) ＝ 353.70，和 1.1 用利率算的 353.69 只差 0.01。不高于它的第一个行权价是 350，就是 K<sub>0</sub>。往下取 put 取到 95，再往下 90 和 85 连续两档买价是 0，停；往上的 call 只有 950 一档买价是 0，跳过，一直取到 990。一共 142 张。</p>
+  <p>下面要拿真实报价和「平的微笑」比。8 讲过微笑：同一到期日、不同行权价的隐含波动率连成一条曲线，两头往上翘；低行权价那一头叫左翼。平的微笑是假设每个行权价的隐含波动率都一样，都等于远期价处的隐含波动率，5/15 这一串是 46.07%。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="stPlay">逐张再加一遍</button></div>
+    <svg id="st" viewBox="0 0 720 490" role="img" aria-label="TSLA 5/15 到期的每张虚值期权对方差的贡献，从平值往两边逐张加入"></svg>
+    <div class="legend">
+      <span><i style="background:var(--result)"></i>虚值 put</span>
+      <span><i style="background:var(--control)"></i>虚值 call</span>
+      <span><i style="background:var(--ink)"></i>K<sub>0</sub> ＝ 350，call 与 put 平均</span>
+      <span><i class="dash" style="color:var(--ink)"></i>每档都按平值 46.07% 定价时的高度（平的微笑）</span>
+      <span>柱宽 ΔK，柱高 (2/T)·e<sup>rT</sup>·Q ÷ K²，面积就是这一张的贡献</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">已加入</div><div class="d" id="stN"></div><div class="d2" id="stNb"></div></div>
+      <div class="stat"><div class="k">累计 Σ，方差点</div><div class="d" id="stS"></div><div class="d2" id="stSb"></div></div>
+      <div class="stat"><div class="k">扣掉修正后折成波动率</div><div class="d" id="stV" style="color:var(--control)"></div><div class="d2">√(Σ − 12.71)</div></div>
+    </div>
+    <div class="say plain" id="stSay"></div>
+  </div>
+  <p>三张期权放在一起看权重和贡献：</p>
+  <table>
+    <thead><tr><th>行权价</th><th>用哪张</th><th>中间价 Q</th><th>权重<br>以 350 为 1</th><th>贡献<br>方差点</th><th>隐含波动率</th></tr></thead>
+    <tbody id="exTb"></tbody>
+  </table>
+  <p>250 的 put 只值 0.735，但按 1/K² 它的权重是 350 的 1.96 倍；它的隐含波动率 64.2%，比平值高出 18 个点。左翼抬高的那部分，就装在这些便宜的 put 的价格里。</p>
+
+  <h3>两个到期日合成 30 天</h3>
+  <table>
+    <thead><tr><th>到期日</th><th>远期价 F</th><th>分界行权价 K<sub>0</sub></th><th>用到的期权</th><th>算出的 σ</th><th>平值隐含波动率</th></tr></thead>
+    <tbody id="termTb"></tbody>
+  </table>
+  <p class="tiny">平值隐含波动率：远期价处的隐含波动率，由 F 两侧两档虚值期权的隐含波动率插值。</p>
+  <p>插值的权重：5/8 占 (32 − 30) ÷ (32 − 25) ＝ 2/7，5/15 占 5/7。合起来，<b>TSLA 30 天波动率指数 <span id="idxV"></span></b>。</p>
+  <div class="vbars" id="vbars"></div>
+
+  <h3>多出来的 4.34 个点从哪来</h3>
+  <p>把每个行权价都按远期价处的隐含波动率重新定价（5/8 用 47.01%，5/15 用 46.07%），假装那天的微笑是平的，再放进同一套公式，得到 46.34%：微笑平的时候，这套算法还原出平值的隐含波动率，多出的 0.04 来自行权价一档一档不连续、两头又截断。</p>
+  <p>真实报价算出 50.68%，多出 4.34 个点，折成方差是从 2147.1 到 2568.0，多出 420.9 方差点。公式对价格是线性的，这 420.9 可以按行权价拆开：</p>
+  <table>
+    <thead><tr><th>行权价</th><th>真实比平的多出<br>方差点</th><th>5/15 这一段<br>占 Σ 的比例</th></tr></thead>
+    <tbody id="regTb"></tbody>
+  </table>
+  <p>多出来的几乎全在 330 以下：左翼 put 的隐含波动率高（8 讲过，这天 200 的 put 是 86.5%），又按 1/K² 拿到更大的权重。380 到 450 是这天微笑的谷底（8 算出最低点在 378.7），比平值还低，拉低了一点。</p>
+  <p>这两个到期日都包含 4/22 盘后的财报（8 第四节），所以这天的 30 天指数里，也包含了财报那一晚可能的大涨大跌。</p>
+  <p class="tiny">数据：ORATS 4/13 16:00 快照，中间价 ＝ (买一 ＋ 卖一) ÷ 2。离到期时间按日历日 ÷ 365，利率 4.3%（1.1 从 parity 反推）。TSLA 期权是美式的，put 带一点提前行权的价值（节点 9），这里当作欧式处理。</p>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>VIX 与单个期权的隐含波动率</h2>
+  <p class="sub">两者都写成一个百分比，都叫隐含波动率，说的不是同一件事。</p>
+  <table>
+    <thead><tr><th></th><th class="txt">单个期权的隐含波动率</th><th class="txt">VIX</th></tr></thead>
+    <tbody>
+      <tr><td>用了几张期权</td><td class="txt">一张</td><td class="txt">两个到期日的一整排虚值期权，TSLA 这天是 104 ＋ 142 张</td></tr>
+      <tr><td>期限</td><td class="txt">到期日固定，离到期的天数每天少一天</td><td class="txt">永远是从今天起 30 天，靠两个到期日插值</td></tr>
+      <tr><td>要不要定价模型</td><td class="txt">要：把价格代进 Black-Scholes 反推 σ</td><td class="txt">不要：公式里只有价格、行权价、利率和时间</td></tr>
+      <tr><td>微笑</td><td class="txt">只是微笑上的一个点。350 call 是 46.3%</td><td class="txt">整条微笑都在里面，左翼按 1/K² 加重。TSLA 这天 50.68%</td></tr>
+      <tr><td>平方对应什么</td><td class="txt">没有对应的合约</td><td class="txt">一份 30 天方差合约的价格（第二节）</td></tr>
+      <tr><td>能不能直接买卖</td><td class="txt">能，买卖那张期权就是</td><td class="txt">不能，只能交易 VIX 期货、VIX 期权或跟踪它们的产品</td></tr>
+    </tbody>
+  </table>
+  <p>VIX 自己就换过一次算法。Cboe 1993 年推出 VIX 时，算的是 S&amp;P 100（标普 100 指数，由美国 100 家大公司组成）平值附近 8 张期权隐含波动率的平均，属于左边一列的做法；2003 年改成标普 500 期权和第三节的公式，旧算法改名 VXO。</p>
+
+  <h3>为什么 VIX 买不到</h3>
+  <p>讲义说，股票指数可以按权重把成分股买齐来复制，指数基金就是这样做的；VIX 不行，因为它的成分和权重一直在变。拿 TSLA 这串 5/15 的期权连看两天：</p>
+  <table>
+    <thead><tr><th></th><th>4/13</th><th>4/15</th></tr></thead>
+    <tbody id="d15Tb"></tbody>
+  </table>
+  <p id="d15Say"></p>
+  <p>想用期权跟住这个数，就得每天换掉一批期权、改一遍数量。讲义的结论：想交易 VIX，只能通过 VIX 期货、VIX 期权，或者跟踪它们的 ETF 和 ETN（ETF 是在交易所像股票一样买卖的基金；ETN 是银行发行、按某个指数的表现偿付的债券，也在交易所买卖）；而这些产品不一定跟得住指数，表现也不一定像你以为的那样（第七节）。</p>
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>真实的 VIX 与之后的实际波动</h2>
+  <p class="sub">Cboe 在交易时段里用标普 500 指数期权照第三节的公式连续算 VIX。它是市场今天给之后 30 天报的波动率；一份 30 天方差合约到期结算的，是这 30 天真实走出来的波动率。两个放在一起比。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="vxPlay">从 2020 年再放一遍</button></div>
+    <svg id="vx" viewBox="0 0 720 350" role="img" aria-label="2020 年 8 月以来每天的 VIX，与从那天起之后 30 天 SPX 的实际波动率"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink)"></i>VIX</span>
+      <span><i class="ln" style="background:var(--result)"></i>从这一天起之后 30 天的实际波动率，画在起点那天</span>
+      <span><i style="background:var(--control);opacity:.55"></i>实际比 VIX 高的日子</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="vxD"></div></div>
+      <div class="stat"><div class="k">VIX</div><div class="d" id="vxV"></div></div>
+      <div class="stat"><div class="k">之后 30 天的实际</div><div class="d" id="vxR" style="color:var(--result)"></div></div>
+      <div class="stat"><div class="k">到这天为止，VIX 更高的日子</div><div class="d" id="vxP"></div><div class="d2" id="vxPb"></div></div>
+    </div>
+    <div class="say plain" id="vxSay"></div>
+  </div>
+  <p>7 用之后 21 个交易日比过同一件事：86.9% 的日子 VIX 更高，平均高 4.42 个点。这里按第一节的合约公式、之后 30 个日历日算，结果几乎一样。7 讲过原因：卖方承担着对冲不掉的跳空，要多收一份钱。</p>
+  <p>两者的相关系数是 0.59：VIX 高的时候，之后通常也更波动，但 VIX 只说对了一部分。低估得最厉害的就是第一节那个月：2025-03-25 VIX 17.07，之后 30 天 SPX 实际走出 47.69%，差 30.62 个点，当中有 4/3、4/4 的大跌和 4/9 宣布暂缓加征关税那天的大涨。</p>
+
+  <h3>卖方差的人赚什么</h3>
+  <p>设想每个交易日都按当天 VIX 的平方卖出一份 30 天方差合约，到期按实际方差结算。六年里平均每份赚 141.0 方差点，87.6% 的份数赚钱。但赚的时候平均赚 204.2，亏的时候平均亏 306.8；最差的一份是 2025-03-27 起的那一份，亏 2028.5，是平均每份收益的 14.4 倍。只取互不重叠的，每隔 21 个交易日卖一份，69 份里赚 63 份、亏 6 份。</p>
+  <p>大多数时候收一点，偶尔亏一大笔：第七节讲义的 covered call 例子也是这个形状。</p>
+
+  <h3>均值回复</h3>
+  <p>讲义说波动率会<b>均值回复</b>：冲上去会回来，跌下去也会回来。这六年 VIX 平均 19.75，中位数 18.52，最低 11.89（2024-05-24），最高 52.67（2025-04-08）。每次收盘冲过 30，回到 20 以下用了多久：</p>
+  <table>
+    <thead><tr><th>第一次收在 30 以上</th><th>这一段最高</th><th>回到 20 以下</th><th>用了几个交易日</th></tr></thead>
+    <tbody id="epTb"></tbody>
+  </table>
+  <p>2024 年 8 月和 2025 年 4 月都是几天之内冲上去的：8/1 的 18.23 到 8/5 的 38.56，4/2 的 21.45 到 4/8 的 52.67。回落也快，分别用了 6 个和 25 个交易日。2020 年秋天那一段最高 40.7，却在 20 以上停了 111 个交易日；2022 年分三段，每段两到三个多月。</p>
+  <p class="tiny">数据：IBKR 分钟线，SPX 与 VIX 取美东 15:59 那一分钟（半日市 12:59）。VIX 分钟线在 46 个月末的下午缺数据，那些天不算；2024-05-13 至 05-15 三天 SPX 缺数据，用 SPY 同一分钟的涨跌补。实际波动率按第一节的公式：之后 30 个日历日内的对数涨跌，252 ÷ n × Σr²，开平方。最后一个完整窗口从 2026-07-01 起。</p>
+</section>
+
+<!-- ══════════ 七 ══════════ -->
+<section id="s7">
+  <h2><span class="n">七</span>VIX 期货与期权</h2>
+  <p class="sub">VIX 本身买不到。以它结算的期货和期权，是隐含波动率合约。</p>
+
+  <h3>VIX 期货怎么结算</h3>
+  <p>期货是今天约定一个价，到期按结算值和约定价的差额收付现金，和 1.1 的远期合约是同一件事。不同的是期货在交易所买卖，每天按当天的期货价格结一次账：价格涨了，买方当天就收到涨的那部分，卖方付出，而不是等到期一次算清。</p>
+  <p>讲义说，VIX 期货在 SPX 期权到期日之前 30 天的那个周三结算，结算值是那天的 VIX。选这一天的原因讲义没写：那天离下一个 SPX 期权到期日正好 30 天，VIX 只用这一个到期日就能算出来，不用插值。实际结算用的不是那天收盘的 VIX，而是当天早上 Cboe 用 SPX 期权的开盘价专门算的一次 VIX（叫特别开盘报价，SOQ）。到期之前，期货价格是市场对结算那天 VIX 的估计，不等于今天的 VIX。</p>
+
+  <h3>期限结构</h3>
+  <p>讲义的例子：三个到期月的隐含波动率现在都是 25%，整体上涨或整体下跌时各变成多少：</p>
+  <table style="max-width:34rem">
+    <thead><tr><th>到期月</th><th>现在</th><th>整体上涨时</th><th>整体下跌时</th></tr></thead>
+    <tbody>
+      <tr><td>3 月</td><td>25%</td><td>30%</td><td>20%</td></tr>
+      <tr><td>6 月</td><td>25%</td><td>28%</td><td>22%</td></tr>
+      <tr><td>9 月</td><td>25%</td><td>26%</td><td>24%</td></tr>
+    </tbody>
+  </table>
+  <p>以 25% 为均值，3 月一涨一跌是 ±5 个点，6 月 ±3，9 月 ±1：短期的隐含波动率动得快，长期的贴着均值。讲义说，波动率指数的期货，各月份也是这个样子。</p>
+  <p>讲义接着说：股票波动率指数的期限结构有时是 <span class="sym" data-say="backwardation 的简称。近月的隐含波动率高于远月，通常出现在市场刚大跌、波动率冲高的时候。">backward</span>，近月高于远月；更常见的是 <span class="sym" data-say="远月的隐含波动率高于近月。平静的时候通常是这样：眼下风平浪静，但远一点总有可能出事。">contango</span>，远月高于近月。在 contango 下，随着时间过去，一张期货离到期越来越近，它的价格往下滑向近月的水平，价值必然下降。所以讲义说，买入 VIX 期货要赚钱，至少要发生下面一件事：</p>
+  <ol>
+    <li>整条 contango 曲线往上移；</li>
+    <li>期限结构从 contango 翻成 backward；</li>
+    <li>到期那一刻隐含波动率突然冲高。</li>
+  </ol>
+
+  <h3>跟踪 VIX 期货的产品</h3>
+  <p>UVXY 是一只 ETF（在交易所买卖的基金），持有最近两个月的 VIX 期货，每天调整到 1.5 倍杠杆。它跌得太多时会合股：把几股并成一股，每股价格按比例放大，持有人的总价值不变。它和 VIX 指数放在一起，从同一天的 100 出发：</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="uvPlay">从 2020 年再放一遍</button></div>
+    <svg id="uv" viewBox="0 0 720 340" role="img" aria-label="2020 年 8 月以来 VIX 指数、UVXY 与一个假想产品，都从 100 出发，纵轴按对数"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink)"></i>VIX 指数</span>
+      <span><i class="ln" style="background:var(--control)"></i>UVXY（已按合股调整）</span>
+      <span style="color:var(--result)"><i class="dash"></i>假想：每天拿 1.5 倍 VIX 指数当天的涨跌</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="uvD"></div></div>
+      <div class="stat"><div class="k">VIX 指数</div><div class="d" id="uvV"></div><div class="d2" id="uvVb"></div></div>
+      <div class="stat"><div class="k">UVXY</div><div class="d" id="uvU" style="color:var(--control)"></div><div class="d2">起点 ＝ 100</div></div>
+      <div class="stat"><div class="k">假想产品</div><div class="d" id="uvH" style="color:var(--result)"></div><div class="d2">起点 ＝ 100</div></div>
+    </div>
+    <div class="say plain" id="uvSay"></div>
+  </div>
+  <p>冲高的时候 UVXY 也涨不到指数的 1.5 倍。2024-08-01 到 08-05，VIX 涨了 111.5%，1.5 倍是 167%，UVXY 涨了 120.6%；2025-04-02 到 04-08，VIX 涨了 145.5%，1.5 倍是 218%，UVXY 只涨了 112.2%。近月的期货涨得比指数少，后面讲 VIX 期权时会看到为什么。</p>
+  <p class="tiny">数据：IBKR 分钟线，美东 15:59 那一分钟；图上每周取最后一个交易日。UVXY 的价格已按它历次合股调整，数据里没有合股造成的跳空。假想产品按 UVXY 与 VIX 都有收盘的 1438 天逐日计算。</p>
+
+  <h3>VIX 期权</h3>
+  <p>VIX 期权是欧式的（只能在到期那天行权，节点 9 讲过美式与欧式的区别），现金结算：到期也在那个周三，和同月的 VIX 期货按同一个 VIX 值结算。所以它实际上是那张同月 VIX 期货的期权。</p>
+  <p>讲义：想兑现一张期权的波动率价值，就要动态对冲。VIX 本身买不到，VIX 期权只能用 VIX 期货对冲，所以决定 VIX 期权价值的，是 VIX 期货的波动率，不是 VIX 指数的波动率。讲义给了 2015-05-21 的历史波动率：</p>
+  <table style="max-width:34rem">
+    <thead><tr><th></th><th>20 日</th><th>50 日</th><th>100 日</th></tr></thead>
+    <tbody>
+      <tr><td>VIX 指数</td><td>116.65</td><td>97.95</td><td>112.23</td></tr>
+      <tr><td>第 1 个月期货</td><td>72.66</td><td>66.07</td><td>78.28</td></tr>
+      <tr><td>第 2 个月期货</td><td>41.94</td><td>44.14</td><td>54.19</td></tr>
+      <tr><td>第 3 个月期货</td><td>28.91</td><td>29.37</td><td>41.66</td></tr>
+    </tbody>
+  </table>
+  <p>VIX 指数自己的年化波动率超过 100%。越往后的月份越不波动：20 日那一列，从指数到第 1 个月乘 0.62，再往后每个月乘 0.58、0.69，第 3 个月只有指数的四分之一（116.65 对 28.91，4.03 倍）。这是均值回复落在期货上的样子：远月期货的结算日还远，今天的冲高到那时多半已经回落，所以它不跟着今天冲。用指数的波动率给远月的 VIX 期权定价，会高估好几倍。</p>
+
+  <h3>谁用 VIX</h3>
+  <table>
+    <thead><tr><th>讲义列的用途</th><th class="txt">说的是什么</th></tr></thead>
+    <tbody>
+      <tr><td>投机</td><td class="txt">直接押波动率涨或跌</td></tr>
+      <tr><td>对冲波动率头寸</td><td class="txt">手里的期权头寸有 vega，用 VIX 产品抵掉一部分</td></tr>
+      <tr><td>对冲市场头寸</td><td class="txt">市场和波动率反着走（7：SPX 每涨 1%，VIX 平均跌 1.38 点），持有 VIX 产品能在下跌时补回一部分</td></tr>
+      <tr><td>对冲间接的波动率头寸</td><td class="txt">收入跟着交易量走、跟着流动性走的业务，以及任何对波动率敏感的策略，盈亏都暗中依赖波动率</td></tr>
+    </tbody>
+  </table>
+
+  <h3>covered call 是空波动率</h3>
+  <p>讲义最后一个例子：组合经理有两个目标，一是让组合增值，二是跑赢市场。他持有一篮子股票，同时卖出这些股票的 call 收权利金，这叫 covered call。什么情况下两个目标能同时达到？</p>
+  <table>
+    <thead><tr><th>市场</th><th>目标一：增值</th><th>目标二：跑赢市场</th><th class="txt">原因</th></tr></thead>
+    <tbody>
+      <tr><td>大涨</td><td class="ok">达到</td><td class="no">达不到</td><td class="txt">卖出的 call 封住了上涨</td></tr>
+      <tr><td>大跌</td><td class="no">达不到</td><td class="ok">达到</td><td class="txt">收的权利金只抵掉一小部分下跌</td></tr>
+      <tr><td>平静，小涨小跌</td><td class="ok">达到</td><td class="ok">达到</td><td class="txt">权利金落袋，call 不被行权</td></tr>
+    </tbody>
+  </table>
+  <p>两个目标只在平静的市场里同时达到，所以 covered call 是一个空波动率的头寸，市场越不波动越好。讲义说，这个空波动率头寸可以用波动率合约来对冲：买入一份波动率合约，市场大动时它赚钱，抵掉 covered call 在大涨大跌时吃的亏。</p>
+</section>
+
+<!-- ══════════ 八 ══════════ -->
+<section id="s8">
+  <h2><span class="n">八</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号与术语</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">已实现波动率合约</div><div class="t">到期按这段时间标的实际走出来的波动率（或方差）结算的合约。例子：方差互换。</div></div>
+      <div class="gl"><div class="s">隐含波动率合约</div><div class="t">到期按期权价格反推出来的隐含波动率结算的合约。例子：VIX 期货与期权、VSTOXX 期货与期权。</div></div>
+      <div class="gl"><div class="s">方差互换</div><div class="t">开始时约定一个价，到期买方拿实际方差、付约定价。结算值 252 ÷ n × Σr²。</div></div>
+      <div class="gl"><div class="s">方差点</div><div class="t">波动率点的平方。VIX 17.07 对应 291.4 方差点。</div></div>
+      <div class="gl"><div class="s">r<sub>i</sub>, ln</div><div class="t">第 i 天的对数涨跌 ln(p<sub>i</sub> ÷ p<sub>i−1</sub>)。ln 是自然对数。</div></div>
+      <div class="gl"><div class="s">n, 252</div><div class="t">n 是这段时间的日涨跌个数；252 是一年的交易日数，用来年化。</div></div>
+      <div class="gl"><div class="s">Σ</div><div class="t">对每一项算一遍再加起来。</div></div>
+      <div class="gl"><div class="s">VIX</div><div class="t">Cboe 用标普 500 指数期权算的 30 天波动率指数：一整排虚值期权按 1/K² 加权，两个到期日插值到 30 天。</div></div>
+      <div class="gl"><div class="s">VXO</div><div class="t">2003 年以前的 VIX 算法：S&amp;P 100 指数平值附近 8 张期权隐含波动率的平均。</div></div>
+      <div class="gl"><div class="s">σ²</div><div class="t">一个到期日算出来的年化方差，开平方是波动率。</div></div>
+      <div class="gl"><div class="s">T</div><div class="t">离到期的时间，以年计。</div></div>
+      <div class="gl"><div class="s">K<sub>i</sub>, ΔK<sub>i</sub></div><div class="t">第 i 个行权价；它管的宽度，前后两个行权价之差的一半。</div></div>
+      <div class="gl"><div class="s">1/K²</div><div class="t">每个行权价期权数量的配法。抵掉「平值 vega 与价格成正比」和「起作用的档数与价格成正比」两个因素，总 vega 不随标的变。</div></div>
+      <div class="gl"><div class="s">Q(K)</div><div class="t">行权价 K 上虚值期权的中间价。</div></div>
+      <div class="gl"><div class="s">F, K<sub>0</sub></div><div class="t">F 是用 parity 反推的远期价；K<sub>0</sub> 是不高于 F 的第一个行权价，虚值 put 与 call 的分界。</div></div>
+      <div class="gl"><div class="s">e<sup>rT</sup></div><div class="t">把今天的期权价格换算成到期那天的价值。</div></div>
+      <div class="gl"><div class="s">N<sub>1</sub>, N<sub>2</sub>, N<sub>30</sub>, N<sub>365</sub></div><div class="t">近月、次月离到期的时间，30 天，一年。插值公式里用。</div></div>
+      <div class="gl"><div class="s">近月、次月</div><div class="t">VIX 用的两个到期日：离到期 23 到 30 天、30 到 37 天。</div></div>
+      <div class="gl"><div class="s">vega</div><div class="t">隐含波动率变 1 个点，期权价格变多少（2.3）。</div></div>
+      <div class="gl"><div class="s">平值、虚值、实值</div><div class="t">行权价在现价附近叫平值。call 行权价高于现价、put 行权价低于现价叫虚值，现在行权拿不到钱，价格全是时间价值；反过来叫实值，价格里有内在价值。</div></div>
+      <div class="gl"><div class="s">微笑、左翼</div><div class="t">同一到期日不同行权价的隐含波动率连成的曲线，两头往上翘，叫微笑（8）；低行权价那一头叫左翼。平的微笑：假设每个行权价都按平值的隐含波动率定价。</div></div>
+      <div class="gl"><div class="s">delta 对冲</div><div class="t">每天用标的抵掉期权头寸的 delta（4.1、4.2）。按 1/K² 配好的一排期权再做 delta 对冲，盈亏只看实际方差，才是方差合约。</div></div>
+      <div class="gl"><div class="s">Cboe</div><div class="t">芝加哥期权交易所，编制 VIX 的机构。</div></div>
+      <div class="gl"><div class="s">S&amp;P 100</div><div class="t">标普 100 指数，由美国 100 家大公司组成。旧的 VIX（VXO）用它的期权算。</div></div>
+      <div class="gl"><div class="s">期货</div><div class="t">今天约定一个价，到期按结算值与约定价的差额收付现金，和 1.1 的远期合约是同一件事；在交易所买卖，每天按当天价格结一次账。</div></div>
+      <div class="gl"><div class="s">SOQ</div><div class="t">特别开盘报价：VIX 期货与期权结算那天早上，Cboe 用 SPX 期权的开盘价专门算的一次 VIX，作为结算值。</div></div>
+      <div class="gl"><div class="s">ETF、ETN</div><div class="t">ETF 是在交易所像股票一样买卖的基金；ETN 是银行发行、按某个指数的表现偿付的债券，也在交易所买卖。</div></div>
+      <div class="gl"><div class="s">欧式期权</div><div class="t">只能在到期那天行权（节点 9）。VIX 期权是欧式、现金结算的。</div></div>
+      <div class="gl"><div class="s">合股</div><div class="t">把几股并成一股，每股价格按比例放大，持有人的总价值不变。</div></div>
+      <div class="gl"><div class="s">均值回复</div><div class="t">波动率冲高会回落、压低会回升，长期围着一个均值转。</div></div>
+      <div class="gl"><div class="s">期限结构</div><div class="t">同一标的不同到期日的隐含波动率连成的曲线。</div></div>
+      <div class="gl"><div class="s">contango</div><div class="t">远月高于近月。在它下面，期货随时间往下滑。</div></div>
+      <div class="gl"><div class="s">backward</div><div class="t">近月高于远月，常见于刚大跌之后。</div></div>
+      <div class="gl"><div class="s">UVXY</div><div class="t">持有最近两个月 VIX 期货、每天 1.5 倍杠杆的 ETF。</div></div>
+      <div class="gl"><div class="s">SPX</div><div class="t">标普 500 指数。VIX 用它的期权算。</div></div>
+      <div class="gl"><div class="s">covered call</div><div class="t">持有股票，同时卖出它的 call。平静时最好，是空波动率的头寸。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>支线到这里结束。回到课程地图可以看全部节点；另一条支线是 <b>M 做市报价</b>：拿着一张波动率曲面给每个行权价报双边价，边际从哪来。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · TSLA 期权报价来自 ORATS 历史快照，SPX、VIX、UVXY 价格来自 IBKR 分钟线</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
+const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);          // 负数用真正的减号
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+/* 窄屏时 720 宽的 SVG 缩到一半左右，标签字号乘 FS */
+const NARROW=matchMedia('(max-width:620px)');
+let FS=NARROW.matches?1.45:1;
+const lab = (x,y,t,c,a='start',s=11,w=400)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${+(s*FS).toFixed(1)}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+const npdf = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+const md = s => +s.slice(5,7)+'/'+(+s.slice(8,10));
+
+/* ══════════ 数据 ══════════
+   由 scripts/data/station_v.py --page 生成，改数据请重跑脚本，不要手改。
+   VG：第二节示意曲线的参数。EXPS：4/13 的到期日与日历天数。STRIP：5/15 这一串用到的期权
+   [行权价, P/C/A, 中间价, ΔK, 贡献（方差点）, 隐含波动率 %, 平的微笑时的贡献]。TERM：两个到期日的结果。
+   REG：真实与平的微笑之差按行权价分段。D15：4/15 的同一串。WIN：第一节两个 30 天窗口（对数涨跌 %）。
+   D0 ＋ GAP：交易日（GAP 是相邻交易日的日历天数差）。VIXC：VIX × 100，0 表示那天缺数据。
+   RV30：从那天起之后 30 天 SPX 实际波动率 × 100。UV：每周一点，UVXY 与假想产品以起点为 100。 */
+/* DATA:start */
+const VG={"sig":0.463,"days":30,"k0":100,"k1":800,"dk":10,"ref":350};
+const EXPS=[["4/13",0],["4/15",2],["4/17",4],["4/20",7],["4/24",11],["4/27",14],["5/1",18],["5/8",25],["5/15",32]];
+const F355=[18.55,19.85];
+const REG=[["250 以下",197.1,8.4],["250 到 330",197.7,23.8],["330 到 380",10.0,50.3],["380 到 450",-17.2,15.3],["450 以上",33.3,2.2]];
+const STRIP=[[95.0,"P",0.02,5.0,2.537,142.84,0.0],[100.0,"P",0.03,5.0,3.435,142.93,0.0],[105.0,"P",0.035,5.0,3.635,138.97,0.0],[110.0,"P",0.045,5.0,4.258,0.0,0.0],[115.0,"P",0.045,5.0,3.896,132.1,-0.0],[120.0,"P",0.045,5.0,3.578,128.93,0.0],[125.0,"P",0.06,5.0,4.397,375.19,0.0],[130.0,"P",0.065,5.0,4.404,371.9,0.0],[135.0,"P",0.08,5.0,5.026,370.0,0.0],[140.0,"P",0.09,5.0,5.257,367.37,0.0],[145.0,"P",0.095,5.0,5.173,114.37,0.0],[150.0,"P",0.115,5.0,5.852,112.56,0.0],[155.0,"P",0.12,5.0,5.719,109.0,0.0],[160.0,"P",0.135,5.0,6.038,106.45,0.0],[165.0,"P",0.15,5.0,6.308,103.9,0.0],[170.0,"P",0.17,5.0,6.735,101.56,0.0],[175.0,"P",0.185,5.0,6.916,98.78,0.0],[180.0,"P",0.2,5.0,7.067,96.0,0.0],[185.0,"P",0.225,5.0,7.527,93.78,0.0],[190.0,"P",0.25,5.0,7.929,91.53,0.001],[195.0,"P",0.27,5.0,8.13,88.87,0.001],[200.0,"P",0.295,5.0,8.444,86.48,0.003],[205.0,"P",0.32,5.0,8.718,83.97,0.007],[210.0,"P",0.345,5.0,8.957,81.26,0.015],[215.0,"P",0.375,5.0,9.288,75.85,0.03],[220.0,"P",0.41,5.0,9.699,76.84,0.056],[225.0,"P",0.45,5.0,10.177,74.61,0.103],[230.0,"P",0.49,5.0,10.605,72.38,0.183],[235.0,"P",0.54,5.0,11.195,70.19,0.312],[240.0,"P",0.595,5.0,11.827,67.84,0.517],[245.0,"P",0.665,5.0,12.684,66.2,0.829],[250.0,"P",0.735,5.0,13.464,64.2,1.291],[255.0,"P",0.83,5.0,14.614,62.24,1.959],[260.0,"P",0.94,5.0,15.921,60.59,2.896],[265.0,"P",1.07,5.0,17.445,58.85,4.181],[270.0,"P",1.235,5.0,19.396,57.31,5.902],[275.0,"P",1.44,5.0,21.801,56.02,8.155],[280.0,"P",1.695,5.0,24.753,54.77,11.044],[285.0,"P",2.015,5.0,28.403,53.67,14.677],[290.0,"P",2.4,5.0,32.673,52.69,19.161],[295.0,"P",2.87,5.0,37.759,51.81,24.597],[300.0,"P",3.45,5.0,43.889,51.1,31.08],[305.0,"P",4.1,5.0,50.462,50.26,38.691],[310.0,"P",4.9,5.0,58.378,49.62,47.492],[315.0,"P",5.85,5.0,67.502,49.06,57.529],[320.0,"P",6.95,5.0,77.708,48.55,68.825],[325.0,"P",8.2,5.0,88.885,48.02,81.38],[330.0,"P",9.65,5.0,101.456,47.6,95.169],[335.0,"P",11.25,5.0,114.774,47.09,110.147],[340.0,"P",13.1,5.0,129.746,46.75,126.247],[345.0,"P",15.125,5.0,145.491,46.35,143.383],[350.0,"A",19.225,5.0,179.684,46.18,178.657],[355.0,"C",18.55,5.0,168.526,46.06,168.536],[360.0,"C",16.225,5.0,143.337,45.76,144.447],[365.0,"C",14.15,5.0,121.605,45.58,123.31],[370.0,"C",12.25,5.0,102.45,45.35,104.851],[375.0,"C",10.55,5.0,85.895,45.16,88.805],[380.0,"C",9.075,5.0,71.955,45.08,74.922],[385.0,"C",7.75,5.0,59.863,44.96,62.967],[390.0,"C",6.65,5.0,50.058,45.03,52.719],[395.0,"C",5.65,5.0,41.46,45.01,43.974],[400.0,"C",4.775,5.0,34.169,44.96,36.545],[405.0,"C",4.05,5.0,28.27,45.05,30.261],[410.0,"C",3.45,5.0,23.498,45.24,24.968],[415.0,"C",2.925,5.0,19.445,45.43,20.53],[420.0,"C",2.485,5.0,16.129,45.65,16.823],[425.0,"C",2.12,5.0,13.438,45.88,13.74],[430.0,"C",1.81,5.0,11.208,46.17,11.185],[435.0,"C",1.55,5.0,9.378,46.48,9.076],[440.0,"C",1.335,5.0,7.895,46.9,7.342],[445.0,"C",1.155,5.0,6.678,47.28,5.921],[450.0,"C",1.01,5.0,5.711,47.77,4.761],[455.0,"C",0.88,5.0,4.867,48.24,3.818],[460.0,"C",0.775,5.0,4.193,48.75,3.052],[465.0,"C",0.685,5.0,3.627,49.31,2.434],[470.0,"C",0.61,5.0,3.162,49.81,1.936],[475.0,"C",0.545,5.0,2.766,50.47,1.535],[480.0,"C",0.49,5.0,2.435,51.03,1.215],[485.0,"C",0.445,5.0,2.166,51.71,0.959],[490.0,"C",0.41,5.0,1.955,52.39,0.755],[495.0,"C",0.37,5.0,1.729,53.05,0.593],[500.0,"C",0.34,5.0,1.557,53.54,0.465],[505.0,"C",0.32,5.0,1.437,54.51,0.364],[510.0,"C",0.295,5.0,1.299,55.58,0.284],[515.0,"C",0.27,5.0,1.166,55.9,0.221],[520.0,"C",0.255,5.0,1.08,56.69,0.172],[525.0,"C",0.24,5.0,0.997,57.27,0.133],[530.0,"C",0.23,5.0,0.937,58.14,0.103],[535.0,"C",0.215,5.0,0.86,59.83,0.08],[540.0,"C",0.2,5.0,0.785,59.64,0.062],[545.0,"C",0.19,5.0,0.732,60.17,0.048],[550.0,"C",0.185,5.0,0.7,61.08,0.037],[555.0,"C",0.18,5.0,0.669,61.97,0.028],[560.0,"C",0.165,5.0,0.602,62.61,0.022],[565.0,"C",0.16,5.0,0.574,63.19,0.016],[570.0,"C",0.155,5.0,0.546,63.97,0.013],[575.0,"C",0.15,5.0,0.519,64.74,0.01],[580.0,"C",0.145,5.0,0.494,65.5,0.007],[585.0,"C",0.135,5.0,0.452,65.96,0.006],[590.0,"C",0.135,5.0,0.444,66.93,0.004],[595.0,"C",0.13,5.0,0.42,67.35,0.003],[600.0,"C",0.125,5.0,0.398,68.3,0.002],[605.0,"C",0.125,5.0,0.391,69.24,0.002],[610.0,"C",0.115,5.0,0.354,69.54,0.001],[615.0,"C",0.115,5.0,0.348,70.43,0.001],[620.0,"C",0.11,7.5,0.491,71.02,0.001],[630.0,"C",0.105,10.0,0.606,72.39,0.001],[640.0,"C",0.09,10.0,0.503,73.02,0.001],[650.0,"C",0.09,10.0,0.488,74.69,0.0],[660.0,"C",0.08,10.0,0.421,75.46,0.0],[670.0,"C",0.075,10.0,0.383,76.66,0.0],[680.0,"C",0.07,10.0,0.347,77.69,0.0],[690.0,"C",0.06,10.0,0.289,0.0,0.0],[700.0,"C",0.065,10.0,0.304,316.02,0.0],[710.0,"C",0.055,10.0,0.25,80.4,0.0],[720.0,"C",0.055,10.0,0.243,82.44,0.0],[730.0,"C",0.05,10.0,0.215,82.47,0.0],[740.0,"C",0.05,10.0,0.209,83.83,0.0],[750.0,"C",0.045,10.0,0.183,84.53,0.0],[760.0,"C",0.045,10.0,0.178,334.43,0.0],[770.0,"C",0.045,10.0,0.174,86.79,0.0],[780.0,"C",0.04,10.0,0.151,87.43,0.0],[790.0,"C",0.04,10.0,0.147,88.67,0.0],[800.0,"C",0.04,10.0,0.143,338.55,0.0],[810.0,"C",0.04,10.0,0.14,91.09,0.0],[820.0,"C",0.035,10.0,0.119,90.95,0.0],[830.0,"C",0.035,10.0,0.116,92.12,0.0],[840.0,"C",0.03,10.0,0.097,92.43,0.0],[850.0,"C",0.03,10.0,0.095,93.55,0.0],[860.0,"C",0.025,10.0,0.077,92.45,0.0],[870.0,"C",0.025,10.0,0.076,342.4,0.0],[880.0,"C",0.025,10.0,0.074,0.0,0.0],[890.0,"C",0.025,10.0,0.072,95.61,0.0],[900.0,"C",0.025,10.0,0.071,96.64,0.0],[910.0,"C",0.025,10.0,0.069,97.65,0.0],[920.0,"C",0.025,10.0,0.068,97.57,0.0],[930.0,"C",0.02,10.0,0.053,352.45,0.0],[940.0,"C",0.02,15.0,0.078,353.48,0.0],[960.0,"C",0.02,15.0,0.075,355.43,0.0],[970.0,"C",0.02,10.0,0.049,356.39,0.0],[980.0,"C",0.015,10.0,0.036,354.13,0.0],[990.0,"C",0.015,10.0,0.035,102.65,0.0]];
+const TERM={"25":{"F":353.3953,"K0":350.0,"n":104,"lo":110.0,"hi":760.0,"s2":0.259458,"sig":50.94,"adj":0.0013739,"atf":47.01,"flat":47.06,"ert":1.00295},"32":{"F":353.6951,"K0":350.0,"n":142,"lo":95.0,"hi":990.0,"s2":0.255966,"sig":50.59,"adj":0.0012713,"atf":46.07,"flat":46.11,"ert":1.00378}};
+const IDX={"v":50.68,"flat":46.34,"wA":0.2857,"wB":0.7143};
+const D15={"S":391.93,"F":393.1936,"K0":390.0,"n":142,"sw0":350.0,"sw1":385.0,"lo":100.0,"hi":990.0,"nsw":8,"swc0":355.0,"swc1":385.0,"nswc":7,"sig":54.27};
+const EP=[["2020-09-03",40.7,"2021-02-12",111],["2021-12-01",32.17,"2021-12-08",5],["2022-01-25",36.06,"2022-03-28",43],["2022-04-26",34.91,"2022-08-10",73],["2022-09-26",33.69,"2022-12-01",47],["2024-08-05",38.56,"2024-08-13",6],["2025-04-04",52.67,"2025-05-12",25],["2026-03-27",30.75,"2026-04-09",8]];
+const WIN={"calm":{"t0":"2026-07-01","vix":16.38,"px0":7485.02,"d":["7/2","7/6","7/7","7/8","7/9","7/10","7/13","7/14","7/15","7/16","7/17","7/20","7/21","7/22","7/23","7/24","7/27","7/28","7/29","7/30","7/31"],"r":[-0.0988,0.8086,-0.4651,-0.2923,0.8097,0.4379,-0.7883,0.377,0.3693,-0.4975,-1.0251,-0.1751,0.8372,-0.105,-1.2244,0.0634,0.0074,0.1864,-1.4515,1.5897,0.6993],"settle":11.7035},"crash":{"t0":"2025-03-25","vix":17.07,"px0":5776.83,"d":["3/26","3/27","3/28","3/31","4/1","4/2","4/3","4/4","4/7","4/8","4/9","4/10","4/11","4/14","4/15","4/16","4/17","4/21","4/22","4/23","4/24"],"r":[-1.1267,-0.3464,-1.9886,0.5549,0.384,0.6429,-4.9605,-6.1078,-0.3035,-1.4771,8.9343,-3.4226,1.7503,0.824,-0.164,-2.257,0.1371,-2.4077,2.4703,1.6063,2.0482],"settle":47.6854}};
+const D0="2020-08-03";
+const GAP="11113111131111311113111141113111131111311113111131111311113111131111311113111131123111131111311113111411141111311114111311113111131111411131111311113111131111311113111411113111131111311113111131111311113111141113111131111311113111141113111131111311113111131111311113111131111411131111311113111131111311113111131111311113111131111311231111311113111131114111131111311114111311113111131111311114111311113111131111311113111131111311141111311113111131111311113111141113111131111411131111411131111311113111131111311113111131111311114111311113111131111311113111131111311113111131111311113112311113111131111311114111411131111411131111311113111131111411131111311113111131111311113111411113111131111311113111131111311114111311113111141113111132113111131111311113111131111311113111131111411131111311113111131111311113111131111311113111131111311231111311113111131111411141113111141113111131111311113111141113111131111311113111131114111131111311113111131111311113111131111411131111311113121311113112311113111131111311113111131111311113111141113111131111311113111131111311113111131111311113111131111311231111311113111131213121311231111411131111311113111141113111131111311113111131111311113111131114111131111311113111131111411131111311113112311113111411113111131111311113111131111311113111141113111131111311113111131111311113111131111311113111131111311231111311113111131123112311113111141113111131111311114111311113111131111311113111131114111131111311113111131111311113111141113111131111311141111311141111311113111131111";
+const VIXC=[2447,2386,2298,2262,2224,2201,2426,2208,2218,2182,2156,2161,2254,2250,2218,2234,2210,2315,2437,2268,0,2596,2660,3377,3035,3186,2914,2977,2663,2565,2559,2608,2658,2581,2755,2662,2911,2874,2602,2643,2662,0,2668,2746,2808,2946,2818,2636,2482,2518,2599,2637,2696,2685,2928,2923,2873,2787,2732,3256,3308,4070,3674,3806,3727,3479,2978,2777,2489,2570,2498,2358,2577,2313,2269,2277,2370,2283,2353,2264,2171,2122,2089,0,2085,2124,2162,2062,2122,2059,2191,2237,2348,2465,2282,2257,2180,2170,2493,2412,2302,2140,2179,2324,2269,0,2682,2519,2608,2247,2156,2435,2308,2222,2323,2375,2304,2152,2129,2162,2326,2355,3252,3023,3321,2961,2607,2369,2177,2095,2129,2157,2224,2120,1998,2133,2140,2261,2179,2370,2300,2138,2953,2729,2317,2445,2659,2863,2482,2620,2388,2281,2186,2077,1996,2004,1930,2184,2071,1902,2081,2130,2022,1888,2095,1981,0,1734,1787,1815,1727,1699,1664,1688,1664,1724,1650,1608,1744,1846,1717,1876,1697,1772,1754,1746,1749,0,1821,1938,1902,1835,1680,1924,2152,2767,2312,1895,1999,2109,2194,2069,2024,1858,1880,1752,1676,1676,1801,1730,1800,1648,1641,1696,1793,1606,1572,1625,1709,1799,1759,2066,1797,1671,1642,1600,1539,1587,1621,0,1536,1498,1627,1619,1899,1624,1624,1720,1635,1691,1822,2282,1996,1790,1778,1709,1761,1883,1796,1740,1827,1972,1779,1804,1723,1626,1685,1667,1603,1572,1527,1604,1756,2108,2187,1837,1719,1722,1654,1884,1634,1611,0,1612,1644,1628,1786,1778,1884,2102,1950,1975,1816,1858,2083,2475,2367,2102,1872,1784,1866,2334,2292,0,2136,2302,2142,2103,1956,1875,1987,1955,1855,1687,1629,1628,1563,1548,1493,1537,1520,1601,1720,1627,1627,1632,1598,1522,1550,1639,1717,1782,1868,1783,1631,1662,1644,1702,1748,1809,1940,1905,1859,2671,2246,0,3217,2801,3072,2750,2220,1996,2161,1871,2052,2171,1910,2083,2181,2307,2100,1868,1805,1764,1784,1704,1757,0,1663,1677,1993,1975,1895,1929,1835,1781,2035,1921,2289,2399,2560,2923,2955,3060,3079,3099,2730,0,2224,2077,2575,2326,2316,2168,2012,2393,2797,2868,2534,2434,2800,2809,2935,3092,2947,2761,0,3392,3054,3084,3170,3606,3520,3229,3077,3104,3230,3003,2638,2541,2408,2371,2294,2347,2160,2082,1957,1892,1959,0,1943,1847,2133,2213,2160,2133,2424,2436,2165,2254,2244,2062,2065,2286,2805,2699,3252,3189,2936,3410,3214,2956,2512,3172,3015,3491,3304,3293,3182,2885,2755,2619,3090,2938,2953,2842,2951,2841,2725,2559,0,2568,2457,2512,2495,2397,2402,2617,2806,3430,3235,2938,3331,3098,3006,2911,2895,2736,2723,2839,2815,0,2680,2753,2682,2588,2484,2636,2721,2661,2640,2413,2536,2457,2382,2298,2296,2327,2497,2318,2247,2150,2288,2384,2186,2163,2086,2135,2182,1975,2021,1957,1986,1964,2004,1958,2044,2404,2395,2291,2179,2557,2615,2637,0,2525,2570,2671,2468,2356,2293,2407,2711,2626,2643,2614,2580,2723,2813,2729,2974,3197,3274,3037,3191,0,3017,2911,2895,3042,3122,3250,3368,3369,3213,3214,3123,3065,3094,3021,2995,2981,2833,2745,2700,2601,0,2569,2586,2521,2465,2447,2538,2610,2337,2248,2391,2428,2424,2389,2306,2242,2135,2051,2053,2211,2185,0,1991,1901,2059,2211,2260,2228,2286,2502,2264,2132,2278,2246,2225,2146,2008,2188,2097,2183,2218,2147,2170,2279,2201,2252,2111,2186,2067,2116,1889,1820,1931,2034,2057,1977,1972,1938,1909,1874,1838,2000,0,1819,1835,1843,1943,1854,1957,2075,2055,2044,1873,1829,2016,1990,2296,2235,2111,2160,2096,0,2067,1969,1850,1867,1960,1905,2243,2476,2687,2362,2606,2310,2561,2414,2162,2223,2261,2182,2085,2007,1914,1906,0,1856,1908,1907,1843,1898,1922,1916,1784,1709,1694,1677,1635,1729,1667,1680,1965,1900,1702,1591,1608,1781,1863,2010,1706,1703,1776,1687,1682,1686,1721,1810,1684,1617,1673,1729,1851,2011,1906,1801,1753,0,1578,1455,1473,1399,1392,1364,1384,1483,1460,1389,1439,1354,1389,1323,1283,1338,1417,1373,1341,1347,0,1349,1416,1537,1491,1509,1487,1358,1353,1330,1352,1333,1372,1402,1362,1388,1401,1327,1459,1331,0,1386,1602,1633,1725,1586,1600,1614,1584,1508,1480,1634,1684,1782,1742,1708,1703,1602,1714,1568,1512,1442,1383,0,1310,1396,1434,1443,1394,1384,1422,1353,1288,1395,1408,1418,1502,1724,1722,1682,1914,1840,1733,1766,1772,1999,1841,1838,1753,1772,1708,1626,1679,1930,1734,1779,1960,2082,2136,2055,1905,2050,2112,2127,1977,0,1688,1558,1510,1487,1484,1443,1540,1423,1481,1415,1409,1423,1382,1339,1329,1289,1256,1269,1264,1300,0,1263,1306,1286,1300,1305,1247,1266,1204,1217,1244,1231,1250,1249,1379,1355,1309,1296,1239,1249,1240,1322,1398,1407,1342,1302,1279,1273,1242,1267,1383,1477,1419,1337,1322,1259,1307,1347,1328,1362,1330,0,1415,1388,1365,1309,1285,1274,1292,1389,1595,1441,1419,1426,1531,1527,1457,1375,1373,1346,1369,0,1317,1346,1453,1445,1439,1478,1519,1386,1380,1444,1455,1439,1386,1307,1300,1302,1317,1341,1273,1299,1366,1462,1440,1654,1609,1528,1510,1562,1506,1740,1915,1830,1811,1808,1883,1687,1583,1562,1608,1501,1470,0,1538,1474,1355,1344,1320,1299,1273,1258,1363,1338,1240,1244,1194,1214,1191,1232,1303,1189,1283,1420,1419,0,1319,1314,1264,1259,1223,1274,1293,1204,1191,1251,1273,1227,1335,1310,1336,1288,1242,1229,1249,1214,1193,1208,1235,1241,1251,1285,1291,1247,1312,1328,1443,1591,1650,1484,1469,1833,1842,1638,1646,1721,0,1823,2359,3856,2732,2833,2371,2026,2066,1802,1619,1519,1479,1449,1585,1627,1769,1571,1596,1543,1698,1591,1485,2086,2096,2003,2213,1959,1900,1755,1698,1647,1715,1770,1839,1635,1609,1582,1532,1555,1543,1682,0,1931,1900,2046,1863,2280,2142,2084,2083,2052,1978,2052,1956,1900,1813,1844,1815,1937,1924,2020,1977,1961,2022,0,2205,2209,2057,1627,1517,1496,1497,1473,1406,1404,1615,1553,1629,1735,1681,1540,1478,1411,1412,1357,1342,1329,1343,1344,1272,1408,1433,1357,1380,1374,1452,1570,2409,2361,1822,1686,1469,1471,1621,1716,0,1807,1611,1618,1807,1756,1956,1923,1892,1612,1630,1597,1504,1510,1493,1481,1802,1633,1652,1587,0,1849,1684,1588,1534,1664,1574,1595,1576,1500,1485,1543,1515,1542,1838,1917,1967,1925,2119,0,2294,2383,2180,2522,2332,2800,2717,2390,2492,2165,2048,2187,2003,1995,1919,1754,1707,1833,1866,2165,0,2183,2145,2971,4385,4826,5267,3341,4118,3794,3075,3010,3273,3003,3369,3055,2824,2664,2505,2494,2427,0,2424,2253,2359,2471,2364,2262,2199,1825,1824,1866,1797,1723,1798,1789,2047,2031,2234,1903,1919,1905,1875,1848,1765,1749,1863,1681,1711,1676,1736,1794,2114,1917,2143,2038,2059,1990,1751,1668,1644,1625,0,1672,1662,1642,1773,1682,1589,1573,1630,1718,1726,1709,1663,1645,1675,1652,1544,1551,1496,1511,1596,1611,0,2060,1762,1789,1669,1678,1543,1606,1478,1444,1468,1503,1503,1558,1575,1670,1423,1484,1479,1492,1432,1541,1754,1642,1542,1523,1521,1508,1536,1467,1472,1558,1638,1580,1575,1549,1603,1672,1633,1674,1532,1606,0,1615,1660,1657,1636,1722,1625,1645,2205,1893,2042,2048,2459,2106,1831,1767,1862,1730,1641,1580,1642,1711,1735,0,1729,1894,1786,1980,1925,1773,1730,1753,2054,2016,2250,2424,2351,2636,2374,2059,1857,1725,1622,1731,1650,1613,1575,1528,1665,1688,1586,1500,1588,1648,0,1792,1676,1505,1406,1384,1343,1361,1415,1432,1501,1455,1494,1471,1533,1547,1450,1507,1596,1667,1584,1586,2046,1704,1562,1577,1605,1621,1648,1679,1755,1646,1797,1929,2157,1762,1737,1781,1765,2074,2062,2037,1956,2028,1921,2135,1949,1794,1863,1980,2132,2356,2123,2337,2966,2508,2555,2432,2713,2724,2369,2245,2459,2429,2746,2617,2694,2534,2818,3075,3037,2544,2461,2415,2417,2601,2103,1950,1933,1903,1836,1806,1784,1751,1890,2029,1874,1898,1864,1817,1781,1836,1693,1700,1818,1743,1725,1706,1718,1836,1794,1787,1733,1826,1770,1807,1738,1668,1681,1694,1633,1564,1533,1600,1579,1605,1519,2018,1869,1977,2208,1954,1775,1605,1631,1843,1645,1737,1950,1951,1906,1853,1754,1646,1638,1606,1567,1621,1668,1581,1505,1705,1638,1569,1658,1852,1856,1691,1685,1886,1851,1873,1827,2030,1734,1605];
+const RV30=[1046,1584,1595,1618,1658,2010,2087,2033,2083,2137,2088,2106,2140,2191,2244,2323,2322,2361,2419,2470,2434,2428,2397,2111,2144,2014,1919,1862,1908,1880,1872,1866,1889,1890,1844,1820,1634,1669,1613,1981,2009,2028,2066,2088,2160,2206,2130,2160,2192,2068,2085,2124,2173,2226,2144,2143,2153,2196,2247,2128,2175,1795,1797,1798,1707,1597,1434,1301,1334,1245,1245,1219,1196,1122,1095,1100,1027,1043,1041,985,825,844,861,863,814,832,853,814,983,1108,1088,1116,1145,1102,1008,1039,1045,1067,1180,1177,1182,1206,1439,1471,1622,1648,1656,1680,1675,1635,1666,1590,1591,1596,1631,1651,1554,1480,1517,1552,1547,1772,1541,1547,1423,1571,1562,1694,1693,1731,1722,1758,1758,1800,1840,1799,1799,1835,1879,1819,1827,1870,1707,1741,1466,1493,1458,1420,1284,1304,1220,1227,1204,1234,1165,1220,1223,1136,1165,1165,1179,1221,1237,1119,1067,1086,1107,1058,917,954,985,998,988,1275,1332,1418,1405,1434,1393,1416,1380,1376,1358,1337,1337,1338,1350,1360,1326,1312,1346,1352,1360,1247,1219,966,897,746,736,674,809,744,763,826,848,854,874,896,856,890,902,872,864,912,985,996,1020,985,990,1006,1031,941,1104,1092,1144,1154,1177,1133,1142,1156,1169,1169,1151,1145,1135,1097,1042,1040,1041,1058,1050,954,807,807,823,765,785,794,846,854,855,826,784,767,757,774,764,781,819,833,852,882,849,826,846,817,991,1072,1071,1077,1059,1228,1299,1355,1385,1421,1458,1459,1485,1498,1451,1546,1541,1576,1582,1426,1429,1392,1363,1396,1349,1201,1202,1155,1115,1009,959,956,936,956,933,930,956,787,762,732,696,687,696,712,675,689,1028,997,1020,1313,1398,1410,1437,1469,1623,1637,1644,1684,1708,1761,1781,1815,1856,1904,1979,1990,2037,1922,1841,1728,1675,1639,1654,1681,1520,1524,1540,1543,1473,1531,1430,1434,1422,1514,1436,1545,1569,1483,1493,1713,1752,1795,1856,2033,1923,1971,2016,2005,2080,2183,2180,2237,2186,2173,2190,2140,2209,2224,2356,2407,2306,2258,2253,2246,2139,2188,2495,2484,2474,2450,2412,2542,2517,2550,2499,2550,2462,2387,2393,2317,2269,2267,2182,2227,2265,2002,1992,1800,1836,1824,1856,1758,1627,1613,1598,1620,1650,1870,1848,1887,2048,2186,2533,2538,2602,2674,2911,2898,2965,3041,3098,3096,3175,3224,3439,3402,3402,3445,3384,3301,3224,3329,3294,3102,3040,3102,2984,2787,2850,2520,2654,2789,2858,2809,3034,3160,2825,2886,2960,2946,2955,3128,3129,3080,2945,2950,2952,2968,2894,2921,2897,2839,2697,2220,2218,2260,1999,2053,2003,2027,2046,1789,1957,1874,1939,1968,1990,1936,1933,1913,1960,1964,1941,2018,2063,2008,1916,1687,1731,1739,1751,1824,1844,2000,2002,1987,1961,1951,1914,1959,2006,2056,2063,2005,2054,2013,2481,2512,2512,2573,2596,2476,2492,2555,2570,2323,2322,2398,2435,2492,2528,2710,2810,2868,2888,2754,2466,2584,2615,2666,2713,2702,2754,2803,2811,2755,2761,2805,2780,2803,2699,2524,2564,2600,2468,2472,3053,3067,3012,2976,2748,2722,2716,2765,2707,2601,2602,2588,2645,2571,2704,2700,2553,2590,2611,2588,2594,2504,1733,1744,1734,1911,1935,1980,2024,2007,2015,2013,2063,1989,2075,1793,1837,1885,1750,1722,1895,1925,1959,1861,1847,1840,1659,1644,1670,1694,1747,1714,1750,1708,1655,1578,1619,1747,1762,1758,1610,1653,1664,1607,1642,1679,1675,1592,1607,1507,1576,1586,1627,1621,1661,1531,1470,1529,1482,1475,1486,1555,1592,1600,1640,1633,1735,1774,1750,1792,1706,1717,1748,1753,1736,1743,1803,1827,1785,1719,1643,1681,1595,1545,1476,1433,1415,1319,1293,1198,1129,972,991,993,1101,1285,1225,1239,1159,1190,1202,1356,1383,1336,1337,1331,1285,1315,1333,1370,1371,1388,1422,1430,1358,1420,1293,1290,1274,1251,1325,1331,1192,1145,1154,1145,1172,1201,1206,1259,1197,1181,1211,1207,1147,1148,1134,1061,1077,1137,1118,1021,997,1033,1029,1032,1059,1018,1032,1032,960,976,964,946,961,946,904,848,912,920,838,936,933,914,931,973,947,913,889,911,999,1004,1001,998,1023,1064,1157,1179,1185,1166,1238,1236,1145,1168,1183,1148,1144,1119,1146,1175,1143,1110,1158,1153,1183,1152,1284,1228,1160,1165,1210,1119,1114,1141,1169,1202,1243,1267,1297,1256,1258,1268,1265,1221,1297,1326,1357,1264,1292,1340,1309,1318,1334,1364,1422,1488,1497,1532,1514,1432,1448,1535,1556,1585,1609,1609,1542,1551,1524,1482,1497,1412,1381,1407,1279,1267,1228,1067,1041,1014,1044,1052,1039,901,997,755,753,771,789,914,980,973,997,983,982,986,1000,1007,1030,1036,1028,1017,1035,1108,1097,988,1009,1036,1018,1045,998,948,974,915,914,938,959,1147,1170,1194,1223,1104,1104,1103,1130,1160,1226,1223,1215,1168,1155,1356,1356,1377,1412,1327,1339,1245,1198,1167,1175,1224,1213,1242,1259,1259,1168,1145,1155,1172,1152,1152,935,958,959,958,978,984,970,959,995,1052,1014,1013,1020,981,1099,1122,1126,1151,1137,1136,1158,1187,1232,1238,1248,1278,1341,1357,1418,1383,1361,1344,1355,1315,1321,1253,1206,1207,1192,1217,1209,1121,1080,1104,1119,1094,1094,966,1000,968,888,870,869,870,872,893,908,897,790,804,824,850,851,845,826,809,772,738,729,684,712,727,627,644,660,713,767,733,748,768,877,914,945,969,1273,1279,1335,1367,1395,1441,1499,1626,1654,1913,2057,2036,2063,2105,2085,2146,2093,2126,2164,2064,2083,1962,1999,2010,1930,1922,1877,1863,1789,1587,1557,1649,1492,1521,1548,1465,1471,1391,1426,1320,1439,1433,1437,1422,1359,1364,1348,1381,1373,1112,1150,1173,1037,1045,1037,998,982,990,1020,1020,1024,875,894,905,902,899,911,933,892,1070,1080,1104,1087,1360,1346,1331,1360,1378,1292,1285,1357,1389,1416,1362,1374,1343,1373,1407,1361,1392,1403,1255,1278,1232,1160,786,759,766,808,821,821,812,671,1238,1232,1292,1311,1339,1379,1365,1412,1432,1454,1456,1506,1544,1584,1557,1593,1664,1698,1747,1772,1767,1425,1464,1443,1435,1388,1392,1371,1390,1395,1403,1366,1338,1282,1324,1239,1204,1257,1094,1119,1088,1009,1154,1167,1193,1045,1143,1249,1267,1287,1458,1563,1568,1602,1607,1806,1868,1998,2013,2065,2000,1998,2040,1999,2024,2021,2130,2108,2091,1933,2524,3241,3260,3335,4322,4467,4503,4584,4640,4492,4477,4568,4680,4802,4716,4769,4759,4875,4949,4708,4713,4736,4522,4071,3890,3862,2310,2032,1985,2188,2193,2062,2113,1929,1738,1665,1550,1567,1688,1682,1682,1702,1662,1588,1574,1605,1631,1673,1155,1137,1202,1222,1228,1247,1270,1131,1160,1168,1014,1010,1026,1052,1016,1036,1061,1072,1035,1039,1022,1026,1044,986,896,867,867,886,828,730,743,707,704,653,664,862,836,950,950,965,983,999,1032,1023,1021,1027,1052,1024,1033,1118,1144,1164,1130,1131,1150,1170,1045,936,965,938,961,945,908,873,865,887,904,878,869,880,891,734,734,740,764,774,761,692,670,623,630,653,654,1131,1120,1148,1209,1227,1239,1258,1278,1274,1276,1299,1318,1334,1337,1375,1372,1404,1439,1428,1470,1457,1489,1175,1121,1254,1246,1256,1275,1242,1351,1381,1399,1407,1428,1459,1471,1463,1498,1440,1383,1379,1358,1393,1244,1243,1298,1191,1222,1188,1183,1214,1112,1083,932,899,866,867,856,875,869,891,913,922,921,918,939,876,852,851,751,717,658,1053,1058,1051,1080,1043,1043,1020,1045,1045,1106,1281,1313,1326,1276,1382,1371,1402,1439,1181,1138,1150,1180,1226,1232,1242,1271,1296,1287,1268,1341,1305,1147,1122,1235,1253,1161,1191,1257,1344,1373,1385,1347,1452,1538,1562,1593,1824,1797,1820,1854,1837,1930,1939,1939,1911,1949,1915,1915,1900,1945,1920,1834,1835,1846,1785,1723,1643,1353,1334,1367,1414,1418,1179,1189,1218,1132,1092,1140,1163,1112,1138,1118,1071,1087,1078,1072,1076,1079,1046,1069,1042,1012,1280,1306,1306,1368,1490,1487,1499,1469,1581,1604,1601,1641,1680,1628,1630,1659,1700,1705,1704,1728,1768,1516,1476,1501,1395,1288,1310,1145,1141,1116,1083,1068,1029,1029,1054,1077,1039,1146,1170];
+const RVS={"n":1439,"vix":19.78,"rv":15.31,"gap":4.48,"med":4.74,"pct":87.6,"up":1261,"g0":"2025-03-25","gv":17.07,"gr":47.69};
+const UV={"d0":"2020-08-03","d":[4,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,5,10,7,7,7,7,7,7,7,7,7,7,7,6,8,7,7,6,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,6,9,7,7,7,7,7,7,7,7,7,7,7,7,7,6,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,5,8,8,7,7,7,7,7,7,7,7,7,7,6,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,8,7,7,7,7,7,7,7,5,9,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,5,9,7,7,6,8,7,7,7,7,7,6,8,7,7,7,7,7,7,7,7,7,6,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,5,9,7,7,7,7,7,7,7,7,7,7,7,7,6,8,7,7,7,7,7,7,6,8,7,7,7,7,7,7,7,7,7,6,8,6,8,7,7,7],"u":[100.0,90.02,84.43,80.09,84.84,101.6,83.67,78.04,83.51,84.47,67.94,67.62,67.26,86.85,58.93,52.45,50.4,45.98,44.49,47.95,44.13,43.36,45.41,40.99,43.77,41.03,58.89,40.47,37.85,35.44,38.37,35.04,31.05,27.07,23.65,21.68,19.47,18.1,18.66,17.58,16.25,17.14,17.7,14.53,13.73,12.1,14.43,11.08,10.91,11.18,11.8,11.53,11.49,10.37,9.272,9.996,8.962,8.54,9.586,9.437,8.222,9.344,8.29,7.309,6.754,6.625,6.34,6.13,6.404,8.604,9.461,5.986,6.476,5.696,5.08,5.093,4.94,6.915,6.814,5.881,6.782,6.838,6.589,7.985,8.021,6.158,5.459,5.121,5.265,5.374,6.163,7.349,6.975,6.472,6.436,5.716,5.422,5.953,6.521,5.784,5.623,5.221,5.012,4.702,4.143,3.97,3.673,3.773,4.183,4.127,3.761,4.183,4.759,5.02,5.113,5.274,4.855,4.035,3.821,3.697,3.508,3.113,2.86,3.146,3.049,2.836,2.767,2.55,2.168,2.208,1.959,1.963,2.18,2.056,2.188,1.834,2.418,2.607,2.18,1.879,1.766,1.601,1.508,1.428,1.476,1.4,1.299,1.287,1.054,0.9051,0.8568,0.8166,0.7655,0.7896,0.6987,0.6866,0.6488,0.7767,0.6887,0.7695,0.6983,0.5716,0.5732,0.5475,0.6356,0.6512,0.6613,0.7309,0.7731,0.7957,0.5483,0.498,0.4481,0.4055,0.3982,0.3817,0.3616,0.3761,0.3395,0.3387,0.3154,0.3202,0.3041,0.317,0.288,0.2973,0.2824,0.2723,0.2981,0.2884,0.257,0.2534,0.2904,0.3043,0.3253,0.2632,0.243,0.2225,0.2037,0.1994,0.2179,0.1955,0.1983,0.1986,0.1895,0.1773,0.1693,0.2046,0.208,0.315,0.2433,0.1805,0.1837,0.1751,0.2438,0.1966,0.1892,0.2077,0.2207,0.2265,0.2087,0.2335,0.2423,0.1684,0.1776,0.1728,0.155,0.1499,0.1537,0.1798,0.1605,0.1581,0.1862,0.155,0.1437,0.1488,0.1546,0.1438,0.1561,0.1676,0.1918,0.191,0.1736,0.1894,0.3224,0.3224,0.2856,0.2371,0.2233,0.2173,0.1731,0.2079,0.1816,0.166,0.187,0.1778,0.152,0.1486,0.1371,0.1364,0.1241,0.1401,0.1165,0.1088,0.09582,0.09686,0.09364,0.08632,0.08447,0.08319,0.08439,0.1006,0.09726,0.08214,0.08375,0.08817,0.08705,0.09715,0.0771,0.07207,0.06808,0.06219,0.05915,0.05617,0.05506,0.05725,0.05707,0.06008,0.06599,0.06518,0.06206,0.06375,0.08697,0.08396,0.0869,0.09924,0.0814,0.06734,0.06137,0.06389,0.05924,0.05815,0.0576,0.05298,0.04629,0.04928,0.04618,0.04191,0.04373,0.03992,0.03731,0.04085,0.04029,0.03744],"v":[24.47,22.24,21.82,22.18,22.68,30.35,26.63,25.81,26.02,27.46,24.82,26.85,27.32,38.06,24.89,23.13,23.53,20.89,20.62,23.48,21.7,21.4,23.24,21.56,23.75,21.62,33.21,20.95,19.98,21.79,27.29,24.82,20.77,20.71,18.88,17.34,16.64,16.08,16.97,17.49,16.8,18.95,20.24,16.76,16.48,15.72,20.66,15.39,14.98,16.24,18.22,17.09,18.27,16.26,15.27,18.37,16.34,16.28,21.02,20.83,17.84,21.36,18.75,16.29,15.37,16.27,16.39,16.31,18.09,26.71,30.72,18.71,21.81,18.05,17.04,18.95,19.21,29.23,27.3,23.26,27.97,28.09,27.61,31.7,31.04,24.08,20.82,19.43,21.33,22.54,28.05,34.1,30.15,28.85,29.53,25.59,25.12,28.06,30.98,27.36,26.8,24.84,24.13,22.96,21.5,20.86,19.57,20.44,25.57,25.7,22.93,26.14,29.74,31.91,31.22,32.14,29.95,26.01,24.65,22.48,23.06,20.53,19.01,22.86,22.46,20.97,21.7,21.11,18.2,19.77,18.38,18.43,20.55,19.9,21.6,18.5,24.76,25.61,21.82,19.14,18.43,17.09,16.67,15.91,17.06,16.86,16.73,18.01,14.55,13.84,13.54,13.38,13.47,14.91,13.3,13.62,13.31,17.25,15.08,17.42,15.68,13.1,13.94,13.95,17.22,17.66,17.53,19.3,21.36,21.27,15.1,14.23,13.82,12.56,12.63,12.47,12.31,13.09,12.4,13.42,12.67,13.37,13.28,13.88,12.92,14.26,13.75,13.17,14.78,14.55,13.02,12.99,16.09,17.4,18.83,15.01,13.55,12.58,11.94,11.89,14.2,12.23,12.51,13.1,12.49,12.35,12.47,16.5,16.38,23.59,20.26,14.79,15.71,14.85,22.13,16.47,16.09,16.82,18.63,20.52,18.13,20.2,22.05,14.96,16.15,15.4,13.57,12.72,13.74,18.22,16.21,16.11,19.56,15.97,14.81,16.52,16.64,14.85,18.38,21.19,23.32,21.65,19.19,21.65,43.85,37.94,30.03,25.05,22.53,21.99,17.23,22.34,18.75,16.81,21.14,20.59,16.25,16.42,16.3,16.45,14.96,20.6,15.43,15.03,14.23,15.41,15.23,14.72,15.49,15.32,16.57,22.05,21.06,16.41,17.11,19.25,20.16,23.74,16.22,15.28,15.88,15.05,13.61,14.55,14.5,15.86,15.77,17.55,21.57,20.62,19.21,19.8,29.66,27.24,27.46,30.75,24.15,19.33,17.51,18.64,17.0,17.18,18.26,16.81,15.33,20.18,17.75,16.45,18.53,16.06,15.05,18.52,18.51,16.05],"h":[100.0,86.56,83.53,85.54,88.11,132.4,107.8,102.8,103.1,111.8,95.56,107.4,109.9,175.5,91.08,80.82,82.79,69.15,67.74,82.06,72.64,70.43,79.58,69.77,80.05,69.37,127.0,62.41,57.97,65.81,88.66,74.98,57.0,56.32,48.59,41.96,39.38,37.35,39.99,41.82,39.14,44.08,48.45,36.3,35.18,32.56,48.5,30.84,29.56,32.66,38.64,34.09,37.52,31.24,28.38,36.4,30.04,29.86,43.45,42.44,32.88,42.26,34.51,27.77,25.41,27.56,27.8,27.43,32.0,55.06,63.79,29.12,36.12,26.91,24.65,28.6,28.93,53.3,47.77,36.11,46.57,46.23,44.86,54.16,51.96,35.11,28.11,25.29,28.83,30.95,42.1,55.17,44.33,40.97,41.92,33.68,32.73,38.45,43.46,36.0,34.84,31.04,29.57,27.39,24.69,23.46,21.22,22.62,31.04,31.26,26.23,31.73,38.34,42.39,40.9,42.64,38.33,30.96,28.55,24.7,25.62,21.48,19.02,24.96,24.07,21.59,22.71,21.72,17.25,19.48,17.45,17.41,20.42,19.33,21.67,17.12,26.15,26.91,21.01,17.22,16.25,14.47,13.91,12.77,13.93,13.66,13.45,14.92,10.73,9.94,9.573,9.384,9.462,10.98,9.217,9.542,9.146,13.37,10.89,13.45,11.41,8.67,9.496,9.464,12.88,13.27,13.01,14.9,17.18,16.98,9.893,9.01,8.609,7.451,7.509,7.356,7.206,7.869,7.249,8.133,7.454,8.03,7.934,8.47,7.599,8.7,8.205,7.685,9.113,8.862,7.487,7.451,10.17,11.34,12.7,8.963,7.653,6.843,6.294,6.222,8.075,6.435,6.633,7.084,6.587,6.472,6.561,9.914,9.553,16.1,11.02,6.778,7.336,6.693,11.7,7.441,7.133,7.599,8.752,9.962,8.248,9.675,10.98,5.963,6.638,6.142,5.07,4.595,5.133,7.182,5.946,5.835,7.739,5.646,5.035,5.833,5.826,4.9,6.673,8.225,9.348,8.139,6.748,7.982,21.28,14.96,10.27,7.721,6.57,6.314,4.308,6.297,4.789,4.038,5.637,5.369,3.734,3.791,3.731,3.777,3.268,5.166,3.299,3.159,2.874,3.228,3.143,2.984,3.212,3.145,3.534,5.268,4.757,3.231,3.434,4.063,4.305,5.416,3.009,2.743,2.887,2.638,2.264,2.5,2.481,2.828,2.699,3.165,4.25,3.857,3.46,3.578,6.357,5.5,5.47,6.422,4.408,3.082,2.655,2.897,2.514,2.548,2.784,2.454,2.134,3.136,2.542,2.235,2.656,2.137,1.932,2.606,2.583,2.051]};
+const UVS={"u0":62150.0,"u1":23.27,"v0":24.47,"v1":16.05,"left":0.0374,"lev":2.051,"d0":"2020-08-03","d1":"2026-07-31"};
+/* DATA:end */
+
+const DATES=(()=>{ const o=[D0]; let t=Date.parse(D0+'T00:00:00Z'); for(const ch of GAP){ t+=(+ch)*864e5; o.push(new Date(t).toISOString().slice(0,10)); } return o; })();
+const vixAt=i=>VIXC[i]>0?VIXC[i]/100:null;
+const rvAt=i=>i<RV30.length?RV30[i]/100:null;
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 动画共用 ══════════ */
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+function segOn(id,fn){
+  const bs=document.querySelectorAll('#'+id+' button');
+  bs.forEach(b=>b.addEventListener('click',()=>{ bs.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(b.dataset); }));
+}
+/* 按帧推进：每 ms 毫秒走一步，直到 done() */
+function runLoop(s,ms,step,draw,done){
+  s.playing=true; s.last=0; s.acc=0; const id=(s.id=(s.id||0)+1);
+  const tick=t=>{
+    if(!s.playing||s.id!==id) return;
+    const dt=s.last?Math.min(t-s.last,100):ms; s.last=t; s.acc+=dt;
+    while(s.acc>=ms && !done()){ step(); s.acc-=ms; }
+    draw();
+    if(done()){ s.playing=false; return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+/* 一个动画的播放器：p 从 0 走到 n，每步 ms 毫秒走 inc */
+function player(n,ms,inc,draw){
+  const s={p:n,playing:false};
+  function start(){
+    s.playing=false;
+    if(reduced){ s.p=n; draw(s.p); return; }
+    s.p=0; runLoop(s,ms,()=>{ s.p=Math.min(n,s.p+inc); },()=>draw(s.p),()=>s.p>=n);
+  }
+  return {s,start,draw:()=>draw(s.p,true),setN(v){ n=v; }};
+}
+
+/* ══════════ 一 · 方差合约逐天结算 ══════════ */
+const VS=(()=>{
+  const W=720, L=58, R=704, T1=28, B1=172, T2=222, B2=346;
+  let key='crash';
+  function running(w){ let acc=0; return w.r.map((x,i)=>{ acc+=(x/100)**2; return Math.sqrt(252/(i+1)*acc)*100; }); }
+  function draw(p){
+    const w=WIN[key], n=w.r.length, rv=running(w), k=Math.min(n,p), kd=Math.floor(k);
+    const am=Math.max(...w.r.map(Math.abs))*1.18, bw=(R-L)/n, day1=w.vix/Math.sqrt(252);
+    const Y1=v=>(T1+B1)/2-v/am*(B1-T1)/2;
+    const vmax=Math.max(w.vix,...rv)*1.14, Y2=v=>B2-v/vmax*(B2-T2);
+    const xc=i=>L+(i+.5)*bw;
+    let g='';
+    g+=lab(L,T1-12,'每天的对数涨跌（%）','var(--ink-soft)','start',11.5);
+    g+=`<line x1="${L}" y1="${Y1(0)}" x2="${R}" y2="${Y1(0)}" stroke="var(--ink-faint)"/>`;
+    g+=lab(L-7,Y1(0)+4,'0','var(--ink-faint)','end',10.5);
+    [day1,-day1].forEach(v=>{ g+=`<line x1="${L}" y1="${Y1(v)}" x2="${R}" y2="${Y1(v)}" stroke="var(--result)" stroke-width="1.2" stroke-dasharray="2 4"/>`; });
+    g+=lab(R,T1-12,`约定价折成一天：${f2(w.vix)} ÷ √252 ＝ ±${f2(day1)}%`,'var(--result)','end',10.5);
+    let pl=null;                                  // 上一个数字标签：相邻两根同向时错开一行
+    for(let i=0;i<n;i++){
+      const f=Math.max(0,Math.min(1,k-i)); if(f<=0) break;
+      const v=w.r[i], out=Math.abs(v)>day1, y0=Y1(0), y1=Y1(v*f);
+      g+=`<rect x="${(L+i*bw+bw*.16).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${(bw*.68).toFixed(1)}" height="${Math.max(Math.abs(y1-y0),1).toFixed(1)}" rx="1.5" fill="${out?'var(--control)':'var(--ink-faint)'}" fill-opacity="${out?1:.55}"/>`;
+      if(f===1 && Math.abs(v)>=2.4){
+        let y=v>0?y1-5:y1+3+10*FS;
+        if(pl&&pl.i===i-1&&pl.up===(v>0)) y= v>0 ? Math.min(y,pl.y-11*FS) : Math.max(y,pl.y+11*FS);
+        g+=lab(xc(i),y,(v>0?'+':'−')+Math.abs(v).toFixed(2),'var(--control)','middle',10);
+        pl={i,up:v>0,y};
+      }
+    }
+    // 下半：到这一天为止的实际波动率
+    g+=lab(L,T2-12,'到这一天为止的实际波动率（%，年化）','var(--ink-soft)','start',11.5);
+    const step=vmax>40?10:vmax>20?5:2;
+    for(let v=0;v<=vmax;v+=step){ g+=`<line x1="${L}" y1="${Y2(v)}" x2="${R}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.1}"/>`; g+=lab(L-7,Y2(v)+4,v,'var(--ink-faint)','end',10); }
+    g+=`<line x1="${L}" y1="${Y2(w.vix)}" x2="${R}" y2="${Y2(w.vix)}" stroke="var(--result)" stroke-width="1.8" stroke-dasharray="7 5"/>`;
+    g+=lab(R,Y2(w.vix)-6,`约定价：开始那天的 VIX ${f2(w.vix)}`,'var(--result)','end',10.5);
+    if(kd>=1){
+      let pts=[]; for(let i=0;i<kd;i++) pts.push(xc(i).toFixed(1)+','+Y2(rv[i]).toFixed(1));
+      g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.4" stroke-linejoin="round"/>`;
+      g+=`<circle cx="${xc(kd-1)}" cy="${Y2(rv[kd-1])}" r="4" fill="var(--control)"/>`;
+      if(kd===n) g+=lab(xc(n-1)-8,Y2(rv[n-1])+(rv[n-1]>w.vix?-10:18),`结算 ${f2(w.settle)}`,'var(--control)','end',11.5,600);
+    }
+    for(let i=0;i<n;i++) if(i%3===0||i===n-1) g+=lab(xc(i),B2+18,w.d[i],'var(--ink-faint)','middle',10);
+    $('vs').innerHTML=g;
+    // 读数
+    const i=Math.max(0,Math.ceil(k)-1);
+    if(k<=0){ $('vsD').textContent=md(w.t0); $('vsDb').textContent='开始那天'; $('vsR').textContent=''; $('vsV').textContent=''; }
+    else { $('vsD').textContent=w.d[i]; $('vsDb').textContent=`第 ${i+1} 个交易日，共 ${n} 个`; $('vsR').textContent=sgn(w.r[i])+'%'; $('vsV').textContent=f2(rv[i])+'%'; }
+    $('vsK').textContent=f2(w.vix)+'%'; $('vsKb').textContent=`方差 ${f1(w.vix**2)}`;
+    const say=$('vsSay');
+    if(k<n){ say.textContent=''; return; }
+    const K2=w.vix**2, S2=w.settle**2, sq=w.r.map(x=>x*x), tot=sq.reduce((a,b)=>a+b,0), top3=[...sq].sort((a,b)=>b-a).slice(0,3).reduce((a,b)=>a+b,0);
+    if(key==='crash'){
+      say.textContent=`${w.t0} 起的 30 天，开始那天 VIX ${f2(w.vix)}，约定价 ${f1(K2)} 方差点。4/3、4/4 两天分别跌 ${f2(-w.r[6])}% 和 ${f2(-w.r[7])}%，4/9 涨 ${f2(w.r[10])}%。${n} 个交易日走完，实际波动率 ${f2(w.settle)}%，方差 ${f1(S2)}：买方付 ${f1(K2)}、拿回 ${f1(S2)}，赚 ${f1(S2-K2)} 方差点，是约定价的 ${(S2/K2-1).toFixed(1)} 倍。涨跌先平方再加，大的日子占大头：最大的三天占了全部平方和的 ${f1(top3/tot*100)}%。`;
+    } else {
+      say.textContent=`${w.t0} 起的 30 天，开始那天 VIX ${f2(w.vix)}，约定价 ${f1(K2)} 方差点。${n} 个交易日里最大的一天只动了 ${f2(Math.max(...w.r.map(Math.abs)))}%，实际波动率 ${f2(w.settle)}%，方差 ${f1(S2)}：买方付 ${f1(K2)}、拿回 ${f1(S2)}，亏 ${f1(K2-S2)} 方差点。这是常见的一个月，第六节会看到，六年里 ${f1(RVS.pct)}% 的日子，之后 30 天的实际波动率低于当天的 VIX。`;
+    }
+  }
+  const P=player(21,16.7,16.7/300,draw);
+  segOn('vsSeg',d=>{ key=d.k; P.setN(WIN[key].r.length); P.start(); });
+  $('vsPlay').addEventListener('click',P.start);
+  return {start:P.start, draw:P.draw, el:$('vs')};
+})();
+
+/* ══════════ 二 · 恒定 vega：逐档叠加 ══════════ */
+const VGA=(()=>{
+  const W=720, L=58, R=704, PAN=[[34,196],[258,420]], S0=200, S1=500, NS=151;
+  const Ss=Array.from({length:NS},(_,i)=>S0+i*(S1-S0)/(NS-1));
+  const Ks=[]; for(let K=VG.k0;K<=VG.k1;K+=VG.dk) Ks.push(K);
+  const t=VG.days/365, sg=VG.sig, st=sg*Math.sqrt(t);
+  const vega=(S,K)=>{ const d1=(Math.log(S/K)+st*st/2)/st; return S*npdf(d1)*Math.sqrt(t)/100; };
+  const M=Ks.map(K=>Ss.map(S=>vega(S,K)));
+  const WTS=[Ks.map(()=>1), Ks.map(K=>(VG.ref/K)**2)];
+  const CUM=WTS.map(w=>{ const c=[new Float64Array(NS)]; for(let j=0;j<Ks.length;j++){ const p=c[j], q=new Float64Array(NS); for(let i=0;i<NS;i++) q[i]=p[i]+w[j]*M[j][i]; c.push(q); } return c; });
+  const at=(c,S)=>{ const f=(S-S0)/(S1-S0)*(NS-1), i=Math.floor(f); return c[i]+(c[Math.min(NS-1,i+1)]-c[i])*(f-i); };
+  const YM=[Math.ceil(Math.max(...CUM[0][Ks.length])/2)*2, 8];
+  const X=S=>L+(S-S0)/(S1-S0)*(R-L);
+  const TITLE=['每个行权价各买一张','按 (350 ÷ K)² 张买：175 买 4 张，350 买 1 张，700 买 0.25 张'];
+  let lastK=-1;
+  function draw(p,force){
+    const k=Math.min(Ks.length,Math.floor(p));
+    if(k===lastK && !force) return;
+    lastK=k;
+    let g='';
+    PAN.forEach(([T,B],pi)=>{
+      const ym=YM[pi], Y=v=>B-v/ym*(B-T), c=CUM[pi];
+      g+=lab(L,T-12,TITLE[pi],'var(--ink-soft)','start',11.5,600);
+      for(let v=0;v<=ym;v+=2){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.1}"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10); }
+      for(let j=0;j<k;j++){
+        const lo=c[j], hi=c[j+1]; let mx=0; for(let i=0;i<NS;i++) mx=Math.max(mx,hi[i]-lo[i]);
+        if(mx<ym*.002) continue;
+        let d='M'; for(let i=0;i<NS;i++) d+=`${X(Ss[i]).toFixed(1)},${Y(hi[i]).toFixed(1)} `;
+        for(let i=NS-1;i>=0;i--) d+=`L${X(Ss[i]).toFixed(1)},${Y(lo[i]).toFixed(1)} `;
+        const cur= k<Ks.length ? j===k-1 : Ks[j]===VG.ref;
+        g+=`<path d="${d}Z" fill="${cur?'var(--control)':'var(--result)'}" fill-opacity="${cur?.95:(j%2?.3:.52)}"/>`;
+      }
+      if(k>0){ let pts=[]; for(let i=0;i<NS;i++) pts.push(X(Ss[i]).toFixed(1)+','+Y(c[k][i]).toFixed(1)); g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>`; }
+      [250,350,450].forEach(S=>{ g+=`<line x1="${X(S)}" y1="${T}" x2="${X(S)}" y2="${B}" stroke="var(--ink-faint)" stroke-width=".8" stroke-dasharray="2 4"/>`; });
+      if(k===Ks.length){
+        const r=at(c[k],350);
+        [250,350,450].forEach(S=>{ const v=at(c[k],S); g+=`<circle cx="${X(S)}" cy="${Y(v)}" r="4" fill="var(--ink)"/>`; g+=lab(X(S),Y(v)-10,(v/r).toFixed(2)+' 倍','var(--ink)','middle',11,600); });
+      }
+      for(let S=200;S<=500;S+=50) g+=lab(X(S),B+17,S,'var(--ink-faint)','middle',10);
+    });
+    g+=lab((L+R)/2,PAN[1][1]+32,'标的价格','var(--ink-faint)','middle',10.5);
+    { const K= k<Ks.length ? (k>0?Ks[k-1]:null) : VG.ref; if(K!==null&&K>=S0&&K<=S1){ const t=(k<Ks.length?'刚加入 K ＝ ':'橙色一层：K ＝ ')+K;
+      g+= FS>1 ? lab(R,PAN[0][0]-12,t,'var(--control)','end',10.5,600) : lab(X(K),PAN[0][1]+30,t,'var(--control)','middle',10.5,600); } }
+    $('vg').innerHTML=g;
+    $('vgN').textContent=`${k} / ${Ks.length} 档`;
+    const rat=c=>[250,350,450].map(S=>(at(c,S)/at(c,350)).toFixed(2)).join(' : ');
+    $('vgA').textContent= k===Ks.length?rat(CUM[0][k]):'';
+    $('vgB').textContent= k===Ks.length?rat(CUM[1][k]):'';
+  }
+  const P=player(Ks.length,16.7,16.7/70,draw);
+  $('vgPlay').addEventListener('click',P.start);
+  return {start:P.start, draw:P.draw, el:$('vg')};
+})();
+
+/* ══════════ 四 · TSLA 5/15：从平值往两边逐张加 ══════════
+   上图：每张期权一根柱，宽 ΔK，高 (2/T)·e^(rT)·Q ÷ K²，面积就是它对 Σ 的贡献；虚线是同一套公式、每档都按平值定价时的高度。
+   下图：真实报价比平的微笑多出的部分，同一个单位 */
+const STA=(()=>{
+  const W=720, L=58, R=704, T=28, B=280, T3=346, B3=446, X0=150, X1=700;
+  const tm=TERM['32'], K0=tm.K0, adj=tm.adj*1e4, n=STRIP.length;
+  const order=STRIP.map((_,i)=>i).sort((a,b)=>Math.abs(STRIP[a][0]-K0)-Math.abs(STRIP[b][0]-K0)||STRIP[a][0]-STRIP[b][0]);
+  const H=STRIP.map(s=>s[4]/s[3]), HF=STRIP.map(s=>s[6]/s[3]), DH=H.map((h,i)=>h-HF[i]);
+  const inR=i=>{ const [K,,,dK]=STRIP[i]; return K+dK/2>=X0 && K-dK/2<=X1; };
+  const ym=Math.max(...H,...HF)*1.1;
+  const dp=Math.max(...DH.filter((_,i)=>inR(i)))*1.15, dn=Math.min(0,...DH.filter((_,i)=>inR(i)))*1.15;
+  const X=K=>L+(Math.max(X0,Math.min(X1,K))-X0)/(X1-X0)*(R-L), Y=v=>B-v/ym*(B-T), Y3=v=>B3-(v-dn)/(dp-dn)*(B3-T3);
+  const tot=STRIP.reduce((a,s)=>a+s[4],0);
+  const colOf=ty=> ty==='P'?'var(--result)':ty==='C'?'var(--control)':'var(--ink)';
+  function draw(p){
+    const k=Math.min(n,Math.floor(p)), on=new Set(order.slice(0,k)), lastI=k<n&&k>0?order[k-1]:-1;
+    let g='';
+    for(let v=0;v<=ym;v+=10){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.1}"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10); }
+    g+=lab(L,T-12,'每 1 美元行权价贡献的方差点','var(--ink-soft)','start',11);
+    g+=lab(L,T3-12,'真实报价比平的微笑多出的部分（同一个单位）','var(--ink-soft)','start',11);
+    const st=Math.abs(dp-dn)>1.2?(FS>1?1:0.5):0.2;
+    for(let v=Math.ceil(dn/st)*st; v<=dp+1e-9; v+=st){ const z=Math.abs(v)<1e-9; g+=`<line x1="${L}" y1="${Y3(v)}" x2="${R}" y2="${Y3(v)}" stroke="${z?'var(--ink-faint)':'var(--rule)'}" stroke-width="${z?1.1:0.7}"/>`; g+=lab(L-7,Y3(v)+4,z?'0':fm(v,st<1?1:0),'var(--ink-faint)','end',10); }
+    STRIP.forEach((s,i)=>{
+      if(!on.has(i) || !inR(i)) return;
+      const [K,ty,,dK]=s, x0=X(K-dK/2), x1=X(K+dK/2), w=Math.max(.6,x1-x0-.6), col=colOf(ty), op=i===lastI?1:.78;
+      g+=`<rect x="${(x0+.3).toFixed(1)}" y="${Y(H[i]).toFixed(1)}" width="${w.toFixed(1)}" height="${(B-Y(H[i])).toFixed(1)}" fill="${col}" fill-opacity="${op}"/>`;
+      const ya=Y3(Math.max(DH[i],0)), yb=Y3(Math.min(DH[i],0));
+      g+=`<rect x="${(x0+.3).toFixed(1)}" y="${ya.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(.5,yb-ya).toFixed(1)}" fill="${col}" fill-opacity="${op}"/>`;
+    });
+    let d=''; STRIP.forEach((s,i)=>{ if(!inR(i)) return; const [K,,,dK]=s; d+=`M${X(K-dK/2).toFixed(1)},${Y(HF[i]).toFixed(1)}H${X(K+dK/2).toFixed(1)}`; });
+    g+=`<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="3 2"/>`;
+    for(let K=150;K<=700;K+=50){ g+=lab(X(K),B+17,K,'var(--ink-faint)','middle',10); g+=lab(X(K),B3+17,K,'var(--ink-faint)','middle',10); }
+    g+=lab((L+R)/2,B3+36,'行权价','var(--ink-faint)','middle',10.5);
+    g+=`<line x1="${X(tm.F)}" y1="${T}" x2="${X(tm.F)}" y2="${B}" stroke="var(--ink-faint)" stroke-width=".9" stroke-dasharray="2 3"/>`;
+    g+=lab(X(tm.F)+5,T+10,'F '+f2(tm.F),'var(--ink-faint)','start',10);
+    g+=lab(R,T+10,'150 以下 11 档、700 以上 28 档画在图外','var(--ink-faint)','end',10);
+    $('st').innerHTML=g;
+    let S=0, nP=0, nC=0; order.slice(0,k).forEach(i=>{ S+=STRIP[i][4]; if(STRIP[i][1]==='P') nP++; if(STRIP[i][1]==='C') nC++; });
+    $('stN').textContent=`${k} / ${n} 张`;
+    $('stNb').textContent=`put ${nP}，K₀ ${k?1:0}，call ${nC}`;
+    $('stS').textContent=f1(S);
+    $('stSb').textContent=`合计 ${f1(tot)}`;
+    $('stV').textContent= S>adj ? f2(Math.sqrt(S-adj))+'%' : '';
+    const say=$('stSay');
+    if(k<n){ say.textContent=''; return; }
+    const sh=t=>STRIP.filter(s=>s[1]===t).reduce((a,s)=>a+s[4],0)/tot*100;
+    const mid=STRIP.filter(s=>Math.abs(s[0]-K0)<=25).reduce((a,s)=>a+s[4],0)/tot*100;
+    say.textContent=`${n} 张加完：Σ ＝ ${f1(tot)} 方差点，减掉修正项 ${f2(adj)}，σ² ＝ ${f1(tot-adj)}，σ ＝ ${f2(tm.sig)}%。离平值最近的 325 到 375 这 11 档占了 ${f1(mid)}%；虚值 put 合计 ${f1(sh('P'))}%，K₀ 一档 ${f1(sh('A'))}%，虚值 call ${f1(sh('C'))}%。和平的微笑比，330 以下的 put 一路高出，380 到 450 的 call 略低，450 以上又高出一点。`;
+  }
+  const P=player(n,16.7,16.7/45,draw);
+  $('stPlay').addEventListener('click',P.start);
+  return {start:P.start, draw:P.draw, el:$('st')};
+})();
+
+/* ══════════ 四 · 表格 ══════════ */
+function renderTables(){
+  $('expList').textContent=EXPS.filter(e=>e[1]>0).map(e=>`${e[0]}（${e[1]} 天）`).join('、');
+  const ref=STRIP.find(s=>s[0]===350);
+  $('exTb').innerHTML=[250,350,450].map(K=>{
+    const s=STRIP.find(x=>x[0]===K), w=(s[3]/K**2)/(ref[3]/350**2);
+    const nm= s[1]==='P'?'put':s[1]==='C'?'call':'call 与 put 平均';
+    return `<tr${K===350?' class="hot"':''}><td>${K}</td><td>${nm}</td><td>${s[2].toFixed(3)}</td><td>${w.toFixed(2)}</td><td>${f2(s[4])}</td><td>${f2(s[5])}%</td></tr>`;
+  }).join('');
+  $('termTb').innerHTML=[['5/8','25'],['5/15','32']].map(([d,k])=>{ const t=TERM[k];
+    return `<tr><td>${d}<br><span class="tiny">离到期 ${k} 天</span></td><td>${f2(t.F)}</td><td>${t.K0}</td><td>${t.n} 张<br>${t.lo} 到 ${t.hi}</td><td>${f2(t.sig)}%</td><td>${f2(t.atf)}%</td></tr>`; }).join('');
+  $('idxV').textContent=f2(IDX.v)+'%';
+  const bars=[['350 call 的隐含波动率<br><span class="tiny">1.2 用的数</span>',46.29,'var(--ink-faint)'],
+    ['5/15 远期价处<br><span class="tiny">8 算的平值</span>',TERM['32'].atf,'var(--ink-faint)'],
+    ['平的微笑代入公式',IDX.flat,'var(--result)'],
+    ['真实报价代入公式<br><span class="tiny">TSLA 30 天指数</span>',IDX.v,'var(--control)']];
+  const mx=60;
+  $('vbars').innerHTML=bars.map(([l,v,c])=>`<div class="vb"><span class="l">${l}</span><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${c}"></div></div><span class="n" style="color:${c}">${f2(v)}%</span></div>`).join('');
+  $('regTb').innerHTML=REG.map(r=>`<tr${r[1]>100?' class="hot"':''}><td>${r[0]}</td><td>${r[1]>=0?'+':'−'}${Math.abs(r[1]).toFixed(1)}</td><td>${f1(r[2])}%</td></tr>`).join('')
+    +`<tr><td><b>合计</b></td><td><b>+${f1(REG.reduce((a,r)=>a+r[1],0))}</b></td><td>100%</td></tr>`;
+  // 五 · 4/13 与 4/15
+  const a=TERM['32'], b=D15;
+  const rows=[['TSLA 收盘','352.36',f2(b.S)],['远期价 F',f2(a.F),f2(b.F)],['分界行权价 K₀',a.K0,b.K0],['离到期','32 天','30 天'],
+    ['用到的期权',`${a.n} 张，${a.lo} 到 ${a.hi}`,`${b.n} 张，${b.lo} 到 ${b.hi}`],['算出的 σ',f2(a.sig)+'%',f2(b.sig)+'%']];
+  $('d15Tb').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+  $('d15Say').textContent=`两天里 TSLA 涨了 ${f1((b.S/352.36-1)*100)}%。K₀ 从 ${a.K0} 挪到 ${b.K0}：${b.sw0} 从 call 与 put 平均变成 put，${b.swc0} 到 ${b.swc1} 这 ${b.nswc} 档从 call 换成 put；最低的 95 因为买价掉到 0 被截掉，950 在 4/13 没人出价、4/15 有了买价，新加了进来；离到期少了两天，公式里的 2/T 让每一档的权重都乘上 1.0664。近月那一串 5/8 离到期只剩 23 天，出了 23 到 30 天的范围；4/15 那天 5/15 正好离到期 30 天，指数就只用它一个到期日。`;
+  // 六 · 均值回复
+  $('epTb').innerHTML=EP.map(e=>`<tr${e[1]>38?' class="hot"':''}><td>${e[0]}</td><td>${f2(e[1])}</td><td>${e[2]}</td><td>${e[3]}</td></tr>`).join('');
+}
+
+/* ══════════ 六 · VIX 与之后 30 天的实际波动率 ══════════ */
+const VXA=(()=>{
+  const W=720, L=46, R=704, T=18, B=300, N=RV30.length, ym=60;
+  const X=i=>L+i/(DATES.length-1)*(R-L), Y=v=>B-Math.min(v,ym)/ym*(B-T);
+  const years=[]; DATES.forEach((d,i)=>{ if(i&&d.slice(0,4)!==DATES[i-1].slice(0,4)) years.push(i); });
+  function draw(p){
+    const k=Math.min(N,Math.floor(p));
+    let g='';
+    for(let v=0;v<=ym;v+=10){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.1}"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10); }
+    years.forEach(i=>{ g+=`<line x1="${X(i)}" y1="${B}" x2="${X(i)}" y2="${B+5}" stroke="var(--ink-faint)"/>`; g+=lab(X(i),B+18,DATES[i].slice(0,4),'var(--ink-faint)','middle',10); });
+    let sh='', up=0, both=0;
+    for(let i=0;i<k;i++){ const v=vixAt(i), r=rvAt(i); if(v===null||r===null) continue; both++; if(v>r) up++; else sh+=`M${X(i).toFixed(1)},${Y(v).toFixed(1)}V${Y(r).toFixed(1)}`; }
+    if(sh) g+=`<path d="${sh}" stroke="var(--control)" stroke-opacity=".5" stroke-width="1.2" fill="none"/>`;
+    let dv='', pen=false; for(let i=0;i<k;i++){ const v=vixAt(i); if(v===null){ pen=false; continue; } dv+=(pen?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1); pen=true; }
+    g+=`<path d="${dv}" fill="none" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/>`;
+    let dr=''; for(let i=0;i<k;i++) dr+=(i?'L':'M')+X(i).toFixed(1)+','+Y(rvAt(i)).toFixed(1);
+    g+=`<path d="${dr}" fill="none" stroke="var(--result)" stroke-width="1.2" stroke-linejoin="round"/>`;
+    g+=lab(L+4,T+10,'%','var(--ink-faint)','start',10);
+    if(k>=N){
+      const iR=DATES.indexOf(RVS.g0), iV=VIXC.indexOf(Math.max(...VIXC));
+      g+=`<circle cx="${X(iR)}" cy="${Y(rvAt(iR))}" r="3.5" fill="var(--result)"/>`;
+      g+=lab(X(iR)-8,Y(rvAt(iR))+14,`${RVS.g0} 起：VIX ${f2(RVS.gv)}，之后 30 天 ${f2(RVS.gr)}`,'var(--result)','end',10.5,600);
+      g+=`<circle cx="${X(iV)}" cy="${Y(vixAt(iV))}" r="3.5" fill="var(--ink)"/>`;
+      g+=lab(X(iV)-8,Y(vixAt(iV))+4,`VIX 最高 ${f2(vixAt(iV))}（${DATES[iV]}）`,'var(--ink)','end',10.5,600);
+    }
+    $('vx').innerHTML=g;
+    const i=Math.max(0,k-1);
+    $('vxD').textContent=DATES[i];
+    $('vxV').textContent=vixAt(i)===null?'缺':f2(vixAt(i));
+    $('vxR').textContent=f2(rvAt(i));
+    const say=$('vxSay');
+    if(k<N){ $('vxP').textContent=both?f1(up/both*100)+'%':''; $('vxPb').textContent=`${up} / ${both} 天`; say.textContent=''; return; }
+    $('vxP').textContent=f1(RVS.pct)+'%'; $('vxPb').textContent=`${RVS.up} / ${RVS.n} 天`;
+    say.textContent=`${RVS.n} 天里（VIX 与之后 30 天都有数据的日子），VIX 高于之后 30 天实际波动率的有 ${RVS.up} 天，占 ${f1(RVS.pct)}%。VIX 平均 ${f2(RVS.vix)}，之后的实际平均 ${f2(RVS.rv)}，平均高 ${f2(RVS.gap)} 个点。实际不低于 VIX 的起点集中在 2022 年的 9 个月、2024 年 7 月（之后 30 天里有 8/5 跌 2.98%）、2024 年 12 月（之后 30 天里有 12/18 跌 3.04%）和 2025 年 2 到 3 月（之后赶上 3 月的回调和 4 月的关税）。`;
+  }
+  const P=player(N,16.7,16.7*N/7000,draw);
+  $('vxPlay').addEventListener('click',P.start);
+  return {start:P.start, draw:P.draw, el:$('vx')};
+})();
+
+/* ══════════ 七 · UVXY 与 VIX ══════════ */
+const UVA=(()=>{
+  const W=720, L=58, T=18, B=294, N=UV.u.length;
+  let R=636;                                    // 右边留给期末读数；窄屏字大，多留一些
+  const D=(()=>{ const o=[UV.d0]; let t=Date.parse(UV.d0+'T00:00:00Z'); UV.d.forEach(x=>{ t+=x*864e5; o.push(new Date(t).toISOString().slice(0,10)); }); return o; })();
+  const V=UV.v.map(v=>v/UVS.v0*100);
+  const lo=Math.log10(0.02), hi=Math.log10(400);
+  const X=i=>L+i/(N-1)*(R-L), Y=v=>B-(Math.log10(Math.max(v,0.02))-lo)/(hi-lo)*(B-T);
+  const years=[]; D.forEach((d,i)=>{ if(i&&d.slice(0,4)!==D[i-1].slice(0,4)) years.push(i); });
+  const line=(a,k)=>{ let s=''; for(let i=0;i<k;i++) s+=(i?'L':'M')+X(i).toFixed(1)+','+Y(a[i]).toFixed(1); return s; };
+  function draw(p){
+    const k=Math.max(1,Math.min(N,Math.floor(p)));
+    R=FS>1?606:636;
+    let g='';
+    [0.1,1,10,100].forEach(v=>{ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===100?1.3:0.7}"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10); });
+    years.forEach(i=>{ g+=`<line x1="${X(i)}" y1="${B}" x2="${X(i)}" y2="${B+5}" stroke="var(--ink-faint)"/>`; g+=lab(X(i),B+18,D[i].slice(0,4),'var(--ink-faint)','middle',10); });
+    g+=`<path d="${line(UV.h,k)}" fill="none" stroke="var(--result)" stroke-width="1.6" stroke-dasharray="5 3"/>`;
+    g+=`<path d="${line(V,k)}" fill="none" stroke="var(--ink)" stroke-width="1.6"/>`;
+    g+=`<path d="${line(UV.u,k)}" fill="none" stroke="var(--control)" stroke-width="2.2"/>`;
+    const e=k-1;
+    g+=`<circle cx="${X(e)}" cy="${Y(UV.u[e])}" r="3.5" fill="var(--control)"/>`;
+    g+=lab(X(e)+8,Y(V[e])+4,`VIX ${f1(V[e])}`,'var(--ink)','start',11,600);
+    g+=lab(X(e)+8,Y(UV.h[e])+4,`假想 ${UV.h[e]>=10?f1(UV.h[e]):UV.h[e].toPrecision(2)}`,'var(--result)','start',11,600);
+    g+=lab(X(e)+8,Y(UV.u[e])+4,`UVXY ${UV.u[e]>=10?f1(UV.u[e]):UV.u[e].toPrecision(2)}`,'var(--control)','start',11,600);
+    $('uv').innerHTML=g;
+    $('uvD').textContent=D[e];
+    $('uvV').textContent=f2(UV.v[e]); $('uvVb').textContent=`起点 ＝ 100 时 ${f1(V[e])}`;
+    $('uvU').textContent= UV.u[e]>=1?f1(UV.u[e]):UV.u[e].toPrecision(2);
+    $('uvH').textContent= UV.h[e]>=1?f1(UV.h[e]):UV.h[e].toPrecision(2);
+    const say=$('uvSay');
+    if(k<N){ say.textContent=''; return; }
+    say.textContent=`${UVS.d0} 到 ${UVS.d1}，VIX 从 ${f2(UVS.v0)} 到 ${f2(UVS.v1)}，跌了 ${f1((1-UVS.v1/UVS.v0)*100)}%；UVXY 跌掉 ${f2(100-UVS.left)}%，100 块只剩 ${UVS.left.toPrecision(2)} 块。每天 1.5 倍杠杆本身就会磨损：同样每天 1.5 倍、但跟 VIX 指数本身的假想产品，同期剩 ${f1(UVS.lev)}。UVXY 跟的是期货，只剩这个假想产品的 1/${Math.round(UVS.lev/UVS.left)}。这里的推断（手头没有 VIX 期货的价格，没法把缺口拆开量）：大部分缺口来自 contango 下期货一路往下滑，另一部分是期货本身涨跌得比指数少。`;
+  }
+  const P=player(N,16.7,16.7*N/7000,draw);
+  $('uvPlay').addEventListener('click',P.start);
+  return {start:P.start, draw:P.draw, el:$('uv')};
+})();
+
+/* ══════════ 八 · 费曼检验 ══════════ */
+const QS=[
+ {q:`不看公式，向一个只懂期权基本概念的人讲清楚：VIX 是用哪些期权、怎么算出来的？`,
+  a:['用标普 500 指数的期权，取离到期 23 到 30 天、30 到 37 天的两个到期日。',
+     '每个到期日只取虚值期权：远期价以下用 put，以上用 call，从平值往两边取，取到连续两档没人出价为止。实值期权的价格大多是内在价值，和波动率无关。',
+     '每张期权的中间价乘上权重 ΔK/K²，全部加起来，换算成一年的方差。',
+     '两个到期日按离 30 天的远近插值成正好 30 天，开平方，乘 100。'],
+  s:'「VIX 就是标普 500 的平值隐含波动率」：那是 2003 年以前的旧算法，现在叫 VXO。现在的 VIX 用一整排虚值期权。'},
+ {q:`为什么每个行权价买的期权数量要按 1/K² 配，而不是每档一张？只讲道理。`,
+  a:['目标是一个 vega 不随标的价格变的期权头寸，再每天用标的做 delta 对冲，对冲下来的盈亏只看实际走出来的方差比买入时的隐含方差多还是少，这才复制出一份方差合约。',
+     '一张期权的 vega 只在标的靠近它的行权价时大，所以每个行权价都要有。',
+     '每档一张时，标的越高总 vega 越大：平值期权的 vega 和价格成正比；一个标准差的美元宽度也和价格成正比，同时起作用的档数就和价格成正比。',
+     '两个因素相乘是价格的平方，所以数量按 1/K² 配，正好抵掉。第二节的模型里，每档一张时标的 450 的总 vega 是 350 的 1.65 倍，按 1/K² 配以后是 1.00 倍。'],
+  s:'「低行权价的期权便宜，所以多买」：便宜不是理由，要抵掉的是 vega 随价格变大。「买齐这排期权就等于持有方差合约」：不做 delta 对冲，标的一动它的价值就跟着变。'},
+ {q:`4/13 那天，TSLA 350 call 的隐含波动率是 46.3%，照 VIX 的算法算出来是 50.68%。多出的 4 个多点从哪来？如果那天每个行权价的隐含波动率都一样，会算出多少？`,
+  a:['VIX 的算法用的是整条微笑，不只是平值那一点。',
+     '这天左翼 put 的隐含波动率高，250 的 put 是 64.2%，而且它们按 1/K² 拿到更大的权重。',
+     '每个行权价都按平值重新定价，同一套公式算出 46.34%，几乎就是平值。',
+     '真实报价比这多出 420.9 方差点，其中 330 以下的 put 贡献了 394.8。'],
+  s:'「因为 VIX 用了两个到期日」：两个到期日的平值只有 47.01% 和 46.07%，插值出来也在 46% 多；多出来的是微笑。'},
+ {q:`单个期权的隐含波动率和 VIX 有哪几点不同？为什么股票指数可以把成分股买齐来复制，VIX 却不行？`,
+  a:['单个期权：一张期权、一个固定的到期日，要把价格代进 Black-Scholes 反推。VIX：一整排虚值期权、两个到期日插值成固定的 30 天，公式里没有定价模型。',
+     '单个期权只是微笑上的一个点；VIX 把整条微笑装进去，左翼按 1/K² 加重。VIX 的平方是一份 30 天方差合约的价格。',
+     'VIX 的成分每天都在换：标的一动，K₀ 跟着挪，call 和 put 互换（TSLA 两天就有 8 档换了用法）；两头按有没有人出价截断；T 变小，每一档的权重都变；到期日还会往后滚。',
+     '所以只能交易 VIX 期货、期权和跟踪产品，而它们不一定跟得住指数。'],
+  s:'「VIX 就是很多隐含波动率的平均」：没说按什么权重、为什么左翼更重，也没说它固定看 30 天。'},
+ {q:`一份 30 天方差合约，21 个交易日里有一天跌 6%，其余 20 天每天只涨跌 0.5%。结算大概是多少？那一天占了多大分量？合约为什么用平方、不减平均值？`,
+  a:['跌 6% 的对数涨跌约 −6.19%，平方约 38.3；其余 20 天每天约 0.25，合计约 5.0。平方和约 43.3。',
+     '乘 252 ÷ 21 ＝ 12，约 519，开平方约 22.8%。那一天占平方和的 88%；如果那天也只动 0.5%，结算只有 7.9%。',
+     '平方让大的日子占大头，一次大跌就能决定整个月的结算。',
+     '不减平均值是 1.2 的零均值：朝一个方向稳定地走，对持有人来说也是波动。'],
+  s:'「平均每天只跌 0.3%，波动率很低」：结算看的是平方和，不看平均。'},
+ {q:`VIX 期货的期限结构是 contango 时，买入一张 VIX 期货，VIX 指数一动不动也会亏，为什么？要赚钱，至少得发生什么？`,
+  a:['contango：远月的期货高于近月，也高于指数。',
+     '期货到期按那天的 VIX 结算。时间一天天过去，这张期货离到期越来越近，价格往下滑向近月和指数的水平；指数不动，期货就一路跌。',
+     '讲义给了三种情形，至少发生一种才赚：整条曲线上移；期限结构翻成 backward；到期那一刻隐含波动率冲高。',
+     '持有近两个月期货的 UVXY 六年里跌掉 99.96%，同期 VIX 指数只跌了 34.4%。'],
+  s:'「只要波动率上升就赚」：略升一点，会被期货往下滑的那部分吃掉。'},
+ {q:`六年里 87.6% 的日子，VIX 高于之后 30 天的实际波动率。常年按 VIX 卖出方差合约是不是稳赚？这和讲义的 covered call 例子有什么关系？`,
+  a:['平均每份赚 141.0 方差点，大多数时候赚。',
+     '亏的时候亏得多：赚的份数平均赚 204.2，亏的份数平均亏 306.8；2025-03-27 起的那一份亏 2028.5，是平均每份收益的 14.4 倍。',
+     '结算按平方算，对大行情特别敏感；VIX 比之后的实际高出的那部分，是卖方为这种月份收的保险费。',
+     'covered call 也是空波动率：平静时两个目标都达到，大涨大跌至少丢一个。两者都是大多数时候收一点、偶尔亏一大笔，讲义说可以用波动率合约对冲。'],
+  s:'「87.6% 的胜率，当然稳赚」：只数了赢的次数，没看输的时候输多少。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-V-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-V-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题：图都用 CSS 变量上色，切换时整张重画 ══════════ */
+const ANIMS=[VS,VGA,STA,VXA,UVA];
+function recolor(){ ANIMS.forEach(a=>a.draw()); }
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+NARROW.addEventListener('change',()=>{ FS=NARROW.matches?1.45:1; recolor(); });
+
+/* ══════════ 启动 ══════════ */
+renderTables();
+ANIMS.forEach(a=>a.draw());                 // 先画最后一帧，滚到眼前再从头播放
+ANIMS.forEach(a=>onView(a.el,a.start));
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>

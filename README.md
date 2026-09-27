@@ -26,6 +26,7 @@
 | [7 模型假设怎么崩](https://luoy2.github.io/options-lab/station-7-model-assumptions.html) | 两条路在这里合流 |
 | [8 skew 与波动率曲面](https://luoy2.github.io/options-lab/station-8-skew-surface.html) | skew、kurtosis 与曲面 |
 | [M 做市报价](https://luoy2.github.io/options-lab/station-m-market-making.html) | 支线 · 从交易者到做市商 |
+| [V 波动率合约与 VIX](https://luoy2.github.io/options-lab/station-v-vix.html) | 支线 · 直接交易波动率 |
 
 每个页面都是单文件 HTML，没有构建步骤；左侧课程目录由共用的 `course-nav.js` 生成。
 
