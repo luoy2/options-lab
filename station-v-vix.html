@@ -207,7 +207,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <header>
   <p class="eyebrow">FIN 580 复习 · 节点 V</p>
   <h1>波动率合约与 VIX</h1>
-  <p class="lede">8 把隐含波动率读成一张曲面：每个行权价、每个到期日各有一个数。这一节讲两件事：直接按波动率结算的合约有哪几种、到期怎么结算；VIX 怎样把一整排期权的价格压成一个数。案例是 2026-04-13 收盘的 TSLA 期权链，和 2020 年 8 月以来的标普 500 与 VIX。</p>
+  <p class="lede">节点 8 把隐含波动率读成一张曲面：每个行权价、每个到期日各有一个数。这一节讲两件事：直接按波动率结算的合约有哪几种、到期怎么结算；VIX 怎样把一整排期权的价格压成一个数。案例是 2026-04-13 收盘的 TSLA 期权链，和 2020 年 8 月以来的标普 500 与 VIX。</p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
@@ -218,10 +218,10 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <table>
     <thead><tr><th>讲义的假设</th><th class="txt">在哪里见过它不成立</th></tr></thead>
     <tbody>
-      <tr><td>① 涨跌是钟形分布</td><td class="txt">1.2 与 7：TSLA 和 SPX 的日涨跌，两条尾巴都比钟形长</td></tr>
-      <tr><td>② 能连续地对冲</td><td class="txt">7：TSLA 财报那一晚，盘后三分钟涨了 4.1%，中间来不及调仓</td></tr>
-      <tr><td>③ 存续期内波动率不变</td><td class="txt">7：SPX 的 50 日历史波动率不到一年从 8.6% 走到 34.7%</td></tr>
-      <tr><td>④ 波动率与方向无关</td><td class="txt">7：SPX 每涨 1%，VIX 平均跌 1.38 点</td></tr>
+      <tr><td>① 涨跌是钟形分布</td><td class="txt">1.2 与节点 7：TSLA 和 SPX 的日涨跌，两条尾巴都比钟形长</td></tr>
+      <tr><td>② 能连续地对冲</td><td class="txt">节点 7：TSLA 财报那一晚，盘后三分钟涨了 4.1%，中间来不及调仓</td></tr>
+      <tr><td>③ 存续期内波动率不变</td><td class="txt">节点 7：SPX 的 50 日历史波动率不到一年从 8.6% 走到 34.7%</td></tr>
+      <tr><td>④ 波动率与方向无关</td><td class="txt">节点 7：SPX 每涨 1%，VIX 平均跌 1.38 点</td></tr>
     </tbody>
   </table>
   <p>讲义的结论：模型有这些弱点，所以即使你对波动率的判断是对的，动态对冲不但要花交易成本，结果也常常和模型预测的不一样，有时差得很远。于是讲义问：<b>能不能不用期权、不靠定价模型，直接交易波动率？</b></p>
@@ -343,7 +343,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <table>
     <thead><tr><th>这一项</th><th class="txt">怎么取</th><th class="txt">为什么</th></tr></thead>
     <tbody>
-      <tr><td>用哪些期权</td><td class="txt">只用虚值的：K<sub>0</sub> 以下用 put，K<sub>0</sub> 以上用 call，K<sub>0</sub> 那一档取 call 与 put 中间价的平均</td><td class="txt">实值期权的价格大部分是内在价值，与波动率无关。8 讲过，实值那一张报价差几分钱，反推出来的 σ 就差很多。虚值期权的价格全是时间价值</td></tr>
+      <tr><td>用哪些期权</td><td class="txt">只用虚值的：K<sub>0</sub> 以下用 put，K<sub>0</sub> 以上用 call，K<sub>0</sub> 那一档取 call 与 put 中间价的平均</td><td class="txt">实值期权的价格大部分是内在价值，与波动率无关。节点 8 讲过，实值那一张报价差几分钱，反推出来的 σ 就差很多。虚值期权的价格全是时间价值</td></tr>
       <tr><td>取到哪里为止</td><td class="txt">从 K<sub>0</sub> 往两边走，买价为 0 的跳过；连续碰到两个买价为 0 的就停</td><td class="txt">没人肯出价的期权，价格说明不了什么</td></tr>
       <tr><td>Q(K)</td><td class="txt">买一与卖一的中间价</td><td class="txt">1.1 起一直这样取</td></tr>
       <tr><td>F</td><td class="txt">找 call 与 put 中间价最接近的行权价 K，F ＝ K ＋ e<sup>rT</sup> × (call − put)</td><td class="txt">5.2 讲的 parity</td></tr>
@@ -367,7 +367,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p class="sub">TSLA 没有官方的 VIX。把 4/13 收盘的真实报价放进同一套算法，得到一个「TSLA 30 天波动率指数」，拿它和 1.2 用的 46.3% 比。</p>
   <p>4/13 收盘，TSLA 有这些到期日：<span id="expList"></span>。离到期 23 到 30 天的是 5/8（25 天），30 到 37 天的是 5/15（32 天），1.1 起用的就是 5/15 这一串。</p>
   <p>先看 5/15。call 与 put 中间价最接近的行权价是 355：call 18.55，put 19.85，F ＝ 355 ＋ 1.00378 × (18.55 − 19.85) ＝ 353.70，和 1.1 用利率算的 353.69 只差 0.01。不高于它的第一个行权价是 350，就是 K<sub>0</sub>。往下取 put 取到 95，再往下 90 和 85 连续两档买价是 0，停；往上的 call 只有 950 一档买价是 0，跳过，一直取到 990。一共 142 张。</p>
-  <p>下面要拿真实报价和「平的微笑」比。8 讲过微笑：同一到期日、不同行权价的隐含波动率连成一条曲线，两头往上翘；低行权价那一头叫左翼。平的微笑是假设每个行权价的隐含波动率都一样，都等于远期价处的隐含波动率，5/15 这一串是 46.07%。</p>
+  <p>下面要拿真实报价和「平的微笑」比。节点 8 讲过微笑：同一到期日、不同行权价的隐含波动率连成一条曲线，两头往上翘；低行权价那一头叫左翼。平的微笑是假设每个行权价的隐含波动率都一样，都等于远期价处的隐含波动率，5/15 这一串是 46.07%。</p>
   <div class="panel">
     <div class="bar"><button class="btn ghost" id="stPlay">逐张再加一遍</button></div>
     <svg id="st" viewBox="0 0 720 490" role="img" aria-label="TSLA 5/15 到期的每张虚值期权对方差的贡献，从平值往两边逐张加入"></svg>
@@ -408,7 +408,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <thead><tr><th>行权价</th><th>真实比平的多出<br>方差点</th><th>5/15 这一段<br>占 Σ 的比例</th></tr></thead>
     <tbody id="regTb"></tbody>
   </table>
-  <p>多出来的几乎全在 330 以下：左翼 put 的隐含波动率高（8 讲过，这天 200 的 put 是 86.5%），又按 1/K² 拿到更大的权重。380 到 450 是这天微笑的谷底（8 算出最低点在 378.7），比平值还低，拉低了一点。</p>
+  <p>多出来的几乎全在 330 以下：左翼 put 的隐含波动率高（节点 8 讲过，这天 200 的 put 是 86.5%），又按 1/K² 拿到更大的权重。380 到 450 是这天微笑的谷底（节点 8 算出最低点在 378.7），比平值还低，拉低了一点。</p>
   <p>这两个到期日都包含 4/22 盘后的财报（8 第四节），所以这天的 30 天指数里，也包含了财报那一晚可能的大涨大跌。</p>
   <p class="tiny">数据：ORATS 4/13 16:00 快照，中间价 ＝ (买一 ＋ 卖一) ÷ 2。离到期时间按日历日 ÷ 365，利率 4.3%（1.1 从 parity 反推）。TSLA 期权是美式的，put 带一点提前行权的价值（节点 9），这里当作欧式处理。</p>
 </section>
@@ -460,7 +460,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     </div>
     <div class="say plain" id="vxSay"></div>
   </div>
-  <p>7 用之后 21 个交易日比过同一件事：86.9% 的日子 VIX 更高，平均高 4.42 个点。这里按第一节的合约公式、之后 30 个日历日算，结果几乎一样。7 讲过原因：卖方承担着对冲不掉的跳空，要多收一份钱。</p>
+  <p>节点 7 用之后 21 个交易日比过同一件事：86.9% 的日子 VIX 更高，平均高 4.42 个点。这里按第一节的合约公式、之后 30 个日历日算，结果几乎一样。节点 7 讲过原因：卖方承担着对冲不掉的跳空，要多收一份钱。</p>
   <p>两者的相关系数是 0.59：VIX 高的时候，之后通常也更波动，但 VIX 只说对了一部分。低估得最厉害的就是第一节那个月：2025-03-25 VIX 17.07，之后 30 天 SPX 实际走出 47.69%，差 30.62 个点，当中有 4/3、4/4 的大跌和 4/9 宣布暂缓加征关税那天的大涨。</p>
 
   <h3>卖方差的人赚什么</h3>
@@ -545,7 +545,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <tbody>
       <tr><td>投机</td><td class="txt">直接押波动率涨或跌</td></tr>
       <tr><td>对冲波动率头寸</td><td class="txt">手里的期权头寸有 vega，用 VIX 产品抵掉一部分</td></tr>
-      <tr><td>对冲市场头寸</td><td class="txt">市场和波动率反着走（7：SPX 每涨 1%，VIX 平均跌 1.38 点），持有 VIX 产品能在下跌时补回一部分</td></tr>
+      <tr><td>对冲市场头寸</td><td class="txt">市场和波动率反着走（节点 7：SPX 每涨 1%，VIX 平均跌 1.38 点），持有 VIX 产品能在下跌时补回一部分</td></tr>
       <tr><td>对冲间接的波动率头寸</td><td class="txt">收入跟着交易量走、跟着流动性走的业务，以及任何对波动率敏感的策略，盈亏都暗中依赖波动率</td></tr>
     </tbody>
   </table>
@@ -616,7 +616,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 </section>
 
 <footer>
-  <p>支线到这里结束。回到课程地图可以看全部节点；另一条支线是 <b>M 做市报价</b>：拿着一张波动率曲面给每个行权价报双边价，边际从哪来。</p>
+  <p>支线到这里结束。回到课程地图可以看全部节点；另一条支线是 <a href="station-m-market-making.html"><b>M 做市报价</b></a>：拿着一张波动率曲面给每个行权价报双边价，边际从哪来。</p>
   <p><a href="./">← 回到课程路线图</a></p>
     <p class="tiny">期权入门交互课 · TSLA 期权报价来自 ORATS 历史快照，SPX、VIX、UVXY 价格来自 IBKR 分钟线</p>
 </footer>
@@ -903,7 +903,7 @@ function renderTables(){
     return `<tr><td>${d}<br><span class="tiny">离到期 ${k} 天</span></td><td>${f2(t.F)}</td><td>${t.K0}</td><td>${t.n} 张<br>${t.lo} 到 ${t.hi}</td><td>${f2(t.sig)}%</td><td>${f2(t.atf)}%</td></tr>`; }).join('');
   $('idxV').textContent=f2(IDX.v)+'%';
   const bars=[['350 call 的隐含波动率<br><span class="tiny">1.2 用的数</span>',46.29,'var(--ink-faint)'],
-    ['5/15 远期价处<br><span class="tiny">8 算的平值</span>',TERM['32'].atf,'var(--ink-faint)'],
+    ['5/15 远期价处<br><span class="tiny">节点 8 算的平值</span>',TERM['32'].atf,'var(--ink-faint)'],
     ['平的微笑代入公式',IDX.flat,'var(--result)'],
     ['真实报价代入公式<br><span class="tiny">TSLA 30 天指数</span>',IDX.v,'var(--control)']];
   const mx=60;

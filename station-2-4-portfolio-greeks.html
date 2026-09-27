@@ -546,7 +546,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
       <div class="gl"><div class="s">跨式（straddle）</div><div class="t">同一行权价、同一到期日的 call 和 put 各一张（3.2）。</div></div>
       <div class="gl"><div class="s">牛市价差</div><div class="t">买低行权价 call、卖高行权价 call，同一到期日（3.1）。</div></div>
       <div class="gl"><div class="s">近月、远月</div><div class="t">同一行权价、不同到期日的两张期权，到期早的叫近月，到期晚的叫远月。</div></div>
-      <div class="gl"><div class="s">日历价差</div><div class="t">同一行权价，买远月、卖近月（3.2）。gamma 与 vega 反号。</div></div>
+      <div class="gl"><div class="s">日历价差</div><div class="t">同一行权价，买远月、卖近月（3.2 叫 calendar spread）。gamma 与 vega 反号。</div></div>
       <div class="gl"><div class="s">中间价</div><div class="t">(买一 ＋ 卖一) ÷ 2。本页的仓位价值都按中间价算。</div></div>
       <div class="gl"><div class="s">σ、S、X、r</div><div class="t">隐含波动率、TSLA 价格、行权价（沿用 1.1 的写法）、无风险利率（本页 4.3%，1.1 从报价反解）。每条腿的 σ 用它自己的报价隐含波动率：call 用 call 的，put 用 put 的。</div></div>
       <div class="gl"><div class="s">折回今天</div><div class="t">把将来的一笔钱按利率换算成今天的值：除以 (1 ＋ r·t)（1.1）。</div></div>
@@ -555,7 +555,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
 </section>
 
 <footer>
-  <p>下一节，两条路从这里分开。左边 <b>4.1 动态对冲</b>（风险与对冲）：只盯四个数里的 delta，每周调仓把它拉回 0，看理论价值怎样一步步变成现金。右边 <b>3.1 价差家族</b>（策略与组合）：用两条腿表达方向观点，本页的牛市价差是其中一种。</p>
+  <p>下一节，两条路从这里分开。左边 <a href="station-4-1-dynamic-hedging.html"><b>4.1 动态对冲</b></a>（风险与对冲）：只盯四个数里的 delta，每周调仓把它拉回 0，看理论价值怎样一步步变成现金。右边 <a href="station-3-1-spreads.html"><b>3.1 价差家族</b></a>（策略与组合）：用两条腿表达方向观点，本页的牛市价差是其中一种。</p>
   <p><a href="./">← 回到课程路线图</a></p>
     <p class="tiny">期权入门交互课 · 案例报价与希腊字母来自 ORATS 历史快照</p>
 </footer>
