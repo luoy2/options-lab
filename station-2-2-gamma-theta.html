@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gamma 与 theta</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2025C13%2025%2019%2020%2027%207'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3Cpath%20d='M9%2029L27%2013'%20stroke='%23fdf6ec'%20stroke-width='1.4'%20stroke-dasharray='2%202'%20fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+.say:empty{display:none}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt,th.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+td.pos{color:var(--result);font-weight:600} td.neg{color:var(--control);font-weight:600}
+.tscroll{overflow-x:auto}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.stage{display:flex;justify-content:center}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:4px;max-width:100%}
+.cvw{position:relative}
+.cvax{position:absolute;inset:0;pointer-events:none;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;line-height:1;color:var(--ink-faint)}
+.cvax span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.8rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;vertical-align:-.1rem;border-radius:1px}
+.legend i.ln{height:3px;vertical-align:.2rem}
+.legend i.dash{height:0;border-top:2px dashed currentColor;vertical-align:.25rem;background:none!important}
+.legend i.dot{border-radius:50%;width:.6rem;height:.6rem;vertical-align:0}
+ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+
+.prac{margin-top:.4rem}
+.prac td select,.prac td input{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.85rem;padding:.3rem .45rem;
+  border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink)}
+.prac td input{width:5.6rem}
+.prac .ok{border-color:var(--good);color:var(--good);background:var(--good-bg)}
+.prac .no{border-color:var(--warn);color:var(--warn);background:var(--warn-bg)}
+.prac td.fb{font-size:.78rem;width:7rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.btnrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.1rem;align-items:center}
+.reveal{margin-top:1.2rem;padding:1rem 1.1rem;border-radius:9px;background:var(--result-bg);color:var(--result);font-size:.93rem;line-height:1.7}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem .85rem}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .formula{padding:1rem .8rem}
+  .formula .math{font-size:1.02rem}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat .d{font-size:1.12rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 delta 会变</a><a href="#s1">一 gamma 在哪大</a><a href="#s2">二 theta</a><a href="#s3">三 成比例</a>
+  <a href="#s4">四 逐日账本</a><a href="#s5">五 收租付租</a><a href="#s6">六 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 2.2</p>
+  <h1>gamma 与 theta</h1>
+  <p class="lede">2.1 讲了 delta：标的动 1 美元，期权跟着动多少。这一节讲两件事：delta 自己变得多快（gamma），持有期权每天流失多少时间价值（theta）。模型把这两个数绑在一个固定比例上。案例还是 2026-04-13 收盘买入的 TSLA 5/15 到期 350 call。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>delta 自己会变</h2>
+  <p class="sub">4/13 收盘买入时，ORATS 给这张 350 call 的 delta 是 0.557。第二天 TSLA 涨了 11.96 美元，delta 变成 0.651；第三天又涨 27.61，delta 变成 0.807。</p>
+  <p>1.1 算过：整段持有下来，这张 call 实际跟上了 TSLA 涨幅的 0.734，比入场时的 0.557 大，原因就是 delta 一路在变大。这一节先量它变得有多快。</p>
+
+  <h3>gamma 的定义</h3>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="gamma，读作「伽马」。标的每动 1 美元，delta 变多少。">Γ</span> ＝ <span class="sym" data-say="delta。标的动 1 美元，期权价值动多少（2.1）。call 的 delta 在 0 到 1 之间。">Δ</span> 的变化 ÷ <span class="sym" data-say="标的价格，本页是 TSLA 的股价。">S</span> 的变化</div>
+    <div class="gloss">标的每动 1 美元，delta 变多少</div>
+  </div>
+  <p>ORATS 给 350 call 的入场 gamma 是 <b>0.00820</b>：TSLA 每涨 1 美元，delta 大约加 0.0082。拿真实的两天核对：</p>
+  <div class="tscroll">
+  <table style="white-space:nowrap">
+    <thead><tr><th>这一天</th><th>TSLA 涨</th><th>delta 实际变化</th><th>按前一天的 gamma 估</th><th>当天收盘的 gamma</th></tr></thead>
+    <tbody>
+      <tr><td>4/13 → 4/14</td><td>+11.96</td><td>0.557 → 0.651，+0.094</td><td>0.00820 × 11.96 ＝ +0.098</td><td>0.00749</td></tr>
+      <tr><td>4/14 → 4/15</td><td>+27.61</td><td>0.651 → 0.807，+0.156</td><td>0.00749 × 27.61 ＝ +0.207</td><td>0.00472</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>第一天估得很准。第二天多估了三分之一：TSLA 走到 392 的路上，gamma 自己从 0.00749 掉到 0.00472。用两天 gamma 的平均值去估，是 +0.169，接近得多。<b>gamma 也在变</b>，所以它只适合估小幅变动。</p>
+  <p class="tiny">单位：ORATS 的 gamma 按小数写。讲义把 delta 写成整数（0.50 写成 50），gamma 也跟着写成整数，讲义的 gamma 2 就是小数的 0.02。</p>
+
+  <h3>讲义的两个例子</h3>
+  <p>标的 100，一张 110 call 的 delta 是 30、gamma 是 2（整数写法）：</p>
+  <div class="tscroll">
+  <table style="max-width:36rem">
+    <thead><tr><th>标的</th><th>97</th><th>98</th><th>99</th><th>100</th><th>101</th><th>102</th></tr></thead>
+    <tbody><tr><td>delta</td><td>24</td><td>26</td><td>28</td><td>30</td><td>32</td><td>34</td></tr></tbody>
+  </table>
+  </div>
+  <p>照这个速度算，标的跌到 75 时 delta 是 30 − 25 × 2 ＝ −20。call 的 delta 不可能是负数，说明 gamma 不是常数，离得远了就不能这样线性外推。</p>
+  <p>另一个例子是同一个行权价的 call 和 put。标的 100，100 call 的 delta 是 +50，100 put 是 −50，两者的 gamma 都是 5：</p>
+  <div class="tscroll">
+  <table style="max-width:36rem">
+    <thead><tr><th></th><th>100 call</th><th>100 put</th></tr></thead>
+    <tbody>
+      <tr><td>现在</td><td>+50</td><td>−50</td></tr>
+      <tr><td>涨到 101</td><td>+55</td><td>−45</td></tr>
+      <tr><td>跌到 99</td><td>+45</td><td>−55</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>标的涨，delta 加上 gamma；标的跌，delta 减去 gamma。put 的 delta 从 −50 到 −45 也是「加」，往 0 靠。<b>买 call 和买 put 的 gamma 都是正的</b>，同一个行权价、同一个到期日的 call 和 put，gamma 完全一样（ORATS 的表里 gamma 只有一列）。</p>
+
+  <h3>gamma 就是弯曲</h3>
+  <p>把 350 call 的价值画成 TSLA 价格的函数。某一点的切线有多陡，就是那一点的 delta；切线转得多快，就是 gamma。下面的曲线用 Black-Scholes 模型按入场时的条件算（离到期 32 天，隐含波动率 46.3%，利率 4.3%），是模型值；下图的三个点是 ORATS 当天收盘的真实 delta。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="a1Play">再扫一遍</button></div>
+    <svg id="a1" viewBox="0 0 720 452" role="img" aria-label="350 call 的价值曲线与切线，以及 delta 随 TSLA 价格变化的曲线"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink)"></i>离到期 32 天（模型）</span>
+      <span style="color:var(--ink-faint)"><i class="dash"></i>到期那天</span>
+      <span><i class="ln" style="background:var(--control)"></i>切线</span>
+      <span><i class="dot" style="background:var(--result)"></i>ORATS 当天收盘</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">TSLA 价格</div><div class="d" id="a1S"></div></div>
+      <div class="stat"><div class="k">delta（切线斜率）</div><div class="d" id="a1D" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k">gamma（delta 线的斜率）</div><div class="d" id="a1G"></div></div>
+    </div>
+  </div>
+  <p>到期那天的价值是一条折线（1.1）：350 左边斜率 0，右边斜率 1，delta 在 350 上一步从 0 跳到 1。离到期还有 32 天，折角被磨成了圆弧：TSLA 在 300 时切线斜率 0.15，在 410 时 0.89，中间一路慢慢转过来。圆弧最弯的一段在行权价附近，切线在那里转得最快，gamma 最大；两头几乎是直线，gamma 接近 0。</p>
+  <p>真实的三个点：4/14 的 0.651 和模型一样；4/15 的 0.807 比模型的 0.822 略低，那两天隐含波动率从 46% 升到约 51%，时间也过去了两天。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>gamma 在哪里大</h2>
+  <p class="sub">同一天、同一个 TSLA 价格，不同行权价、不同到期日的期权，gamma 差好几倍。下图是 4/13 收盘 ORATS 报的四个到期日，TSLA 都是 352.36。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="a2Seg">
+        <button data-m="g" aria-pressed="true">gamma</button>
+        <button data-m="th" aria-pressed="false">theta</button>
+      </div>
+      <button class="btn ghost" id="a2Play">再画一遍</button>
+    </div>
+    <svg id="a2" viewBox="0 0 720 318" role="img" aria-label="4/13 收盘四个到期日的 gamma 随行权价的曲线"></svg>
+    <div class="legend" id="a2Leg"></div>
+  </div>
+  <p><b>越近行权价越大。</b>每条线都在平值附近（352.5 到 360 这几档）最高，往两边落下去。离平值远的期权，delta 贴在 0 或 1 附近，标的动一点它几乎不变。</p>
+  <p><b>越近到期越大。</b>平值附近，2 天到期的 gamma 是 0.0367，32 天的是 0.0084，差 4.4 倍。原因要回到 1.2 的一个标准差（远期价 × 隐含波动率 × √t）：到期前 delta 要从接近 0 爬到接近 1，爬坡大约占几个标准差宽。离到期 32 天，1.2 算过，一个标准差约 48.5 美元；离到期 2 天，平值那档的隐含波动率是 42.5%，一个标准差只有约 11.1 美元。同样的爬升挤进约四分之一的宽度，坡就陡了约 4 倍。√(32/2) ＝ 4；两个到期日的隐含波动率不同（46.3% 对 42.5%），再乘 46.3 ÷ 42.5，是 4.4 倍，和 gamma 的倍数对得上。</p>
+  <p>离平值远的地方反过来：320 这档，2 天到期的 gamma 只有 0.0022，比 32 天的 0.0059 还小。32 美元对 2 天的期权约是三个标准差，delta 早已贴在 1 附近不动了。这种反转节点 6 细讲。</p>
+  <p>theta 也一样，平值最大、越近到期越大：2 天到期的平值 call 每天流失 1.10，32 天的 0.32。讲义的说法是<b>平值期权的 gamma、theta 都比同等的实值、虚值期权大</b>。</p>
+
+  <h3>350 call 自己的 gamma</h3>
+  <p>一张期权的 gamma 随着标的走动和时间流逝一直在变。下图是这 24 天里 350 call 的 gamma，和「每天换成当天离收盘价最近的行权价」的平值 call 的 gamma，都是 ORATS 收盘值。</p>
+  <div class="panel">
+    <svg id="g350" viewBox="0 0 720 262" role="img" aria-label="350 call 与当天平值 call 的 gamma，逐日"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--control)"></i>350 call</span>
+      <span><i class="ln" style="background:var(--result)"></i>当天的平值 call（行权价每天换）</span>
+    </div>
+  </div>
+  <p>4/15 TSLA 涨到 392，350 离平值远了，gamma 从 0.0082 掉到 0.0047。4/23 到 4/30 TSLA 回落到 373 到 382，gamma 又回到 0.0068 到 0.0085。5/7 之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。同一段时间，平值 call 的 gamma 跟着到期日临近一路涨，5/14 剩一天时是 0.0295。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>theta：时间价值每天流失多少</h2>
+  <p class="sub">1.1 讲过，期权价格 ＝ 内在价值 ＋ 时间价值。入场时 350 call 值 21.05：内在价值 352.36 − 350 ＝ 2.36，剩下 18.69 是时间价值，付的是「到期前 TSLA 还可能走多远」。到期那一刻时间价值归零，theta 量的是它每天流失多快。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="theta，读作「西塔」。其他条件都不变，只过一天，期权价值变多少。买期权时是负数。">Θ</span> ＝ 只过一天、其他不变时，期权价值的变化</div>
+    <div class="gloss">标的价格、波动率、利率都不动，时间往前走一天，期权少值多少</div>
+  </div>
+  <p>讲义的例子：期权值 5.00，theta 是 −.05，过一天 4.95，两天 4.90，三天 4.85。ORATS 给 350 call 的 theta 是 <b>−0.319</b>：其他不变，过一天，21.05 变成约 20.73。</p>
+  <p>买期权的人 theta 为负，每天都在流失；卖期权的人 theta 为正，每天都在收进来。讲义举过一个例外，要三个条件同时满足：深度实值，几乎肯定会被行权；<span class="sym" data-say="European。只能在到期那天行权，不能提前。与之相对的美式期权随时可以行权，TSLA 的个股期权是美式。">欧式</span>，只能在到期那天行权，今天拿不到内在价值；买的时候当场付全款（讲义叫股票型结算，美国的期权都这样；有的交易所买期权先不付钱，只按每天的涨跌结算盈亏）。这样的期权今天的价值是到期价值的折现，比内在价值还低，过一天少折现一天，价值反而涨一点，theta 为正。TSLA 的期权是美式的，随时可以行权，本页的期权都不属于这种。</p>
+
+  <h3>如果 TSLA 一动不动</h3>
+  <p>假设 TSLA 每天都收在 352.36，隐含波动率一直是 46.3%，这张 350 call 从剩 32 天走到到期。价值曲线用模型算；下图的点是 ORATS 在真实的每一天、给当天平值 call 报的 theta，横轴按那天离 5/15 还剩几天摆放。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="a3Seg">
+        <button data-m="raw" aria-pressed="true">ORATS 原值</button>
+        <button data-m="adj" aria-pressed="false">按入场时的股价和波动率折算</button>
+      </div>
+      <button class="btn ghost" id="a3Play">逐天播放</button>
+    </div>
+    <svg id="a3" viewBox="0 0 720 420" role="img" aria-label="TSLA 不动时 350 call 的价值逐日下降；下方是每天的 theta"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--ink)"></i>350 call 的价值（模型，TSLA 不动）</span>
+      <span><i style="background:var(--result-bg)"></i>时间价值</span>
+      <span><i class="ln" style="background:var(--control)"></i>theta 的大小（模型）</span>
+      <span><i class="dot" style="background:var(--result)"></i>ORATS：当天平值 call 的 theta</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">离到期</div><div class="d" id="a3N"></div></div>
+      <div class="stat"><div class="k">期权价值</div><div class="d" id="a3V"></div><div class="d2">内在价值 2.36</div></div>
+      <div class="stat"><div class="k">其中时间价值</div><div class="d" id="a3TV" style="color:var(--result)"></div><div class="d2" id="a3TVb"></div></div>
+      <div class="stat"><div class="k">这一天的 theta</div><div class="d" id="a3Th" style="color:var(--control)"></div><div class="d2">每天，模型</div></div>
+    </div>
+    <div class="say plain" id="a3Say"></div>
+  </div>
+  <p>时间价值大致按<b>剩余天数的平方根</b>缩小，原因和 1.2 一样：还能走多远按 √t 算。剩一半时间，还剩约 √½ ≈ 71%；剩四分之一时间，还剩约一半。平方根曲线越靠近 0 越陡，所以 theta 越近到期越大。</p>
+  <p>讲义给的平值期权例子：离到期 3 个月 theta −.03，3 周 −.06，3 天 −.16。按 1/√t 放大可以互相推出来：.03 ÷ √(3/14) ≈ .065，.06 ÷ √(3/21) ≈ .159（3 个月约 14 周，3 周 ＝ 21 天）。</p>
+  <p>ORATS 的点在最后几天远高于模型线：5/14 剩一天，平值 call 的 theta 是 −2.76，模型是 −1.66。那时 TSLA 已经涨到 443，ORATS 算希腊字母用的隐含波动率升到 58%。平值 theta 和股价 × 波动率成正比，两者合起来大了 1.57 倍。按入场时的股价和波动率折算回去，−2.76 变成 −1.75，点就回到线旁边。</p>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>为什么 gamma 和 theta 成比例</h2>
+  <p class="sub">gamma 让买方在标的大动时多赚一点，theta 让买方每天付一点。模型把两者锁在一个固定比例上。先算大动一天 gamma 多赚多少。</p>
+
+  <h3>gamma 多赚的那一块</h3>
+  <p>标的从 S 动到 S ＋ ΔS，delta 一路从 Δ 变到 Δ ＋ Γ × ΔS。这一路上 delta 的平均值是 Δ ＋ ½ × Γ × ΔS。期权价值的变化等于「标的动了多少 × 一路上的平均 delta」：</p>
+  <div class="formula">
+    <div class="math">期权价值的变化 ≈ Δ × <span class="sym" data-say="标的这一天动了多少美元，涨为正、跌为负。">ΔS</span> ＋ ½ × Γ × (ΔS)²</div>
+    <div class="gloss">按起点的 delta 算的部分 ＋ delta 一路变大（变小）多出来的部分</div>
+  </div>
+  <p>讲义的例子：股票 49 涨到 51，50 call 值 2.67，delta 50，gamma 5。到 51 时 delta 是 50 ＋ 2 × 5 ＝ 60，平均 55，新价值 2.67 ＋ 2 × 0.55 ＝ 3.77。用上面的式子：2.67 ＋ 2 × 0.50 ＋ ½ × 5 × 2² ÷ 100 ＝ 2.67 ＋ 1.00 ＋ 0.10 ＝ 3.77，两种算法一样。2.4 会用同一个式子估整个组合。</p>
+  <p>第一项是方向。2.1 讲过，卖出 Δ 股标的就能把它抵掉，这叫对冲。对冲之后只剩 ½ × Γ × (ΔS)²，它有两个特点：</p>
+  <ul>
+    <li>ΔS 平方以后总是正的：涨也赚，跌也赚。</li>
+    <li>按幅度的平方增长：动的幅度翻倍，赚的变成 4 倍。</li>
+  </ul>
+
+  <h3>平均一天赚多少</h3>
+  <p>明天动多少事先不知道。按 1.2，一天的一个标准差是 S × σ ÷ 16。1.2 算标准差的办法是把每天离 0 的距离平方、求平均、再开方；反过来，ΔS 平方的平均值就是一个标准差的平方。这一点对任何形状的分布都成立。所以 gamma 平均每天赚：</p>
+  <div class="formula">
+    <div class="math">平均一天 ＝ ½ × Γ × (S × <span class="sym" data-say="sigma，年化波动率。这里用买入时的隐含波动率 46.3%。">σ</span> ÷ 16)²</div>
+    <div class="gloss">把一个标准差当作这一天的 ΔS 代进 ½ × Γ × (ΔS)²</div>
+    <div class="note">350 call 入场时：½ × 0.00820 × (352.36 × 46.3% ÷ 16)² ＝ ½ × 0.00820 × 10.20² ≈ 0.426</div>
+  </div>
+  <p>这个平均值是怎么凑出来的，用 2000 个模拟的交易日看：每一天从钟形分布里抽一个涨跌。gamma 那天赚的钱按「动了几个标准差」的平方算：动 1 个标准差正好赚平均值那么多，动 2 个赚 4 倍，动半个只赚四分之一。图里把每天付的 theta（本页叫租金）定成这个平均值，看收入和租金怎么相抵。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="a4Play">再抽一遍</button></div>
+    <div class="stage"><div class="cvw"><canvas id="a4" width="264" height="160" aria-label="2000 个模拟交易日的涨跌堆成钟形；下方是累计 gamma 收入与累计租金之比"></canvas><div class="cvax" id="a4ax" aria-hidden="true"></div></div></div>
+    <div class="legend">
+      <span><i style="background:var(--ink-faint)"></i>动不到一个标准差：这一天亏</span>
+      <span><i style="background:var(--control)"></i>超过一个标准差：这一天赚</span>
+      <span>点线：±1 个标准差</span>
+      <span>下方：累计 gamma 收入 ÷ 累计租金</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">已过天数</div><div class="d" id="a4N"></div><div class="d2">共 2000 天</div></div>
+      <div class="stat"><div class="k">赚的日子</div><div class="d" id="a4W" style="color:var(--control)"></div><div class="d2">钟形理论 31.7%</div></div>
+      <div class="stat"><div class="k">这些日子带来的 gamma 收入</div><div class="d" id="a4I"></div><div class="d2">钟形理论 80.1%</div></div>
+      <div class="stat"><div class="k">收入 ÷ 租金</div><div class="d" id="a4R" style="color:var(--result)"></div></div>
+    </div>
+    <div class="say plain" id="a4Say"></div>
+  </div>
+
+  <h3>公平的租金</h3>
+  <p>如果 theta 比这个平均值小，买入期权再对冲，平均每天稳赚：gamma 收进来的多于付出去的。人人都去买，期权价格被抬高，theta 跟着变大，直到每天的租金等于 gamma 的平均收入。反过来卖方稳赚，价格被压低。</p>
+  <p>上面算的是一个交易日。一年约 256 个交易日，而 16² ＝ 256，所以一年的 gamma 平均收入是 ½ × Γ × (S × σ ÷ 16)² × 256 ＝ ½ × σ² × S² × Γ，16 正好消掉。所以在模型里：</p>
+  <div class="formula">
+    <div class="math">Θ ≈ −½ × σ² × S² × Γ</div>
+    <div class="gloss">一年要付的租金 ＝ ½ × 波动率² × 股价² × gamma；换成每天，除以一年的天数</div>
+  </div>
+  <p>这就是<b>买 gamma 就要付 theta</b>：gamma 越大，租金越贵，比例由 σ² × S² 定。本页把 theta 叫租金：持有期权，每天为「标的可能大动」付的钱。</p>
+
+  <h3>用 ORATS 的数字核对</h3>
+  <p>350 call 入场时：½ × 0.463² × 352.36² × 0.00820 ＝ 109.12，这是一年的租金。上面的 0.426 是把它分到 256 个交易日：109.12 ÷ 256 ＝ 0.426。ORATS 的 theta 按日历日算，周末也算，把同一笔分成 365 份：109.12 ÷ 365 ＝ <b>0.299</b>。0.426 和 0.299 是同一笔一年的租金，只是摊的天数不同，不是收入比租金多。ORATS 给的是 −0.319，比 0.299 多约 0.02。</p>
+  <p>差的是利息。对冲好的仓位是买一张 call（付 21.05）、卖 0.5574 股（收 196.41），手里净多出 175.36 美元，按 4.3% 一天利息 0.021。模型要求这个仓位平均每天不赚不赔，所以 theta 要同时抵掉 gamma 的平均收入和这笔利息：0.299 ＋ 0.021 ＝ 0.320，ORATS 给的是 0.319。讲义说 theta 来自两部分，波动价值的衰减和利息价值的衰减，就是这两项。</p>
+  <div class="panel">
+    <svg id="ver" viewBox="0 0 720 300" role="img" aria-label="5/15 到期各行权价的 ORATS theta 与公式值"></svg>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--ink)"></i>ORATS 的 theta</span>
+      <span style="color:var(--result)"><i class="dash"></i>½σ²S²Γ ÷ 365（gamma 那一项）</span>
+      <span><i class="ln" style="background:var(--control)"></i>再加上利息</span>
+    </div>
+  </div>
+  <p>整条 5/15 链都这样：300 到 410 之间，gamma 那一项占 ORATS theta 的 88% 到 97%，加上利息后和 ORATS 最多差 0.006。图最左边更深的实值档差得多一些，295 差 0.008，290 差 0.012。实值越深，delta 越大，对冲时卖出的股票越多，手里的现金越多，利息那一项越大。</p>
+  <p class="tiny">图里每个行权价用的是 ORATS 算希腊字母时用的那个隐含波动率（350 这档 46.2%），所以 350 的 gamma 项是 0.298，比上面按 46.3% 算的少 0.001。</p>
+  <p>讲义有一张表，列出同一个标的各行权价期权的模型价值和希腊字母，讲义叫它<span class="sym" data-say="risk matrix。讲义里的一张表：同一个标的、同一个到期日，每个行权价的市价、模型价值、delta、gamma、theta、vega 排在一起。">风险矩阵</span>。它也对得上：标的 99.50，波动率 25%，利率 6%，离到期 60 天，100 call 的模型价值（讲义叫<span class="sym" data-say="theoretical value。用定价模型算出来的期权价值，就是本页说的模型值，不是市场报价。">理论值</span>）4.26，delta 54，gamma 3.9（小数 0.039），theta −.0416。gamma 项 ½ × 0.25² × 99.5² × 0.039 ÷ 365 ＝ 0.0331，利息 6% × (99.5 × 0.54 − 4.26) ÷ 365 ＝ 0.0081，合计 0.0412。</p>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>逐日账本：买 gamma 付 theta</h2>
+  <p class="sub">买入 350 call，每天收盘按新的 delta 调一次股票，把方向对冲掉（4.1 讲具体怎么调）。这样每一天只剩两笔账：gamma 赚的 ½ × Γ × (ΔS)²，和付掉的租金。</p>
+
+  <h3>回本的门槛是一个标准差</h3>
+  <p>gamma 赚的等于租金，就是 ½ × Γ × (ΔS)² ＝ ½ × Γ × (S × σ ÷ 16)²。两边的 ½ × Γ 消掉：</p>
+  <div class="formula">
+    <div class="math">回本的一天：|ΔS| ＝ S × σ ÷ 16</div>
+    <div class="gloss">当天的涨跌正好是一个标准差时，gamma 赚的等于租金；超过就赚，不到就亏</div>
+    <div class="note">门槛和 gamma 大小无关：gamma 大的期权赚得多，租金也同比例贵</div>
+  </div>
+  <p>按入场时的隐含波动率 46.3%，一天的一个标准差是 2.89%。1.2 数过：之后 24 天里有 8 天超过它。</p>
+  <p>下面的账本有两种记法。第一种先把 gamma 固定在入场时的 0.00820，租金按 1.2 的口诀按交易日摊（一年 256 份）：一年 109.12 ÷ 256 ≈ 每个交易日 0.426（只算 gamma 那一项）。这笔租金是 ½ × Γ × (S × 2.89%)²，随股价的平方变：从入场的 0.43 涨到 5 月中的 0.68。这样只看涨跌的作用。第二种用真实的 350 call：每天用 ORATS 当天收盘的 gamma 和 theta，theta 按日历日收。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="a5Seg">
+        <button data-m="A" aria-pressed="true">gamma 固定在入场值</button>
+        <button data-m="B" aria-pressed="false">真实的 350 call</button>
+      </div>
+      <button class="btn ghost" id="a5Play">逐天播放</button>
+    </div>
+    <svg id="a5" viewBox="0 0 720 410" role="img" aria-label="24 个交易日，每天 gamma 赚的与付的租金，以及累计"></svg>
+    <div class="legend">
+      <span><i style="background:var(--result)"></i>向上：gamma 赚的 ½Γ(ΔS)²</span>
+      <span><i style="background:var(--control)"></i>向下：租金</span>
+      <span>柱顶数字：当天涨跌是几个标准差（只标超过 1 的日子）</span>
+      <span><i class="ln" style="background:var(--ink)"></i>下图：累计净额</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="a5D"></div><div class="d2" id="a5Db"></div></div>
+      <div class="stat"><div class="k">当天涨跌</div><div class="d" id="a5M"></div><div class="d2" id="a5Mb"></div></div>
+      <div class="stat"><div class="k">gamma 赚 / 租金</div><div class="d" id="a5G"></div><div class="d2" id="a5Gb"></div></div>
+      <div class="stat"><div class="k">累计净额</div><div class="d" id="a5C"></div><div class="d2" id="a5Cb"></div></div>
+    </div>
+    <div class="say plain" id="a5Say"></div>
+  </div>
+
+  <p>账本最后赚还是亏，看这段时间的实际波动比买入时付的隐含波动高还是低。4.2 从这里接着讲盈亏平衡波动率。</p>
+
+  <h3>横盘时买方慢慢亏</h3>
+  <p>4/24 到 5/6 这 9 个交易日，TSLA 每天都没动到一个标准差，最大的一天 2.37%。第一种账本在这 9 天里天天付租：gamma 只赚了 1.16，租金付了 4.49，净亏 3.34。</p>
+  <p>这 9 天 TSLA 其实从 373.69 涨到 398.62，涨了 6.67%。如果这 6.67% 在一天里走完，是 2.31 个标准差，gamma 那一天就赚 2.55，是当天租金的 5.3 倍。gamma 只按每一天动多大算钱，不看累计走了多远。<b>横盘和慢慢走，对买方是一样的：每天付租，等不来大动的日子。</b></p>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>收租还是付租</h2>
+  <p class="sub">gamma 为正，theta 就为负：在付租，等标的大动。gamma 为负，theta 就为正：在收租，怕标的大动。看一个就知道另一个。</p>
+  <div class="tscroll">
+  <table>
+    <thead><tr><th>仓位</th><th>gamma</th><th>theta</th><th class="txt">收租还是付租</th><th class="txt">希望市场</th></tr></thead>
+    <tbody>
+      <tr><td>买 call、买 put</td><td class="pos">＋</td><td class="neg">−</td><td class="txt">付租</td><td class="txt">大动、快动</td></tr>
+      <tr><td>卖 call、卖 put</td><td class="neg">−</td><td class="pos">＋</td><td class="txt">收租</td><td class="txt">不动、慢动</td></tr>
+      <tr><td>标的本身</td><td>0</td><td>0</td><td class="txt">都不是</td><td class="txt">只看方向</td></tr>
+      <tr><td>买 350 call 再对冲（本页账本）</td><td class="pos">+0.0082</td><td class="neg">−0.319</td><td class="txt">付租</td><td class="txt">每天动超过 2.89%</td></tr>
+      <tr><td>卖出这张 350 call 的人</td><td class="neg">−0.0082</td><td class="pos">+0.319</td><td class="txt">收租</td><td class="txt">每天动不到 2.89%</td></tr>
+      <tr><td>讲义：卖 10 张 95 call、买 7 手标的</td><td class="neg">−33</td><td class="pos">+0.387</td><td class="txt">收租</td><td class="txt">不动、慢动</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>卖出 350 call 的人，账本正好是第四节反过来：平静的日子每天收租，大动的日子付出 ½ × Γ × (ΔS)²。4/15 TSLA 涨了 7.58%，是 2.62 个标准差。按第一种账本（gamma 固定在 0.0082），卖方这一天付出 3.13，是入场时一个交易日租金 0.426 的 7.3 倍。</p>
+  <p>讲义那个仓位：卖出 10 张 95 call（每张 delta 73、gamma 3.3、theta −.0387），再买 7 手标的。讲义的 1 手标的是 100 股，和 1 张期权合约对应的股数一样（1.1），整数写法下它的 delta 是 100，gamma 和 theta 都是 0。各腿相加：delta −10 × 73 ＋ 7 × 100 ＝ −30；gamma −10 × 3.3 ＝ −33；theta −10 × (−.0387) ＝ +0.387。市场不动，这个仓位每天收 0.387。可是标的涨 1 美元，delta 从 −30 变成 −63，空头自己变大，再涨亏得更快；跌也一样，delta 往正的方向走，越跌越不利。标的一天动 3 美元，gamma 那一项亏 ½ × 0.33 × 3² ≈ 1.49（gamma 33 按小数写是 0.33），约 3.8 天的租金。讲义的原话：负 gamma 想要市场平稳，正 gamma 想要市场大动。</p>
+  <p>多腿仓位，把各腿的 gamma 加起来看总数（2.4 讲加法）：总 gamma 为正，就在付租；为负，就在收租。</p>
+
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号与术语</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">Γ</div><div class="t">gamma，读作「伽马」。标的每动 1 美元，delta 变多少。买期权为正，卖期权为负。平值、临近到期时最大。</div></div>
+      <div class="gl"><div class="s">Θ</div><div class="t">theta，读作「西塔」。只过一天、其他不变时，期权价值变多少。买期权为负，本页叫它租金。</div></div>
+      <div class="gl"><div class="s">Δ</div><div class="t">delta。标的动 1 美元，期权价值动多少（2.1）。</div></div>
+      <div class="gl"><div class="s">ΔS</div><div class="t">标的这一天动了多少美元。这里的 Δ 表示「变化量」，和 delta 用的是同一个希腊字母，但不是 delta。</div></div>
+      <div class="gl"><div class="s">S</div><div class="t">标的价格，本页是 TSLA 的股价。</div></div>
+      <div class="gl"><div class="s">σ</div><div class="t">年化波动率（1.2）。本页用买入时的隐含波动率 46.3%。</div></div>
+      <div class="gl"><div class="s">½Γ(ΔS)²</div><div class="t">对冲掉方向之后，标的动了 ΔS 那一天 gamma 带来的收入。涨跌都为正，按幅度的平方增长。</div></div>
+      <div class="gl"><div class="s">½σ²S²Γ</div><div class="t">一年的租金。按日历日除以 365（ORATS 的 theta），按交易日除以 256（1.2 的口诀）。</div></div>
+      <div class="gl"><div class="s">S × σ ÷ 16</div><div class="t">一天的一个标准差（1.2）。对冲后的买方，当天涨跌超过它就赚，不到就亏。</div></div>
+      <div class="gl"><div class="s">内在价值</div><div class="t">现在马上行权能拿到的钱。call 是 max(S − 行权价, 0)（1.1）。</div></div>
+      <div class="gl"><div class="s">时间价值</div><div class="t">期权价格减去内在价值，到期时归零。</div></div>
+      <div class="gl"><div class="s">平值</div><div class="t">行权价离标的价格最近的期权。gamma、theta 都在这里最大。</div></div>
+      <div class="gl"><div class="s">对冲</div><div class="t">买期权的同时卖出 Δ 股标的，把方向的盈亏抵掉（2.1）。</div></div>
+      <div class="gl"><div class="s">收租 / 付租</div><div class="t">theta 为正是收租（卖期权），为负是付租（买期权）。</div></div>
+      <div class="gl"><div class="s">日历日 / 交易日</div><div class="t">日历日一年 365 天，周末也算；交易日一年约 256 天，只算开市的日子。</div></div>
+      <div class="gl"><div class="s">标准差 / 钟形分布</div><div class="t">标准差是一组数离中心的典型距离：每个数离中心的距离平方、求平均、再开方（1.2）。钟形分布里约三分之二的数落在一个标准差以内。</div></div>
+      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%。ORATS 算希腊字母时用的是它自己的另一列隐含波动率，350 这档是 46.2%。</div></div>
+      <div class="gl"><div class="s">实值 / 深度实值 / 虚值</div><div class="t">call 的行权价低于股价是实值，低得多是深度实值，delta 接近 1；行权价高于股价是虚值（2.1）。</div></div>
+      <div class="gl"><div class="s">欧式 / 美式</div><div class="t">欧式期权只能在到期那天行权；美式随时可以行权。TSLA 的个股期权是美式。</div></div>
+      <div class="gl"><div class="s">模型值 / 理论值</div><div class="t">用定价公式（本页是 Black-Scholes，2.1）算出来的数，不是市场报价。讲义把期权的模型价值叫理论值。</div></div>
+      <div class="gl"><div class="s">风险矩阵</div><div class="t">讲义里的一张表：同一个标的、同一个到期日，各行权价期权的市价、理论值和希腊字母。</div></div>
+      <div class="gl"><div class="s">期权链</div><div class="t">同一个标的、同一个到期日，各个行权价的期权排成的一张表（2.1）。本页的「5/15 链」是 5/15 到期的那一条。</div></div>
+      <div class="gl"><div class="s">整数写法 / 1 手标的</div><div class="t">讲义把 delta 0.50 写成 50，gamma 跟着写成整数（3.3 就是小数的 0.033）。讲义的 1 手标的是 100 股，和 1 张期权合约对应的股数一样，整数写法下 delta 是 100。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节 <a href="station-2-4-portfolio-greeks.html"><b>2.4 组合希腊字母</b></a>：把多腿仓位的 delta、gamma、theta、vega 各自加起来，压成四个数。<a href="station-2-3-vega-rho.html">2.3 vega 与 rho</a> 是和本节并列的另一节，两节都学完再进 2.4。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f2 = n => n.toFixed(2), f3 = n => n.toFixed(3);
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);          // 负数用真正的减号
+const lab = (x,y,t,c,a='start',s=11,w=400)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${(s*FS).toFixed(1)}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+function ncdf(x){   // 标准正态累积分布，Abramowitz–Stegun 7.1.26
+  const z=Math.abs(x)/Math.SQRT2, t=1/(1+0.3275911*z);
+  const e=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-z*z);
+  return x>=0 ? 0.5*(1+e) : 0.5*(1-e);
+}
+const npdf = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 案例数据 ══════════
+   由 scripts/data/station_2_2.py 生成。ORATS 快照每天 16:00 那一行，中间价 = (买一 + 卖一) / 2。
+   C350：350 call 每天 [中间价, delta, gamma, theta]；ATM：当天离收盘价最近的行权价 [行权价, gamma, theta, 隐含波动率]（都是 5/15 到期）。
+   CURVES：4/13 收盘，到期 2 / 7 / 18 / 32 天的 [行权价, gamma, theta]。VER：4/13 的 5/15 链 [行权价, ORATS theta, gamma 项, 加利息]。
+   TVCURVE：模型，TSLA 停在 352.36、σ 46.29% 时 350 call 剩 32 天 … 0 天的价值。 */
+const DAYS=["2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15"];
+const U=[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83,378.75,376.14,373.02,381.77,390.83,392.48,389.52,398.62,411.74,428.45,445.06,433.7,445.2,443.36,422.32];
+const C350=[[21.05,0.5574,0.0082,-0.319],[28.2,0.6512,0.00749,-0.3245],[49.675,0.8071,0.00472,-0.296],[46.125,0.7987,0.00506,-0.3013],[55.775,0.8678,0.00412,-0.2421],[47.925,0.8505,0.0049,-0.2546],[42.925,0.8061,0.00554,-0.3131],[43.4,0.822,0.00553,-0.2998],[30.6,0.7576,0.00792,-0.3086],[32.0,0.7939,0.00776,-0.2734],[33.475,0.7996,0.00712,-0.3365],[30.875,0.7892,0.00778,-0.3479],[27.55,0.7701,0.00852,-0.3664],[35.025,0.833,0.00682,-0.3524],[42.7,0.9187,0.00467,-0.2155],[43.95,0.9108,0.00466,-0.3006],[40.725,0.9122,0.00493,-0.2996],[49.75,0.9451,0.00334,-0.2554],[62.425,0.9926,0.0008,-0.0785],[78.55,0.9941,0.00048,-0.0574],[95.175,0.9996,6e-05,-0.0047],[83.725,0.9978,0.00019,-0.0205],[95.375,0.9998,1e-05,-0.0007],[93.4,1.0,0.0,0.0],[72.425,1.0,0.0,0.0]];
+const ATM=[[350.0,0.0082,-0.319,0.462],[365.0,0.00814,-0.3365,0.463],[390.0,0.00753,-0.3708,0.499],[390.0,0.00799,-0.3668,0.4781],[400.0,0.00775,-0.3892,0.465],[392.5,0.00872,-0.3874,0.4641],[387.5,0.00833,-0.4224,0.4831],[387.5,0.00855,-0.4273,0.4812],[375.0,0.01036,-0.3716,0.4195],[375.0,0.01132,-0.3556,0.409],[380.0,0.01194,-0.3963,0.425],[375.0,0.01258,-0.3948,0.414],[375.0,0.01362,-0.389,0.4],[382.5,0.0138,-0.4128,0.404],[390.0,0.01293,-0.4649,0.402],[392.5,0.01408,-0.542,0.4271],[390.0,0.01577,-0.5346,0.423],[397.5,0.01546,-0.5999,0.426],[412.5,0.01519,-0.6809,0.442],[427.5,0.0166,-0.7012,0.434],[445.0,0.01571,-1.3123,0.561],[432.5,0.01653,-1.6529,0.5997],[445.0,0.02011,-1.999,0.589],[442.5,0.02952,-2.7584,0.579],[422.5,0.3034,-0.445,0.257]];
+const CURVES={"2":{"K":[300.0,302.5,305.0,307.5,310.0,312.5,315.0,317.5,320.0,322.5,325.0,327.5,330.0,332.5,335.0,337.5,340.0,342.5,345.0,347.5,350.0,352.5,355.0,357.5,360.0,362.5,365.0,367.5,370.0,372.5,375.0,377.5,380.0,382.5,385.0,387.5,390.0,392.5,395.0,397.5,400.0,402.5,405.0,407.5,410.0],"g":[4e-05,8e-05,0.00015,0.00026,0.00043,0.0007,0.00108,0.00157,0.00218,0.00301,0.00406,0.00539,0.00704,0.00904,0.01156,0.01465,0.01839,0.02263,0.02711,0.03133,0.0347,0.03665,0.03661,0.03435,0.03021,0.02513,0.0202,0.01603,0.01268,0.01012,0.00799,0.00635,0.00496,0.00383,0.00297,0.00231,0.00175,0.00132,0.00098,0.00067,0.00045,0.00029,0.00019,0.00012,7e-05],"th":[-0.0007,-0.0015,-0.0031,-0.0059,-0.0109,-0.0198,-0.0332,-0.0516,-0.0751,-0.11,-0.1556,-0.2176,-0.296,-0.3928,-0.5231,-0.6217,-0.7247,-0.8344,-0.9419,-1.0324,-1.0902,-1.1015,-1.0588,-0.9689,-0.8521,-0.7317,-0.6253,-0.5385,-0.4538,-0.3609,-0.2778,-0.218,-0.1642,-0.1221,-0.0921,-0.0703,-0.0512,-0.0371,-0.0266,-0.0166,-0.0103,-0.0062,-0.0038,-0.0022,-0.0013]},"7":{"K":[300.0,302.5,305.0,307.5,310.0,312.5,315.0,317.5,320.0,322.5,325.0,327.5,330.0,332.5,335.0,337.5,340.0,342.5,345.0,347.5,350.0,352.5,355.0,357.5,360.0,362.5,365.0,367.5,370.0,372.5,375.0,377.5,380.0,382.5,385.0,387.5,390.0,392.5,395.0,397.5,400.0,402.5,405.0,407.5,410.0],"g":[0.0015,0.00181,0.00215,0.00256,0.00302,0.00352,0.00409,0.00474,0.00547,0.00632,0.00729,0.00842,0.00973,0.01119,0.0128,0.01449,0.01615,0.01767,0.01898,0.01996,0.02063,0.021,0.02105,0.0208,0.02025,0.01933,0.01808,0.01653,0.01479,0.01299,0.01127,0.00972,0.00836,0.00719,0.0062,0.00536,0.00462,0.00397,0.00343,0.00294,0.0025,0.00214,0.00183,0.00155,0.00129],"th":[-0.1093,-0.1233,-0.1383,-0.1552,-0.1727,-0.19,-0.2075,-0.2257,-0.2433,-0.2622,-0.282,-0.3038,-0.3283,-0.3559,-0.3863,-0.4195,-0.4538,-0.4873,-0.5175,-0.5409,-0.5561,-0.5617,-0.5556,-0.5385,-0.5116,-0.4756,-0.4338,-0.3893,-0.3453,-0.3047,-0.269,-0.2387,-0.2131,-0.1912,-0.1724,-0.1563,-0.14,-0.1249,-0.1122,-0.0992,-0.0868,-0.0764,-0.0671,-0.0579,-0.0492]},"18":{"K":[300.0,305.0,310.0,315.0,320.0,325.0,330.0,332.5,335.0,337.5,340.0,342.5,345.0,347.5,350.0,352.5,355.0,357.5,360.0,362.5,365.0,367.5,370.0,375.0,380.0,385.0,390.0,395.0,400.0,405.0,410.0],"g":[0.00355,0.00417,0.00486,0.00563,0.00645,0.00727,0.00807,0.00843,0.00877,0.00909,0.00936,0.00959,0.0098,0.00996,0.01008,0.01018,0.01021,0.01023,0.0102,0.01013,0.01004,0.0099,0.00972,0.00928,0.0087,0.00802,0.00727,0.00649,0.00572,0.00501,0.00436],"th":[-0.2268,-0.2489,-0.2732,-0.2993,-0.3269,-0.3553,-0.383,-0.3959,-0.408,-0.4194,-0.4291,-0.4375,-0.4448,-0.4497,-0.4531,-0.455,-0.4541,-0.4519,-0.4478,-0.4414,-0.4337,-0.4239,-0.4126,-0.3861,-0.3558,-0.3229,-0.2898,-0.2581,-0.2289,-0.2028,-0.1801]},"32":{"K":[300.0,305.0,310.0,315.0,320.0,325.0,330.0,335.0,340.0,345.0,350.0,355.0,360.0,365.0,370.0,375.0,380.0,385.0,390.0,395.0,400.0,405.0,410.0],"g":[0.00376,0.00427,0.0048,0.00532,0.00585,0.00636,0.00684,0.00727,0.00766,0.00797,0.0082,0.00834,0.00838,0.00832,0.00817,0.00794,0.00762,0.00725,0.00683,0.00638,0.00591,0.00544,0.00496],"th":[-0.1908,-0.2097,-0.2284,-0.2462,-0.263,-0.2781,-0.2914,-0.3023,-0.3108,-0.3164,-0.319,-0.3186,-0.3152,-0.309,-0.3001,-0.289,-0.2758,-0.2611,-0.2453,-0.2287,-0.2117,-0.1946,-0.1778]}};
+const VER=[[290.0,-0.1533,-0.1348,-0.1652],[295.0,-0.1718,-0.1498,-0.18],[300.0,-0.1908,-0.167,-0.1969],[305.0,-0.2097,-0.1845,-0.214],[310.0,-0.2284,-0.2017,-0.2306],[315.0,-0.2462,-0.2181,-0.2464],[320.0,-0.263,-0.2371,-0.2647],[325.0,-0.2781,-0.2513,-0.278],[330.0,-0.2914,-0.2647,-0.2903],[335.0,-0.3023,-0.2763,-0.3008],[340.0,-0.3108,-0.2866,-0.3099],[345.0,-0.3164,-0.2931,-0.3151],[350.0,-0.319,-0.2977,-0.3183],[355.0,-0.3186,-0.2988,-0.3181],[360.0,-0.3152,-0.2961,-0.3139],[365.0,-0.309,-0.2917,-0.308],[370.0,-0.3001,-0.2851,-0.3],[375.0,-0.289,-0.2747,-0.2882],[380.0,-0.2758,-0.2624,-0.2746],[385.0,-0.2611,-0.2486,-0.2595],[390.0,-0.2453,-0.2342,-0.2439],[395.0,-0.2287,-0.2196,-0.2282],[400.0,-0.2117,-0.2026,-0.2102],[405.0,-0.1946,-0.1874,-0.194],[410.0,-0.1778,-0.1723,-0.1781],[415.0,-0.1612,-0.1571,-0.1621],[420.0,-0.1453,-0.1437,-0.148]];
+const TVCURVE=[21.0459,20.7249,20.399,20.0679,19.7314,19.3891,19.0407,18.6859,18.3243,17.9555,17.5789,17.1942,16.8005,16.3974,15.9841,15.5596,15.123,14.6732,14.2088,13.7282,13.2296,12.7106,12.1685,11.5997,10.9996,10.3622,9.6794,8.9392,8.1238,7.2032,6.1196,4.7291,2.36];
+
+const S0=352.36, K=350, RATE=0.043, IV=0.4629, SD1=0.463/16, G0=C350[0][2], SIM_SEED=2300;
+const CAL=DAYS.map(d=>(Date.parse(d)-Date.parse(DAYS[0]))/864e5);    // 离入场的日历日
+const md=d=>+d.slice(5,7)+'/'+(+d.slice(8));
+/* Black-Scholes，不派息；theta 按每个日历日 */
+function bs(S,X,t,sig,r=RATE){
+  if(t<=0) return {v:Math.max(S-X,0), d:S>X?1:0, g:0, th:0};
+  const st=sig*Math.sqrt(t), d1=(Math.log(S/X)+(r+sig*sig/2)*t)/st, d2=d1-st;
+  return {v:S*ncdf(d1)-X*Math.exp(-r*t)*ncdf(d2), d:ncdf(d1), g:npdf(d1)/(S*st),
+          th:(-S*npdf(d1)*sig/(2*Math.sqrt(t))-r*X*Math.exp(-r*t)*ncdf(d2))/365};
+}
+
+/* ══════════ 动画共用 ══════════ */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+let C={}, RAMP=[];
+function readColors(){
+  const cs=getComputedStyle(document.documentElement), g=k=>cs.getPropertyValue(k).trim();
+  C={bg:g('--panel'),ink:g('--ink'),faint:g('--ink-faint'),soft:g('--ink-soft'),ctl:g('--control'),res:g('--result')};
+  const pr=v=>{ const m=v.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)/); return m?m.slice(1).map(Number):[0.5,0,60]; };
+  const [l0,c0]=pr(C.bg), [l1,c1,h1]=pr(C.ink);
+  RAMP=[0.16,0.3,0.45,0.6,0.76].map(f=>`oklch(${(l0+(l1-l0)*f).toFixed(3)} ${(c0+(c1-c0)*f).toFixed(3)} ${h1})`);
+}
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function pxLine(c,x0,y0,x1,y1){
+  const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0),1);
+  for(let k=0;k<=n;k++) c.fillRect(Math.round(x0+(x1-x0)*k/n),Math.round(y0+(y1-y0)*k/n),1,1);
+}
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+function segOn(id,fn){
+  const bs_=document.querySelectorAll('#'+id+' button');
+  bs_.forEach(b=>b.addEventListener('click',()=>{ bs_.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(b.dataset); }));
+}
+function runLoop(s,ms,step,draw,done){
+  s.playing=true; s.last=0; s.acc=0;
+  const tick=t=>{
+    if(!s.playing) return;
+    const dt=s.last?Math.min(t-s.last,100):ms; s.last=t; s.acc+=dt;
+    while(s.acc>=ms && !done()){ step(); s.acc-=ms; }
+    draw();
+    if(done()){ s.playing=false; if(s.onEnd) s.onEnd(); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+const poly=(pts,col,w=2,extra='')=>`<polyline points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linejoin="round" ${extra}/>`;
+const line=(x1,y1,x2,y2,col,w=1,extra='')=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="${w}" ${extra}/>`;
+
+/* ══════════ 图表宽度 ══════════
+   SVG 图的 viewBox 宽度随容器变：宽屏 720，手机 460（字号相应放大），高度不变 */
+let CW=720, FS=1;
+const NARROW=()=>CW<720;
+const vb=(id,h)=>$(id).setAttribute('viewBox',`0 0 ${CW} ${h}`);
+const ylab=(x,y,t)=>`<text transform="translate(${x} ${y}) rotate(-90)" text-anchor="middle" font-size="${11.5*FS}" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">${t}</text>`;
+
+/* ══════════ 〇 · 切线扫过价值曲线 ══════════
+   模型：350 call，离到期 32 天，σ 46.29%，r 4.3%。上图价值与切线（斜率 = delta），下图 delta 与它的切线（斜率 = gamma） */
+const A1=(()=>{
+  const H=452, L=58, T1=14, B1=208, T2=262, B2=404, lo=290, hi=420, t=32/365;
+  const pts=[]; for(let s=lo;s<=hi;s+=1) pts.push([s,bs(s,K,t,IV)]);
+  const REAL=[[0,'4/13'],[1,'4/14'],[2,'4/15']].map(([i,n])=>({s:U[i],d:C350[i][1],n}));
+  const st={p:1, playing:false};
+  const sAt=p=> p<0.75 ? lo+(hi-lo)*(p/0.75) : hi+(S0-hi)*((p-0.75)/0.25);
+  function draw(){
+    vb('a1',H);
+    const R=CW-20, X=s=>L+(s-lo)/(hi-lo)*(R-L), VM=80, Y1=v=>B1-v/VM*(B1-T1), Y2=d=>B2-d*(B2-T2);
+    const s=sAt(st.p), m=bs(s,K,t,IV);
+    let g=`<defs><clipPath id="a1c"><rect x="${L}" y="${T1}" width="${R-L}" height="${B1-T1}"/></clipPath><clipPath id="a1d"><rect x="${L}" y="${T2-4}" width="${R-L}" height="${B2-T2+8}"/></clipPath></defs>`;
+    [0,20,40,60,80].forEach(v=>{ g+=line(L,Y1(v),R,Y1(v),'var(--rule)',v?.7:1.2); g+=lab(L-8,Y1(v)+4,v,'var(--ink-faint)','end',10.5); });
+    [0,.5,1].forEach(v=>{ g+=line(L,Y2(v),R,Y2(v),'var(--rule)',v===.5?.7:1.1); g+=lab(L-8,Y2(v)+4,v===.5?'0.5':v,'var(--ink-faint)','end',10.5); });
+    (NARROW()?[300,340,380,420]:[300,320,340,360,380,400,420]).forEach(v=>{ g+=lab(X(v),B2+18,v,'var(--ink-faint)','middle',10.5); g+=line(X(v),B2,X(v),B2+4,'var(--ink-faint)'); });
+    g+=lab((L+R)/2,B2+38,'TSLA 价格','var(--ink-soft)','middle',11.5);
+    g+=ylab(14,(T1+B1)/2,'期权价值')+ylab(14,(T2+B2)/2,'delta');
+    g+=line(X(K),T1,X(K),B2,'var(--ink-faint)',1,'stroke-dasharray="2 4"');
+    g+=lab(X(K)-6,T1+12,'行权价 350','var(--ink-faint)','end',10.5);
+    g+=poly([[X(lo),Y1(0)],[X(K),Y1(0)],[X(hi),Y1(hi-K)]],'var(--ink-faint)',1.6,'stroke-dasharray="6 5"');
+    g+=poly(pts.map(([x,b])=>[X(x),Y1(b.v)]),'var(--ink)',2.4);
+    // 切线：斜率 = delta
+    const w=26, tx=[s-w,s+w].map(x=>[X(x),Y1(m.v+m.d*(x-s))]);
+    g+=`<g clip-path="url(#a1c)">${line(tx[0][0],tx[0][1],tx[1][0],tx[1][1],'var(--control)',2.6)}</g>`;
+    g+=`<circle cx="${X(s)}" cy="${Y1(m.v)}" r="5" fill="var(--control)"/>`;
+    const t1= s<330 ? [X(s)+12,Y1(m.v)-24,'start'] : [X(s)-14,Y1(m.v)-14,'end'];
+    g+=lab(t1[0],Math.max(T1+30,t1[1]),(NARROW()?'斜率 = delta = ':'切线斜率 = delta = ')+m.d.toFixed(3),'var(--control)',t1[2],12,600);
+    // 下图：delta 与它的切线（斜率 = gamma）
+    g+=poly(pts.map(([x,b])=>[X(x),Y2(b.d)]),'var(--ink)',2.4);
+    REAL.forEach(r=>{ g+=`<circle cx="${X(r.s)}" cy="${Y2(r.d)}" r="4.5" fill="var(--result)"/>`; });
+    g+=lab(X(REAL[0].s)+8,Y2(REAL[0].d)+17,'4/13 0.557','var(--result)','start',10.5);
+    g+=lab(X(REAL[1].s)-8,Y2(REAL[1].d)-9,'4/14 0.651','var(--result)','end',10.5);
+    g+=lab(X(REAL[2].s)+8,Y2(REAL[2].d)+17,'4/15 0.807','var(--result)','start',10.5);
+    const w2=16, dx=[s-w2,s+w2].map(x=>[X(x),Y2(m.d+m.g*(x-s))]);
+    g+=`<g clip-path="url(#a1d)">${line(dx[0][0],dx[0][1],dx[1][0],dx[1][1],'var(--control)',2.6)}</g>`;
+    g+=`<circle cx="${X(s)}" cy="${Y2(m.d)}" r="5" fill="var(--control)"/>`;
+    const t2= s<330 ? [X(s)+10,Y2(m.d)-30,'start'] : s>385 ? [X(s)-16,Y2(m.d)-14,'end'] : [X(s)+14,Y2(m.d)+42,'start'];
+    g+=lab(t2[0],Math.max(T2+12,Math.min(B2-6,t2[1])),(NARROW()?'斜率 = gamma = ':'这条线的斜率 = gamma = ')+m.g.toFixed(4),'var(--control)',t2[2],12,600);
+    $('a1').innerHTML=g;
+    $('a1S').textContent=f2(s); $('a1D').textContent=m.d.toFixed(3); $('a1G').textContent=m.g.toFixed(5);
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.p=1; draw(); return; }
+    st.p=0; runLoop(st,16.7,()=>{ st.p=Math.min(1,st.p+16.7/7000); },draw,()=>st.p>=1);
+  }
+  $('a1Play').addEventListener('click',start);
+  return {start,draw,el:$('a1')};
+})();
+
+/* ══════════ 一 · 四个到期日的 gamma / theta 曲线（ORATS，4/13 收盘） ══════════ */
+const A2=(()=>{
+  const H=318, L=62, T=18, B=272;
+  const ORD=[32,18,7,2], COL={32:'var(--ink-faint)',18:'var(--ink)',7:'var(--result)',2:'var(--control)'};
+  const EXPN={32:'5/15',18:'5/1',7:'4/20',2:'4/15'};
+  /* 标签放在曲线旁边的空白处：[行权价, 纵坐标, 对齐] */
+  const CFG={g:{max:0.04,ticks:[0,.01,.02,.03,.04],fmt:v=>v===0?'0':v.toFixed(2),val:(c,i)=>c.g[i],pk:v=>v.toFixed(4),word:'最高',title:'gamma',
+               pos:{2:[359,.0352,'start'],7:[371,.0205,'start'],18:[329,.0122,'end'],32:[410,.0092,'end']}},
+             th:{max:1.2,ticks:[0,.3,.6,.9,1.2],fmt:v=>v===0?'0':'−'+v.toFixed(1),val:(c,i)=>-c.th[i],pk:v=>'−'+v.toFixed(2),word:'最大',title:'theta（每天，美元）',
+               pos:{2:[359,1.06,'start'],7:[372,.56,'start'],18:[331,.50,'end'],32:[300,.66,'start']}}};
+  let mode='g'; const st={p:4, playing:false};
+  function peak(n){ const c=CURVES[n], cf=CFG[mode]; let bi=0; c.K.forEach((_,i)=>{ if(cf.val(c,i)>cf.val(c,bi)) bi=i; }); return {k:c.K[bi],v:cf.val(c,bi)}; }
+  function valAt(c,k){ const cf=CFG[mode]; for(let i=1;i<c.K.length;i++) if(c.K[i]>=k){ const f=(k-c.K[i-1])/(c.K[i]-c.K[i-1]); return cf.val(c,i-1)+(cf.val(c,i)-cf.val(c,i-1))*f; } return cf.val(c,c.K.length-1); }
+  function draw(){
+    vb('a2',H);
+    const R=CW-20, X=k=>L+(k-300)/110*(R-L), cf=CFG[mode], Y=v=>B-v/cf.max*(B-T);
+    let g='';
+    cf.ticks.forEach(v=>{ g+=line(L,Y(v),R,Y(v),'var(--rule)',v===0?1.2:.7); g+=lab(L-8,Y(v)+4,cf.fmt(v),'var(--ink-faint)','end',10.5); });
+    for(let k=300;k<=410;k+=10){ g+=line(X(k),B,X(k),B+4,'var(--ink-faint)'); if(k%(NARROW()?40:20)===0||(!NARROW()&&k===410)) g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',10.5); }
+    g+=lab((L+R)/2,B+38,'行权价','var(--ink-soft)','middle',11.5);
+    g+=ylab(12,(T+B)/2,cf.title);
+    g+=line(X(S0),T,X(S0),B,'var(--ink-faint)',1,'stroke-dasharray="3 4"');
+    g+=lab(X(S0)-6,T+10,'TSLA 352.36','var(--ink-faint)','end',10.5);
+    ORD.forEach((n,j)=>{
+      const f=Math.max(0,Math.min(1,st.p-j)); if(f<=0) return;
+      const c=CURVES[n], kEnd=300+110*f, pts=[];
+      c.K.forEach((k,i)=>{ if(k<=kEnd) pts.push([X(k),Y(cf.val(c,i))]); });
+      if(kEnd<410 && pts.length) pts.push([X(kEnd),Y(valAt(c,kEnd))]);
+      g+=poly(pts,COL[n],n===32?2.2:2.5);
+      if(f>=1){
+        const pk=peak(n), [kl,yl,an]=cf.pos[n];
+        g+=`<circle cx="${X(pk.k)}" cy="${Y(pk.v)}" r="3.6" fill="${COL[n]}"/>`;
+        g+=lab(X(kl),Y(yl),NARROW()?`${n} 天`:`${n} 天 · ${cf.word} ${cf.pk(pk.v)}`,COL[n],an,11.5,600);
+      }
+    });
+    $('a2').innerHTML=g;
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.p=4; draw(); return; }
+    st.p=0; runLoop(st,16.7,()=>{ st.p=Math.min(4,st.p+16.7/900); },draw,()=>st.p>=4);
+  }
+  function legend(){ $('a2Leg').innerHTML=ORD.map(n=>{ const pk=peak(n); return `<span><i class="ln" style="background:${COL[n]}"></i>离到期 ${n} 天（${EXPN[n]} 到期），${CFG[mode].word} ${CFG[mode].pk(pk.v)}</span>`; }).join(''); }
+  legend();
+  segOn('a2Seg',d=>{ mode=d.m; legend(); start(); });
+  $('a2Play').addEventListener('click',start);
+  return {start,draw,el:$('a2')};
+})();
+
+/* ══════════ 一 · 350 call 与当天平值 call 的 gamma，逐日 ══════════ */
+function drawG350(){
+  const H=262, L=62, T=16, B=214, n=24, YM=0.032;
+  vb('g350',H);
+  const R=CW-(NARROW()?62:60), X=i=>L+i/(n-1)*(R-L), Y=v=>B-v/YM*(B-T);
+  let g='';
+  [0,.01,.02,.03].forEach(v=>{ g+=line(L,Y(v),R,Y(v),'var(--rule)',v===0?1.2:.7); g+=lab(L-8,Y(v)+4,v===0?'0':v.toFixed(2),'var(--ink-faint)','end',10.5); });
+  (NARROW()?[0,6,12,18,23]:[0,4,8,12,16,20,23]).forEach(i=>{ g+=line(X(i),B,X(i),B+4,'var(--ink-faint)'); g+=lab(X(i),B+18,md(DAYS[i]),'var(--ink-faint)','middle',10.5); });
+  g+=ylab(12,(T+B)/2,'gamma');
+  const a=[], b=[];
+  for(let i=0;i<n;i++){ a.push([X(i),Y(C350[i][2])]); b.push([X(i),Y(ATM[i][1])]); }
+  g+=poly(b,'var(--result)',2.4); g+=poly(a,'var(--control)',2.4);
+  a.forEach(p=>g+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--control)"/>`);
+  b.forEach(p=>g+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--result)"/>`);
+  g+=lab(X(23)+8,Y(ATM[23][1])+4,'平值','var(--result)','start',11.5,600);
+  g+=lab(X(23)+8,Y(ATM[23][1])+19,'0.0295','var(--result)','start',11);
+  g+=lab(X(23)+8,Y(0)-4,'350','var(--control)','start',11.5,600);
+  g+=lab(X(2)+4,Y(C350[2][2])+22,NARROW()?'4/15：0.0047':'4/15 TSLA 392：0.0047','var(--control)','start',11);
+  g+=lab(X(0)+6,Y(C350[0][2])-12,NARROW()?'4/13：0.0082':'4/13 两者都是 0.0082','var(--ink-soft)','start',11);
+  $('g350').innerHTML=g;
+}
+
+/* ══════════ 二 · 横盘 32 天（模型）＋ ORATS 平值 theta ══════════ */
+const A3=(()=>{
+  const H=420, L=58, T1=16, B1=196, T2=250, B2=376;
+  const VM=22, Y1=v=>B1-v/VM*(B1-T1), TM=3, Y2=v=>B2-Math.min(v,TM)/TM*(B2-T2);
+  const intr=S0-K, TV=TVCURVE.map(v=>Math.max(0,v-intr));
+  const thAt=n=>-bs(S0,K,n/365,IV).th;
+  const DOTS=[]; for(let i=0;i<24;i++){ const n=32-CAL[i]; DOTS.push({n, raw:-ATM[i][2], adj:-ATM[i][2]*(S0*IV)/(U[i]*ATM[i][3]), d:DAYS[i]}); }
+  let mode='raw'; const st={p:32, playing:false};   // p：已经过去几天（0 到 32）
+  const valAt=p=>{ const j=Math.min(31,Math.floor(p)), f=p-j; return TVCURVE[j]+(TVCURVE[j+1]-TVCURVE[j])*f; };
+  const thLine=[]; for(let n=32;n>=0.35;n-=0.25) thLine.push([n,thAt(n)]);
+  function draw(){
+    vb('a3',H);
+    const R=CW-30, X=n=>L+(32-n)/32*(R-L);
+    const p=st.p, n=32-p;
+    let g='';
+    [0,5,10,15,20].forEach(v=>{ g+=line(L,Y1(v),R,Y1(v),'var(--rule)',v?.7:1.2); g+=lab(L-8,Y1(v)+4,v,'var(--ink-faint)','end',10.5); });
+    [0,1,2,3].forEach(v=>{ g+=line(L,Y2(v),R,Y2(v),'var(--rule)',v?.7:1.2); g+=lab(L-8,Y2(v)+4,v?'−'+v:'0','var(--ink-faint)','end',10.5); });
+    (NARROW()?[32,24,16,8,0]:[32,28,24,20,16,12,8,4,0]).forEach(k=>{ g+=line(X(k),B2,X(k),B2+4,'var(--ink-faint)'); g+=lab(X(k),B2+18,k,'var(--ink-faint)','middle',10.5); });
+    g+=lab((L+R)/2,B2+38,'离到期还剩几天','var(--ink-soft)','middle',11.5);
+    g+=ylab(12,(T1+B1)/2,'期权价值')+ylab(12,(T2+B2)/2,'theta（每天）');
+    // 上图：价值与时间价值
+    const full=[], done=[];
+    for(let j=0;j<=32;j++){ full.push([X(32-j),Y1(TVCURVE[j])]); if(j<=p) done.push([X(32-j),Y1(TVCURVE[j])]); }
+    const cv=valAt(p), ctv=Math.max(0,cv-intr);
+    done.push([X(n),Y1(cv)]);
+    g+=poly(full,'var(--ink-faint)',1.3,'stroke-dasharray="3 4"');
+    const area=done.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' ')+` ${X(n).toFixed(1)},${Y1(intr).toFixed(1)} ${X(32).toFixed(1)},${Y1(intr).toFixed(1)}`;
+    g+=`<polygon points="${area}" fill="var(--result-bg)"/>`;
+    g+=poly(done,'var(--ink)',2.4);
+    g+=line(L,Y1(intr),R,Y1(intr),'var(--ink-soft)',1.2,'stroke-dasharray="6 4"');
+    g+=lab(X(31),Y1(intr)-6,'内在价值 2.36','var(--ink-soft)','start',10.5);
+    g+=`<circle cx="${X(n)}" cy="${Y1(cv)}" r="5" fill="var(--ink)"/>`;
+    if(n>=0.5) g+=lab(X(n)+(n<10?-10:10),Y1(cv)-10,'时间价值 '+f2(ctv),'var(--result)',n<10?'end':'start',12,600);
+    // 下图：theta
+    const tl=thLine.map(([k,v])=>[X(k),Y2(v)]), tdone=thLine.filter(([k])=>k>=n).map(([k,v])=>[X(k),Y2(v)]);
+    g+=poly(tl,'var(--ink-faint)',1.3,'stroke-dasharray="3 4"');
+    if(tdone.length>1) g+=poly(tdone,'var(--control)',2.4);
+    if(n<=5) g+=lab(X(5),Y2(thAt(5))+20,'模型','var(--control)','middle',11,600);
+    DOTS.forEach(o=>{ if(o.n<n-1e-9) return; g+=`<circle cx="${X(o.n)}" cy="${Y2(o[mode])}" r="4" fill="var(--result)"/>`; });
+    if(p>=32){
+      const last=DOTS[23];
+      g+=lab(X(last.n)-10,Y2(last[mode])-9,`5/14 剩 1 天：${fm(-last[mode])}`,'var(--result)','end',11,600);
+    }
+    $('a3').innerHTML=g;
+    const ni=Math.round(n*1000)/1000;
+    $('a3N').textContent= ni<=0 ? '到期' : (Number.isInteger(ni)?ni:ni.toFixed(1))+' 天';
+    $('a3V').textContent=f2(cv);
+    $('a3TV').textContent=f2(ctv); $('a3TVb').textContent=`入场时的 ${(ctv/TV[0]*100).toFixed(0)}%`;
+    $('a3Th').textContent= n>0.5 ? fm(-thAt(Math.max(1,Math.round(n))),3) : '0';
+    $('a3Say').textContent= p<32 ? '' :
+      `TSLA 一动不动的 32 天：前 16 天时间价值丢了 ${f2(TV[0]-TV[16])}（${((TV[0]-TV[16])/TV[0]*100).toFixed(0)}%），后 16 天丢了 ${f2(TV[16])}（${(TV[16]/TV[0]*100).toFixed(0)}%），其中最后 8 天就丢了 ${f2(TV[24])}（${(TV[24]/TV[0]*100).toFixed(0)}%）。第一天流失 ${f2(TVCURVE[0]-TVCURVE[1])}，最后一天流失 ${f2(TVCURVE[31]-TVCURVE[32])}。`;
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.p=32; draw(); return; }
+    st.p=0; runLoop(st,16.7,()=>{ st.p=Math.min(32,st.p+16.7/260); },draw,()=>st.p>=32);
+  }
+  segOn('a3Seg',d=>{ mode=d.m; draw(); });
+  $('a3Play').addEventListener('click',start);
+  return {start,draw,el:$('a3')};
+})();
+
+/* ══════════ 三 · 2000 个模拟交易日（像素） ══════════
+   每天从钟形分布抽一个 z（离 0 几个标准差）。这一天 gamma 收入 = z² 份租金，租金 = 1 份 */
+const A4=(()=>{
+  const W=264, H=160, N=2000, NB=80, BW=3, X0=12, BASE=92, TOP=6, LY0=114, LY1=154, MS=16.7;
+  const cv=$('a4'), c=cv.getContext('2d');
+  const binOf=z=>Math.max(0,Math.min(NB-1,Math.floor((z+4)/0.1)));
+  /* 刻度数字放在画布上面一层 HTML 里，按画布坐标的百分比定位 */
+  const pc=(v,d)=>(v/d*100).toFixed(2)+'%', ty=pc(BASE+6,H);
+  $('a4ax').innerHTML=[-3,-2,-1,0,1,2,3].map(z=>`<span style="left:${pc(X0+(z+4)/0.1*BW,W)};top:${ty}">${z>0?'+'+z:z<0?'−'+(-z):'0'}</span>`).join('')+
+    `<span style="left:auto;right:0;transform:none;top:${ty}">标准差</span>`+
+    `<span style="left:${pc(X0-3,W)};top:${pc((LY0+LY1)/2+0.5,H)};transform:translate(-100%,-50%)">1</span>`;
+  let s=null;
+  function init(){
+    const rnd=mulberry32(SIM_SEED), z=new Float64Array(N);
+    for(let i=0;i<N;i++){ const u1=1-rnd(), u2=rnd(); z[i]=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); }
+    s={z, n:0, spawned:0, fly:[], cnt:new Array(NB).fill(0), sum:0, sumW:0, nW:0, ratio:new Float32Array(N+1), playing:false};
+  }
+  const stackTop=b=>BASE-Math.floor(s.cnt[b]/2);
+  function land(i){
+    const z=s.z[i], b=binOf(z); s.cnt[b]++; s.n++;
+    s.sum+=z*z; if(Math.abs(z)>1){ s.sumW+=z*z; s.nW++; }
+    s.ratio[s.n]=s.sum/s.n;
+  }
+  function step(){
+    const k= s.spawned<60 ? 1 : s.spawned<300 ? 4 : 14;
+    for(let q=0;q<k && s.spawned<N;q++){ s.fly.push({i:s.spawned, y:TOP}); s.spawned++; }
+    s.fly=s.fly.filter(f=>{ f.y+=5; const b=binOf(s.z[f.i]); if(f.y<stackTop(b)) return true; land(f.i); return false; });
+  }
+  const done=()=>s.n>=N;
+  function draw(){
+    c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+    const xOf=z=>X0+(z+4)/0.1*BW;
+    c.fillStyle=RAMP[1]; c.fillRect(X0,BASE+1,NB*BW,1);
+    c.fillStyle=C.soft; for(let y=TOP;y<=BASE;y+=3){ c.fillRect(Math.round(xOf(-1))-1,y,1,1); c.fillRect(Math.round(xOf(1))-1,y,1,1); }
+    c.fillStyle=C.faint; [-3,-2,-1,0,1,2,3].forEach(z=>c.fillRect(Math.round(xOf(z))-1,BASE+2,1,z===0?3:2));
+    for(let b=0;b<NB;b++){
+      const zc=-4+(b+0.5)*0.1; c.fillStyle= Math.abs(zc)>1 ? C.ctl : RAMP[3];
+      const x0=X0+b*BW;
+      for(let m=0;m<s.cnt[b];m++) c.fillRect(x0+(m&1),BASE-(m>>1),1,1);
+    }
+    s.fly.forEach(f=>{ const z=s.z[f.i]; c.fillStyle= Math.abs(z)>1 ? C.ctl : C.ink; c.fillRect(X0+binOf(z)*BW,Math.round(f.y),1,1); });
+    // 下方：累计收入 ÷ 累计租金
+    const Yr=r=>Math.round(LY1-(Math.max(0.4,Math.min(1.6,r))-0.4)/1.2*(LY1-LY0));
+    c.fillStyle=RAMP[1]; c.fillRect(X0,LY0-2,1,LY1-LY0+4);
+    c.fillStyle=C.soft; for(let x=X0;x<X0+NB*BW;x+=3) c.fillRect(x,Yr(1),1,1);
+    c.fillStyle=C.res;
+    let px=null;
+    for(let d=1;d<=s.n;d++){
+      const x=X0+Math.round((d-1)/(N-1)*(NB*BW-1)), y=Yr(s.ratio[d]);
+      if(px) pxLine(c,px[0],px[1],x,y); else c.fillRect(x,y,1,1);
+      px=[x,y];
+    }
+    $('a4N').textContent=s.n;
+    $('a4W').textContent= s.n? (s.nW/s.n*100).toFixed(1)+'%' : '0%';
+    $('a4I').textContent= s.sum? (s.sumW/s.sum*100).toFixed(1)+'%' : '0%';
+    $('a4R').textContent= s.n? (s.sum/s.n).toFixed(2) : '0';
+    $('a4Say').textContent= s.n<N ? '' :
+      `2000 天里，动不到一个标准差的日子占 ${(100-s.nW/s.n*100).toFixed(0)}%，每天都亏一点租金；超过一个标准差的 ${(s.nW/s.n*100).toFixed(0)}%，带来 ${(s.sumW/s.sum*100).toFixed(0)}% 的 gamma 收入。前 100 天收入是租金的 ${s.ratio[100].toFixed(2)} 倍，日子越多越接近 1，2000 天是 ${(s.sum/s.n).toFixed(2)}。长期平均下来，一天的收入正好等于租金。`;
+  }
+  function start(){
+    if(s) s.playing=false;
+    init();
+    if(reduced){ for(let i=0;i<N;i++){ land(i); } s.spawned=N; draw(); return; }
+    runLoop(s,MS,step,draw,done);
+  }
+  $('a4Play').addEventListener('click',start);
+  init(); for(let i=0;i<N;i++) land(i); s.spawned=N;
+  /* 画布外面包了一层放刻度数字，宽度按 .stage 算：能整数倍放大就整数倍，否则占满 */
+  function fit(){ const pw=cv.parentElement.parentElement.clientWidth, k=Math.floor(pw/W), w= k>=2 ? W*k : pw;
+    cv.style.width=w+'px'; cv.style.height=(w*H/W)+'px'; }
+  return {start,draw,fit,el:cv};
+})();
+
+/* ══════════ 三 · theta 公式核对：5/15 整条链（4/13 收盘） ══════════ */
+function drawVer(){
+  const H=300, L=62, T=16, B=250, lo=290, hi=420, y0=0.12, y1=0.34;
+  vb('ver',H);
+  const R=CW-20, X=k=>L+(k-lo)/(hi-lo)*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+  let g='';
+  [.15,.2,.25,.3].forEach(v=>{ g+=line(L,Y(v),R,Y(v),'var(--rule)',.7); g+=lab(L-8,Y(v)+4,'−'+v.toFixed(2),'var(--ink-faint)','end',10.5); });
+  (NARROW()?[300,340,380,420]:[300,320,340,360,380,400,420]).forEach(k=>{ g+=line(X(k),B,X(k),B+4,'var(--ink-faint)'); g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',10.5); });
+  g+=lab((L+R)/2,B+38,NARROW()?'行权价（5/15 到期）':'行权价（5/15 到期，4/13 收盘）','var(--ink-soft)','middle',11.5);
+  g+=ylab(12,(T+B)/2,'theta（每天）');
+  g+=poly(VER.map(r=>[X(r[0]),Y(-r[2])]),'var(--result)',2,'stroke-dasharray="6 4"');
+  g+=poly(VER.map(r=>[X(r[0]),Y(-r[3])]),'var(--control)',2.2);
+  VER.forEach(r=>g+=`<circle cx="${X(r[0]).toFixed(1)}" cy="${Y(-r[1]).toFixed(1)}" r="3.4" fill="var(--ink)"/>`);
+  const r350=VER.find(r=>r[0]===350);
+  g+=lab(X(350),Y(-r350[1])-14,'350：ORATS −0.319','var(--ink)','middle',11,600);
+  g+=lab(X(350),Y(-r350[2])+26,'gamma 项 −0.298','var(--result)','middle',11,600);
+  $('ver').innerHTML=g;
+}
+
+/* ══════════ 四 · 逐日账本 ══════════
+   A：gamma 固定 0.0082，租金 = ½Γ(S × 2.89%)² 每个交易日；B：真实 350 call，ORATS 当天的 gamma 与 theta，theta × 日历日 */
+const A5=(()=>{
+  const H=410, L=58, T1=18, B1=226, T2=268, B2=372, n=24;
+  const UP=3.7, DN=1.0, K1=(B1-T1)/(UP+DN), Y0=T1+UP*K1;
+  const CM=[-2.2,3.2], Yc=v=>B2-(v-CM[0])/(CM[1]-CM[0])*(B2-T2);
+  const mv=[], rows={A:[],B:[]};
+  for(let i=0;i<n;i++){
+    const dS=U[i+1]-U[i], m=U[i+1]/U[i]-1, days=CAL[i+1]-CAL[i];
+    mv.push(m);
+    rows.A.push({g:0.5*G0*dS*dS, r:0.5*G0*(U[i]*SD1)**2, days:1});
+    rows.B.push({g:0.5*C350[i][2]*dS*dS, r:-C350[i][3]*days, days, th:C350[i][3]});
+  }
+  ['A','B'].forEach(k=>{ let c=0; rows[k].forEach(r=>{ c+=r.g-r.r; r.cum=c; }); });
+  let mode='A'; const st={p:n, playing:false};
+  function draw(){
+    vb('a5',H);
+    const R=CW-20, bw=(R-L)/n, XC=i=>L+(i+0.5)*bw;
+    const R_=rows[mode], p=st.p, k=Math.min(n,Math.floor(p)), fr=p-k;
+    let g='';
+    [3,2,1,0,-1].forEach(v=>{ const y=Y0-v*K1; g+=line(L,y,R,y,'var(--rule)',v===0?1.3:.7); g+=lab(L-8,y+4,v>0?'+'+v:v<0?'−'+(-v):'0','var(--ink-faint)','end',10.5); });
+    g+=lab(R,T1+10,'↑ gamma 赚的','var(--result)','end',11,600);
+    g+=lab(R,B1-2,'↓ 租金','var(--control)','end',11,600);
+    if(k<n && p>0) g+=`<rect x="${(L+k*bw).toFixed(1)}" y="${T1}" width="${bw.toFixed(1)}" height="${B1-T1}" fill="var(--panel2)"/>`;
+    let lastLab={i:-9,y:0};
+    for(let i=0;i<n;i++){
+      const f= i<k ? 1 : i===k ? fr : 0; if(f<=0) continue;
+      const r=R_[i], win=r.g>r.r, x=XC(i)-bw*0.34, w=bw*0.68;
+      const hu=Math.max(1,r.g*K1*f), hd=Math.max(1,r.r*K1*f);
+      g+=`<rect x="${x.toFixed(1)}" y="${(Y0-hu).toFixed(1)}" width="${w.toFixed(1)}" height="${hu.toFixed(1)}" fill="var(--result)" fill-opacity="${win?1:.45}"/>`;
+      g+=`<rect x="${x.toFixed(1)}" y="${Y0.toFixed(1)}" width="${w.toFixed(1)}" height="${hd.toFixed(1)}" fill="var(--control)" fill-opacity=".75"/>`;
+      if(f>=1 && Math.abs(mv[i])>SD1){
+        let y=Y0-hu-5; if(NARROW() && lastLab.i===i-1 && Math.abs(y-lastLab.y)<14) y=lastLab.y-13;
+        g+=lab(XC(i),y,NARROW()?Math.abs(mv[i]/SD1).toFixed(1):sgn(mv[i]/SD1,1),'var(--result)','middle',NARROW()?9:9.5,600);
+        lastLab={i,y};
+      }
+    }
+    // 下图：累计
+    [-2,0,2].forEach(v=>{ g+=line(L,Yc(v),R,Yc(v),'var(--rule)',v===0?1.3:.7); g+=lab(L-8,Yc(v)+4,v>0?'+'+v:v<0?'−'+(-v):'0','var(--ink-faint)','end',10.5); });
+    g+=ylab(12,(T2+B2)/2,'累计')+ylab(12,(T1+B1)/2,'每天，美元');
+    const pts=[[L,Yc(0)]];
+    for(let i=0;i<n;i++){
+      if(i<k) pts.push([XC(i),Yc(R_[i].cum)]);
+      else if(i===k && fr>0){ const px=i?XC(i-1):L, pc=i?R_[i-1].cum:0; pts.push([px+(XC(i)-px)*fr, Yc(pc+(R_[i].cum-pc)*fr)]); }
+    }
+    g+=poly(pts,'var(--ink)',2.2);
+    pts.slice(1).forEach((q,j)=>{ if(j<k) g+=`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="2.6" fill="var(--ink)"/>`; });
+    if(k>=n){ const last=R_[n-1].cum; g+=lab(XC(n-1)-6,Yc(last)-10,fm(last),'var(--ink)','end',11,600); }
+    (NARROW()?[0,7,15,23]:[0,3,7,11,15,19,23]).forEach(i=>g+=lab(XC(i),B2+18,md(DAYS[i+1]),'var(--ink-faint)','middle',10.5));
+    $('a5').innerHTML=g;
+    // 读数
+    const ci= p>=n ? n-1 : (fr>0 ? k : k-1);
+    if(ci<0){ ['a5Db','a5M','a5Mb','a5G','a5Gb','a5C','a5Cb'].forEach(id=>$(id).textContent=''); $('a5D').textContent='4/13'; $('a5Db').textContent='入场'; }
+    else {
+      const r=R_[ci];
+      $('a5D').textContent=md(DAYS[ci+1]); $('a5Db').textContent=`第 ${ci+1} 个交易日`;
+      $('a5M').textContent=sgn(mv[ci]*100)+'%'; $('a5Mb').textContent=sgn(mv[ci]/SD1)+' 个标准差';
+      $('a5G').textContent=`${f3(r.g)} / ${f3(r.r)}`;
+      $('a5Gb').textContent= mode==='A' ? '½Γ(ΔS)² / ½Γ(S×2.89%)²' : `theta ${fm(r.th,4)} × ${r.days} 天`;
+      const cum= ci<k||p>=n ? r.cum : (ci?R_[ci-1].cum:0);
+      $('a5C').textContent=sgn(cum); $('a5C').style.color= cum>=0?'var(--result)':'var(--control)';
+      $('a5Cb').textContent= Math.abs(r.g-r.r)<5e-4 ? '这一天不赚不亏' : r.g>r.r ? '这一天赚' : '这一天亏';
+    }
+    const say=$('a5Say');
+    if(p<n){ say.textContent=''; return; }
+    const G=R_.reduce((a,r)=>a+r.g,0), Rt=R_.reduce((a,r)=>a+r.r,0), wins=R_.filter(r=>r.g>r.r).length;
+    if(mode==='A'){
+      const wd=R_.map((r,i)=>r.g>r.r?md(DAYS[i+1]):null).filter(Boolean).join('、');
+      say.textContent=`${wins} 天赚，${n-wins} 天亏。赚的 ${wins} 天是 ${wd}，就是 1.2 数出的那 ${wins} 天。24 天合计：gamma 赚 ${f2(G)}，租金付 ${f2(Rt)}，净 ${fm(G-Rt)}。实际波动 45.8% 和买入时付的 46.3% 几乎一样，账本就几乎打平。累计在 4/15 最高（${sgn(R_[1].cum)}），之后总体往下走，5/6 最低（${fm(Math.min(...R_.map(r=>r.cum)))}）：4/24 到 5/6 是连着 9 天的小动。`;
+    } else {
+      const late=R_.slice(17).reduce((a,r)=>a+r.g,0);
+      say.textContent=`真实的 350 call，${wins} 天赚。4/15 TSLA 冲到 392，gamma 掉到 0.0047；4/23 到 4/30 回落到 373 到 382，gamma 回到 0.0068 到 0.0085，4/29 的 0.0085 比入场时还高，theta 也跟着到了 −0.366；5/7 收盘之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。从 5/7 起的 7 个交易日里有 4 天涨跌超过一个标准差，gamma 一共只赚了 ${f2(late)}。ORATS 的 theta 按日历日收，周末两天的记在周一：按 46.3% 算，平常一天涨跌超过 2.42% 就回本，周一要超过 4.20%。合计 gamma 赚 ${f2(G)}，theta 付 ${f2(Rt)}，净 ${fm(G-Rt)}。1.1 里这张 call 赚的钱来自方向，方向已经对冲掉，不在这本账里。`;
+    }
+  }
+  function start(){
+    st.playing=false;
+    if(reduced){ st.p=n; draw(); return; }
+    st.p=0; runLoop(st,16.7,()=>{ st.p=Math.min(n,st.p+16.7/430); },draw,()=>st.p>=n);
+  }
+  segOn('a5Seg',d=>{ mode=d.m; start(); });
+  $('a5Play').addEventListener('click',start);
+  return {start,draw,el:$('a5')};
+})();
+
+
+/* ══════════ 六 · 费曼检验 ══════════ */
+const QS=[
+ {q:`不许用「导数」「二阶」这类词，向没学过的人解释 gamma 是什么。再解释：TSLA 从 352 涨到 392，350 call 的 gamma 为什么从 0.0082 掉到 0.0047。`,
+  a:['delta 是期权跟着标的动的比例；gamma 是这个比例本身变得多快：标的每动 1 美元，delta 变多少。',
+     'call 的 delta 在 0 和 1 之间：标的远低于行权价时贴近 0，远高于时贴近 1，只在行权价附近往上爬。gamma 就是这段爬坡有多陡。',
+     '352 就在 350 旁边，delta 正在爬，gamma 大。到 392，delta 已经 0.81，离 1 不远，能爬的余地小了，gamma 就小。'],
+  s:'「gamma 是 delta 的导数」：换了个名字，没说出它在期权上意味着什么。'},
+ {q:`同一天、TSLA 都是 352.36，2 天到期的平值 call gamma 是 0.0367，32 天到期的只有 0.0084。为什么越近到期 gamma 越大？为什么 320 这种离平值远的行权价，反而是 32 天的 gamma 大？`,
+  a:['到期那一刻，delta 不是 0 就是 1，在行权价上一步跳过去。离到期越近，delta 从 0 爬到 1 的价格范围越窄。',
+     '这段范围大约几个标准差宽，一个标准差按 √t 缩小：32 天约 48.5 美元，2 天约 11 美元。同样的爬升挤进四分之一的宽度，坡陡了约 4 倍。',
+     '320 离 352 有 32 美元：对 2 天的期权约是三个标准差，delta 早已贴在 1 附近不动；对 32 天的期权还不到一个标准差，delta 还在爬。'],
+  s:'「快到期了风险大」：没说出 gamma 大是因为 delta 爬得陡，也解释不了 320 的反例。'},
+ {q:`假设 TSLA 一直停在 352.36，这张 350 call 的时间价值 18.69 会怎样流失？为什么最后 8 天丢得比前 16 天还多？`,
+  a:['时间价值付的是「到期前还可能走多远」，这个距离按剩余天数的平方根算（1.2）。',
+     '所以时间价值大致跟 √剩余天数 成正比：剩 16 天还剩约 71%，剩 8 天还剩约一半。',
+     '前 16 天只丢了约三成（5.92），最后 8 天丢了近一半（8.64）。平方根越靠近 0 越陡，每天的流失越来越大：第一天 0.32，最后一天 2.37。'],
+  s:'「时间价值每天均匀减少」：那样前 16 天和后 16 天应该丢得一样多。'},
+ {q:`为什么说「买 gamma 就要付 theta」？如果有一张期权，theta 只有 ½σ²S²Γ 的一半，会发生什么？`,
+  a:['对冲掉方向之后，持有期权一天的盈亏是 ½Γ(ΔS)² 减去租金。',
+     '一天 (ΔS)² 的平均值是一个标准差的平方，所以 gamma 平均每天收入 ½Γ(Sσ/16)²；一年约 256 个交易日，16² ＝ 256，一年就是 ½σ²S²Γ。',
+     '如果租金只有一半，买入再对冲平均每天稳赚。人人都去买，价格被抬高，theta 变大，直到租金等于 gamma 的平均收入。',
+     'ORATS 的数字对得上：350 call 的 gamma 项按日历日一天 0.299，加利息 0.021 是 0.320，ORATS 给 −0.319。'],
+  s:'「因为公式推出来就是这样」：没说出背后「平均不赚不赔」的定价要求。'},
+ {q:`对冲好的 350 call，今天 TSLA 涨了 1%，买方这一天赚还是亏？涨 5% 呢？回本的门槛是多少，为什么和 gamma 大小无关？`,
+  a:['门槛是一天的一个标准差 S × σ ÷ 16，按 46.3% 是 2.89%。',
+     '涨 1%：gamma 收入是 (1 ÷ 2.89)² ≈ 0.12 份租金，这一天亏掉约九成的租金。涨 5%：1.73 个标准差，收入约 3 份租金。',
+     'gamma 收入 ½Γ(ΔS)²，租金 ½Γ(Sσ/16)²，两边都乘 ½Γ，一比 Γ 就消掉了。gamma 大的期权赚得多，租金也同比例贵。'],
+  s:'「涨了就赚」：方向已经对冲掉了。跌 5% 同样赚，涨 1% 同样亏。'},
+ {q:`4/24 到 5/6，TSLA 从 373.69 涨到 398.62，涨了 6.67%。为什么对冲好的买方这 9 天天天在亏？如果同样的 6.67% 在一天里走完呢？`,
+  a:['每天收盘重新对冲一次，gamma 只按当天的涨跌算钱，不看累计走了多远。',
+     '这 9 天最大的一天 2.37%，都没到 2.89%：gamma 9 天只赚 1.16，租金付了 4.49，净亏 3.34。',
+     '一天走完 6.67% 是 2.31 个标准差，gamma 那一天就赚 2.55，是当天租金的 5 倍多。',
+     '对买方来说，慢慢走和横盘一样：每天付租，等不来大动的日子。'],
+  s:'「TSLA 涨了，买 call 应该赚」：方向那部分已经对冲掉，这里只算 gamma 和 theta。'},
+ {q:`讲义的仓位：卖 10 张 95 call、买 7 手标的，合计 delta −30、gamma −33、theta +0.387。这个人在收租还是付租？他希望市场怎样？标的涨 1 美元会怎样？`,
+  a:['theta 为正、gamma 为负：收租。市场不动，每天收 0.387。',
+     '他希望标的不动或慢动。讲义原话：负 gamma 想要市场平稳。',
+     '标的涨 1 美元，delta 从 −30 变成 −63，空头自己变大，再涨亏得更快；跌的时候 delta 往正的方向走，也是越走越不利。',
+     '一天动 3 美元，gamma 那一项亏 ½ × 0.33 × 3² ≈ 1.49，差不多 4 天的租金。'],
+  s:'「delta 只有 −30，风险很小」：只看了 delta，没看到 gamma 会让 delta 自己变大。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-2-2-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-2-2-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+function recolor(){ readColors(); drawAll(); }
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+
+/* ══════════ 启动 ══════════ */
+readColors();
+function setWidth(){
+  const w=$('a1').parentElement.clientWidth, nw= w<560 ? 460 : 720;
+  if(nw===CW) return false;
+  CW=nw; FS= nw<720 ? 1.2 : 1; return true;
+}
+function drawAll(){ A1.draw(); A2.draw(); A3.draw(); A4.draw(); A5.draw(); drawG350(); drawVer(); }
+setWidth();
+A4.fit();
+addEventListener('resize',()=>{ A4.fit(); if(setWidth()) drawAll(); });
+drawAll();
+/* 滚到眼前才开始播放 */
+onView(A1.el,A1.start); onView(A2.el,A2.start); onView(A3.el,A3.start); onView(A4.el,A4.start); onView(A5.el,A5.start);
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>

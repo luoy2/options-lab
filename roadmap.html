@@ -214,20 +214,20 @@ const NODES=[
  can:['把任何期权头寸换算成「相当于持有多少股」','算出对冲一个仓位需要买卖多少股标的','解释为什么入场 delta 和事后实际捕获比不相等'],
  src:'S3 + S4',link:'station-2-1-delta.html'},
 
-{id:'2.2',col:1,row:4,st:'todo',t:'gamma 与 theta',d:'时间换波动',deps:['2.1'],
+{id:'2.2',col:1,row:4,st:'done',t:'gamma 与 theta',d:'时间换波动',deps:['2.1'],
  teach:['gamma 是 delta 变化的速度；越近到期、越近行权价，gamma 越大','theta 是时间价值的流失速度','<b>Θ ≈ −½σ²S²Γ</b>：两者在模型里成固定比例，买 gamma 就要付 theta'],
  can:['说清为什么买 gamma 就要付 theta','判断一个仓位是在收租还是在付租','解释为什么标的横盘时买方会慢慢亏钱'],
- src:'S3 + S4'},
+ src:'S3 + S4',link:'station-2-2-gamma-theta.html'},
 
-{id:'2.3',col:3,row:4,st:'todo',t:'vega 与 rho',d:'波动率与利率的敏感度',deps:['2.1'],
+{id:'2.3',col:3,row:4,st:'done',t:'vega 与 rho',d:'波动率与利率的敏感度',deps:['2.1'],
  teach:['vega 三定律（讲义原文给的三条规律）','rho 在两种结算方式下完全不同：<b>期货型结算下 call 与 put 的 rho 全为负</b>','股息通过 delta 传导，不是单独一个希腊字母'],
  can:['知道隐含波动率变一个点，你的仓位值多少钱','算出利率变动对期货期权仓位的影响','看懂长期期权为什么对利率敏感得多'],
- src:'S3 + 机制层结算方式'},
+ src:'S3 + 机制层结算方式',link:'station-2-3-vega-rho.html'},
 
-{id:'2.4',col:2,row:5,st:'todo',t:'组合希腊字母',d:'把多腿仓位压成四个数',deps:['2.2','2.3'],
+{id:'2.4',col:2,row:5,st:'done',t:'组合希腊字母',d:'把多腿仓位压成四个数',deps:['2.2','2.3'],
  teach:['希腊字母可加：整个组合的 delta 就是各腿之和','净头寸的读法：四个数就描述完一个任意复杂的仓位','一阶与二阶估算，以及 delta 截断陷阱'],
  can:['把一个多腿仓位压缩成四个数，一眼看出它在赌什么','估算一次市场变动会让整个组合赚亏多少'],
- src:'S4'},
+ src:'S4',link:'station-2-4-portfolio-greeks.html'},
 
 {id:'4.1',col:1,row:6,st:'todo',t:'动态对冲',d:'理论值是怎么被兑现的',deps:['2.4'],
  teach:['十周重对冲全过程表：理论值 6.55、市价 5.50、逐周调仓','实现 P&amp;L +105.75 对上预测的 105.00','对冲频率的影响；轮盘赌类比'],

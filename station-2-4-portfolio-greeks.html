@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>组合希腊字母</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M7%209h10M7%2014h16M7%2019h7M7%2024h13'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.pair .formula{margin:1rem 0}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+.presets{display:flex;flex-wrap:wrap;gap:.5rem}
+.presets button,.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.presets button:hover,.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.3rem 2.2rem;margin-top:1.2rem}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;font-size:.87rem;color:var(--ink-soft)}
+.ctl .v{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1rem;color:var(--control);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--control);margin:.35rem 0 0;height:1.3rem}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+@media (pointer:fine){ #drag{touch-action:none;cursor:ns-resize} }
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.32rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.up{background:var(--result-bg);color:var(--result)}
+.say.down{background:var(--warn-bg);color:var(--warn)}
+.say.flat{background:var(--good-bg);color:var(--good)}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:1rem}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+tr.hot td{background:var(--control-bg)}
+
+.count{display:flex;flex-wrap:wrap;align-items:baseline;gap:.3rem 1.2rem;margin-top:1rem}
+.count .big{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:2.1rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.count .cap{font-size:.9rem;color:var(--ink-soft)}
+.count.hit .big{color:var(--good)}
+
+.vbars{margin-top:1.2rem}
+.vb{display:grid;grid-template-columns:7.5rem 1fr 4.2rem;align-items:center;gap:.8rem;margin:.55rem 0}
+.vb .l{font-size:.9rem;color:var(--ink-soft)}
+.vb .track{height:.9rem;background:var(--panel2);border-radius:99px;overflow:hidden}
+.vb .fill{height:100%;border-radius:99px}
+.vb .n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.95rem;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.stage{display:flex;justify-content:center}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:4px;max-width:100%}
+.chart{max-width:29rem;margin:0 auto}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.8rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;vertical-align:-.1rem;border-radius:1px}
+.legend i.rp{margin-right:1px;border-radius:0}
+th.txt{text-align:left}
+td.no{color:var(--control);font-weight:600}
+ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  .pair{grid-template-columns:1fr}
+  table{font-size:.8rem} th,td{padding:.4rem .3rem}
+  .formula .math{font-size:1.05rem}
+  .vb{grid-template-columns:5.6rem 1fr 3.8rem;gap:.5rem}
+}
+/* ── 2.4 新增 ── */
+.legtab td,.legtab th{padding:.42rem .45rem}
+.legtab tbody tr{transition:opacity .25s}
+.legtab tfoot td{border-top:1.5px solid var(--ink-faint);border-bottom:none;font-weight:600}
+.legtab td.lg{font-family:"Source Serif 4","Songti SC",serif;text-align:left;white-space:nowrap}
+.pos{color:var(--result)} .neg{color:var(--control)}
+.gauges{margin-top:1.3rem}
+.gg{display:grid;grid-template-columns:8.6rem 1fr 5.4rem;align-items:center;gap:.8rem;margin:.6rem 0}
+.gg .l{font-size:.88rem;color:var(--ink-soft);line-height:1.35}
+.gg .l small{display:block;font-size:.74rem;color:var(--ink-faint)}
+.gg .track{position:relative;height:1rem;background:var(--panel2);border-radius:4px}
+.gg .track::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1.5px;background:var(--ink-faint)}
+.gg .fill{position:absolute;top:0;bottom:0;border-radius:3px}
+.gg .n{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.98rem;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+td.rd{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);font-size:.86rem;line-height:1.6;padding-top:0;padding-bottom:.8rem}
+tr.nb td{border-bottom:none;padding-bottom:.15rem}
+.terms{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-faint);margin-top:.6rem;line-height:1.7}
+.bd{display:grid;grid-template-columns:auto auto auto auto;gap:.45rem .5rem;align-items:center;justify-content:start;margin-top:1rem}
+.bd select,.bd input,.bdS input{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule);border-radius:6px;padding:.3rem .35rem}
+.bd input{width:3.6rem}
+.bdS{display:flex;align-items:center;gap:.6rem;margin-top:.7rem;font-size:.87rem;color:var(--ink-soft)}
+.bdS input{width:4.6rem}
+.est td:first-child{white-space:nowrap}
+.hwt input{width:4.8rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;padding:.25rem .3rem;border:1px solid var(--rule);border-radius:5px;background:var(--paper);color:var(--ink)}
+.hwt input.ok{border-color:var(--good);background:var(--good-bg)} .hwt input.no{border-color:var(--warn);background:var(--warn-bg)}
+.hwrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.9rem}
+.reveal{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.92rem;line-height:1.72}
+@media (max-width:620px){
+  .gg{grid-template-columns:5.8rem 1fr 4.4rem;gap:.5rem}
+  .gg .l{font-size:.8rem}
+  .legtab td,.legtab th{padding:.36rem .22rem .36rem .5rem}
+  .legtab td:first-child,.legtab th:first-child{padding-left:.1rem}
+  .legtab td.lg{white-space:normal;font-size:.78rem}
+  .bd{grid-template-columns:auto auto auto auto;gap:.35rem}
+  .bd input{width:3rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 按仓位算</a><a href="#s1">一 可以相加</a><a href="#s2">二 在赌什么</a><a href="#s3">三 估算盈亏</a>
+  <a href="#s4">四 截断陷阱</a><a href="#s5">五 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 2.4</p>
+  <h1>组合希腊字母</h1>
+  <p class="lede">2.1 到 2.3 讲的都是一张期权自己的 delta、gamma、theta、vega。真实的仓位常常有好几条腿：几张 call、几张 put，再加一些股票。这一节把各条腿的希腊字母加起来，压成四个数，用它们读出仓位在赌什么，再估算一次市场变动会赚亏多少。所有仓位都用 2026-04-13 收盘 TSLA 的真实报价搭。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>先按仓位算</h2>
+  <p class="sub">2.2、2.3 给出的数都是「每股」的。2.1 已经把 delta 换算成整个仓位的等价标的头寸；放进仓位之前，四个数都要这样换算。</p>
+  <p>还是 1.1 那张 5/15 到期的 350 call。4/13 收盘时（TSLA 352.36），ORATS 给出它的四个希腊字母：</p>
+  <table>
+    <thead><tr><th>名称</th><th>符号</th><th>350 call 每股</th><th class="txt">意思</th></tr></thead>
+    <tbody>
+      <tr><td>delta</td><td><span class="sym" data-say="delta。TSLA 涨 1 美元，期权价格变多少。放进仓位后读成「相当于持有多少股」（2.1）。">Δ</span></td><td>0.5574</td><td class="txt">TSLA 涨 1 美元，这张期权涨约 0.56 美元</td></tr>
+      <tr><td>gamma</td><td><span class="sym" data-say="gamma。TSLA 涨 1 美元，delta 变多少。gamma 大，delta 变得快（2.2）。">Γ</span></td><td>0.0082</td><td class="txt">TSLA 涨 1 美元，delta 多 0.0082</td></tr>
+      <tr><td>theta</td><td><span class="sym" data-say="theta。别的都不变，过一天，期权价格变多少。按日历日算，周末算 3 天（2.2）。">Θ</span></td><td>−0.319</td><td class="txt">别的都不变，过一天，这张期权少 0.32 美元</td></tr>
+      <tr><td>vega</td><td><span class="sym" data-say="vega。隐含波动率涨 1 个百分点，期权价格变多少（2.3）。vega 不是希腊字母，常借用 ν（读作「纽」）来写；2.3 直接写 vega，是同一个量。">ν</span></td><td>0.4125</td><td class="txt">隐含波动率涨 1 个点，这张期权涨 0.41 美元</td></tr>
+    </tbody>
+  </table>
+
+  <h3>换算成一条腿</h3>
+  <div class="formula">
+    <div class="math">一条腿的 <span class="sym" data-say="delta。">Δ</span> ＝ 每股 <span class="sym" data-say="delta。">Δ</span> × <span class="sym" data-say="合约乘数：一张期权对应 100 股。">100</span> × <span class="sym" data-say="几张合约。买入记正，卖出记负。">张数</span></div>
+    <div class="gloss">一张合约是 100 股（1.1）；买入的张数记正，卖出的记负。Γ、Θ、ν 用同样的方法换算</div>
+  </div>
+  <p>买 1 张 350 call，这条腿的四个数是：</p>
+  <ul>
+    <li>delta 55.74：相当于持有 55.74 股 TSLA，就是 2.1 讲的等价标的头寸。</li>
+    <li>gamma 0.82：TSLA 每涨 1 美元，这 55.74 股再多 0.82 股。</li>
+    <li>theta −31.90：别的都不变，每过一天少 31.90 美元。</li>
+    <li>vega 41.25：隐含波动率每涨 1 个点，多 41.25 美元。</li>
+  </ul>
+  <p>卖出同一张，四个数的符号全部翻过来：−55.74、−0.82、+31.90、−41.25。</p>
+  <p>股票也可以当成一条腿。一股 TSLA 的 delta 是 1，gamma、theta、vega 都是 0：股票的价值跟着股价一比一地变，不会弯；不会随时间衰减；和隐含波动率无关。买 11 股，这条腿就是 delta 11，其余三个数都是 0。</p>
+  <p class="tiny">ORATS 的 theta 只有 call 的一列。put 的 theta 用 1.1 的 put-call parity 换算。1.1 写的是 C − P ＝ (F − X) ÷ (1 ＋ r·t)：同一行权价、同一到期日的 call 价格减 put 价格，等于远期价减行权价再折回今天。TSLA 不分红，这就是 <span class="sym" data-say="TSLA 现在的价格。">S</span> 减去行权价 <span class="sym" data-say="行权价，沿用 1.1 的写法。这里是 350。">X</span> 折回今天的值。过一天，行权价折回今天的值多出约 <span class="sym" data-say="无风险利率，1.1 从报价反解出 4.3%。">r</span> × X ÷ 365，call − put 就少这么多，所以 put 的 theta 比 call 高出这一块（r ＝ 4.3%，350 put 是 −0.278 每天，call 是 −0.319）。同一个式子的右边对 S 是一条直线、和隐含波动率无关，所以 call 与 put 的 gamma、vega 相同。</p>
+  <p>第五个希腊字母 <span class="sym" data-say="rho。利率涨 1 个百分点，期权价格变多少（2.3）。">ρ</span>（rho，2.3）在一个月的期权上很小：1 张 350 call 的 rho 是 15.45 美元每个百分点，而利率一个月里很少动一个百分点。本页只用四个数。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>希腊字母可以直接相加</h2>
+  <p class="sub">一个仓位的价值是各条腿价值的和。所以整个仓位的 delta 就是各条腿 delta 的和，gamma、theta、vega 也一样。</p>
+  <p>每个希腊字母问的都是同一类问题：某一个量动一点，价值变多少。delta 问 TSLA 涨 1 美元，theta 问过一天，vega 问隐含波动率涨 1 个点，gamma 问的是 delta 自己。仓位价值 ＝ 第一条腿 ＋ 第二条腿 ＋ …。TSLA 涨 1 美元时，每条腿各变各的，仓位的变化就是这些变化加起来。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="整个仓位的 delta：相当于持有多少股 TSLA。">Δ<sub>仓位</sub></span> ＝ <span class="sym" data-say="第 1 条腿的 delta，已经乘了 100 × 张数、带正负号。">Δ<sub>1</sub></span> ＋ <span class="sym" data-say="第 2 条腿的 delta。">Δ<sub>2</sub></span> ＋ … ＋ <span class="sym" data-say="最后一条腿（第 n 条）的 delta。">Δ<sub>n</sub></span></div>
+    <div class="gloss">仓位的 delta ＝ 每条腿的 delta（已经乘了 100 × 张数、带正负号）之和；Γ、Θ、ν 同样</div>
+  </div>
+  <p>直接相加有一个前提：每条腿量的是同一个标的、同一种单位，都是 TSLA 的每 1 美元、每 1 天、每 1 个波动率点。vega 相加还多一层默认：各条腿的隐含波动率一起涨跌同样多的点。同一到期日、行权价相近的腿大致如此；到期日不同的腿不一定。</p>
+
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="lgSeg">
+        <button data-p="short" aria-pressed="true">卖跨式加股票</button>
+        <button data-p="bull" aria-pressed="false">牛市价差</button>
+        <button data-p="messy" aria-pressed="false">七条腿</button>
+      </div>
+      <button class="btn ghost" id="lgPlay">再加一遍</button>
+    </div>
+    <table class="legtab">
+      <thead><tr><th>腿（4/13 收盘）</th><th>delta<br>股</th><th>gamma<br>股/美元</th><th>theta<br>美元/天</th><th>vega<br>美元/点</th></tr></thead>
+      <tbody id="lgBody"></tbody>
+      <tfoot id="lgFoot"></tfoot>
+    </table>
+    <div class="gauges" id="lgG"></div>
+    <div class="say plain" id="lgSay"></div>
+  </div>
+
+  <p><b>卖跨式加股票。</b>同一行权价、同一到期日的 call 和 put 各一张，叫<span class="sym" data-say="straddle。同一行权价、同一到期日的 call 和 put 各一张。买跨式赌大动，卖跨式赌不动。3.2 细讲。">跨式</span>。卖 350 call，delta −55.74；再卖 350 put，put 的 delta 本来是负的，卖出变成 +44.26，合计 −11.48；再买 11 股，delta 变成 −0.48，几乎是 0。第二条腿加进来时，gamma、vega 翻了一倍，theta 从 31.90 变成 59.69，差不多翻倍（put 的 theta 小一点）；买股票时三个数一点没动：股票只能调 delta。</p>
+  <p><b>牛市价差。</b>买 350 call、卖 380 call，叫<span class="sym" data-say="bull call spread。买低行权价的 call、卖高行权价的 call，同一到期日。看涨，但赚亏都有上限。3.1 细讲。">牛市价差</span>。卖出 380 call 之后，delta 从 55.74 降到 23.91，还留着 43%；gamma、theta、vega 只留下 7%、14%、9%。两张期权离现价都不远，gamma、theta、vega 差不多大（gamma 一个 0.0082、一个 0.0076），delta 却差得多（0.5574 对 0.3183）。相减之后，剩下的几乎只有方向。</p>
+  <p><b>七条腿。</b>两个到期日，call 和 put，买的卖的都有，再加 60 股。一条条加上去，四个数来回摆，最后停在 delta +45.46、gamma −1.13、theta +42.72、vega −50.96。只看这七条腿，很难说它在赌什么；看这四个数就能说出来，下一节讲怎么读。</p>
+
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>四个数读出它在赌什么</h2>
+  <p class="sub">每个数的正负号对应一种市场变化。四个符号连起来读，就是这个仓位的市场观点。</p>
+  <table>
+    <thead><tr><th>名称</th><th class="txt">为正：希望</th><th class="txt">为负：希望</th></tr></thead>
+    <tbody>
+      <tr><td>delta</td><td class="txt">TSLA 涨</td><td class="txt">TSLA 跌</td></tr>
+      <tr><td>gamma</td><td class="txt">TSLA 大动，哪个方向都行</td><td class="txt">TSLA 不动，或者慢慢动</td></tr>
+      <tr><td>theta</td><td class="txt">每过一天赚一点</td><td class="txt">每过一天亏一点</td></tr>
+      <tr><td>vega</td><td class="txt">隐含波动率涨</td><td class="txt">隐含波动率跌</td></tr>
+    </tbody>
+  </table>
+
+  <h3>五个真实仓位</h3>
+  <p>都是 4/13 收盘、按中间价建的仓，每条腿 1 张（七条腿见上一节）。</p>
+  <table id="galTb">
+    <thead><tr><th>仓位</th><th>delta</th><th>gamma</th><th>theta</th><th>vega</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>gamma 和 theta 读成一句话</h3>
+  <p>2.2 讲过，模型里 <span class="sym" data-say="theta。">Θ</span> ≈ −½<span class="sym" data-say="隐含波动率，年化（1.2）。">σ</span>²<span class="sym" data-say="TSLA 的价格，这里是 352.36。">S</span>²<span class="sym" data-say="gamma。">Γ</span>：买 gamma 就要付 theta。等号两边都是各条腿相加，所以它对整个仓位也成立，每条腿用自己的 σ：</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="整个仓位每天的 theta，美元。">Θ<sub>仓位</sub></span> ≈ −½ × <span class="sym" data-say="TSLA 的价格，352.36。">S</span>² × <span class="sym" data-say="Σ 读作「西格玛」（大写），意思是把后面这一项对每条腿算一遍，再全部加起来。">Σ</span> <span class="sym" data-say="第 i 条腿自己的隐含波动率，年化，写成小数（46.3% 写成 0.463）。call 用 call 报价反推的那个，put 用 put 报价反推的那个。">σ<sub>i</sub></span>² <span style="white-space:nowrap"><span class="sym" data-say="第 i 条腿的 gamma，已经乘了 100 × 张数。">Γ<sub>i</sub></span> ÷ 365</span></div>
+    <div class="gloss">仓位每天的 theta ≈ 各条腿「−½ × 股价² × 自己的隐含波动率² × 自己的 gamma」之和，按年算出来再除以 365 换成每天</div>
+  </div>
+  <table id="thgTb" style="max-width:36rem">
+    <thead><tr><th>仓位</th><th>gamma</th><th>theta<br>ORATS 相加</th><th>theta<br>按上式</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p id="thgText"></p>
+
+  <h3>delta 和 gamma 连起来读</h3>
+  <p>delta 说方向，gamma 说 delta 跟着价格变得多快。delta 为正、gamma 为负的仓位看涨，但 TSLA 每涨一段，它的 delta 就小一点：涨得越多（离入场价越远），后面那一段赚得越少。跌的时候反过来，delta 越跌越大，亏得越来越快。仓位不调整时，gamma 带来的这部分损失只看 TSLA 从入场价一共走了多远，不管分几天走完（第三节会算出来）。所以它要的是慢慢涨：同样涨到那里，用的天数越多，一路按天收的 theta 越多。</p>
+  <p id="messySay"></p>
+
+  <h3>gamma 和 vega 连起来读</h3>
+  <p>同一到期日的仓位，gamma 和 vega 同号：买期权两者都为正，卖期权两者都为负。<span class="sym" data-say="calendar spread。同一行权价、不同到期日，一般是买远月、卖近月。3.2 细讲。">日历价差</span>是例外：买 5/15 的 350 call、卖 4/24 的 350 call。同一个行权价，到期早的叫<span class="sym" data-say="到期日较早的那张期权。这里是 4/24 到期的。">近月</span>（这里是 4/24），到期晚的叫<span class="sym" data-say="到期日较晚的那张期权。这里是 5/15 到期的。">远月</span>（5/15）。近月那张的 gamma 更大（0.0118 对 0.0082），远月那张的 vega 更大（0.41 对 0.24），相减之后 gamma −0.36、vega +16.98。它希望 TSLA 不大动，同时希望隐含波动率上涨。只看 gamma，会以为它和卖跨式赌的是同一件事；vega 的符号说明不是。</p>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>估算一次变动的盈亏</h2>
+  <p class="sub">四个数还能倒过来用：给定一次市场变动，估算仓位赚亏多少。先只用 delta，再把 gamma、theta、vega 加上。</p>
+
+  <h3>一阶估算：只用 delta</h3>
+  <div class="formula">
+    <div class="math">盈亏 ≈ <span class="sym" data-say="整个仓位的 delta，单位是股。">Δ</span> × <span class="sym" data-say="TSLA 价格的变动量。这里的 Δ 读作「变动」，和 delta 是同一个希腊字母，意思不同：单独一个 Δ 是 delta，后面跟着字母时是变动量。">ΔS</span></div>
+    <div class="gloss">delta × TSLA 变动了多少美元。假设这一路上 delta 一直不变</div>
+  </div>
+  <p>delta 是价值随股价变化的斜率。如果斜率一直不变，价值就沿一条直线变。可是 gamma 不为 0 时，TSLA 每动一点 delta 就跟着变，直线就不准了。</p>
+
+  <h3>二阶估算：讲义的写法</h3>
+  <div class="pair">
+    <div class="formula">
+      <div class="math">新 <span class="sym" data-say="delta。">Δ</span> ＝ 旧 <span class="sym" data-say="delta。">Δ</span> ＋ <span class="sym" data-say="gamma：TSLA 涨 1 美元，delta 变多少。">Γ</span> × <span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span></div>
+      <div class="gloss">TSLA 动完之后的 delta：原来的 delta 加上 gamma 乘变动</div>
+    </div>
+    <div class="formula">
+      <div class="math">盈亏 ≈ <span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span> × (旧 <span class="sym" data-say="delta。">Δ</span> ＋ 新 <span class="sym" data-say="delta。">Δ</span>) ÷ 2</div>
+      <div class="gloss">一路上的 delta 用新旧两个值的平均来代表</div>
+    </div>
+  </div>
+  <p>delta 在这一段变动里从旧值一路变到新值。价值的变化是这一路上每一小段「delta × 那一小段距离」加起来；delta 均匀变化时，就等于平均 delta 乘总距离。把新 Δ 代进去展开：</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span> × (<span class="sym" data-say="delta。">Δ</span> ＋ <span class="sym" data-say="delta。">Δ</span> ＋ <span class="sym" data-say="gamma。">Γ</span>·<span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span>) ÷ 2 ＝ <span class="sym" data-say="delta。">Δ</span>·<span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span> ＋ ½·<span class="sym" data-say="gamma。">Γ</span>·<span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span>²</div>
+    <div class="gloss">讲义的平均 delta 写法，和「一阶估算加一项 ½ × gamma × 变动的平方」是同一个式子</div>
+  </div>
+  <p>只用旧 delta，就漏掉了 ½·Γ·ΔS² 这一项。它和变动的平方成正比：TSLA 动 2 倍，这一项变成 4 倍；而且不管往哪边动，它的符号都跟着 gamma 走。gamma 为正的仓位，一阶估算总是偏低：大涨时少算了赚的，大跌时多算了亏的。gamma 为负的仓位反过来，一阶估算总是偏高。</p>
+  <p>再把时间和隐含波动率的变化加上，就是估算一次变动的完整式子：</p>
+  <div class="formula">
+    <div class="math">盈亏 ≈ <span class="sym" data-say="delta。">Δ</span>·<span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span> ＋ ½·<span class="sym" data-say="gamma。">Γ</span>·<span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span>² ＋ <span class="sym" data-say="theta：别的都不变，过一天价值变多少。">Θ</span>·<span class="sym" data-say="过了几天，按日历日算，周末算 3 天。">Δt</span> ＋ <span class="sym" data-say="vega：隐含波动率涨 1 个点，价值变多少。">ν</span>·<span class="sym" data-say="隐含波动率变了几个百分点。每条腿用它自己的报价隐含波动率：call 用 call 报价反推的，put 用 put 报价反推的。">Δσ</span></div>
+    <div class="gloss">方向 ＋ 弯曲 ＋ 时间 ＋ 隐含波动率。Δt 是过了几天，Δσ 是隐含波动率变了几个点</div>
+    <div class="note">各条腿的隐含波动率变化不一样时，vega 那一项按腿分别算再相加</div>
+  </div>
+
+  <h3>一个算例：卖跨式加 11 股，4/13 到 4/14</h3>
+  <p id="exIntro"></p>
+  <table class="est" id="exTb"></table>
+  <p id="exText"></p>
+
+  <h3>第二个算例：七条腿，4/14 到 4/15</h3>
+  <p id="mxIntro"></p>
+  <table class="est" id="mxTb"></table>
+  <p id="mxText"></p>
+
+  <h3>逐日回放：估算和实际</h3>
+  <p>接下来 9 个交易日，每天收盘读一次四个数，用它们估算下一天的盈亏，再和实际对照。实际盈亏按每天收盘的中间价重算整个仓位，仓位本身不调整。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="rpSeg">
+        <button data-p="short" aria-pressed="true">卖跨式加股票</button>
+        <button data-p="call" aria-pressed="false">买 350 call</button>
+        <button data-p="bull" aria-pressed="false">牛市价差</button>
+      </div>
+    </div>
+    <div class="bar">
+      <div class="seg" id="rpMode">
+        <button data-m="daily" aria-pressed="true">每天重读四个数</button>
+        <button data-m="fixed" aria-pressed="false">一直用 4/13 的</button>
+      </div>
+      <button class="btn ghost" id="rpPlay">逐日播放</button>
+    </div>
+    <svg id="rpSvg" viewBox="0 0 720 320" role="img" aria-label="每天的一阶估算、二阶估算与实际盈亏"></svg>
+    <div class="legend">
+      <span><i style="background:var(--ink-faint)"></i>一阶估算（只用 delta）</span>
+      <span><i style="background:var(--result)"></i>二阶估算（四个数）</span>
+      <span><i style="background:var(--control)"></i>实际</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
+      <div class="stat"><div class="k">一阶估算</div><div class="d" id="rp1"></div></div>
+      <div class="stat"><div class="k">二阶估算</div><div class="d" id="rp2" style="color:var(--result)"></div></div>
+      <div class="stat"><div class="k">实际</div><div class="d" id="rpA" style="color:var(--control)"></div></div>
+    </div>
+    <div class="terms" id="rpTerms"></div>
+    <div class="say plain" id="rpSay"></div>
+  </div>
+  <p id="rpText1"></p>
+  <p id="rpText2"></p>
+
+  <h3>换一个仓位、换一次变动</h3>
+  <p class="sub">5/15 到期的期权，4/13 收盘中间价与 ORATS 希腊字母。</p>
+  <div class="panel">
+    <div class="presets">
+      <button data-b="short">卖跨式加股票</button><button data-b="bull">牛市价差</button><button data-b="call">买 350 call</button><button data-b="clear">清空</button>
+    </div>
+    <div class="bd" id="bdRows"></div>
+    <div class="bdS"><span>另加股票（股，负数为卖空）</span><input type="number" id="bdSh" step="1" value="0"></div>
+    <div class="stats">
+      <div class="stat"><div class="k">delta（股）</div><div class="d" id="bdD"></div></div>
+      <div class="stat"><div class="k">gamma（股每美元）</div><div class="d" id="bdG"></div></div>
+      <div class="stat"><div class="k">theta（美元每天）</div><div class="d" id="bdT"></div></div>
+      <div class="stat"><div class="k">vega（美元每点）</div><div class="d" id="bdV"></div></div>
+    </div>
+    <div class="say plain" id="bdSay"></div>
+    <div class="controls">
+      <div class="ctl"><label><span>TSLA 变动 ΔS</span><span class="v" id="vDS"></span></label><input type="range" id="iDS" min="-40" max="40" step="0.01" value="11.96"></div>
+      <div class="ctl"><label><span>过了几天 Δt</span><span class="v" id="vDT"></span></label><input type="range" id="iDT" min="0" max="10" step="1" value="1"></div>
+      <div class="ctl"><label><span>隐含波动率变动 Δσ</span><span class="v" id="vDV"></span></label><input type="range" id="iDV" min="-10" max="10" step="0.1" value="0.7"></div>
+    </div>
+    <table class="est" id="bdEst"></table>
+  </div>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>delta 截断陷阱</h2>
+  <p class="sub">用「新 Δ ＝ 旧 Δ ＋ Γ × ΔS」算新 delta 时，结果可能是一个不可能出现的值。讲义要求先截到边界，再求平均。</p>
+  <p>每张期权的 delta 有硬边界：call 在 0 到 1 之间，put 在 −1 到 0 之间（讲义用整数格式写，就是 0 到 100、−100 到 0）。</p>
+  <ul>
+    <li>call 深度实值时，到期几乎一定会行权，它就相当于一股股票：TSLA 涨 1 美元它涨 1 美元，不会涨得更多。</li>
+    <li>put 在 TSLA 大涨之后几乎一定作废，TSLA 再涨它也跌不下去，delta 最多回到 0。</li>
+  </ul>
+  <p><span class="sym" data-say="线性外推：假设 gamma 一路不变，用 旧 Δ ＋ Γ × ΔS 算新 delta。它不知道 delta 有边界。">线性外推</span>不知道这两道边界。变动大，或者 gamma 大（临近到期的平值期权 gamma 最大，2.2 讲过），<span class="sym" data-say="gamma × TSLA 的变动：线性外推给 delta 加上的那一段。">Γ</span> × <span class="sym" data-say="TSLA 的变动量，美元。">ΔS</span> 就会把新 delta 推出边界。推出去的部分要截掉：call 截到 1、put 截到 0（下跌时 call 截到 0、put 截到 −1），再和旧 delta 求平均。</p>
+  <p>放到仓位里还有一层：<b>整个仓位的 delta 没有边界</b>，多买股票就能任意大。所以截断只能一条腿一条腿做，每条腿截完再相加，不能拿仓位合计去截。</p>
+
+  <h3>一个真实例子：临近到期的跨式</h3>
+  <p id="trIntro"></p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="trPlay">重播</button></div>
+    <svg id="trSvg" viewBox="0 0 720 440" role="img" aria-label="365 call 与 365 put 的 delta 随 TSLA 上涨的线性外推、截断与模型曲线"></svg>
+    <div class="legend">
+      <span><i style="background:var(--ink-soft);height:2px;vertical-align:.2rem"></i>虚线：线性外推 旧 Δ ＋ Γ × ΔS</span>
+      <span><i style="background:var(--result);height:3px;vertical-align:.2rem"></i>截断后：从旧 delta 连到边界</span>
+      <span><i style="background:var(--warn)"></i>越过边界的部分</span>
+      <span>点线：模型算出的 delta（σ 与剩余时间固定在 4/14）</span>
+      <span><i style="background:var(--good);border-radius:99px"></i>4/15 收盘真实 delta</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">TSLA</div><div class="d" id="trS"></div><div class="d2" id="trSb"></div></div>
+      <div class="stat"><div class="k">call 新 delta（线性）</div><div class="d" id="trC"></div></div>
+      <div class="stat"><div class="k">put 新 delta（线性）</div><div class="d" id="trP"></div></div>
+      <div class="stat"><div class="k">跨式合计</div><div class="d" id="trT"></div></div>
+    </div>
+    <div class="say plain" id="trSay"></div>
+  </div>
+  <table id="trTb">
+    <thead><tr><th>4/15 收盘的估算</th><th>365 call</th><th>365 put</th><th>跨式</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <p id="trText"></p>
+  <p id="trAlt"></p>
+  <p id="trEnd"></p>
+
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">腿</div><div class="t">仓位里的一笔：某一张期权或股票，买或卖，若干张（股）。</div></div>
+      <div class="gl"><div class="s">仓位 / 组合</div><div class="t">同一标的上所有腿的总和。本页的四个数都是整个仓位的。</div></div>
+      <div class="gl"><div class="s">Δ（delta）</div><div class="t">TSLA 涨 1 美元，价值变多少。仓位的 delta 以「股」计：相当于持有多少股 TSLA（2.1 的等价标的头寸）。</div></div>
+      <div class="gl"><div class="s">Γ（gamma）</div><div class="t">TSLA 涨 1 美元，delta 变多少。仓位的 gamma 以「股每美元」计。</div></div>
+      <div class="gl"><div class="s">Θ（theta）</div><div class="t">别的都不变，过一天价值变多少，美元每天，按日历日。</div></div>
+      <div class="gl"><div class="s">ν（vega）</div><div class="t">隐含波动率涨 1 个点，价值变多少，美元每点。2.3 直接写 vega。</div></div>
+      <div class="gl"><div class="s">ρ（rho）</div><div class="t">利率涨 1 个百分点，价值变多少。一个月的期权上很小，本页不用。</div></div>
+      <div class="gl"><div class="s">ΔS、Δt、Δσ</div><div class="t">TSLA 变动几美元、过了几天、隐含波动率变了几个点。Δ 后面跟字母时读作「变动」。</div></div>
+      <div class="gl"><div class="s">100</div><div class="t">合约乘数：一张期权对应 100 股。每股的希腊字母乘 100 × 张数，才是这条腿的。</div></div>
+      <div class="gl"><div class="s">Σ</div><div class="t">读作「西格玛」（大写）：把后面那一项对每条腿算一遍，再全部加起来。</div></div>
+      <div class="gl"><div class="s">一阶估算</div><div class="t">盈亏 ≈ Δ × ΔS，假设一路上 delta 不变。</div></div>
+      <div class="gl"><div class="s">二阶估算</div><div class="t">盈亏 ≈ Δ·ΔS ＋ ½Γ·ΔS² ＋ Θ·Δt ＋ ν·Δσ。前两项就是讲义的「平均 delta × 变动」。</div></div>
+      <div class="gl"><div class="s">线性外推</div><div class="t">假设 gamma 一路不变，用 旧 Δ ＋ Γ × ΔS 算新 delta。它不知道 delta 有边界。</div></div>
+      <div class="gl"><div class="s">delta 截断</div><div class="t">线性外推出的新 delta 越过边界（call 0 到 1，put −1 到 0）时，截到边界再用。只能按腿截，仓位合计没有边界。</div></div>
+      <div class="gl"><div class="s">跨式（straddle）</div><div class="t">同一行权价、同一到期日的 call 和 put 各一张（3.2）。</div></div>
+      <div class="gl"><div class="s">牛市价差</div><div class="t">买低行权价 call、卖高行权价 call，同一到期日（3.1）。</div></div>
+      <div class="gl"><div class="s">近月、远月</div><div class="t">同一行权价、不同到期日的两张期权，到期早的叫近月，到期晚的叫远月。</div></div>
+      <div class="gl"><div class="s">日历价差</div><div class="t">同一行权价，买远月、卖近月（3.2）。gamma 与 vega 反号。</div></div>
+      <div class="gl"><div class="s">中间价</div><div class="t">(买一 ＋ 卖一) ÷ 2。本页的仓位价值都按中间价算。</div></div>
+      <div class="gl"><div class="s">σ、S、X、r</div><div class="t">隐含波动率、TSLA 价格、行权价（沿用 1.1 的写法）、无风险利率（本页 4.3%，1.1 从报价反解）。每条腿的 σ 用它自己的报价隐含波动率：call 用 call 的，put 用 put 的。</div></div>
+      <div class="gl"><div class="s">折回今天</div><div class="t">把将来的一笔钱按利率换算成今天的值：除以 (1 ＋ r·t)（1.1）。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节，两条路从这里分开。左边 <b>4.1 动态对冲</b>（风险与对冲）：只盯四个数里的 delta，每周调仓把它拉回 0，看理论价值怎样一步步变成现金。右边 <b>3.1 价差家族</b>（策略与组合）：用两条腿表达方向观点，本页的牛市价差是其中一种。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价与希腊字母来自 ORATS 历史快照</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);             // 负数用真正的减号
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+const grp = (n,d=2) => { const s=Math.abs(n).toFixed(d).split('.'); s[0]=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,','); return s.join('.'); };
+const mo = (n,d=2) => (n<0?'−':'')+grp(n,d);                           // 美元，千分位
+const smo = (n,d=2) => (n>=0?'+':'−')+grp(n,d);
+const pa = (n,d=2) => n<0 ? '('+fm(n,d)+')' : fm(n,d);          // 负数作乘数时加括号
+const sz = (n,d=2) => Math.abs(n)<1e-9 ? '0' : sgn(n,d);          // 恰好为 0 时只写 0
+const lab = (x,y,t,c,a='start',s=11,w=400) => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+const labH = (x,y,t,c,a='start',s=11,w=400) => `<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" font-weight="${w}" fill="${c}" stroke="var(--panel)" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke" font-family="IBM Plex Mono,monospace">${t}</text>`;   // 带底色描边，压在线上也看得清
+function ncdf(x){   // 标准正态累积分布，Abramowitz–Stegun 7.1.26
+  const z=Math.abs(x)/Math.SQRT2, t=1/(1+0.3275911*z);
+  const e=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-z*z);
+  return x>=0 ? 0.5*(1+e) : 0.5*(1-e);
+}
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+function segOn(id,fn){
+  const bs=document.querySelectorAll('#'+id+' button');
+  bs.forEach(b=>b.addEventListener('click',()=>{ bs.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(b.dataset); }));
+}
+/* 按帧推进：每 ms 毫秒走一步，直到 done() */
+function runLoop(s,ms,step,draw,done){
+  s.playing=true; s.last=0; s.acc=0;
+  const tick=t=>{
+    if(!s.playing) return;
+    const dt=s.last?Math.min(t-s.last,100):ms; s.last=t; s.acc+=dt;
+    while(s.acc>=ms && !done()){ step(); s.acc-=ms; }
+    draw();
+    if(done()){ s.playing=false; if(s.onEnd) s.onEnd(); return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+/* SVG 按容器宽度取 viewBox 宽，文字 1:1，手机上不会缩成小字 */
+const svgW = el => Math.round(Math.min(720, Math.max(300, el.getBoundingClientRect().width || 720)));
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 数据 ══════════
+   scripts/data/station_2_4.py 生成。ORATS TSLA 每天 16:00 快照，中间价 = (买一 + 卖一) / 2。
+   ports：4/13 收盘的五个仓位，每条腿已乘 100 × 张数（卖为负），股票腿 delta = 股数。
+     put 的 theta 由 parity 换算：θ_put = θ_call + r·K·e^(−rT)/365，r = 4.3%。thg = Σ −½σ²S²Γ/365。
+   replay[仓位][daily|fixed]：每行 [ΔS, Δt, delta 项, gamma 项, theta 项, vega 项, 实际]。
+     daily 用前一天收盘的四个数估当天；fixed 一直用 4/13 的四个数估从 4/13 到当天。
+   σ：每条腿自己的报价隐含波动率，call 用 C_IV、put 用 P_IV（350 call 入场 46.29%，与 1.2、2.2、2.3 同源）。
+   ex：第三节算例；messy415：七条腿 4/14 → 4/15（D G T V 是 4/14 收盘的四个数）。
+   trunc：4/14 收盘 4/17 到期的 365 call 与 put，4/15 收盘对照；m 是 σ、T 固定在 4/14 的模型价格变化；alt 是 5/15 的 370 put。
+   chain：4/13 收盘 5/15 到期，每行 [K, call 中间价, put 中间价, call Δ, put Δ, Γ, call Θ, put Θ, ν, σ]。 */
+const DATA={"ports":{"call":{"name":"买 350 call","legs":[{"q":1,"cp":"C","e":"5/15","K":350,"mid":21.05,"delta":55.74,"gamma":0.82,"theta":-31.9,"vega":41.25,"rho":15.45}],"tot":{"delta":55.74,"gamma":0.82,"theta":-31.9,"vega":41.25,"rho":15.45,"value":2105.0},"thg":-29.88},"bull":{"name":"350/380 牛市价差","legs":[{"q":1,"cp":"C","e":"5/15","K":350,"mid":21.05,"delta":55.74,"gamma":0.82,"theta":-31.9,"vega":41.25,"rho":15.45},{"q":-1,"cp":"C","e":"5/15","K":380,"mid":9.075,"delta":-31.83,"gamma":-0.762,"theta":27.58,"vega":-37.66,"rho":-9.1}],"tot":{"delta":23.91,"gamma":0.058,"theta":-4.32,"vega":3.59,"rho":6.35,"value":1197.5},"thg":-3.55},"short":{"name":"卖 350 跨式 + 买 11 股","legs":[{"q":-1,"cp":"C","e":"5/15","K":350,"mid":21.05,"delta":-55.74,"gamma":-0.82,"theta":31.9,"vega":-41.25,"rho":-15.45},{"q":-1,"cp":"P","e":"5/15","K":350,"mid":17.4,"delta":44.26,"gamma":-0.82,"theta":27.792,"vega":-41.25,"rho":15.119},{"q":11,"cp":"S","delta":11.0,"gamma":0.0,"theta":0.0,"vega":0.0,"rho":0.0}],"tot":{"delta":-0.48,"gamma":-1.64,"theta":59.692,"vega":-82.5,"rho":-0.331,"value":30.96},"thg":59.5},"cal":{"name":"350 日历价差","legs":[{"q":1,"cp":"C","e":"5/15","K":350,"mid":21.05,"delta":55.74,"gamma":0.82,"theta":-31.9,"vega":41.25,"rho":15.45},{"q":-1,"cp":"C","e":"4/24","K":350,"mid":14.75,"delta":-55.24,"gamma":-1.184,"theta":62.53,"vega":-24.27,"rho":-5.46}],"tot":{"delta":0.5,"gamma":-0.364,"theta":30.63,"vega":16.98,"rho":9.99,"value":630.0},"thg":30.32},"messy":{"name":"七条腿","legs":[{"q":3,"cp":"P","e":"5/15","K":330,"mid":9.65,"delta":-86.25,"gamma":2.052,"theta":-75.801,"vega":107.61,"rho":-28.988},{"q":-1,"cp":"C","e":"5/15","K":340,"mid":26.775,"delta":-63.79,"gamma":-0.766,"theta":31.08,"vega":-39.25,"rho":-17.43},{"q":-1,"cp":"C","e":"5/15","K":360,"mid":16.225,"delta":-47.44,"gamma":-0.838,"theta":31.52,"vega":-41.66,"rho":-13.31},{"q":-2,"cp":"C","e":"5/15","K":380,"mid":9.075,"delta":-63.66,"gamma":-1.524,"theta":55.16,"vega":-75.32,"rho":-18.2},{"q":-3,"cp":"P","e":"4/24","K":350,"mid":11.85,"delta":134.28,"gamma":-3.552,"theta":175.236,"vega":-72.81,"rho":15.223},{"q":3,"cp":"C","e":"4/24","K":365,"mid":8.025,"delta":112.32,"gamma":3.501,"theta":-174.48,"vega":70.47,"rho":11.31},{"q":60,"cp":"S","delta":60.0,"gamma":0.0,"theta":0.0,"vega":0.0,"rho":0.0}],"tot":{"delta":45.46,"gamma":-1.127,"theta":42.715,"vega":-50.96,"rho":-51.395,"value":16774.1},"thg":40.97}},"replay":{"call":{"daily":[[11.96,1.0,666.65,58.65,-31.9,21.86,715.0],[27.61,1.0,1797.96,285.49,-32.45,160.35,2147.5],[-2.99,1.0,-241.32,2.11,-29.6,-88.95,-355.0],[12.0,1.0,958.44,36.43,-30.13,-15.04,965.0],[-8.31,3.0,-721.14,14.23,-72.63,2.09,-785.0],[-6.3,1.0,-535.82,9.72,-25.46,44.08,-500.0],[1.28,1.0,103.18,0.45,-31.31,-24.82,47.5],[-13.92,1.0,-1144.22,53.58,-29.98,-136.04,-1280.0],[2.14,1.0,162.13,1.81,-30.86,4.52,140.0]],"fixed":[[11.96,1.0,666.65,58.65,-31.9,21.86,715.0],[39.57,2.0,2205.63,641.97,-63.8,188.1,2862.5],[36.58,3.0,2038.97,548.62,-95.7,70.95,2507.5],[48.58,4.0,2707.85,967.61,-127.6,50.74,3472.5],[40.27,7.0,2244.65,664.89,-223.3,54.45,2687.5],[33.97,8.0,1893.49,473.12,-255.2,129.94,2187.5],[35.25,9.0,1964.84,509.45,-287.1,93.23,2235.0],[21.33,10.0,1188.93,186.54,-319.0,-129.11,955.0],[23.47,11.0,1308.22,225.84,-350.9,-122.51,1095.0]]},"bull":{"daily":[[11.96,1.0,285.96,4.15,-4.32,-7.89,275.0],[27.61,1.0,659.33,-19.82,-0.26,-10.65,562.5],[-2.99,1.0,-53.97,-1.09,6.47,6.07,-40.0],[12.0,1.0,230.64,-18.14,6.23,47.33,287.5],[-8.31,3.0,-145.51,-9.46,34.83,-7.52,-132.5],[-6.3,1.0,-129.34,-7.01,10.28,-22.92,-145.0],[1.28,1.0,28.11,-0.21,10.29,-10.55,30.0],[-13.92,1.0,-312.23,-27.03,11.84,82.38,-277.5],[2.14,1.0,62.49,-0.55,6.05,34.16,102.5]],"fixed":[[11.96,1.0,285.96,4.15,-4.32,-7.89,275.0],[39.57,2.0,946.12,45.41,-8.64,0.93,837.5],[36.58,3.0,874.63,38.8,-12.96,-31.86,797.5],[48.58,4.0,1161.55,68.44,-17.28,3.29,1085.0],[40.27,7.0,962.86,47.03,-30.24,-2.04,952.5],[33.97,8.0,812.22,33.46,-34.56,8.3,807.5],[35.25,9.0,842.83,36.03,-38.88,-14.48,837.5],[21.33,10.0,510.0,13.19,-43.2,-19.15,560.0],[23.47,11.0,561.17,15.97,-47.52,17.96,662.5]]},"short":{"daily":[[11.96,1.0,-5.74,-117.29,59.69,-58.99,-113.44],[27.61,1.0,-531.22,-570.97,60.79,-323.49,-1228.79],[-2.99,1.0,150.76,-4.22,55.09,154.09,352.11],[12.0,1.0,-584.88,-72.86,56.15,31.31,-598.0],[-8.31,3.0,519.87,-28.45,132.93,4.65,643.59],[-6.3,1.0,372.33,-19.45,46.81,-86.72,298.2],[1.28,1.0,-64.28,-0.91,58.51,56.62,46.58],[-13.92,1.0,743.33,-107.15,55.85,292.03,1029.38],[2.14,1.0,-86.71,-3.63,57.61,20.91,-13.96]],"fixed":[[11.96,1.0,-5.74,-117.29,59.69,-58.99,-113.44],[39.57,2.0,-18.99,-1283.94,119.38,-394.35,-1342.23],[36.58,3.0,-17.56,-1097.24,179.08,-191.4,-990.12],[48.58,4.0,-23.32,-1935.21,238.77,-149.33,-1588.12],[40.27,7.0,-19.33,-1329.77,417.85,-141.08,-944.53],[33.97,8.0,-16.31,-946.25,477.54,-289.58,-646.33],[35.25,9.0,-16.92,-1018.9,537.23,-205.84,-599.75],[21.33,10.0,-10.24,-373.07,596.92,271.42,429.63],[23.47,11.0,-11.27,-451.69,656.61,301.95,415.67]]}},"messy415":{"dS":27.61,"dt":1.0,"d":904.5,"g":-339.61,"t":31.14,"v":-166.07,"e1":904.5,"e2":429.96,"act":413.1,"D":32.76,"G":-0.891,"T":31.14,"V":-55.57},"days":["2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24"],"spot":[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83],"ex":{"dS":11.96,"dt":1.0,"d":-5.74,"g":-117.29,"t":59.69,"v":-58.99,"e1":-5.74,"e2":-122.33,"act":-113.44,"vc":-21.86,"vp":-37.13,"ivc":[46.29,46.82],"ivp":[46.08,46.98]},"trunc":{"Sa":364.32,"Sb":391.93,"K":365,"legs":{"C":{"mid0":5.5,"mid1":27.4,"d0":0.4949,"g":0.02723,"th":-1.01,"v":1.765,"iv0":0.4348,"iv1":0.5686,"d1":0.9529,"dl":1.2467,"dc":1,"e1":13.664,"eu":24.043,"ec":20.637,"T":0.00821917808219178,"f1":19.9193,"fu":30.2982,"fc":26.8922,"m":21.802},"P":{"mid0":6.075,"mid1":0.39,"d0":-0.5051,"g":0.02723,"th":-0.967,"v":2.164,"iv0":0.4407,"iv1":0.6048,"d1":-0.0471,"dl":0.2467,"dc":0,"e1":-13.946,"eu":-3.567,"ec":-6.973,"T":0.00821917808219178,"f1":-6.673,"fu":3.7058,"fc":0.2999,"m":-5.87}},"tot":{"mid0":11.575,"mid1":27.79,"e1":-0.282,"eu":20.476,"ec":13.664,"th":-1.976,"v":3.929,"d1":0.906,"dl":1.493,"dc":1.0,"m":15.932},"dS":27.61,"alt":{"K":370,"e":"5/15","d0":-0.5084,"g":0.00819,"dl":-0.2823,"d1":-0.3037,"sum":0.9644,"leg":0.7177,"real":0.6492}},"chain":[[300,56.975,3.45,0.8825,-0.1175,0.00376,-0.1908,-0.1556,0.2152,0.5126],[305,52.675,4.1,0.8602,-0.1398,0.00427,-0.2097,-0.1739,0.2403,0.5048],[310,48.5,4.9,0.8355,-0.1645,0.0048,-0.2284,-0.192,0.2657,0.4992],[315,44.5,5.85,0.8083,-0.1917,0.00532,-0.2462,-0.2092,0.2907,0.4946],[320,40.55,6.95,0.7788,-0.2212,0.00585,-0.263,-0.2254,0.315,0.4876],[325,36.8,8.2,0.7468,-0.2532,0.00636,-0.2781,-0.24,0.3378,0.4818],[330,33.275,9.65,0.7125,-0.2875,0.00684,-0.2914,-0.2527,0.3587,0.478],[335,29.925,11.25,0.6761,-0.3239,0.00727,-0.3023,-0.263,0.3771,0.474],[340,26.775,13.1,0.6379,-0.3621,0.00766,-0.3108,-0.2709,0.3925,0.4704],[345,23.8,15.125,0.5982,-0.4018,0.00797,-0.3164,-0.2759,0.4044,0.4663],[350,21.05,17.4,0.5574,-0.4426,0.0082,-0.319,-0.2779,0.4125,0.4629],[355,18.55,19.85,0.5159,-0.4841,0.00834,-0.3186,-0.2769,0.4167,0.4606],[360,16.225,22.575,0.4744,-0.5256,0.00838,-0.3152,-0.2729,0.4166,0.4576],[365,14.15,25.475,0.4334,-0.5666,0.00832,-0.309,-0.2662,0.4124,0.4558],[370,12.25,28.625,0.3934,-0.6066,0.00817,-0.3001,-0.2567,0.4042,0.4535],[375,10.55,31.95,0.3549,-0.6451,0.00794,-0.289,-0.245,0.3921,0.4516],[380,9.075,35.475,0.3183,-0.6817,0.00762,-0.2758,-0.2312,0.3766,0.4508],[385,7.75,39.15,0.2838,-0.7162,0.00725,-0.2611,-0.2159,0.3581,0.4496],[390,6.65,43.05,0.2519,-0.7481,0.00683,-0.2453,-0.1995,0.337,0.4503],[395,5.65,46.975,0.2223,-0.7777,0.00638,-0.2287,-0.1823,0.314,0.4501],[400,4.775,51.225,0.1954,-0.8046,0.00591,-0.2117,-0.1648,0.2896,0.4496],[405,4.05,55.625,0.1708,-0.8292,0.00544,-0.1946,-0.1471,0.2644,0.4505],[410,3.45,60.0,0.1487,-0.8513,0.00496,-0.1778,-0.1297,0.2389,0.4524],[415,2.925,64.5,0.1288,-0.8712,0.0045,-0.1612,-0.1125,0.2138,0.4543],[420,2.485,69.2,0.1111,-0.8889,0.00405,-0.1453,-0.096,0.1892,0.4565]],"S0":352.36};
+const RATE=0.043;
+const G4=['delta','gamma','theta','vega'];
+const DEC=[2,3,2,2];
+const md = d => +d.slice(5,7)+'/'+(+d.slice(8));
+function legName(l){
+  const bs=l.q>0?'买':'卖', n=Math.abs(l.q);
+  if(l.cp==='S') return `${bs} ${n} 股 TSLA`;
+  return `${bs} ${n} 张 ${l.e} ${l.K} ${l.cp==='C'?'call':'put'}`;
+}
+const cls = v => v>0?'pos':v<0?'neg':'';
+
+/* ══════════ 一 · 一条条腿加进仓位 ══════════ */
+const LEG=(()=>{
+  const LABEL=[['delta','相当于几股'],['gamma','股每美元'],['theta','美元每天'],['vega','美元每点']];
+  const SAY={
+    short:()=>`卖 call 的 delta −55.74，卖 put 反而 +44.26，两条腿合计 −11.48；11 股把它拉到 −0.48。gamma、theta、vega 两条腿同号相加，股票一点没动它们。`,
+    bull:()=>`卖出的 380 call 把 gamma、theta、vega 几乎抵消掉，delta 还剩 23.91 股。`,
+    messy:()=>{ const Ls=DATA.ports.messy.legs, t=DATA.ports.messy.tot; let a=0; const ps=Ls.map(l=>a+=l.delta);
+      return `delta 从 ${fm(ps[0])} 一路降到 ${fm(Math.min(...ps))}，两条 4/24 的腿又把它拉回 ${fm(ps[5])}，最后 60 股拉到 ${sgn(ps[6])}。gamma、theta、vega 也各自变过号。七条腿压成四个数：${G4.map((g,j)=>sgn(t[g],j===1?2:2)).join('、')}。`; }
+  };
+  let key='short', P=null, scale=[1,1,1,1];
+  const s={k:0,playing:false};
+  function setup(){
+    P=DATA.ports[key];
+    scale=G4.map(g=>{ let acc=0, m=0; P.legs.forEach(l=>{ acc+=l[g]; m=Math.max(m,Math.abs(acc)); }); return (m||1)*1.08; });
+  }
+  function draw(){
+    const n=P.legs.length, k=Math.min(s.k,n), full=Math.floor(k), fr=k-full;
+    const tot=G4.map(g=>P.legs.reduce((a,l,i)=>a+(i<full?l[g]:i===full?l[g]*fr:0),0));
+    $('lgBody').innerHTML=P.legs.map((l,i)=>{
+      const op= i<full?1 : i===full?Math.min(1,fr*2.2) : 0;
+      return `<tr style="opacity:${op.toFixed(2)}"${i===full&&k<n?' class="hot"':''}><td class="lg">${legName(l)}</td>`+
+        G4.map((g,j)=>`<td class="${cls(l[g])}">${sz(l[g],DEC[j])}</td>`).join('')+'</tr>';
+    }).join('');
+    $('lgFoot').innerHTML=`<tr><td class="lg">合计</td>`+tot.map((v,j)=>`<td class="${cls(v)}">${sgn(v,DEC[j])}</td>`).join('')+'</tr>';
+    $('lgG').innerHTML=tot.map((v,j)=>{
+      const w=Math.min(50,Math.abs(v)/scale[j]*50), c=v>=0?'var(--result)':'var(--control)';
+      return `<div class="gg"><div class="l">${LABEL[j][0]}<small>${LABEL[j][1]}</small></div>`+
+        `<div class="track"><div class="fill" style="left:${v>=0?50:50-w}%;width:${w}%;background:${c}"></div></div>`+
+        `<div class="n" style="color:${c}">${sgn(v,DEC[j])}</div></div>`;
+    }).join('');
+    $('lgSay').textContent= k>=n ? SAY[key]() : `正在加第 ${Math.min(n,full+1)} 条腿，共 ${n} 条。`;
+  }
+  function start(){
+    s.playing=false; setup(); s.k=0;
+    if(reduced){ s.k=P.legs.length; draw(); return; }
+    const n=P.legs.length;
+    runLoop(s,16.7,()=>{ s.k=Math.min(n,s.k+16.7/1000); },draw,()=>s.k>=n);
+  }
+  segOn('lgSeg',d=>{ key=d.p; start(); });
+  $('lgPlay').addEventListener('click',start);
+  setup(); s.k=0;   // 滚到眼前之前停在第一帧，开播时不会先闪出最后一帧
+  return {start, draw, el:$('lgG')};
+})();
+
+/* ══════════ 二 · 五个仓位的四个数 ══════════ */
+function renderGallery(){
+  const P=DATA.ports;
+  const read={
+    call:t=>`看涨，相当于 ${t.delta.toFixed(2)} 股；想要大动，最好涨得快；每天付 ${fm(-t.theta)} 的时间租金；隐含波动率涨对它有利。`,
+    bull:t=>`看涨，相当于 ${t.delta.toFixed(2)} 股；gamma、theta、vega 都接近 0，几乎只剩方向。`,
+    short:t=>`不赌方向；赌 TSLA 不大动、隐含波动率下降；每天收 ${t.theta.toFixed(2)}。`,
+    cal:t=>`不赌方向；希望 TSLA 不大动，同时希望隐含波动率上涨：gamma 与 vega 反号。`,
+    messy:t=>`看涨，但要慢慢涨；大动对它不利，哪个方向都一样；隐含波动率下降有利；每天收 ${t.theta.toFixed(2)}。`
+  };
+  const nm={call:'买 350 call',bull:'牛市价差：买 350 call、卖 380 call',short:'卖跨式：卖 350 call、卖 350 put，买 11 股',cal:'日历价差：买 5/15 350 call、卖 4/24 350 call',messy:'七条腿（第一节）'};
+  const order=['call','bull','short','cal','messy'];
+  $('galTb').querySelector('tbody').innerHTML=order.map(k=>{
+    const t=P[k].tot;
+    return `<tr class="nb"><td>${nm[k]}</td>`+G4.map((g,j)=>`<td class="${cls(t[g])}">${sgn(t[g],DEC[j])}</td>`).join('')+`</tr>`+
+      `<tr><td class="rd" colspan="5">${read[k](t)}</td></tr>`;
+  }).join('');
+  const short={call:'买 350 call',bull:'牛市价差',short:'卖跨式加股票',cal:'日历价差',messy:'七条腿'};
+  $('thgTb').querySelector('tbody').innerHTML=order.map(k=>{
+    const t=P[k].tot;
+    return `<tr><td>${short[k]}</td><td>${sgn(t.gamma,3)}</td><td>${sgn(t.theta)}</td><td>${sgn(P[k].thg)}</td></tr>`;
+  }).join('');
+  const gaps=order.map(k=>Math.abs(+P[k].tot.theta.toFixed(2)-P[k].thg));
+  $('thgText').textContent=`两列只差 ${Math.min(...gaps).toFixed(2)} 到 ${Math.max(...gaps).toFixed(2)} 美元，差的主要是利息那一小项（模型里 call 的 theta 还有一块来自行权价的利息）。σ 用的是每条腿自己的报价隐含波动率，350 call 是 46.3%，和 2.2 一样：2.2 按这个数算出 350 call 一股 0.299，一张就是上表的 ${fm(-P.call.thg)}。所以读仓位时，gamma 和 theta 几乎总是反号：gamma 为正，每天付 theta，换 TSLA 大动时的好处；gamma 为负，每天收 theta，承担 TSLA 大动时的损失。`;
+  const m=DATA.messy415, S=DATA.spot;
+  $('messySay').textContent=`七条腿就是这种仓位（delta ${sgn(P.messy.tot.delta)}、gamma ${sgn(P.messy.tot.gamma,2)}）。4/15 TSLA 一天涨了 ${m.dS.toFixed(2)}（+${(m.dS/S[1]*100).toFixed(1)}%），按 4/14 收盘的 delta，应该赚 ${grp(m.e1)}，实际只赚了 ${grp(m.act)}。少赚的 ${grp(m.e1-m.act)} 大部分来自 gamma 为负，第三节把它拆开算。`;
+}
+
+/* ══════════ 三 · 两个算例 ══════════ */
+function estTable(rows){
+  return `<thead><tr><th>项</th><th>算式</th><th>美元</th></tr></thead><tbody>`+
+    rows.map(([a,b,v,h])=>`<tr${h?' class="hot"':''}><td>${a}</td><td>${b}</td><td>${smo(v)}</td></tr>`).join('')+'</tbody>';
+}
+function renderExamples(){
+  const x=DATA.ex, S=DATA.spot, t=DATA.ports.short.tot, vg=DATA.ports.short.legs[0].vega;
+  const dc=x.ivc[1]-x.ivc[0], dp=x.ivp[1]-x.ivp[0];
+  $('exIntro').textContent=`4/14 收盘 TSLA ${S[1].toFixed(2)}，比 4/13 涨了 ${x.dS.toFixed(2)}（+${(x.dS/S[0]*100).toFixed(1)}%）。隐含波动率也涨了，两条腿涨得不一样：350 call 从 ${x.ivc[0].toFixed(2)}% 变成 ${x.ivc[1].toFixed(2)}%，涨了 ${dc.toFixed(2)} 个点；350 put 从 ${x.ivp[0].toFixed(2)}% 变成 ${x.ivp[1].toFixed(2)}%，涨了 ${dp.toFixed(2)} 个点。所以 vega 项按腿分别算。`;
+  $('exTb').innerHTML=estTable([
+    ['delta 项',`${fm(t.delta)} × ${x.dS.toFixed(2)}`,x.d],
+    ['gamma 项',`½ × ${pa(t.gamma)} × ${x.dS.toFixed(2)}²`,x.g],
+    ['theta 项',`${t.theta.toFixed(2)} × ${x.dt} 天`,x.t],
+    ['vega 项（call）',`${fm(vg)} × ${dc.toFixed(2)}`,x.vc],
+    ['vega 项（put）',`${fm(vg)} × ${dp.toFixed(2)}`,x.vp],
+    ['二阶估算合计','',x.e2,1],
+    ['实际','按 4/14 收盘中间价重算仓位',x.act]]);
+  $('exText').textContent=`只用 delta，估出来几乎不赚不亏（${fm(x.d)}），实际亏了 ${grp(-x.act)}。把 gamma、theta、vega 都加上，估 ${fm(x.e2)}，只差 ${Math.abs(x.e2-x.act).toFixed(2)}。按讲义的写法：新 delta ＝ −0.48 ＋ (−1.64) × 11.96 ＝ −20.09，平均 −10.29，乘 11.96 得 −123.03，正好是上表 delta 项加 gamma 项。`;
+  const m=DATA.messy415;
+  $('mxIntro').textContent=`第一节的七条腿。4/15 TSLA 从 ${S[1].toFixed(2)} 涨到 ${S[2].toFixed(2)}，一天涨了 ${m.dS.toFixed(2)}（+${(m.dS/S[1]*100).toFixed(1)}%），各条腿的隐含波动率也都涨了。用 4/14 收盘的四个数（delta ${sgn(m.D)}、gamma ${sgn(m.G,3)}、theta ${sgn(m.T)}、vega ${sgn(m.V)}）来估：`;
+  $('mxTb').innerHTML=estTable([
+    ['delta 项',`${fm(m.D)} × ${m.dS.toFixed(2)}`,m.d],
+    ['gamma 项',`½ × ${pa(m.G,3)} × ${m.dS.toFixed(2)}²`,m.g],
+    ['theta 项',`${fm(m.T)} × ${m.dt} 天`,m.t],
+    ['vega 项','七条腿各自的 vega × 各自的隐含波动率变化，再相加',m.v],
+    ['二阶估算合计','',m.e2,1],
+    ['实际','按 4/15 收盘中间价重算仓位',m.act]]);
+  $('mxText').textContent=`只看 delta 应赚 ${grp(m.e1)}，实际只赚 ${grp(m.act)}，少赚了 ${grp(m.e1-m.act)}；四项合起来估 ${sgn(m.e2)}，只差 ${(m.e2-m.act).toFixed(2)}。少赚的部分里，gamma 项占 ${grp(-m.g)}：delta 为正、gamma 为负，涨得越多，后面每一段赚得越少（第二节）。vega 为负的仓位碰上隐含波动率上涨，又少了 ${grp(-m.v)}。`;
+}
+
+/* ══════════ 三 · 逐日回放 ══════════ */
+const RP=(()=>{
+  let key='short', mode='daily';
+  const s={k:0,playing:false}, svg=$('rpSvg');   // 滚到眼前之前停在第一帧
+  const rows=()=>DATA.replay[key][mode];
+  const e2=r=>r[2]+r[3]+r[4]+r[5];
+  function niceRange(lo,hi){   // 含 0，刻度取 50/100/200/250/500/1000/2000 的倍数，约 4 到 7 格
+    const steps=[50,100,200,250,500,1000,2000];
+    let st=2000; for(const x of steps){ if((hi-lo)/x<=6.5){ st=x; break; } }
+    return {st, lo:Math.floor(lo/st)*st, hi:Math.ceil(hi/st)*st};
+  }
+  function draw(){
+    const R=rows(), n=R.length, days=DATA.days.slice(1);
+    const W=svgW(svg), narrow=W<520, H=narrow?300:320;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const L=narrow?52:66, Rr=W-6, T=12, B=H-46;
+    let mn=0, mx=0; R.forEach(r=>[r[2],e2(r),r[6]].forEach(v=>{ mn=Math.min(mn,v); mx=Math.max(mx,v); }));
+    const pad=(mx-mn)*.06, {st,lo,hi}=niceRange(mn<0?mn-pad:0, mx>0?mx+pad:0);
+    const Y=v=>T+(hi-v)/(hi-lo)*(B-T);
+    let g='';
+    for(let v=lo; v<=hi+1e-9; v+=st){
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${Rr}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.7}"/>`;
+      g+=lab(L-6,Y(v)+4,v===0?'0':mo(v,0),'var(--ink-faint)','end',narrow?9.5:10.5);
+    }
+    const sw=(Rr-L)/n, bw=Math.min(14,sw*.23), k=s.k;
+    for(let i=0;i<n;i++){
+      const cx=L+sw*(i+.5), f=Math.max(0,Math.min(1,k-i)), r=R[i];
+      const on=f>0;
+      g+=lab(cx,B+17,md(days[i]),on?'var(--ink-soft)':'var(--rule)','middle',narrow?9.5:10.5);
+      g+=lab(cx,B+32,sgn(r[0],narrow?1:2),on?'var(--ink-faint)':'var(--rule)','middle',narrow?8.5:9.5);
+      if(!on) continue;
+      [[r[2],'var(--ink-faint)'],[e2(r),'var(--result)'],[r[6],'var(--control)']].forEach(([v,c],j)=>{
+        const x=cx+(j-1)*(bw+2)-bw/2, y0=Y(0), y1=Y(v*f);
+        g+=`<rect x="${x.toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1,Math.abs(y1-y0)).toFixed(1)}" rx="1.5" fill="${c}"/>`;
+      });
+    }
+    g+=lab(L-6,H-6,mode==='daily'?'当天变动':'累计变动',"var(--ink-faint)",'end',narrow?8.5:9.5);
+    g+=lab(L+4,T+11,mode==='daily'?'当天盈亏，美元':'自 4/13 起的盈亏，美元','var(--ink-faint)','start',narrow?9:10);
+    svg.innerHTML=g;
+    // 读数：最近一个已经出现的交易日
+    const j=Math.max(0,Math.min(n,Math.ceil(k-1e-9))-1), r=R[j];
+    $('rpD').textContent=k>0?md(days[j]):'';
+    $('rpDb').textContent=k>0?`TSLA ${sgn(r[0])}${mode==='daily'?'':'（自 4/13）'}，${r[1]} 天`:'';
+    $('rp1').textContent=k>0?smo(r[2]):''; $('rp2').textContent=k>0?smo(e2(r)):''; $('rpA').textContent=k>0?smo(r[6]):'';
+    $('rpTerms').textContent=k>0?`二阶 = delta 项 ${smo(r[2])} ＋ gamma 项 ${smo(r[3])} ＋ theta 项 ${smo(r[4])} ＋ vega 项 ${smo(r[5])}`:'';
+    const say=$('rpSay'); say.textContent= k>=n ? summary() : ''; say.hidden=!say.textContent;
+  }
+  // 平均误差：[只用 delta, 只加 gamma 项, 只加 theta 与 vega 项, 四项]
+  const mae=(R,f)=>R.reduce((s,r)=>s+Math.abs(f(r)-r[6]),0)/R.length;
+  function errs(R){ return [mae(R,r=>r[2]), mae(R,r=>r[2]+r[3]), mae(R,r=>r[2]+r[4]+r[5]), mae(R,e2)]; }
+  function summary(){
+    const R=rows(), [a,ag,,b]=errs(R);
+    let t= mode==='daily' ? `9 个交易日，只用 delta 平均每天差 ${grp(a)}，四个数都用平均差 ${grp(b)}。`
+                          : `9 个估算，只用 delta 平均每个差 ${grp(a)}，四个数都用平均每个差 ${grp(b)}。`;
+    if(mode==='daily'){
+      if(key==='short'){ const d=R.map(r=>r[2]/r[0]), dd=d.slice(2);
+        t+=`4/13 的 delta 几乎是 0（${fm(d[0])} 股），第一天一阶估算只有 ${fm(R[0][2])}。仓位不调整，TSLA 涨上去之后 delta 变成负几十股（4/15 收盘起在 ${fm(Math.max(...dd),0)} 到 ${fm(Math.min(...dd),0)} 股之间），一阶估算从 4/15 起大多数日子能抓住方向，剩下的差在 gamma 和 vega 里。`; }
+      if(key==='call') t+=`买 call 的 gamma 为正，TSLA 大涨的几天一阶估算都少算了赚的。`;
+      if(key==='bull') t+=`牛市价差的 gamma 很小，只加 gamma 项反而更不准（平均差 ${grp(ag)}），改进来自 theta、vega 项。`;
+    } else {
+      const r=R[3];
+      t+=`到 4/17，TSLA 比 4/13 累计涨了 ${r[0].toFixed(2)}：一阶估算 ${smo(r[2])}，二阶 ${smo(e2(r))}，实际 ${smo(r[6])}。4/13 的四个数只描述 4/13 附近，TSLA 走远之后它们自己变了。`;
+      if(key==='bull') t+=`牛市价差最明显：它的 gamma 4/13 是 +0.058，4/14 收盘已经变成 −0.052，4/15 是 −0.243。TSLA 涨到两个行权价中间附近（4/14 收盘 364.32），gamma 就变了号；一直用 4/13 那个正的 gamma，二阶估算反而比一阶差。`;
+    }
+    return t;
+  }
+  function start(){
+    s.playing=false; s.k=0;
+    const n=rows().length;
+    if(reduced){ s.k=n; draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(n,s.k+16.7/750); },draw,()=>s.k>=n);
+  }
+  segOn('rpSeg',d=>{ key=d.p; start(); });
+  segOn('rpMode',d=>{ mode=d.m; start(); });
+  $('rpPlay').addEventListener('click',start);
+  function texts(){
+    const D=DATA.replay, e=k=>errs(D[k].daily);
+    const sd=D.short.daily[1], sf=D.short.fixed[3];
+    const [s1,sg,stv,s2]=e('short'), [c1,cg,,c2]=e('call'), [b1,bg,,b2]=e('bull'), sv=D.short.daily.map(r=>r[5]);
+    $('rpText1').textContent=`每天重读四个数时，卖跨式加股票只用 delta，平均每天差 ${grp(s1)}；四项都用，差 ${grp(s2)}。最大的一天是 4/15，TSLA 涨 ${sd[0].toFixed(2)}：一阶估算 ${smo(sd[2])}，二阶 ${smo(e2(sd))}，实际 ${smo(sd[6])}。先只加 gamma 项（4/13 的 gamma：卖跨式 −1.64，买 call +0.82，牛市价差 +0.058）：卖跨式从 ${grp(s1)} 降到 ${grp(sg)}，买 350 call 从 ${grp(c1)} 降到 ${grp(cg)}，牛市价差反而从 ${grp(b1)} 变成 ${grp(bg)}。gamma 越大的仓位，越需要 ½·Γ·ΔS² 这一项。其余的改进来自 theta 和 vega：卖跨式不加 gamma 项、只加这两项，平均差降到 ${grp(stv)}，比只加 gamma 项降得多；vega 项在隐含波动率大动的日子最大（4/15 是 ${smo(sv[1])}，4/23 是 ${smo(sv[7])}）。四项都用时，买 350 call 差 ${grp(c2)}，牛市价差是 ${grp(b2)}。`;
+    $('rpText2').textContent=`一直用 4/13 的四个数，误差会随变动变大。卖跨式加股票到 4/17，TSLA 累计涨了 ${sf[0].toFixed(2)}，一阶估算 ${smo(sf[2])}，二阶 ${smo(e2(sf))}，实际 ${smo(sf[6])}：二阶估算多算了 ${grp(sf[6]-e2(sf))} 的亏损。TSLA 离开 350 越远，这个跨式的 gamma 越小（4/13 收盘 −1.64，4/15 −0.94，4/17 −0.82），实际亏得比 ½·Γ·ΔS² 那条抛物线慢。四个数只描述当下附近，所以交易员每天收盘都要重新读一遍；它们自己怎样随价格、时间变化，是节点 6 的内容。`;
+  }
+  return {start, draw, texts};
+})();
+
+/* ══════════ 三 · 搭一个仓位 ══════════ */
+const BD=(()=>{
+  const CH=DATA.chain, S0=DATA.S0;
+  const byK=k=>CH.find(r=>r[0]===k);
+  const PRE={
+    short:{legs:[[-1,1,'C',350],[-1,1,'P',350],[1,0,'C',380],[1,0,'P',330]],sh:11},
+    bull:{legs:[[1,1,'C',350],[-1,1,'C',380],[1,0,'C',400],[1,0,'P',330]],sh:0},
+    call:{legs:[[1,1,'C',350],[1,0,'C',380],[1,0,'C',400],[1,0,'P',330]],sh:0},
+    clear:{legs:[[1,0,'C',350],[1,0,'C',380],[1,0,'C',400],[1,0,'P',330]],sh:0}
+  };
+  const box=$('bdRows');
+  const opts=CH.map(r=>`<option value="${r[0]}">${r[0]}</option>`).join('');
+  box.innerHTML=[0,1,2,3].map(i=>
+    `<select id="bs${i}" aria-label="买或卖"><option value="1">买</option><option value="-1">卖</option></select>`+
+    `<input type="number" id="bn${i}" min="0" max="50" step="1" value="0" aria-label="张数">`+
+    `<select id="bc${i}" aria-label="call 或 put"><option value="C">张 call</option><option value="P">张 put</option></select>`+
+    `<select id="bk${i}" aria-label="行权价">${opts}</select>`).join('');
+  function load(p){
+    PRE[p].legs.forEach(([sd,n,cp,k],i)=>{ $('bs'+i).value=sd; $('bn'+i).value=n; $('bc'+i).value=cp; $('bk'+i).value=k; });
+    $('bdSh').value=PRE[p].sh; render();
+  }
+  function greeks(){
+    const t={delta:0,gamma:0,theta:0,vega:0}, iv=[];
+    for(let i=0;i<4;i++){
+      const n=+$('bn'+i).value||0, sd=+$('bs'+i).value, cp=$('bc'+i).value, r=byK(+$('bk'+i).value);
+      if(!n||!r) continue;
+      const q=sd*n*100;
+      t.delta+=q*(cp==='C'?r[3]:r[4]); t.gamma+=q*r[5]; t.theta+=q*(cp==='C'?r[6]:r[7]); t.vega+=q*r[8];
+    }
+    t.delta+=+$('bdSh').value||0;
+    return t;
+  }
+  function reading(t){
+    const a=[];
+    if(Math.abs(t.delta)<5) a.push('几乎不赌方向');
+    else a.push(t.delta>0?`看涨，相当于持有 ${t.delta.toFixed(1)} 股`:`看跌，相当于卖空 ${Math.abs(t.delta).toFixed(1)} 股`);
+    if(Math.abs(t.gamma)<0.1) a.push('对大动几乎无所谓');
+    else a.push(t.gamma>0?'希望 TSLA 大动':'希望 TSLA 不大动');
+    if(Math.abs(t.theta)>=0.5) a.push(t.theta>0?`每天收 ${t.theta.toFixed(2)}`:`每天付 ${Math.abs(t.theta).toFixed(2)}`);
+    if(Math.abs(t.vega)<5) a.push('对隐含波动率几乎无所谓');
+    else a.push(t.vega>0?'隐含波动率涨有利':'隐含波动率跌有利');
+    return a.join('；')+'。';
+  }
+  function render(){
+    const t=greeks();
+    $('bdD').textContent=sgn(t.delta); $('bdG').textContent=sgn(t.gamma,3); $('bdT').textContent=sgn(t.theta); $('bdV').textContent=sgn(t.vega);
+    const empty=G4.every(g=>Math.abs(t[g])<1e-9);
+    $('bdSay').textContent= empty ? '仓位是空的。' : reading(t);
+    const dS=+$('iDS').value, dt=+$('iDT').value, dv=+$('iDV').value;
+    $('vDS').textContent=sgn(dS); $('vDT').textContent=dt+' 天'; $('vDV').textContent=sgn(dv,1)+' 点';
+    const d=t.delta*dS, g=0.5*t.gamma*dS*dS, th=t.theta*dt, v=t.vega*dv;
+    $('bdEst').innerHTML=`<thead><tr><th>项</th><th>算式</th><th>美元</th></tr></thead><tbody>`+
+      `<tr><td>delta 项</td><td>${fm(t.delta)} × ${pa(dS)}</td><td>${smo(d)}</td></tr>`+
+      `<tr><td>gamma 项</td><td>½ × ${pa(t.gamma,3)} × ${pa(dS)}²</td><td>${smo(g)}</td></tr>`+
+      `<tr><td>theta 项</td><td>${fm(t.theta)} × ${dt}</td><td>${smo(th)}</td></tr>`+
+      `<tr><td>vega 项</td><td>${fm(t.vega)} × ${pa(dv,1)}</td><td>${smo(v)}</td></tr>`+
+      `<tr><td>一阶估算</td><td>只有 delta 项</td><td>${smo(d)}</td></tr>`+
+      `<tr class="hot"><td>二阶估算</td><td>四项合计</td><td>${smo(d+g+th+v)}</td></tr></tbody>`;
+  }
+  document.querySelectorAll('[data-b]').forEach(b=>b.addEventListener('click',()=>load(b.dataset.b)));
+  box.addEventListener('input',render); box.addEventListener('change',render);
+  ['bdSh','iDS','iDT','iDV'].forEach(id=>$(id).addEventListener('input',render));
+  load('short');
+  return {render};
+})();
+
+/* ══════════ 四 · delta 截断 ══════════ */
+const TR=(()=>{
+  const d=DATA.trunc, Sa=d.Sa, Sb=d.Sb, K=d.K, dS=Sb-Sa, LC=d.legs.C, LP=d.legs.P, T=LC.T;
+  const svg=$('trSvg'), s={k:0,playing:false};   // 滚到眼前之前停在第一帧
+  const X0=362, X1=394;
+  function bsDelta(S,cp,iv){ const d1=(Math.log(S/K)+(RATE+iv*iv/2)*T)/(iv*Math.sqrt(T)); return cp==='C'?ncdf(d1):ncdf(d1)-1; }
+  function panel(o){
+    // o: {leg, cp, top, bot, lo, hi, bound, W, L, R, k, title}
+    const {leg,cp,top,bot,lo,hi,bound,L,R,k,narrow}=o;
+    const X=S=>L+(S-X0)/(X1-X0)*(R-L), Y=v=>top+(hi-v)/(hi-lo)*(bot-top);
+    const lin=S=>leg.d0+leg.g*(S-Sa);
+    const fs=narrow?9.5:10.5;
+    let g='';
+    // 边界外：到不了的区域
+    g+=`<rect x="${L}" y="${Y(hi)}" width="${R-L}" height="${Y(bound)-Y(hi)}" fill="var(--warn-bg)"/>`;
+    g+=lab(L+4,top+29,cp==='C'?'call 的 delta 到不了这里':'put 的 delta 到不了这里','var(--warn)','start',fs);
+    // 刻度
+    const ticks=cp==='C'?[0,0.5,1]:[-0.5,0];
+    ticks.forEach(v=>{
+      g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="${v===bound?'var(--ink-soft)':'var(--rule)'}" stroke-width="${v===bound?1.4:.8}"/>`;
+      g+=lab(L-6,Y(v)+4,fm(v,1),'var(--ink-faint)','end',fs);
+    });
+    g+=lab(L+4,Y(bound)-5,cp==='C'?'上限 1':'上限 0','var(--ink-soft)','start',fs);
+    g+=lab(L+4,top+12,o.title,'var(--ink)','start',narrow?11:12,600);
+    const p=Math.min(1,k), Sc=Sa+dS*p, clampOn=Math.max(0,Math.min(1,(k-1)/0.4));
+    // 线性外推下方的面积（到 0）
+    const base=Y(0);
+    g+=`<polygon points="${X(Sa)},${base} ${X(Sa)},${Y(leg.d0)} ${X(Sc)},${Y(lin(Sc))} ${X(Sc)},${base}" fill="var(--control-bg)" opacity="${(1-clampOn*.7).toFixed(2)}"/>`;
+    // 越界部分
+    const Sx=Sa+(bound-leg.d0)/leg.g;
+    if(Sc>Sx){
+      g+=`<polygon points="${X(Sx)},${Y(bound)} ${X(Sc)},${Y(lin(Sc))} ${X(Sc)},${Y(bound)}" fill="var(--warn)" opacity=".55"/>`;
+    }
+    // 模型曲线（点线）
+    let pts=[]; for(let S=Sa; S<=Sb+1e-9; S+=dS/60) pts.push(X(S).toFixed(1)+','+Y(bsDelta(S,cp,leg.iv0)).toFixed(1));
+    g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ink-faint)" stroke-width="1.8" stroke-dasharray="1.5 3.5" stroke-linecap="round"/>`;
+    // 线性外推（虚线）
+    g+=`<line x1="${X(Sa)}" y1="${Y(leg.d0)}" x2="${X(Sc)}" y2="${Y(lin(Sc))}" stroke="var(--ink-soft)" stroke-width="1.8" stroke-dasharray="6 4"/>`;
+    // 截断后
+    if(clampOn>0){
+      g+=`<polygon points="${X(Sa)},${base} ${X(Sa)},${Y(leg.d0)} ${X(Sb)},${Y(bound)} ${X(Sb)},${base}" fill="var(--result-bg)" opacity="${clampOn.toFixed(2)}"/>`;
+      g+=`<line x1="${X(Sa)}" y1="${Y(leg.d0)}" x2="${X(Sb)}" y2="${Y(bound)}" stroke="var(--result)" stroke-width="2.6" opacity="${clampOn.toFixed(2)}"/>`;
+    }
+    // 起点
+    g+=`<circle cx="${X(Sa)}" cy="${Y(leg.d0)}" r="4" fill="var(--ink)"/>`;
+    g+=labH(X(Sa)+7,Y(leg.d0)+15,'旧 '+fm(leg.d0,4),'var(--ink)','start',fs);
+    // 线头
+    g+=`<circle cx="${X(Sc)}" cy="${Y(lin(Sc))}" r="3.5" fill="${lin(Sc)>bound?'var(--warn)':'var(--ink-soft)'}"/>`;
+    if(p>=1){
+      g+=labH(X(Sb)-8,Y(lin(Sb))+4,'线性 '+sgn(lin(Sb),4).replace('+',''),'var(--warn)','end',fs,600);
+      g+=`<circle cx="${X(Sb)}" cy="${Y(leg.d1)}" r="4.5" fill="var(--good)"/>`;
+      g+=labH(X(Sb)-4,Y(leg.d1)+30,'4/15 真实 '+fm(leg.d1,3),'var(--good)','end',fs,600);
+    }
+    return g;
+  }
+  function draw(){
+    const W=svgW(svg), narrow=W<520, H=narrow?420:440;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const L=narrow?36:44, R=W-10, mid=H/2;
+    let g='';
+    g+=panel({leg:LC,cp:'C',top:6,bot:mid-24,lo:-0.08,hi:1.36,bound:1,L,R,k:s.k,narrow,title:'365 call 的 delta'});
+    g+=panel({leg:LP,cp:'P',top:mid+2,bot:H-44,lo:-0.62,hi:0.36,bound:0,L,R,k:s.k,narrow,title:'365 put 的 delta'});
+    const X=S=>L+(S-X0)/(X1-X0)*(R-L), p=Math.min(1,s.k), Sc=Sa+dS*p;
+    // 横轴
+    [[Sa,'364.32'],[Sb,'391.93']].forEach(([S,t],i)=>{
+      g+=`<line x1="${X(S)}" y1="${H-44}" x2="${X(S)}" y2="${H-38}" stroke="var(--ink-faint)"/>`;
+      g+=lab(X(S),H-24,t,'var(--ink-soft)',i?'end':'start',narrow?9.5:10.5);
+      g+=lab(X(S),H-10,i?'4/15 收盘':'4/14 收盘','var(--ink-faint)',i?'end':'start',narrow?9:10);
+    });
+    g+=lab((L+R)/2,H-10,'TSLA','var(--ink-faint)','middle',narrow?9:10);
+    // 游标
+    if(p<1) g+=`<line x1="${X(Sc)}" y1="6" x2="${X(Sc)}" y2="${H-44}" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 3"/>`;
+    svg.innerHTML=g;
+    const lc=LC.d0+LC.g*(Sc-Sa), lp=LP.d0+LP.g*(Sc-Sa);
+    $('trS').textContent=Sc.toFixed(2); $('trSb').textContent='从 364.32 涨了 '+(Sc-Sa).toFixed(2);
+    $('trC').textContent=fm(lc,3); $('trC').style.color=lc>1?'var(--warn)':'';
+    $('trP').textContent=sgn(lp,3); $('trP').style.color=lp>0?'var(--warn)':'';
+    $('trT').textContent=sgn(lc+lp,3);
+    const say=$('trSay'); say.textContent= s.k>=1.4 ? `线性外推到 391.93：call ${fm(LC.dl,4)}，put ${sgn(LP.dl,4)}，合计 ${fm(LC.dl+LP.dl,4)}，都是不可能的值。逐腿截断后 call 1、put 0，合计 1；4/15 收盘真实是 ${fm(LC.d1,4)}、${fm(LP.d1,4)}，合计 ${fm(LC.d1+LP.d1,4)}。` : ''; say.hidden=!say.textContent;
+  }
+  function start(){
+    s.playing=false; s.k=0;
+    if(reduced){ s.k=1.5; draw(); return; }
+    runLoop(s,16.7,()=>{ s.k=Math.min(1.5,s.k+16.7/2600); },draw,()=>s.k>=1.5);
+  }
+  $('trPlay').addEventListener('click',start);
+  function table(){
+    const rows=[
+      ['只用 delta',LC.f1,LP.f1],
+      ['不截断的二阶',LC.fu,LP.fu],
+      ['截断后的二阶',LC.fc,LP.fc],
+      ['4/15 实际（中间价）',LC.mid1,LP.mid1]
+    ];
+    $('trTb').querySelector('tbody').innerHTML=rows.map((r,i)=>`<tr${i===2?' class="hot"':''}><td>${r[0]}</td><td>${fm(r[1])}</td><td class="${r[2]<0?'no':''}">${fm(r[2])}</td><td>${fm(r[1]+r[2])}</td></tr>`).join('');
+    $('trIntro').textContent=`4/14 收盘，TSLA ${Sa.toFixed(2)}。4/17 到期（还剩 3 天）的 365 call 与 365 put，中间价 ${LC.mid0.toFixed(2)} 与 ${LP.mid0.toFixed(3)}，合起来是一个跨式，成本 ${(LC.mid0+LP.mid0).toFixed(3)}。两张的 gamma 都是 ${LC.g.toFixed(5)}，是 5/15 到期 350 call（0.0082）的 3 倍多：离到期只有 3 天，又正好在平值。第二天 4/15，TSLA 涨到 ${Sb.toFixed(2)}，一天涨了 ${dS.toFixed(2)}。`;
+    const pm=LP.f1, pu=LP.fu;
+    const su=rows[1][1]+rows[1][2], sc=rows[2][1]+rows[2][2], sa=rows[3][1]+rows[3][2];
+    $('trText').textContent=`三种估算都加了 theta 项（call ${fm(LC.th)}、put ${fm(LP.th)}）和 vega 项：call 的隐含波动率从 ${(LC.iv0*100).toFixed(1)}% 涨到 ${(LC.iv1*100).toFixed(1)}%，vega 项 ${sgn(LC.v)}；put 从 ${(LP.iv0*100).toFixed(1)}% 涨到 ${(LP.iv1*100).toFixed(1)}%，vega 项 ${sgn(LP.v)}。三种估算只有 delta 和 gamma 的部分不同。只用 delta，put 算出 ${fm(pm)}：期权价格不可能是负数。不截断，put 的新 delta 变成 ${sgn(LP.dl,4)}：TSLA 涨了，put 反倒像 call 一样跟着涨，估成 ${fm(pu)}，实际只剩 ${fm(LP.mid1)}。截断之后，跨式估 ${fm(sc)}，实际 ${fm(sa)}；不截断估 ${fm(su)}，多算了 ${fm(su-sa)}。`;
+    const A=d.alt, lin=LC.dl+A.dl;
+    $('trAlt').textContent=`这个跨式看不出逐腿截断和截合计的区别：一张 call 加同一行权价的一张 put，合计 delta 本来就在 −1 到 1 之间，把合计 ${fm(LC.dl+LP.dl,2)} 截到 1，和逐腿截断的 1 ＋ 0 一样。换成两条行权价、到期日都不同的腿：4/17 的 365 call 加 ${A.e} 的 ${A.K} put。4/14 收盘这张 put 的 delta 是 ${fm(A.d0,4)}、gamma ${A.g.toFixed(5)}，线性外推到 ${fm(A.dl,4)}。合计 ${fm(LC.dl,4)} ＋ (${fm(A.dl,4)}) ＝ ${fm(lin,4)}，没有越界，拿合计去截什么也不截；逐腿截断是 1 ＋ (${fm(A.dl,4)}) ＝ ${fm(1+A.dl,4)}。4/15 收盘真实是 ${fm(LC.d1,4)} ＋ (${fm(A.d1,4)}) ＝ ${fm(LC.d1+A.d1,4)}。`;
+    const m=d.tot.m, ec=d.tot.ec, eu=d.tot.eu, r2=x=>Math.round(x*100)/100, vv=d.tot.v;
+    $('trEnd').textContent=`截断后的直线仍是近似：真实的 delta 是一条弯向边界的曲线（点线），不会在某一点突然撞上边界。截断做的事是保证算式里用到的新 delta 是一个可能出现的值。这一次 TSLA 一天涨了 ${(dS/Sa*100).toFixed(1)}%，跨式的估算从差 ${fm(su-sa)} 缩到差 ${fm(sa-sc)}；这两个数里都含 vega 项 ${sgn(vv)}。只看价格变动（隐含波动率和剩余时间固定在 4/14 的模型），跨式涨 ${fm(m)}：截断估 ${fm(ec)}，低 ${fm(r2(m)-r2(ec))}；不截断估 ${fm(eu)}，高 ${fm(r2(eu)-r2(m))}。截断把这一部分的误差从 ${fm(r2(eu)-r2(m))} 减到 ${fm(r2(m)-r2(ec))}。`;
+  }
+  return {start, draw, table};
+})();
+
+/* ══════════ 五 · 费曼检验 ══════════ */
+const QS=[
+ {q:`为什么各条腿的希腊字母可以直接相加？相加之前，每条腿要先做什么？什么情况下把 vega 直接相加会误导人？`,
+  a:['仓位的价值是各条腿价值之和。希腊字母量的是价值对同一个东西（TSLA 价格、时间、隐含波动率）的变化率，和的变化率就是变化率的和。',
+     '相加前，每条腿先乘 100 × 张数，卖出的记负号；股票腿的 delta 就是股数，其余为 0。',
+     '各条腿要用同一种单位：TSLA 每 1 美元、每 1 天、每 1 个波动率点。',
+     'vega 相加默认各条腿的隐含波动率一起动同样多的点。到期日不同的腿（日历价差）近月常常动得更多，直接相加会误导。'],
+  s:'「因为公式是线性的」：没说出是哪个量线性相加（价值），也没说出前面要先乘 100 和正负号。'},
+ {q:`卖 350 跨式再买 11 股，delta 只有 −0.48 股。有人说「delta 几乎是 0，这个仓位几乎没有风险」。错在哪？`,
+  a:['delta 只管很小的变动。这个仓位的 gamma 是 −1.64：TSLA 不管往哪边大动，delta 都往不利的方向变。',
+     '4/14 TSLA 涨 11.96，只用 delta 估亏 5.74，实际亏 113.44；4/15 又涨 27.61，一天亏了 1,228.79。',
+     'vega 是 −82.50：隐含波动率涨 1 个点就亏 82.50。',
+     '它每天收 59.69 的 theta，就是承担这些风险拿到的钱。'],
+  s:'「股票已经把风险对冲掉了」：股票只能对冲 delta，改变不了 gamma 和 vega。'},
+ {q:`往一个期权仓位里加股票，四个数里哪几个会变？为什么？`,
+  a:['只有 delta 变，每股 +1（卖空每股 −1）。',
+     '股票价值跟股价一比一变，是一条直线，没有弯曲，gamma 是 0。',
+     '股票不会因为时间过去而贬值，theta 是 0（不算利息和分红）；和隐含波动率无关，vega 是 0。',
+     '所以股票能把方向调到任何想要的值，但 gamma、theta、vega 只能靠期权来改。'],
+  s:'「加股票能降低风险」：只降低方向风险，其余三种一点没动。'},
+ {q:`一个仓位 delta 为正、gamma 为负。它希望 TSLA 怎么走？为什么涨得太多反而赚得少？「慢慢涨」好在哪里？`,
+  a:['delta 为正：TSLA 涨了赚钱。',
+     'gamma 为负：每涨一段，delta 就小一点，后面每一美元赚得越来越少；跌的时候 delta 越来越大，亏得越来越快。',
+     '½·Γ·ΔS² 看的是从入场算起的总涨幅，和它的平方成正比，涨得越多越吃亏。仓位不调整、gamma 不变时，它不管分几天走完：把一次涨幅拆成几天，每天这一项变小，但前几天的涨幅已经把 delta 压小，少赚的部分转进了后几天的 delta 项。',
+     '慢慢涨的好处是同样涨到那里用的天数多，一路按天收 theta。仓位每天调回原来的 delta 时，gamma 的代价才按每天涨跌的平方累加，那是 4.1 的内容。',
+     `七条腿在 4/15 TSLA 涨 27.61 那天：只看 delta 应赚 ${grp(DATA.messy415.e1)}，实际只赚 ${grp(DATA.messy415.act)}，少赚的大部分是 gamma 项 ${fm(DATA.messy415.g)}。`],
+  s:'「delta 为正就是看涨，涨得越多越好」：只读了一个数，没读 gamma 说的速度。'},
+ {q:`讲义的二阶估算先算「新 delta ＝ 旧 delta ＋ gamma × 变动」，再用新旧 delta 的平均乘变动。为什么要用平均？这和 Δ·ΔS ＋ ½Γ·ΔS² 是不是同一个东西？`,
+  a:['变动途中 delta 一直在变，从旧值变到新值。价值的变化是一路上每一小段 delta 乘距离的累加。',
+     'gamma 不变时，delta 均匀地变，一路上的平均就是新旧两个值的平均。',
+     '(Δ ＋ Δ ＋ Γ·ΔS) ÷ 2 × ΔS ＝ Δ·ΔS ＋ ½Γ·ΔS²，两者完全相同。',
+     '只用旧 delta 会漏掉 ½Γ·ΔS²：gamma 为正时一阶估算总是偏低（大涨少算赚的，大跌多算亏的），gamma 为负时总是偏高。'],
+  s:'「平均一下比较准」：没说出为什么平均正好对，也没看出它和 ½Γ·ΔS² 是一回事。'},
+ {q:`call 的 delta 为什么不会超过 1，put 的 delta 为什么不会超过 0？为什么截断只能一条腿一条腿做，不能对仓位的合计 delta 做？`,
+  a:['call 深度实值时相当于一股：TSLA 涨 1 美元它最多涨 1 美元。put 在 TSLA 大涨后几乎作废，TSLA 再涨它也不会跟着涨，delta 最多回到 0。',
+     '线性外推「旧 delta ＋ gamma × 变动」不知道边界，变动大或 gamma 大（临近到期的平值期权）时就会越界。',
+     '仓位的合计 delta 没有边界：多买股票就能任意大，所以没法对合计设上下限。',
+     '4/17 到期的 365 跨式：合计线性外推到 1.49，逐腿截断后是 1，第二天真实是 0.91。'],
+  s:'「delta 是概率，概率不超过 1」：概率只是 delta 的一种粗略读法，而且 put 的 delta 本身是负的。'},
+ {q:`一直用 4/13 的四个数估到 4/17（TSLA 累计涨了 ${DATA.replay.short.fixed[3][0].toFixed(2)}），卖跨式加股票的二阶估算亏 ${grp(-DATA.replay.short.fixed[3].slice(2,6).reduce((a,b)=>a+b,0))}，实际亏 ${grp(-DATA.replay.short.fixed[3][6])}。为什么变动越大估得越不准？实务上怎么办？`,
+  a:['四个数是在 4/13 的价位、剩余时间、隐含波动率下量出来的，只描述那附近。',
+     'TSLA 走远之后四个数自己在变：这个跨式离 350 越远，gamma 越小，实际亏损比 ½·Γ·ΔS² 那条抛物线涨得慢。',
+     '二阶估算只修正了 delta 的变化，没有修正 gamma 的变化。',
+     `实务上每天收盘重新读一次四个数：每天重读时，这个仓位的二阶估算平均每天只差 ${grp(DATA.replay.short.daily.reduce((s,r)=>s+Math.abs(r[2]+r[3]+r[4]+r[5]-r[6]),0)/9)}。节点 4.1 的动态对冲也是每次重算 delta 再调仓。`],
+  s:'「因为市场不按模型走」：这里的误差主要不是模型错了，而是四个数本身随价格变了。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-2-4-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-2-4-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+function recolor(){ LEG.draw(); RP.draw(); TR.draw(); }   // 颜色全部是 CSS 变量，重画一遍保证读数与主题同步
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+
+/* ══════════ 启动 ══════════ */
+renderGallery();
+renderExamples();
+RP.texts();
+TR.table();
+LEG.draw(); RP.draw(); TR.draw();
+let rsz=0; addEventListener('resize',()=>{ clearTimeout(rsz); rsz=setTimeout(()=>{ RP.draw(); TR.draw(); },120); });
+/* 滚到眼前才开始播放 */
+onView($('lgG'),LEG.start); onView($('rpSvg'),RP.start); onView($('trSvg'),TR.start);
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>

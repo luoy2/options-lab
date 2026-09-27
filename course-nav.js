@@ -8,9 +8,9 @@
       ['1.1','远期价格','station-1-1-forward-price.html'],
       ['1.2','波动率','station-1-2-volatility.html'],
       ['2.1','delta','station-2-1-delta.html'],
-      ['2.2','gamma 与 theta',''],
-      ['2.3','vega 与 rho',''],
-      ['2.4','组合希腊字母',''],
+      ['2.2','gamma 与 theta','station-2-2-gamma-theta.html'],
+      ['2.3','vega 与 rho','station-2-3-vega-rho.html'],
+      ['2.4','组合希腊字母','station-2-4-portfolio-greeks.html'],
     ]],
     ['风险与对冲',[
       ['4.1','动态对冲',''],
