@@ -27,8 +27,8 @@
       ['9','提前行权','station-9-early-exercise.html'],
     ]],
     ['合流',[
-      ['7','模型假设怎么崩',''],
-      ['8','skew 与波动率曲面',''],
+      ['7','模型假设怎么崩','station-7-model-assumptions.html'],
+      ['8','skew 与波动率曲面','station-8-skew-surface.html'],
     ]],
     ['支线',[
       ['M','做市报价',''],

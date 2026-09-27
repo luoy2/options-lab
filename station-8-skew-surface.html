@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skew 与波动率曲面</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%208C9%2021%2013%2024%2017%2024S24%2019%2027%2013'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light dark;
+  --paper:oklch(0.973 0.011 84);
+  --panel:oklch(0.947 0.015 82);
+  --panel2:oklch(0.923 0.018 80);
+  --ink:oklch(0.29 0.021 58);
+  --ink-soft:oklch(0.505 0.019 62);
+  --ink-faint:oklch(0.645 0.016 70);
+  --rule:oklch(0.866 0.016 80);
+  --control:oklch(0.545 0.152 42);
+  --control-bg:oklch(0.545 0.152 42 / 0.13);
+  --result:oklch(0.472 0.098 214);
+  --result-bg:oklch(0.472 0.098 214 / 0.13);
+  --warn:oklch(0.565 0.135 66);
+  --warn-bg:oklch(0.565 0.135 66 / 0.15);
+  --good:oklch(0.495 0.110 155);
+  --good-bg:oklch(0.495 0.110 155 / 0.14);
+  --shadow:oklch(0 0 0 / .1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+    --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+    --rule:oklch(0.348 0.017 65);
+    --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+    --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+    --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+    --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+    --shadow:oklch(0 0 0 / .45);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:oklch(0.196 0.014 62); --panel:oklch(0.242 0.016 62); --panel2:oklch(0.286 0.018 62);
+  --ink:oklch(0.915 0.014 80); --ink-soft:oklch(0.735 0.016 74); --ink-faint:oklch(0.592 0.015 70);
+  --rule:oklch(0.348 0.017 65);
+  --control:oklch(0.735 0.132 50); --control-bg:oklch(0.735 0.132 50 / 0.2);
+  --result:oklch(0.735 0.095 208); --result-bg:oklch(0.735 0.095 208 / 0.2);
+  --warn:oklch(0.785 0.125 78); --warn-bg:oklch(0.785 0.125 78 / 0.2);
+  --good:oklch(0.725 0.115 158); --good-bg:oklch(0.725 0.115 158 / 0.2);
+  --shadow:oklch(0 0 0 / .45);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:4rem}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Source Serif 4","Songti SC","Noto Serif SC",Georgia,serif;
+  font-size:17px;line-height:1.75;padding:0 16px 5rem}
+.wrap{max-width:53rem;margin:0 auto}
+.num,code,input[type=number],table{font-family:"IBM Plex Mono","SF Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+nav{position:sticky;top:0;z-index:40;background:color-mix(in oklch,var(--paper) 88%,transparent);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);margin:0 -16px;padding:0 16px}
+.navin{max-width:53rem;margin:0 auto;display:flex;gap:.2rem;overflow-x:auto;scrollbar-width:none;align-items:center;height:3.1rem}
+.navin::-webkit-scrollbar{display:none}
+nav a{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.76rem;color:var(--ink-faint);
+  text-decoration:none;padding:.3rem .6rem;border-radius:6px;white-space:nowrap;transition:.14s}
+nav a:hover{color:var(--ink);background:var(--panel)}
+nav a.on{color:var(--control);background:var(--control-bg);font-weight:600}
+#themeBtn{margin-left:auto;background:none;border:1px solid var(--rule);color:var(--ink-faint);
+  border-radius:99px;padding:.22rem .7rem;font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap}
+#themeBtn:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+header{padding:3.2rem 0 2.2rem;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);margin:0 0 .9rem}
+h1{font-size:clamp(2rem,6vw,2.9rem);line-height:1.14;margin:0 0 1rem;font-weight:700;letter-spacing:-.015em}
+.lede{font-size:1.14rem;color:var(--ink-soft);margin:0;max-width:40rem}
+
+section{padding:3.2rem 0;border-bottom:1px solid var(--rule)}
+h2{font-size:1.5rem;margin:0 0 .35rem;font-weight:600;letter-spacing:-.01em}
+h2 .n{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--ink-faint);font-size:.95rem;font-weight:500;margin-right:.7rem}
+h3{font-size:1.1rem;margin:2.6rem 0 .4rem;font-weight:600}
+p{margin:.75rem 0}
+.sub{color:var(--ink-soft);max-width:42rem}
+.tiny{font-size:.86rem;color:var(--ink-faint);line-height:1.65}
+b{font-weight:600}
+a{color:var(--result)}
+
+.sym{border-bottom:1.5px dotted var(--control);cursor:help;font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-weight:600;color:var(--control);padding:0 .06em}
+.sym:hover,.sym:focus{background:var(--control-bg);outline:none;border-radius:2px}
+#tip{position:absolute;z-index:80;max-width:20rem;background:var(--ink);color:var(--paper);
+  padding:.55rem .8rem;border-radius:8px;font-size:.85rem;line-height:1.55;pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:.14s;box-shadow:0 6px 18px var(--shadow)}
+#tip.on{opacity:1;transform:translateY(0)}
+
+.formula{margin:1.5rem 0;padding:1.1rem 1.3rem;background:var(--panel);border-radius:10px;text-align:center}
+.formula .math{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:600;letter-spacing:.02em}
+.formula .gloss{margin-top:.55rem;font-size:.92rem;color:var(--ink-soft);line-height:1.6}
+.formula .note{margin-top:.5rem;font-size:.82rem;color:var(--ink-faint)}
+
+.panel{background:var(--panel);border-radius:10px;padding:1.4rem 1.5rem;margin:1.5rem 0}
+.story{background:var(--panel2);border-radius:10px;padding:1.3rem 1.5rem;margin:1.5rem 0}
+.story p:first-child{margin-top:0} .story p:last-child{margin-bottom:0}
+
+svg{width:100%;height:auto;display:block;overflow:visible}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1rem;margin-top:1.3rem;
+  border-top:1px solid var(--rule);padding-top:1.1rem}
+.stat .k{font-size:.76rem;color:var(--ink-faint);letter-spacing:.03em}
+.stat .d{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:1.25rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat .d2{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-faint);margin-top:.1rem;font-variant-numeric:tabular-nums}
+
+.say{margin-top:1.2rem;padding:.85rem 1.1rem;border-radius:8px;font-size:.95rem;line-height:1.7}
+.say.plain{background:var(--panel2);color:var(--ink-soft)}
+
+.seg{display:inline-flex;background:var(--panel2);border-radius:8px;padding:3px;gap:2px;margin:0 0 .2rem;flex-wrap:wrap}
+.seg button{background:none;border:none;border-radius:6px;padding:.38rem .9rem;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;color:var(--ink-soft);transition:.13s}
+.seg button[aria-pressed=true]{background:var(--paper);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+
+.tw{overflow-x:auto;margin-top:1rem}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+.tw table{margin-top:0}
+th,td{text-align:right;padding:.48rem .5rem;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left;font-family:"Source Serif 4","Songti SC",serif}
+thead th{font-size:.74rem;color:var(--ink-faint);font-weight:500;letter-spacing:.04em;border-bottom-width:1.5px}
+td.txt,th.txt{text-align:left;font-family:"Source Serif 4","Songti SC",serif;color:var(--ink-soft);line-height:1.6}
+tr.hot td{background:var(--control-bg)}
+td.nw{white-space:nowrap}
+td.max{color:var(--control);font-weight:600}
+tr.sum td{border-top:1.5px solid var(--rule);font-weight:600}
+
+details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
+summary{cursor:pointer;padding:1rem 0;font-weight:600;font-size:1rem;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--ink-faint)}
+details[open] summary::before{content:"▾ "}
+details[open]{padding-bottom:1.2rem}
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.9rem 1.8rem}
+.gl .s{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;color:var(--control);font-size:1.05rem}
+.gl .t{font-size:.88rem;color:var(--ink-soft);line-height:1.6}
+
+.q{background:var(--panel);border-radius:10px;padding:1.3rem 1.4rem;margin:1.2rem 0}
+.q .qn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;letter-spacing:.12em;
+  color:var(--control);font-weight:600;margin-bottom:.45rem}
+.q .qt{margin:0 0 .9rem;font-size:1.02rem;line-height:1.72}
+.q textarea{width:100%;min-height:5.4rem;resize:vertical;padding:.7rem .85rem;border:1px solid var(--rule);
+  border-radius:8px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:.95rem;line-height:1.68}
+.q textarea:focus{outline:none;border-color:var(--control)}
+.q .qrow{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.qa{margin-top:1rem;padding:1rem 1.1rem;border-radius:8px;background:var(--panel2);font-size:.93rem;line-height:1.74}
+.qa ul{margin:.45rem 0 0;padding-left:1.15rem} .qa li{margin:.32rem 0}
+.qa .shallow{margin-top:.9rem;padding-top:.8rem;border-top:1px dashed var(--rule);color:var(--warn)}
+.qmark{font-size:.78rem;color:var(--good)}
+.ghost{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;
+  background:var(--panel2);color:var(--ink-soft);border:1px solid transparent;border-radius:7px;
+  padding:.42rem .85rem;cursor:pointer;transition:.13s}
+.ghost:hover{color:var(--ink);border-color:var(--ink-faint)}
+footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
+
+.bar{display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center;margin-bottom:1rem}
+.bar .seg{margin:0}
+.btn{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.8rem;background:var(--control-bg);color:var(--control);
+  border:1px solid transparent;border-radius:7px;padding:.42rem .9rem;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--control)}
+.btn.ghost{background:var(--panel2);color:var(--ink-soft);font-weight:400}
+.btn.ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+.stage{display:flex;justify-content:center}
+.cvbox{display:inline-block;max-width:100%}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:4px;max-width:100%}
+.scale{position:relative;height:1.3rem;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.72rem;color:var(--ink-faint)}
+.scale span{position:absolute;top:.15rem;transform:translateX(-50%);white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.8rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:.8rem;margin-right:.35rem;vertical-align:-.1rem;border-radius:1px}
+.legend i.ln{height:2px;vertical-align:.25rem;width:1.1rem}
+.legend i.dash{height:0;border-top:2px dashed;vertical-align:.25rem;width:1.1rem;background:none}
+.legend i.dot{border-radius:50%}
+ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
+.hw select{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.85rem;background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule);border-radius:6px;padding:.2rem .3rem}
+.hw td.ok{color:var(--good);font-weight:600} .hw td.bad{color:var(--warn);font-weight:600}
+.btnrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem}
+
+@media (max-width:620px){
+  body{font-size:16px}
+  .panel,.story{padding:1.1rem 1rem}
+  table{font-size:.78rem} th,td{padding:.4rem .3rem}
+  .formula .math{font-size:1.02rem}
+  .stat .d{font-size:1.1rem}
+}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<nav><div class="navin">
+  <a href="#s0">〇 微笑</a><a href="#s1">一 三个数</a><a href="#s2">二 逐日变化</a><a href="#s3">三 乘性</a>
+  <a href="#s4">四 曲面</a><a href="#s5">五 真实 delta</a><a href="#s6">六 隐含分布</a><a href="#s7">七 怎么交易</a><a href="#s8">八 费曼检验</a>
+  <button id="themeBtn">明暗</button>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">FIN 580 复习 · 节点 8</p>
+  <h1>skew 与波动率曲面</h1>
+  <p class="lede">7 讲了 Black-Scholes 的几条假设在真实市场里怎么不成立。市场的补法是每个行权价、每个到期日各报一个隐含波动率，这张表就是波动率曲面。这一节把它读懂：一条曲线用三个数描述，整张曲面有两个维度，再从它推出真实的对冲比率和市场心里的到期分布。案例还是 2026-04-13 收盘的 TSLA 期权链。</p>
+</header>
+
+<!-- ══════════ 〇 ══════════ -->
+<section id="s0">
+  <h2><span class="n">〇</span>一个行权价一个 σ</h2>
+  <p class="sub">1.2 给 350 call 定价时，所有行权价都用同一个 σ = 46.3%。同一天、同一个到期日，市场给每个行权价的报价反推出来的 σ 并不一样。</p>
+  <p>1.2 第六节末尾提过一句：这天 5/15 到期的 300 是 51%，400 是 45%。把这个到期日全部 104 档可用的行权价都画出来：</p>
+  <div class="panel">
+    <svg id="s0c" viewBox="0 0 640 330" role="img" aria-label="4/13 收盘，5/15 到期各行权价的隐含波动率"></svg>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--control)"></i>每个行权价的隐含波动率（虚值那一张）</span>
+      <span><i class="ln" style="background:var(--ink-faint);width:2px;height:.8rem;vertical-align:-.1rem"></i>竖线：买价到卖价各自反推的范围</span>
+      <span><i class="dash" style="border-color:var(--result)"></i>ORATS 平滑值 smv_vol</span>
+      <span><i class="dash" style="border-color:var(--ink-soft)"></i>1.2 用的 46.3%</span>
+    </div>
+  </div>
+  <p>两头高，中间低，左边升得比右边快：200 的 put 是 86.5%，比平值高出 40 多个点；500 的 call 是 53.5%。最低的一档是 385，44.96%，在现价右边。</p>
+
+  <h3>取哪一张的报价</h3>
+  <p>每个行权价都有一张 call 和一张 put。5.2 讲过 parity 把同一行权价的 call 和 put 绑在一起：call 的价格定了，put 的价格也就定了。Black-Scholes 用同一个 σ 算出的 call 和 put 正好满足 parity，所以由 parity 可以推出，两张反推出的隐含波动率应该一样。这天 320 到 380 之间逐档看，两者只差 0.16 到 0.34 个点。</p>
+  <p>实值那一张的价格大部分是内在价值，时间价值只剩一点零头，报价差几分钱，反推出来的 σ 就差很多：5 行权价的 call 反推出 1000%。所以每个行权价取虚值那一张：比远期价 353.69 低的用 put，高的用 call。</p>
+  <p>虚线是数据商 ORATS 自己平滑过的曲线。300 到 450 之间它和报价相差不到 0.3 个点；往左它停在 61.4% 不再升，而报价一路升到 200 的 86.5%、150 的 112.6%。看两翼要用原始报价。</p>
+
+  <h3>三种形状</h3>
+  <p>同一到期日、不同行权价的隐含波动率不一样，这件事叫 <span class="sym" data-say="volatility skew，波动率偏斜。讲义的定义：同一到期日、不同行权价的期权以不同的隐含波动率交易。">skew</span>（偏斜）。两头都翘起来的形状叫微笑。讲义按哪一头被抬高分成三种：</p>
+  <div class="tw"><table>
+    <thead><tr><th>名称</th><th class="txt">形状</th><th class="txt">讲义给的来由</th></tr></thead>
+    <tbody>
+      <tr><td>investment skew（投资型）</td><td class="txt">低行权价被抬高</td><td class="txt">持股的人买低行权价的 put 保护自己，把低行权价抬高；同时卖高行权价的 call 收租金，把高行权价压低。两头一推一压，低行权价相对更贵。</td></tr>
+      <tr><td>demand skew（需求型）</td><td class="txt">高行权价被抬高</td><td class="txt">讲义只给了名字和图。</td></tr>
+      <tr><td>balanced skew（平衡型）</td><td class="txt">两头一起被抬高</td><td class="txt">讲义只给了名字和图。</td></tr>
+    </tbody>
+  </table></div>
+  <p>TSLA 这天两头都翘，左头翘得更多，是投资型叠在一个微笑上。7 讲过两件事：真实的日涨跌两头比钟形长；下跌的时候波动更大。前一件让两翼一起抬高，后一件让左边抬得更多。</p>
+  <p class="tiny">数据：ORATS 2026-04-13 16:00 快照。隐含波动率取虚值一侧（行权价低于远期价用 P_IV，高于远期价用 C_IV），只用买价不低于 0.05、买卖两边反推的隐含波动率相差不到 15 个点的报价。远期价 F = 352.36 × (1 + 4.3% × 32/365) = 353.69。</p>
+</section>
+
+<!-- ══════════ 一 ══════════ -->
+<section id="s1">
+  <h2><span class="n">一</span>三个数</h2>
+  <p class="sub">一条曲线几十个点，交易员用三个数记住它：高度、倾斜、弯曲。</p>
+  <p>横轴先换成 1.2 第六节的 z：行权价离中心几个标准差。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="离中心几个标准差。负数在中心左边（低行权价），正数在右边。">z</span> ＝ ln(<span class="sym" data-say="行权价。">X</span> ÷ <span class="sym" data-say="远期价，分布的中心（1.1）。这里是 353.69。">F</span>) ÷ (<span class="sym" data-say="平值隐含波动率：把各行权价的隐含波动率在远期价处插值。4/13 的 5/15 到期是 46.07%。">σ平</span> × <span class="sym" data-say="到期时间（以年计）的平方根。32 天是 √(32/365) ≈ 0.296。">√t</span>)</div>
+    <div class="gloss">行权价比远期价高出的比例，除以一个标准差的宽度</div>
+    <div class="note">σ平 取远期价 353.69 处的隐含波动率 46.07%。1.2 用的 46.3% 是 350 call 自己的，它比远期价低 3.69。</div>
+  </div>
+  <p>讲义用一条抛物线去贴这些点。讲义的横轴是行权价，这里换成 z：同样一条抛物线，放到不同的日子、不同的到期日上才能比。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="隐含波动率，单位是波动率点（1 个点 = 1%）。">y</span> ＝ <span class="sym" data-say="曲率（curvature），讲义也直接叫 kurtosis。管两翼翘起多少：离中心 z 个标准差，这一项加 a × z² 个点，两边一样。">a</span>·z² ＋ <span class="sym" data-say="倾斜（tilt），讲义也叫 skew。管曲线往哪边歪：每往右一个标准差，这一项加 b 个点。b 为负就是左边高。">b</span>·z ＋ <span class="sym" data-say="水平（level）：中心附近的隐含波动率。">c</span></div>
+    <div class="gloss">隐含波动率 ＝ 曲率 × 距离的平方 ＋ 倾斜 × 距离 ＋ 水平</div>
+  </div>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="s1Play">再放一遍</button></div>
+    <svg id="s1c" viewBox="0 0 640 330" role="img" aria-label="用水平、倾斜、曲率三项一步步拼出 TSLA 的微笑"></svg>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--ink-soft)"></i>4/13 收盘报价</span>
+      <span><i class="ln" style="background:var(--control)"></i>当前这一步的曲线</span>
+      <span><i class="dash" style="border-color:var(--ink-faint)"></i>上一步</span>
+    </div>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>离中心</th><th>行权价</th><th>水平 c</th><th>倾斜 b·z</th><th>曲率 a·z²</th><th>合计</th><th>市场</th></tr></thead>
+    <tbody>
+      <tr><td>−2 个标准差</td><td>269</td><td>45.47</td><td>+4.14</td><td>+8.28</td><td>57.89</td><td>57.54</td></tr>
+      <tr><td>−1 个标准差</td><td>309</td><td>45.47</td><td>+2.07</td><td>+2.07</td><td>49.61</td><td>49.80</td></tr>
+      <tr><td>中心</td><td>354</td><td>45.47</td><td>0</td><td>0</td><td>45.47</td><td>46.07</td></tr>
+      <tr><td>+1 个标准差</td><td>405</td><td>45.47</td><td>−2.07</td><td>+2.07</td><td>45.47</td><td>45.06</td></tr>
+      <tr><td>+2 个标准差</td><td>465</td><td>45.47</td><td>−4.14</td><td>+8.28</td><td>49.60</td><td>49.27</td></tr>
+    </tbody>
+  </table></div>
+  <p>用 −3 到 +3 个标准差之间（行权价 235 到 530）的 60 个报价去贴，得到 c = 45.47，b = −2.07，a = 2.07，单位都是波动率点。60 个点离这条线平均 0.33 个点，最远 0.77 个点。</p>
+  <ul>
+    <li><b>c 管高度</b>：中心附近的隐含波动率。</li>
+    <li><b>b 管倾斜</b>：每往左一个标准差，b·z 这一项加 2.07 个点，往右减 2.07 个点。b 为负，左边高。讲义把它叫 tilt，也叫 skew。</li>
+    <li><b>a 管弯曲</b>：离中心 1 个标准差加 2.07 个点，2 个加 8.28 个点，3 个加 18.63 个点，两边一样。a 为正，两翼上翘。讲义把它叫 curvature，也直接叫 kurtosis。</li>
+  </ul>
+  <p>这天 b 和 a 大小几乎相同、符号相反，所以 z = +1 那里倾斜和弯曲正好抵消，右边一个标准差（行权价 405）的拟合值和中心一样。抛物线的最低点在 z = +0.50，行权价 378.7，高度 44.95%。</p>
+  <p><span class="sym" data-say="峰度。说分布时指两头比钟形更长、中间更尖的程度；说曲线时指两翼相对平值翘起的程度。两者是同一件事。">峰度</span>（kurtosis）原本说的是分布：两头比钟形长，中间更尖。分布两头长，远虚值期权到期变成实值的机会就比钟形算出来的多，市场给它们更高的价格，反推出来的 σ 就高。曲线的弯曲 a 和分布的峰度是同一件事的两种写法；倾斜 b 对应分布的<span class="sym" data-say="偏度。分布两条尾巴长度不一样的程度。左尾更长叫负偏，右尾更长叫正偏。">偏度</span>，哪一边的尾巴更长。</p>
+
+  <h3>哪张期权对哪个数最敏感</h3>
+  <p>先说交易员怎么称呼虚值期权。他们按 delta 起名：「25 delta 的 put」就是 delta 为 −0.25 的那张 put，也就是标的涨 1 美元、它跌 0.25 美元的那张（2.1 的整数写法），图表里简写成 25<span class="sym" data-say="delta 的符号。25Δ put 读作 25 delta 的 put：delta 为 −0.25 的那张 put。">Δ</span> put。2.1 第六节讲过，delta 约等于到期落在实值的概率。在处处同一个 σ 的世界里，这个概率就是钟形曲线在行权价外侧那一截的面积，所以 delta 和 z 一一对应：z = 0.674 外侧 25%，就是 25 delta；z = 1 外侧约 16%，是 16 delta；z = 1.645 外侧 5%，是 5 delta。平值的 z 是 0，delta 约 50。</p>
+  <p>把某个数加 1 个点，每张期权的隐含波动率变多少，看它的 z：c 加 1，所有期权都加 1 个点；b 加 1，每张加 z 个点；a 加 1，每张加 z² 个点。隐含波动率变 1 个点，价格变一个 <span class="sym" data-say="隐含波动率变 1 个点时期权价格变多少（2.3）。平值最大，往两边变小。">vega</span>。</p>
+  <div class="formula">
+    <div class="math">价格变化 ＝ vega × (<span class="sym" data-say="水平 c 加了几个点。">Δc</span> ＋ z·<span class="sym" data-say="倾斜 b 加了几个点。">Δb</span> ＋ z²·<span class="sym" data-say="曲率 a 加了几个点。">Δa</span>)</div>
+    <div class="gloss">每个波动率点的价格 × 这张期权的隐含波动率变了几个点</div>
+  </div>
+  <p>在处处同一个 σ 的世界里，Black-Scholes 的 vega 正比于钟形曲线在 z 处的高度 <span class="sym" data-say="标准正态分布（钟形曲线）在 z 处的高度。z = 0 时最高，约 0.399，往两边变小。">φ(z)</span>（还差一个很小的修正），平值最大，往两边变小；z 在中心是 0，往两边变大。两样一乘，峰落在不同的地方。下图就在这样一个世界里算，纵轴以平值那张对 c 的敏感度为 1：</p>
+  <div class="panel">
+    <svg id="s1s" viewBox="0 0 640 300" role="img" aria-label="水平、倾斜、曲率三个数对不同 delta 的期权价格的影响"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:var(--result)"></i>对水平 c</span>
+      <span><i class="ln" style="background:var(--control)"></i>对倾斜 b（绝对值）</span>
+      <span><i class="ln" style="background:var(--good)"></i>对曲率 a</span>
+    </div>
+  </div>
+  <ul>
+    <li><b>c</b>：平值（±50 delta）最敏感。</li>
+    <li><b>b</b>：峰在离中心 1 个标准差，约 ±16 delta，高 0.61。作业用的三档里，±25 delta 是 0.54，±5 delta 是 0.43，平值是 0，±25 最敏感。</li>
+    <li><b>a</b>：峰在离中心 √2 个标准差，约 ±8 delta，高 0.74。三档里 ±5 delta 是 0.70，±25 是 0.36，±5 最敏感。</li>
+  </ul>
+  <p>这就是讲义作业题干给的设定：±25 delta 对 skew 最敏感，±5 delta 对 kurtosis 最敏感，所有期权都对波动率水平敏感，平值最多。换成 TSLA 这天真实的微笑，每档的行权价和隐含波动率按拟合的曲线取（模型值），每股价格变化。c 加 1 点，价格变化就是 vega 本身，表里只列一次：</p>
+  <div class="tw"><table>
+    <thead><tr><th>期权</th><th>行权价</th><th>z</th><th>隐含波动率</th><th>vega<br>（c 加 1 点）</th><th>b 加 1 点</th><th>a 加 1 点</th></tr></thead>
+    <tbody id="sensTb"></tbody>
+  </table></div>
+  <p>call 一侧和上面的规律一致。put 一侧，−5 与 −25 delta 对 b 的敏感度几乎相同（−0.209 与 −0.207）：左翼隐含波动率高（57.3%），同样是 5 delta，这张 put 离中心更远，z 是 −1.94 而不是 −1.645，多出来的距离补上了 vega 小的那一截。b 加 1 点时 put 一侧降价、call 一侧涨价，符号在平值两边相反。</p>
+</section>
+
+<!-- ══════════ 二 ══════════ -->
+<section id="s2">
+  <h2><span class="n">二</span>24 天里的微笑</h2>
+  <p class="sub">同一串 5/15 到期的期权，4/13 到 5/14 每天收盘画一次，一共 24 天。1.2 回放过 TSLA 这 24 天走了哪条路；这里看它的微笑怎么变。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="s2Ax"><button data-v="z" aria-pressed="true">按标准差</button><button data-v="k" aria-pressed="false">按行权价</button></div>
+      <button class="btn" id="s2Play">逐天播放</button>
+    </div>
+    <svg id="s2c" viewBox="0 0 640 420" role="img" aria-label="5/15 到期的微笑从 4/13 到 5/14 逐日变化，下方是倾斜 b 与曲率 a 的逐日记录"></svg>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--ink-soft)"></i>当天报价</span>
+      <span><i class="ln" style="background:var(--control)"></i>当天拟合</span>
+      <span><i class="dash" style="border-color:var(--ink-faint)"></i>4/13 的拟合</span>
+      <span id="s2LgS"><i class="dash" style="border-color:var(--result)"></i>TSLA 收盘价；▲ 谷底</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">日期</div><div class="d" id="s2D"></div><div class="d2" id="s2Db"></div></div>
+      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="s2S"></div><div class="d2" id="s2Sb"></div></div>
+      <div class="stat"><div class="k">平值 σ平</div><div class="d" id="s2A"></div></div>
+      <div class="stat"><div class="k">倾斜 b</div><div class="d" id="s2B" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k">曲率 a</div><div class="d" id="s2K" style="color:var(--good)"></div></div>
+      <div class="stat"><div class="k">25 delta put 减 call</div><div class="d" id="s2R"></div><div class="d2">隐含波动率之差，点</div></div>
+    </div>
+  </div>
+  <p>24 天里 a 从没变成负数，最小 1.91（5/1），最大 3.10（5/12），两翼一直上翘。讲义说所有交易所交易的期权市场都倾向于有某种程度的正峰度，TSLA 这 24 天每一天都是。</p>
+  <p>b 变得多得多。4/13 是 −2.07，左边高；4/15 TSLA 一天涨到 391.93，b 缩到 −0.62；5/7 起明显转正，5/12 到 +1.80。25 delta 的 put 减 25 delta 的 call，从 4/13 的 +3.04 个点变成 5/13 的 −4.97 个点。TSLA 从 352 涨到 445 这几周，高行权价那一头被抬了起来，形状从投资型变成了需求型。</p>
+  <p>按行权价画，曲线的谷底跟着 TSLA 走：4/13 在 378.7，5/13 在 444.5。讲义说标的涨跌时，整条 skew 曲线跟着左右平移（<span class="sym" data-say="floating skew，浮动偏斜：skew 曲线跟着标的价格左右平移，而不是钉在固定的行权价上。">floating skew</span>）。按标准差画，这一层平移已经扣掉了，剩下的变化是形状本身在变。</p>
+  <p>4/22 盘后 Tesla 发一季度财报。第二天 σ平 从 48.13% 落到 42.17%，整条曲线往下掉了约 6 个点，a 只从 2.23 变成 2.08。5/11 起（离到期 4 天及以内）σ平 在 56.30% 到 58.90% 之间，a 在 2.47 到 3.10 之间；5/11 当天 TSLA 从 428.45 涨了 3.9%，到 445.06。</p>
+  <p class="tiny">每天用 |z| ≤ 3 的虚值报价拟合。25 delta 的隐含波动率：每个报价用自己的隐含波动率算模型 delta，在 delta 为 ±0.25 处插值。财报时间：Tesla 2026 年一季度财报于 2026-04-22 盘后发布。</p>
+</section>
+
+<!-- ══════════ 三 ══════════ -->
+<section id="s3">
+  <h2><span class="n">三</span>skew 是乘在波动率上的</h2>
+  <p class="sub">波动率整体涨跌的时候，skew 是按点数平移，还是按比例放大？</p>
+  <p>讲义的例子：</p>
+  <div class="tw"><table style="max-width:30rem">
+    <thead><tr><th>行权价</th><th>原来</th><th>波动率翻倍后</th></tr></thead>
+    <tbody>
+      <tr><td>100（平值）</td><td>20%</td><td>40%</td></tr>
+      <tr><td>90</td><td>25%</td><td>50%</td></tr>
+      <tr><td>90 比平值高出</td><td>5 个点</td><td>10 个点</td></tr>
+      <tr><td>90 占平值</td><td>125%</td><td>125%</td></tr>
+    </tbody>
+  </table></div>
+  <p>翻倍以后，90 比 100 高出的点数也翻倍，占平值的比例不变。skew 是乘在波动率上的比例，不是加在上面的固定点数。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="行权价 X 那张期权的隐含波动率。">σ(X)</span> ÷ <span class="sym" data-say="平值隐含波动率。">σ平</span> ＝ 常数</div>
+    <div class="gloss">某个行权价的隐含波动率占平值的比例，在波动率水平变化时保持不变</div>
+  </div>
+  <p>拿 TSLA 4/13 的真实报价推算一次：假如平值从 46.07% 翻倍，按乘性每个行权价都乘以同一个倍数，按加性每个行权价都加上同样的点数。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="s3Play">再放一遍</button></div>
+    <svg id="s3c" viewBox="0 0 640 330" role="img" aria-label="平值从 46% 翻倍时，按乘性与按加性推算的两条曲线"></svg>
+    <div class="legend">
+      <span><i class="dash" style="border-color:var(--ink-faint)"></i>4/13 报价</span>
+      <span><i class="ln" style="background:var(--control)"></i>按乘性推算</span>
+      <span><i class="dash" style="border-color:var(--result)"></i>按加性推算</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">平值</div><div class="d" id="s3A"></div><div class="d2" id="s3Ab"></div></div>
+      <div class="stat"><div class="k">300 put，乘性</div><div class="d" id="s3M" style="color:var(--control)"></div><div class="d2" id="s3Mb"></div></div>
+      <div class="stat"><div class="k">300 put，加性</div><div class="d" id="s3P" style="color:var(--result)"></div><div class="d2" id="s3Pb"></div></div>
+    </div>
+  </div>
+  <p>按乘性，300 的 put 从 51.10% 变成 102.20%，比平值高出的点数从 5.03 变成 10.07，占平值一直是 110.9%。按加性，它只到 97.17%，点差留在 5.03，占平值降到 105.5%。用固定点差记 skew，平值翻倍那天会少算一半。</p>
+  <p>TSLA 这几周的数据检验不了这一条：5/15 这串期权 24 天里 σ平 只在 40.19% 到 58.90% 之间，形状本身还在翻转（第二节），水平变化带来的那一点缩放被形状的变化盖住了。</p>
+</section>
+
+<!-- ══════════ 四 ══════════ -->
+<section id="s4">
+  <h2><span class="n">四</span>波动率曲面</h2>
+  <p class="sub">到期日是第二个维度。同一天所有到期日的微笑放在一起，就是波动率曲面。</p>
+  <p>这份数据只收了 35 天以内的到期日。4/13 收盘，数据里有 8 个到期日，最近 2 天，最远 32 天；TSLA 还有更远的月度和长期到期日，这份数据没有，下面的期限结构只讲到 32 天。每一行是一个到期日，每一格是一个行权价，橙色越浓隐含波动率越高：</p>
+  <div class="panel">
+    <svg id="s4h" viewBox="0 0 640 300" role="img" aria-label="4/13 收盘，数据里 35 天以内的 8 个到期日乘各行权价的隐含波动率热力图"></svg>
+    <p class="tiny" style="margin-bottom:0">只含 35 天以内的到期日（数据的限制），更远的到期日不在图里。</p>
+  </div>
+  <p>横着读是 skew：每一行都是一条微笑，前三节讲的都是这一维。竖着读是<span class="sym" data-say="term structure。同一个行权价（通常看平值），不同到期日的隐含波动率。">期限结构</span>：平值从 2 天的 42.49% 降到 7 天的 37.44%，11 天突然跳到 54.05%，再慢慢降到 32 天的 46.07%。11 天那一行（4/24 到期）是第一个包含 4/22 盘后财报的到期日，财报那一天可能出现的大涨大跌，全部摊在剩下的几天里。4/22 收盘时它的平值是 90.0%，财报出来后的 4/23 收盘只剩 48.3%。</p>
+
+  <h3>近到期的 skew 更陡</h3>
+  <p>讲义问：股价 100，行权价 90 的 put，一个月到期和三个月到期，哪个更虚值？答案是一个月的。同样 10 美元的距离，一个月里能走的典型幅度只有三个月的 √(1/3)，折成标准差个数更远，就更靠近翼，隐含波动率比平值高得更多。</p>
+  <p>TSLA 这天，330 的 put 离现价 −6.3%。7 天到期时它离中心 −1.28 个标准差，隐含波动率 42.6%，是平值 37.4% 的 113.7%；32 天到期时它离中心只有 −0.51 个标准差，隐含波动率 47.6%，是平值 46.1% 的 103.3%。按行权价画，近到期的 skew 更陡。</p>
+
+  <h3>把 8 条微笑叠成一条</h3>
+  <p>讲义的办法是换两次坐标：纵轴除以平值，把高度对齐；横轴换成</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="natural log，自然对数。ln(X/S) 是行权价比现价高出的比例（按连续复利算）。">ln</span>(X ÷ <span class="sym" data-say="标的现价。4/13 收盘 352.36。">S</span>) ÷ √t</div>
+    <div class="gloss">行权价离现价的比例，除以到期时间的平方根</div>
+  </div>
+  <p>除以 √t，是因为 1.2 第三节讲过价格能走的典型幅度按 √t 张开：到期时间是 4 倍，同样的比例距离只算一半远。再除以 σ平，就是第一节用的 z（中心从 S 换成 F，32 天差 0.4%）。</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="s4Play">再放一遍</button></div>
+    <svg id="s4m" viewBox="0 0 640 330" role="img" aria-label="8 个到期日的微笑先除以平值，再把横轴换成 ln(X/S)/√t"></svg>
+    <div class="legend">
+      <span><i class="ln" style="background:color-mix(in oklch,var(--result) 45%,var(--panel))"></i>2 天</span>
+      <span><i class="ln" style="background:var(--result)"></i>32 天，颜色越深离到期越远</span>
+    </div>
+    <div class="say plain" id="s4Say"></div>
+  </div>
+  <p>同一个行权价 330，8 个到期日的隐含波动率占平值从 103.3% 到 122.4%，相差 19 个百分点；换成同样的 ln(X/S)/√t = −0.3，只从 104.1% 到 108.0%。这一处的差别分成两组：不含财报的 3 个到期日在 105.2% 到 108.0%，含财报的 5 个在 104.1% 到 104.8%。</p>
+  <p>但 −0.3 还在中间段。往两翼走，8 条线又分开：−1.0 处是 118.0% 到 140.5%，+1.0 处是 104.1% 到 124.0%。两翼最高的都是 7 天那条（财报前最后一个到期日，平值只有 37.44%），最低的都是 11 天那条（第一个含财报的到期日）。归一化以后，−0.3 到 +0.4 之间 8 条线相差不到 4 个点，两翼仍差 20 个点左右，没有叠成一条。</p>
+</section>
+
+<!-- ══════════ 五 ══════════ -->
+<section id="s5">
+  <h2><span class="n">五</span>真实 delta</h2>
+  <p class="sub">模型 delta 假设标的动的时候，这张期权的隐含波动率不变。第二节看到，TSLA 一动，微笑就跟着挪。</p>
+  <h3>讲义的两个算例</h3>
+  <p>标的 100 涨到 101。95 的 put 原来 2.00，隐含波动率 26.0%，模型 delta −25；105 的 call 原来 2.30，隐含波动率 21%，模型 delta +17。价格分两步走：</p>
+  <div class="panel">
+    <div class="bar"><button class="btn ghost" id="s5Play">再放一遍</button></div>
+    <svg id="s5w" viewBox="0 0 640 350" role="img" aria-label="讲义算例：标的涨 1 元，95 put 与 105 call 的价格分两步变化"></svg>
+  </div>
+  <p>put：标的上涨，微笑往右挪，95 离中心更远，更深地进到左翼，隐含波动率从 26.0% 升到 27.0%，vega 0.07 把价格推回 0.07。净跌 0.18，真实 delta 是 −18。call：105 离中心更近，往谷底靠，隐含波动率从 21% 降到 20.5%，价格少涨 0.5 × 0.16 = 0.08，真实 delta 是 +9。两边虚值期权的 delta 绝对值同时变小，按模型 delta 对冲，两边都对冲过头。</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="偏斜 delta（skewed delta，讲义也叫 adjusted delta）：把标的动时这张期权的隐含波动率也跟着变算进去之后的 delta。">Δ偏斜</span> ＝ <span class="sym" data-say="模型 delta（implied delta）：定价模型直接给出的 delta，假设隐含波动率不变。">Δ模型</span> ＋ vega × <span class="sym" data-say="标的动一下，这张期权的隐含波动率变几个点。">Δσ</span> ÷ <span class="sym" data-say="标的价格变化，美元。">ΔS</span></div>
+    <div class="gloss">真实 delta ＝ 模型 delta ＋ 每个波动率点的价格 × 标的每动 1 美元，隐含波动率变几个点</div>
+  </div>
+
+  <h3>用 TSLA 的微笑算</h3>
+  <p>假设 4/13 这条微笑按标准差个数整条跟着 TSLA 平移。TSLA 涨 1 美元，远期价跟着涨，每个行权价的 z 变小一点，在曲线上往左滑；隐含波动率变多少，由那一点的斜率决定：</p>
+  <div class="tw"><table>
+    <thead><tr><th>期权</th><th>行权价</th><th>隐含波动率</th><th>模型 delta</th><th>标的 +1 美元<br>隐含变化（点）</th><th>偏斜 delta</th><th>占模型</th></tr></thead>
+    <tbody id="skdTb"></tbody>
+  </table></div>
+  <p>put 一侧全部缩小，越虚值缩得越多：25 delta 的 put 从 −0.250 变成 −0.218，5 delta 的只剩模型的 55%。call 一侧，在谷底 378.7 右边的缩小，5 delta 的 call 剩 76%；35 和 45 delta 的 call 在谷底左边，TSLA 上涨时它们往离谷底更远的地方滑，隐含波动率微升，delta 反而大 1% 到 2%。讲义的 105 call 在谷底右边，所以缩小。</p>
+
+  <h3>拿真实的价格变动检验</h3>
+  <p>上面的推算依赖一个假设：微笑整条跟着平移。换成真实数据量一次。4/13 到 5/8，5/15 到期、模型 delta 绝对值在 0.02 到 0.55 之间的每张期权，每半小时记一次 TSLA 价格和期权中间价，前后两次配成一对，一共 9209 对。按模型 delta 分成 6 档，每一档拿期权价格的变化对 TSLA 价格的变化拟合一条过原点的直线，斜率就是实际的 delta。浮动推算用的是当天收盘拟合出的微笑。</p>
+  <div class="panel">
+    <svg id="s5m" viewBox="0 0 640 310" role="img" aria-label="各档期权实测 delta 与模型 delta 之比，及浮动推算"></svg>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--control)"></i>put 实测</span>
+      <span><i class="dot" style="background:none;border:2px solid var(--control)"></i>put 浮动推算</span>
+      <span><i style="background:var(--result)"></i>call 实测</span>
+      <span><i style="background:none;border:2px solid var(--result)"></i>call 浮动推算</span>
+    </div>
+  </div>
+  <p>put 一侧，实测和推算几乎重合。25 delta 那一档（模型 delta 0.20 到 0.30），模型 −0.244，推算 −0.223，实测 −0.220；7 到 13 delta 那一档，实测是模型的 73%，推算 75%。讲义说的 put 一侧 delta 变小，在 TSLA 上对 2 到 40 delta 的各档成立；40 到 55 delta 那一档接近平值，实测是模型的 105%，反而略大。</p>
+  <p>call 一侧对不上。推算说 call 的 delta 应该缩小，25 delta 那一档应是模型的 91%，实测反而大了两成，是 120%。只有最远的 2 到 7 delta 缩小了，是模型的 82%。这几周 TSLA 一涨，call 那一侧的隐含波动率就被抬高（第二节 b 由负转正），微笑不只平移，形状也跟着价格变。浮动的假设只管平移，这一层算不进去。</p>
+  <p>这个结论要带着噪音看。按天分开算 13 到 40 delta，put 一侧 20 天里有 12 天实测小于模型，中位数 93%；call 一侧 20 天里只有 8 天实测小于模型，中位数 102%。平值隐含波动率本身，TSLA 每涨 1%，平均跟着涨 0.31 个点（这里是点数，不是比例），相关系数只有 0.18。</p>
+  <p>落到对冲上：put 翼按偏斜 delta 对冲；call 翼要先看最近标的上涨时，隐含波动率是跟着涨还是跟着跌。7 讲过的 down faster（下跌时波动更大）是股指的常态；7 用 IBKR 的 30 天隐含波动率量过 TSLA，每涨 1%，隐含波动率按比例降约 0.3%，相关系数 −0.21。4/13 到 5/8 这几周是反过来的。</p>
+  <p class="tiny">实测：每个半小时快照（9:30、10:00 … 16:00）与下一个快照配对，两个快照必须正好隔 30 分钟。数据大多数天缺 12:00 到 13:30 的四个快照（4/28 只缺 12:00、12:30），4/21 另缺 9:30，4/30 另缺 9:30 到 10:30。只用买价不低于 0.05 的期权；模型 delta 用 Black-Scholes（r = 4.3%）和这张期权自己的隐含波动率算。40 到 55 delta 那一档接近平值，put 有一半、call 有 18% 是实值，其余各档全是虚值。斜率 = Σ(ΔS × ΔV) ÷ Σ(ΔS²)，模型与推算按 ΔS² 加权平均。</p>
+</section>
+
+<!-- ══════════ 六 ══════════ -->
+<section id="s6">
+  <h2><span class="n">六</span>市场心里的分布</h2>
+  <p class="sub">曲面是市场的报价，也是市场心里的到期分布。讲义用蝶式把两者换算过来。</p>
+  <p>3.2 讲过 butterfly：买一张行权价 X − 5 的 call，卖两张 X 的 call，买一张 X + 5 的 call。到期时标的正好在 X，它值 5；离 X 超过 5，它值 0；中间按距离直线变化。</p>
+  <p>讲义的推理：假设行权价从 0 开始每 5 美元一档，覆盖所有可能的到期价，把每一张间距 5 的蝶式各买一张。如果到期价只会落在行权价上，到期时正好有一张蝶式的中心被命中，值 5，其余都是 0。</p>
+  <p>再用上 1.1 的定价四步：期权今天的价格，是到期价值按概率加权的期望值，再折回今天。一张蝶式到期只有两种结果，命中值 5，不命中值 0，所以它今天的价格 ＝ 命中的概率 × 5，再折回今天。反过来，蝶式价格 ÷ 5，再乘回折现的那一点，就是标的到期落在它中心的概率。一整套不管标的到哪都值 5，说明这些概率加起来正好是 1：</p>
+  <div class="formula">
+    <div class="math"><span class="sym" data-say="概率。">P</span>(到期落在 X) ＝ 以 X 为中心的蝶式价格 ÷ 行权价间距 × (1 ＋ <span class="sym" data-say="利率，这里用 4.3%（1.1 从 parity 反解）。">r</span>·<span class="sym" data-say="离到期的时间，以年计。32 天是 32/365。">t</span>)</div>
+    <div class="gloss">蝶式价格是今天付的钱，乘 1 ＋ r·t 换成到期那天的钱（32 天是 1.0038），再除以命中时的价值，也就是行权价间距 5</div>
+  </div>
+  <p>TSLA 的例子：345 / 350 / 355 的 call 蝶式，中间价 23.80 − 2 × 21.05 + 18.55 = 0.25，除以 5 是 5.0%。同样的行权价用 put 算，中间价 15.125 − 2 × 17.40 + 19.85 = 0.175，是 3.5%。两者理论上应该相等。这几档的买卖价之间差 0.10 到 0.20，而一张蝶式只值两三毛，报价的一点零头就占了它一大块。</p>
+  <div class="panel">
+    <div class="bar">
+      <div class="seg" id="bfMode"><button data-v="raw" aria-pressed="false">中间价直接算</button><button data-v="fit" aria-pressed="true">用拟合的微笑重算</button></div>
+      <button class="btn ghost" id="bfPlay">再算一遍</button>
+    </div>
+    <div class="stage"><div class="cvbox"><canvas id="bfcv" width="264" height="138" aria-label="81 张蝶式逐张算出的到期概率，叠加对数正态分布"></canvas><div class="scale" id="bfScale"></div></div></div>
+    <div class="legend">
+      <span><i style="background:var(--ink)"></i>每张蝶式算出的概率，一格一张</span>
+      <span><i style="background:var(--control)"></i>算出负数的</span>
+      <span><i style="background:var(--result);width:.3rem;height:.3rem;vertical-align:.1rem"></i>点线：同一个平值波动率的对数正态</span>
+      <span><i style="background:var(--good);width:2px"></i>5/15 实际收盘 422.32</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">正在算</div><div class="d" id="bfK"></div><div class="d2" id="bfKb"></div></div>
+      <div class="stat"><div class="k">这一张的概率</div><div class="d" id="bfP" style="color:var(--control)"></div><div class="d2" id="bfPb"></div></div>
+      <div class="stat"><div class="k">已算 / 合计</div><div class="d" id="bfN"></div><div class="d2" id="bfNb"></div></div>
+    </div>
+  </div>
+  <p>直接用中间价算，中心从 200 到 600 的 81 张蝶式里有 6 张算出负的概率，合计 98.9%，高低不齐。换成第一节拟合的那条微笑：用 a、b、c 算出每个行权价的隐含波动率，用 Black-Scholes 算出价格，再算蝶式。这样得到的分布没有负数，合计 100.0%，平均值 353.85，和远期价 353.69 只差 0.16。</p>
+
+  <h3>和对数正态比</h3>
+  <div class="tw"><table style="max-width:34rem">
+    <thead><tr><th>到期价</th><th>市场隐含</th><th>对数正态</th><th>差</th></tr></thead>
+    <tbody id="bkTb"></tbody>
+  </table></div>
+  <p>对数正态用同一个平值波动率 46.07%，中心在远期价。跌破 250 的概率，市场给 1.73%，对数正态只有 0.67%，是它的 2.6 倍。250 到 340 的中等下跌，市场 36.8%，对数正态 40.6%；340 到 420 的中心附近，市场 53.4%，对数正态 49.5%；420 到 500 的中等上涨，市场 7.5%，对数正态 8.8%；500 以上（比现价高 42% 以上），市场 0.62%，对数正态 0.46%。左尾更肥，中间更高，中等幅度的涨跌更少，右边最远的那一截也比对数正态肥。</p>
+  <p>讲义拿 2014-06-20 的 Eurostoxx 50 做过同样的比较，结论是四条：小到中等的上涨更可能，非常大的下跌更可能，非常大的上涨更不可能，小到中等的下跌更不可能。按上表的分段，TSLA 这天第一、二、四条成立。第三条只对了一半：420 到 500 的大涨，市场给得比对数正态少；500 以上更大的涨幅，市场反而给得多。这和右翼 call 的隐含波动率一路上翘（500 的 call 是 53.5%，a 为正）是同一件事。</p>
+  <p>5/15 TSLA 收在 422.32。事前看，市场给到期在 420 以上的概率是 8.1%，对数正态给 9.2%。</p>
+</section>
+
+<!-- ══════════ 七 ══════════ -->
+<section id="s7">
+  <h2><span class="n">七</span>怎么交易 skew 和 kurtosis</h2>
+  <p class="sub">倾斜和弯曲都可以单独下注。讲义给的两种结构，都要同时做到 delta 中性和 vega 中性。</p>
+  <p>不做 delta 中性，赚亏主要来自方向；不做 vega 中性，赚亏主要来自整体波动率的涨跌。两个都中性，剩下的才是形状。</p>
+
+  <h3>赌倾斜：risk reversal</h3>
+  <p>讲义的定义：买（卖）低行权价的 put，卖（买）高行权价的 call，再用标的把 delta 补成零。常用的 skew 度量就是 25 delta 的 put 和 25 delta 的 call 隐含波动率之差，叫 25 delta <span class="sym" data-say="risk reversal，风险逆转：一买一卖两张虚值期权（一张 put、一张 call），加标的补成 delta 中性。">risk reversal</span>。用 4/13 收盘的真实报价搭一组：</p>
+  <div class="tw"><table>
+    <thead><tr><th>腿</th><th>买一 / 卖一</th><th>delta</th><th>vega</th><th>隐含波动率</th></tr></thead>
+    <tbody>
+      <tr><td>买 325 put</td><td>8.15 / 8.25</td><td>−0.2532</td><td>0.3378</td><td>48.02%</td></tr>
+      <tr><td>卖 390 call</td><td>6.60 / 6.70</td><td>+0.2519</td><td>0.3370</td><td>45.03%</td></tr>
+      <tr class="sum"><td>合计（中间价）</td><td>付 1.55</td><td>−0.5051</td><td>+0.0008</td><td></td></tr>
+    </tbody>
+  </table></div>
+  <p>两条腿的 vega 几乎一样，一买一卖正好抵消。delta 合计 −0.505，每组合约（各 100 股）买 50 股 TSLA 补平。这个仓位在等低行权价的隐含波动率相对高行权价涨上去，也就是 skew 更负。讲义作业把希望 skew 更负的仓位叫 short skew。</p>
+  <p>TSLA 之后，25 delta put 减 call 从 4/13 的 +3.04 个点变成 5/8 的 −3.19、5/13 的 −4.97，按这个度量 skew 翻了过来。但反过来做（卖 325 put、买 390 call、卖 50 股）的人，并没有因此在形状上赚到这 6 个多点。25 delta 是按 delta 取的点，TSLA 一涨，25 delta 就换到了别的行权价；这组仓位的 vega 盈亏只看建仓的 325 和 390 这两张自己的隐含波动率，而它们的差反而拉大了。4/13 是 48.02% 对 45.03%，差 3.0 个点；到 5/1，TSLA 涨到 390.83，325 滑到离中心 2.4 个标准差的左翼，被曲率抬到 51.65%，390 成了平值，落在谷底附近的 40.52%，差 11.1 个点。同一天 25 delta 的差已经缩到 +0.23。</p>
+  <p>要吃到 25 delta 度量的变化，得在重新对冲时把两条腿换到当时新的 25 delta 行权价上。delta 和 vega 中性也只在建仓那一刻成立：TSLA 涨到 390 附近，390 那张已是平值，两条腿的 delta 与 vega 都变了，要重新对冲。</p>
+
+  <h3>赌弯曲：kurtosis 策略</h3>
+  <p>讲义的定义：买（卖）虚值的 call 与 put，卖（买）平值的 call 与 put，同样做成 delta 与 vega 双中性。</p>
+  <div class="tw"><table>
+    <thead><tr><th>腿</th><th>买一 / 卖一</th><th>delta</th><th>vega</th><th>隐含波动率</th></tr></thead>
+    <tbody>
+      <tr><td>买 4 张 280 put</td><td>1.68 / 1.71</td><td>−0.0520</td><td>0.1075</td><td>54.77%</td></tr>
+      <tr><td>买 4 张 445 call</td><td>1.14 / 1.17</td><td>+0.0500</td><td>0.1058</td><td>47.28%</td></tr>
+      <tr><td>卖 1 张 350 call</td><td>21.00 / 21.10</td><td>+0.5574</td><td>0.4125</td><td>46.29%</td></tr>
+      <tr><td>卖 1 张 350 put</td><td>17.35 / 17.45</td><td>−0.4426</td><td>0.4125</td><td>46.08%</td></tr>
+      <tr class="sum"><td>合计（中间价）</td><td>收 27.05</td><td>−0.1228</td><td>+0.0282</td><td></td></tr>
+    </tbody>
+  </table></div>
+  <p>一对翼（一张 280 put 加一张 445 call）的 vega 是 0.2133；平值那一对是一个 straddle（跨式，3.2 讲过：同一行权价的一张 call 加一张 put），vega 是 0.8250。要 3.87 对翼才抵得上一个跨式，取整买 4 对。delta 合计 −0.123，每组配 12 股 TSLA。这个仓位在等两翼相对平值涨上去，也就是 a 变大。建仓那一刻 gamma 也几乎抵消：4 对翼 0.01668，跨式 0.01640。</p>
+</section>
+
+<!-- ══════════ 八 ══════════ -->
+<section id="s8">
+  <h2><span class="n">八</span>费曼检验</h2>
+  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
+  <p class="tiny">答案只存在本机浏览器里。</p>
+  <div id="feynman"></div>
+
+</section>
+
+<section style="border-bottom:none">
+  <details id="glo">
+    <summary>本页出现的全部符号与术语</summary>
+    <div class="glossary">
+      <div class="gl"><div class="s">skew（偏斜）</div><div class="t">同一到期日、不同行权价的期权以不同的隐含波动率交易。也专指曲线往一边倾斜的程度，即 b。</div></div>
+      <div class="gl"><div class="s">微笑</div><div class="t">两翼都比平值高、中间低的隐含波动率曲线。</div></div>
+      <div class="gl"><div class="s">kurtosis（峰度）</div><div class="t">分布两头比钟形更长、中间更尖的程度；在曲线上就是两翼翘起的程度，即 a。</div></div>
+      <div class="gl"><div class="s">偏度</div><div class="t">分布两条尾巴长度不同的程度。左尾更长叫负偏。</div></div>
+      <div class="gl"><div class="s">投资型 / 需求型 / 平衡型</div><div class="t">讲义按哪一头被抬高给 skew 分的三类：低行权价高、高行权价高、两头都高。</div></div>
+      <div class="gl"><div class="s">σ平</div><div class="t">平值隐含波动率，在远期价处插值。4/13 的 5/15 到期是 46.07%。</div></div>
+      <div class="gl"><div class="s">z</div><div class="t">行权价离中心几个标准差：ln(X/F) ÷ (σ平 √t)。</div></div>
+      <div class="gl"><div class="s">y = a z² + b z + c</div><div class="t">用抛物线描述一条微笑。c 水平，b 倾斜，a 曲率，单位都是波动率点。</div></div>
+      <div class="gl"><div class="s">floating skew</div><div class="t">skew 曲线跟着标的价格左右平移，而不是钉在固定的行权价上。波动率水平变化时整条曲线按比例上下缩放，见第三节。</div></div>
+      <div class="gl"><div class="s">25 delta 的 put / 25Δ put</div><div class="t">按 delta 给虚值期权起的名字：delta 为 −0.25 的那张 put。同一个 σ 下，25 delta 离中心约 0.674 个标准差，16 delta 约 1 个，5 delta 约 1.645 个。</div></div>
+      <div class="gl"><div class="s">φ(z)</div><div class="t">钟形曲线（标准正态分布）在 z 处的高度。同一个 σ 下，vega 大致正比于它。</div></div>
+      <div class="gl"><div class="s">Δc / Δb / Δa</div><div class="t">水平、倾斜、曲率各加了几个点。一张期权的隐含波动率随之变 Δc ＋ z·Δb ＋ z²·Δa 个点。</div></div>
+      <div class="gl"><div class="s">σ(X)</div><div class="t">行权价 X 那张期权的隐含波动率。</div></div>
+      <div class="gl"><div class="s">波动率曲面</div><div class="t">行权价 × 到期日两个维度上的隐含波动率。</div></div>
+      <div class="gl"><div class="s">期限结构</div><div class="t">同一个行权价（通常是平值）在不同到期日的隐含波动率。</div></div>
+      <div class="gl"><div class="s">ln(X/S)/√t</div><div class="t">曲面的归一化横轴：行权价离现价的比例除以 √t。再把纵轴除以平值，不同到期日的微笑在中间段基本重合，两翼仍然分开。</div></div>
+      <div class="gl"><div class="s">vega</div><div class="t">隐含波动率变 1 个点，期权价格变多少（2.3）。</div></div>
+      <div class="gl"><div class="s">Δ模型 / Δ偏斜</div><div class="t">模型 delta 假设隐含波动率不变；偏斜 delta 把标的动时隐含波动率的变化也算进去：Δ模型 + vega × Δσ/ΔS。</div></div>
+      <div class="gl"><div class="s">蝶式法</div><div class="t">用等间距蝶式的价格反推到期概率 P：蝶式价格 ÷ 行权价间距 × (1 ＋ r·t)，r 是利率，t 是离到期的年数。</div></div>
+      <div class="gl"><div class="s">隐含分布</div><div class="t">从期权价格反推出来的到期价格分布，拿来和对数正态比。</div></div>
+      <div class="gl"><div class="s">对数正态分布</div><div class="t">涨跌按比例算时到期价的分布（1.2），Black-Scholes 假设的就是它。</div></div>
+      <div class="gl"><div class="s">risk reversal</div><div class="t">一买一卖两张虚值期权（put 与 call），加标的补成 delta 中性，用来交易倾斜。</div></div>
+      <div class="gl"><div class="s">short skew</div><div class="t">希望 skew 变得更负（或不那么正）的仓位：多低行权价、空高行权价。</div></div>
+      <div class="gl"><div class="s">kurtosis 策略</div><div class="t">买（卖）两翼、卖（买）平值，delta 与 vega 双中性，用来交易弯曲。</div></div>
+      <div class="gl"><div class="s">straddle（跨式）</div><div class="t">同一行权价的一张 call 加一张 put（3.2）。</div></div>
+    </div>
+  </details>
+</section>
+
+<footer>
+  <p>下一节有两条支线。<b>M 做市报价</b>：拿着这张曲面给每个行权价报双边价，边际从哪来。<b>V 波动率合约与 VIX</b>：VIX 就是用一整排虚值期权的价格算出来的。</p>
+  <p><a href="./">← 回到课程路线图</a></p>
+    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照</p>
+</footer>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
+const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
+const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);          // 负数用真正的减号
+const NARROW = matchMedia('(max-width:620px)');
+let FK = NARROW.matches ? 1.45 : 1;   // 手机上图缩到一半多，字按 FK 放大；宽度跨过 620px 时重画
+const lab = (x,y,t,c,a='start',s=12,w=400)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${(s*FK).toFixed(1)}" font-weight="${w}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+const npdf = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+const clamp = (v,a=0,b=1) => Math.max(a,Math.min(b,v));
+const ease = p => p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+const lerp = (a,b,u) => a+(b-a)*u;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ══════════ 白话符号气泡 ══════════ */
+(function(){
+  const tip=$('tip'); let cur=null;
+  function show(el){
+    cur=el; tip.textContent=el.dataset.say; tip.classList.add('on');
+    const r=el.getBoundingClientRect();
+    tip.style.left='0px'; tip.style.top='0px';
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let L=r.left+scrollX+r.width/2-tw/2;
+    L=Math.max(12+scrollX, Math.min(L, scrollX+innerWidth-tw-12));
+    let T=r.top+scrollY-th-9;
+    if(T<scrollY+6) T=r.bottom+scrollY+9;
+    tip.style.left=L+'px'; tip.style.top=T+'px';
+  }
+  function hide(){ tip.classList.remove('on'); cur=null; }
+  document.addEventListener('pointerover',e=>{ const s=e.target.closest('.sym'); if(s) show(s); });
+  document.addEventListener('pointerout', e=>{ const s=e.target.closest('.sym'); if(s&&s===cur) hide(); });
+  document.addEventListener('click',e=>{ const s=e.target.closest('.sym'); if(s){ e.preventDefault(); cur===s?hide():show(s);} else hide(); });
+  document.querySelectorAll('.sym').forEach(s=>{ s.tabIndex=0;
+    s.addEventListener('focus',()=>show(s)); s.addEventListener('blur',hide); });
+  addEventListener('scroll',()=>{ if(cur) hide(); },{passive:true});
+})();
+
+/* ══════════ 数据 ══════════
+   由 scripts/data/station_8.py 生成（--page 写回这一段）。
+   S0：4/13 收盘 5/15 到期的虚值报价 [行权价, 隐含, 买价反推, 卖价反推, ORATS smv_vol]（%）
+   FIT0：同一条曲线在 |z| ≤ 3 上拟合的 a、b、c（波动率点）
+   SENS：各档期权对 c、b、a 各加 1 点的价格变化；DAYS：24 天逐日微笑；SURF：4/13 的 8 个到期日
+   SKD：浮动推算的偏斜 delta；MEAS：半小时配对的实测 delta；BF：蝶式法（中间价、拟合、对数正态） */
+/* DATA:start */
+const D={"S0":{"S":352.36,"F":353.6883,"atm":0.460652,"t":32,"pts":[[145,114.37,112.5,116.24,61.44],[150,112.56,112.05,113.06,61.44],[155,109.0,108.01,109.99,61.44],[160,106.45,105.07,107.83,61.44],[165,103.9,103.16,104.64,61.44],[170,101.56,100.83,102.29,61.44],[175,98.78,97.85,99.7,61.44],[180,96.0,95.44,96.56,61.44],[185,93.78,92.96,94.61,61.44],[190,91.53,91.08,91.97,61.44],[195,88.87,88.45,89.29,61.43],[200,86.48,86.27,86.69,61.43],[205,83.97,83.64,84.3,61.42],[210,81.26,80.93,81.58,61.41],[215,75.85,78.93,72.76,61.38],[220,76.84,76.58,77.1,61.34],[225,74.61,74.35,74.87,61.28],[230,72.38,72.17,72.59,61.18],[235,70.19,69.98,70.39,61.04],[240,67.84,67.23,68.45,60.83],[245,66.2,65.95,66.45,60.55],[250,64.2,64.12,64.28,57.9],[255,62.24,62.1,62.37,59.65],[260,60.59,60.45,60.72,59.0],[265,58.85,58.74,58.97,56.9],[270,57.31,57.15,57.47,57.09],[275,56.02,55.93,56.12,55.82],[280,54.77,54.65,54.88,55.3],[285,53.67,53.57,53.77,53.8],[290,52.69,52.57,52.8,53.1],[295,51.81,51.7,51.91,51.9],[300,51.1,50.87,51.33,51.1],[305,50.26,50.05,50.46,50.4],[310,49.62,49.43,49.81,49.7],[315,49.06,48.89,49.23,49.1],[320,48.55,48.39,48.71,48.82],[325,48.02,47.87,48.17,48.2],[330,47.6,47.46,47.74,47.7],[335,47.09,46.95,47.22,47.27],[340,46.75,46.62,46.88,46.9],[345,46.35,46.17,46.54,46.5],[350,46.08,45.96,46.2,46.2],[355,46.06,45.94,46.18,45.9],[360,45.76,45.58,45.94,45.58],[365,45.58,45.46,45.71,45.4],[370,45.35,45.23,45.48,45.3],[375,45.16,45.03,45.29,45.1],[380,45.08,45.01,45.14,45.0],[385,44.96,44.82,45.1,44.9],[390,45.03,44.88,45.18,44.9],[395,45.01,44.85,45.17,44.99],[400,44.96,44.87,45.04,44.9],[405,45.05,44.86,45.24,45.0],[410,45.24,45.03,45.45,45.2],[415,45.43,45.31,45.54,45.3],[420,45.65,45.52,45.77,45.67],[425,45.88,45.77,45.98,45.6],[430,46.17,46.05,46.29,46.19],[435,46.48,46.35,46.62,46.2],[440,46.9,46.79,47.0,46.7],[445,47.28,47.16,47.41,47.2],[450,47.77,47.68,47.87,47.84],[455,48.24,48.14,48.33,48.63],[460,48.75,48.58,48.91,49.29],[465,49.31,49.12,49.49,48.0],[470,49.81,49.67,49.94,50.35],[475,50.47,50.21,50.72,50.77],[480,51.03,50.83,51.24,51.11],[485,51.71,51.4,52.02,51.38],[490,52.39,52.19,52.59,49.2],[495,53.05,52.75,53.34,51.83],[500,53.54,52.98,54.09,51.99],[505,54.51,54.27,54.75,52.12],[510,55.58,55.88,55.29,52.23],[515,55.9,55.5,56.3,52.32],[520,56.69,56.39,56.99,52.4],[525,57.27,56.97,57.57,52.45],[530,58.14,57.84,58.44,52.5],[535,59.83,58.7,60.95,52.54],[540,59.64,59.45,59.83,52.57],[545,60.17,59.8,60.55,52.6],[550,61.08,60.89,61.26,52.62],[555,61.97,61.6,62.34,52.63],[560,62.61,62.17,63.05,52.64],[565,63.19,62.71,63.67,52.65],[570,63.97,63.26,64.68,52.66],[575,64.74,64.26,65.21,52.67],[580,65.5,64.79,66.21,52.67],[585,65.96,65.19,66.72,52.67],[590,66.93,66.14,67.71,52.68],[595,67.35,66.49,68.21,52.68],[600,68.3,67.42,69.18,52.68],[605,69.24,68.35,70.14,52.68],[610,69.54,68.61,70.46,52.68],[615,70.43,69.49,71.37,52.69],[620,71.02,70.36,71.68,52.69],[630,72.39,71.31,73.47,52.69],[640,73.02,72.25,73.79,52.69],[650,74.69,73.93,75.46,52.69],[660,75.46,74.58,76.35,52.69],[670,76.66,76.16,77.16,52.69],[680,77.69,76.68,78.7,52.69]]},"FIT0":{"a":2.0702,"b":-2.0718,"c":45.4677},"SENS":[["−5 put",271.5,-1.94,57.3,1.33,0.108,0.108,-0.209,0.405],["−25 put",324.8,-0.62,47.6,7.96,0.332,0.332,-0.207,0.129],["−50 put",353.7,0.0,45.5,18.91,0.415,0.415,0.0,0.0],["+50 call",356.9,0.07,45.3,17.39,0.416,0.416,0.028,0.002],["+25 call",390.4,0.72,45.1,6.57,0.332,0.332,0.24,0.174],["+5 call",452.5,1.81,48.5,1.0,0.108,0.108,0.194,0.351]],"DAYS":[{"d":"4/13","S":352.36,"n":32,"atm":46.07,"a":2.07,"b":-2.072,"c":45.468,"rr":3.04,"p25":48.07,"c25":45.03,"kmin":378.7,"k":[230,235,240,245,250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545],"v":[72.38,70.19,67.84,66.2,64.2,62.24,60.59,58.85,57.31,56.02,54.77,53.67,52.69,51.81,51.1,50.26,49.62,49.06,48.55,48.02,47.6,47.09,46.75,46.35,46.08,46.06,45.76,45.58,45.35,45.16,45.08,44.96,45.03,45.01,44.96,45.05,45.24,45.43,45.65,45.88,46.17,46.48,46.9,47.28,47.77,48.24,48.75,49.31,49.81,50.47,51.03,51.71,52.39,53.05,53.54,54.51,55.58,55.9,56.69,57.27,58.14,59.83,59.64,60.17]},{"d":"4/14","S":364.32,"n":31,"atm":46.28,"a":2.024,"b":-1.552,"c":45.781,"rr":1.83,"p25":47.76,"c25":45.93,"kmin":385.1,"k":[240,245,250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560],"v":[71.03,68.34,66.49,64.88,62.86,61.2,59.37,58.03,56.45,55.03,53.89,52.77,51.91,51.1,50.25,49.69,49.25,48.69,48.28,47.85,47.43,47.27,46.98,46.76,46.34,46.32,46.03,45.94,45.87,45.92,45.75,45.76,45.93,45.93,46.1,46.0,46.28,46.41,46.67,46.95,47.11,47.51,47.75,48.24,48.62,49.11,49.5,50.05,50.55,51.06,51.62,52.35,53.06,53.6,54.35,54.9,55.83,56.37,57.13,57.86,58.47,59.32,59.88,60.72,61.35]},{"d":"4/15","S":391.93,"n":30,"atm":49.97,"a":2.391,"b":-0.622,"c":49.259,"rr":-0.02,"p25":50.49,"c25":50.5,"kmin":400.7,"k":[250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570,575,580,585,590,595,600,605,610,615,620],"v":[76.06,73.89,71.84,69.86,67.97,66.25,64.44,62.76,61.2,59.79,58.49,57.22,56.11,55.15,54.29,53.56,52.9,52.32,51.69,51.35,51.08,50.72,50.5,50.36,50.28,50.06,49.98,49.93,49.94,49.98,50.0,49.98,50.05,50.08,50.15,50.24,50.29,50.41,50.55,50.72,50.83,51.06,51.31,51.65,51.86,52.29,52.64,53.11,53.51,54.03,54.48,55.12,55.65,56.25,56.8,57.46,58.14,58.85,59.53,60.25,60.84,61.54,62.36,63.08,63.86,64.49,65.33,66.06,66.66,67.44,68.44,68.98,69.54,70.27,70.99]},{"d":"4/16","S":388.94,"n":29,"atm":47.89,"a":2.36,"b":-0.565,"c":47.207,"rr":0.23,"p25":48.51,"c25":48.28,"kmin":396.6,"k":[255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570,575,580,585,590,595,600],"v":[72.49,70.87,68.65,66.73,64.97,63.09,61.52,59.86,58.45,56.98,55.71,54.54,53.54,52.52,51.79,50.95,50.51,49.82,49.38,49.0,48.76,48.46,48.21,48.19,47.94,47.88,47.78,47.9,47.72,47.72,47.75,47.65,47.83,47.87,47.99,48.22,48.39,48.7,48.79,49.12,49.48,49.81,50.21,50.58,51.06,51.58,52.11,52.59,53.25,53.92,54.5,55.09,55.79,56.54,57.33,58.11,58.78,59.53,60.34,61.2,62.0,62.69,63.63,64.41,65.06,65.88,66.71,67.52,68.29,68.92]},{"d":"4/17","S":400.94,"n":28,"atm":46.6,"a":2.333,"b":0.032,"c":45.98,"rr":-0.08,"p25":47.18,"c25":47.25,"kmin":401.9,"k":[270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570,575,580,585,590,595,600,605],"v":[67.3,65.83,64.59,62.8,61.23,59.5,57.95,56.49,55.31,53.9,52.78,51.88,50.86,50.24,49.58,48.87,48.47,48.1,47.81,47.56,47.28,46.92,47.02,46.9,46.85,46.56,46.82,46.34,46.37,46.71,46.49,46.57,46.92,46.76,47.21,47.28,47.78,47.77,48.02,48.45,49.1,49.34,49.84,50.51,50.94,51.71,52.27,52.84,53.63,54.39,55.05,55.9,56.61,57.47,58.32,59.11,60.02,60.68,61.47,62.31,63.42,64.28,65.59,65.98,66.33,67.76,69.26,68.68]},{"d":"4/20","S":392.63,"n":25,"atm":46.57,"a":2.26,"b":-0.284,"c":46.127,"rr":0.31,"p25":47.33,"c25":47.02,"kmin":396.8,"k":[270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570,575,580],"v":[69.21,67.19,65.14,63.14,61.36,59.51,57.84,56.31,54.91,53.61,52.52,51.53,50.64,49.91,49.39,48.79,48.18,47.88,47.56,47.33,47.1,46.95,46.81,46.81,46.82,46.65,46.79,46.73,46.74,46.4,46.48,46.39,46.47,46.44,46.52,46.45,46.56,46.56,46.64,46.68,46.8,46.78,46.96,47.23,47.59,47.94,48.21,48.56,49.07,49.59,50.06,50.64,51.3,51.89,52.63,53.31,54.08,54.83,55.67,56.44,57.3,58.21,58.97,59.86,60.8,61.65,62.49,63.38,64.27,65.09,66.01,66.79,67.79]},{"d":"4/21","S":386.33,"n":24,"atm":47.95,"a":2.309,"b":-0.574,"c":47.855,"rr":0.78,"p25":49.34,"c25":48.56,"kmin":393.4,"k":[265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570],"v":[71.44,69.36,67.39,65.53,63.76,62.4,60.55,59.03,57.49,56.14,54.97,53.89,52.99,52.19,51.44,50.92,50.42,49.95,49.52,49.27,49.09,48.79,48.71,48.68,48.6,48.62,48.61,47.93,47.98,47.96,47.96,47.99,48.0,48.03,48.06,48.12,48.11,48.21,48.24,48.34,48.36,48.55,48.56,48.86,49.11,49.48,49.88,50.12,50.64,51.18,51.69,52.16,52.9,53.43,54.19,54.89,55.58,56.48,57.16,57.9,58.92,59.86,60.67,61.77,62.66,63.46,64.41,65.29,66.05,67.0,67.94,68.88]},{"d":"4/22","S":387.61,"n":23,"atm":48.13,"a":2.234,"b":-0.034,"c":47.535,"rr":-0.4,"p25":48.33,"c25":48.74,"kmin":389.0,"k":[265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520,525,530,535,540,545,550,555,560,565,570],"v":[71.01,68.75,66.73,64.69,62.67,60.86,59.8,57.22,57.6,55.25,53.26,52.32,51.24,51.03,49.9,49.41,49.07,48.81,48.51,48.35,48.22,48.13,48.17,48.12,48.1,48.19,48.2,48.21,48.03,48.03,47.99,48.05,48.15,48.13,48.18,48.18,48.26,48.35,48.33,48.49,48.67,48.68,48.72,49.0,49.29,49.71,50.05,50.44,51.02,52.03,52.03,52.77,53.15,53.95,54.44,55.53,55.87,56.86,57.68,58.61,59.59,59.88,61.5,62.48,63.35,64.24,65.22,66.18,66.95,67.82,68.78,69.7]},{"d":"4/23","S":373.69,"n":22,"atm":42.17,"a":2.077,"b":-0.708,"c":41.805,"rr":-0.08,"p25":42.58,"c25":42.66,"kmin":381.3,"k":[270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510,515,520],"v":[65.49,63.24,61.0,58.93,56.76,54.64,52.83,51.16,49.43,48.11,46.86,45.81,44.89,44.24,43.65,43.08,42.63,42.37,42.08,41.93,41.86,42.19,42.15,42.16,42.2,42.18,42.18,42.31,42.34,42.39,42.47,42.5,42.62,42.67,42.92,43.0,43.13,43.35,43.45,43.76,43.85,44.14,44.6,45.11,45.68,46.26,47.0,47.74,48.39,49.3,50.22,51.13,51.99,52.99,53.83,54.76,55.72,56.62,57.74,58.62,59.55]},{"d":"4/24","S":375.83,"n":21,"atm":40.59,"a":2.116,"b":-0.518,"c":40.513,"rr":0.18,"p25":41.41,"c25":41.22,"kmin":381.3,"k":[280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510],"v":[62.09,59.68,57.71,55.62,53.62,51.51,50.07,48.47,46.75,45.89,44.51,43.6,42.81,42.26,41.73,41.33,41.05,40.8,40.6,40.44,40.66,41.35,41.2,40.61,41.28,40.64,40.79,41.36,40.89,41.52,41.07,41.24,41.85,41.61,41.78,42.32,42.18,42.79,42.61,43.23,43.79,44.03,45.02,45.47,46.33,47.49,48.12,49.16,50.41,51.24,52.29,53.29,54.56,55.86,56.62,57.79,58.68]},{"d":"4/27","S":378.75,"n":18,"atm":42.45,"a":2.186,"b":-0.316,"c":42.25,"rr":0.45,"p25":43.53,"c25":43.08,"kmin":382.1,"k":[285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500,505,510],"v":[63.41,61.17,58.92,56.82,54.81,52.92,51.26,49.68,48.37,47.18,46.21,45.36,44.6,44.19,43.69,43.32,43.15,43.0,42.85,42.81,42.37,42.47,42.32,42.31,42.43,42.36,42.45,42.54,42.72,42.77,43.01,43.11,43.34,43.5,43.78,43.9,44.23,44.53,44.8,45.52,46.2,47.05,47.94,48.8,49.8,50.86,51.9,53.0,54.13,55.23,56.32,57.53,58.55,59.64,60.75,61.85]},{"d":"4/28","S":376.14,"n":17,"atm":41.49,"a":2.059,"b":-0.06,"c":41.28,"rr":-0.01,"p25":42.3,"c25":42.31,"kmin":377.4,"k":[285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500],"v":[62.28,59.63,57.27,55.17,52.99,51.04,49.33,47.79,46.48,45.36,44.47,43.74,43.02,42.74,42.35,42.07,41.85,41.76,41.62,41.45,41.56,41.39,41.47,41.52,41.61,41.69,41.84,42.02,42.1,42.31,42.57,42.71,43.02,43.3,43.57,43.91,44.18,44.58,44.88,45.62,46.44,47.35,48.37,49.29,50.34,51.49,52.58,53.73,54.81,56.18,57.18,58.43,59.47,60.63]},{"d":"4/29","S":373.02,"n":16,"atm":40.19,"a":2.003,"b":0.031,"c":39.906,"rr":0.24,"p25":41.09,"c25":40.85,"kmin":373.5,"k":[290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485],"v":[58.62,55.92,53.66,51.59,49.58,47.93,46.35,45.01,43.88,43.06,42.31,41.77,41.27,41.04,40.69,40.57,40.53,40.07,39.92,40.02,40.0,40.15,40.25,40.41,40.57,40.73,40.86,41.01,41.37,41.54,41.9,42.21,42.56,42.87,43.3,43.77,44.09,44.58,45.53,46.52,47.57,48.76,49.94,51.1,52.39,53.63,54.92,56.17,57.47,58.61]},{"d":"4/30","S":381.77,"n":15,"atm":40.73,"a":2.115,"b":0.333,"c":40.236,"rr":-0.79,"p25":40.83,"c25":41.61,"kmin":380.0,"k":[295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495],"v":[60.62,57.95,55.56,53.22,51.08,49.16,47.58,46.07,44.81,43.76,42.81,42.12,41.5,41.12,40.61,40.46,40.31,40.32,40.24,40.74,40.59,40.57,40.68,40.73,40.91,41.04,41.12,41.4,41.49,41.73,41.99,42.4,42.64,42.85,43.21,43.54,43.96,44.75,45.73,46.74,47.88,49.1,50.36,51.68,53.0,54.41,55.72,57.08,58.51,59.8,61.13]},{"d":"5/1","S":390.83,"n":14,"atm":40.24,"a":1.913,"b":-0.344,"c":39.957,"rr":0.23,"p25":41.08,"c25":40.85,"kmin":394.3,"k":[305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495,500],"v":[60.86,58.29,55.88,53.5,51.65,49.32,47.63,46.04,44.82,43.76,42.85,42.16,41.6,41.25,40.8,40.75,40.61,40.57,40.53,40.55,40.52,40.04,40.08,40.13,40.26,40.24,40.36,40.51,40.74,40.77,40.87,41.01,41.28,41.38,41.61,42.08,42.63,43.27,44.0,44.88,45.79,46.79,48.01,49.23,50.64,52.0,53.48,54.84,56.32,57.77]},{"d":"5/4","S":392.48,"n":11,"atm":42.99,"a":2.076,"b":-0.272,"c":42.687,"rr":0.05,"p25":43.7,"c25":43.65,"kmin":394.9,"k":[310,315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485,490,495],"v":[64.59,61.88,59.34,57.01,54.82,52.67,50.82,49.21,47.77,46.59,45.63,44.82,44.18,43.64,43.5,43.38,43.18,43.13,42.96,42.9,43.05,42.76,42.75,42.76,42.96,43.03,43.16,43.37,43.46,43.67,43.83,44.18,44.39,44.65,45.26,46.01,46.84,47.7,48.82,49.9,51.19,52.58,53.94,55.44,57.02,58.66,60.09,61.59]},{"d":"5/5","S":389.52,"n":10,"atm":42.06,"a":2.073,"b":0.308,"c":41.973,"rr":0.0,"p25":43.09,"c25":43.08,"kmin":388.0,"k":[315,320,325,330,335,340,345,350,355,360,365,370,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,430,435,440,445,450,455,460,465,470,475,480,485],"v":[60.89,58.06,55.37,52.92,50.91,49.07,47.42,46.24,45.14,44.37,43.73,43.24,42.94,42.94,42.8,42.72,42.68,42.69,42.05,41.95,42.06,42.21,42.23,42.33,42.53,42.78,43.07,43.21,43.66,43.89,44.24,44.7,45.09,46.11,47.26,48.55,49.88,51.45,52.93,54.54,56.33,57.96,59.72,61.48,63.14]},{"d":"5/6","S":398.62,"n":9,"atm":42.72,"a":2.028,"b":0.069,"c":42.738,"rr":-0.81,"p25":43.36,"c25":44.17,"kmin":398.6,"k":[325,330,335,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,480,485,490],"v":[61.81,59.22,56.59,54.27,53.19,52.12,51.27,50.4,49.49,48.8,47.99,47.31,46.71,46.1,45.55,45.03,44.56,44.18,43.75,43.58,43.3,43.12,42.8,42.67,42.49,42.44,42.43,42.9,42.95,43.14,43.18,43.41,43.63,43.86,44.1,44.2,44.46,44.82,45.18,45.53,45.86,46.24,46.75,47.16,47.72,48.2,48.76,49.35,49.94,50.64,51.24,51.84,52.62,53.4,54.17,54.97,55.7,56.54,58.16,59.83,61.56]},{"d":"5/7","S":411.74,"n":8,"atm":44.27,"a":2.018,"b":0.685,"c":44.279,"rr":-1.68,"p25":44.36,"c25":46.04,"kmin":407.6,"k":[335,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,480,485,490,495,500,505],"v":[63.09,60.68,59.02,57.55,56.38,55.24,54.68,53.52,52.36,51.31,50.59,49.56,48.86,48.29,47.6,47.02,46.54,46.02,45.68,45.31,45.01,44.71,44.54,44.37,44.15,44.04,43.99,43.88,43.81,43.98,44.32,44.34,44.52,44.75,44.96,45.27,45.5,45.79,46.04,46.41,46.79,47.31,47.66,48.08,48.68,49.23,49.65,50.23,50.84,51.54,52.08,53.04,53.58,54.37,54.98,56.1,57.69,59.78,58.48,60.02,61.6,63.07]},{"d":"5/8","S":428.45,"n":7,"atm":43.39,"a":2.092,"b":1.179,"c":43.758,"rr":-3.19,"p25":43.5,"c25":46.69,"kmin":421.6,"k":[355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,480,485,490,495,500,505,510,515],"v":[62.32,60.51,59.29,57.85,56.55,55.41,53.89,52.62,51.54,50.39,49.65,48.58,47.73,47.19,46.26,45.9,45.13,44.84,44.56,43.98,43.95,43.75,43.26,43.5,43.37,43.03,43.31,43.45,43.48,43.1,43.66,43.95,44.39,44.99,45.01,45.36,46.12,46.3,47.01,47.32,47.54,48.06,48.93,49.06,49.97,50.27,51.11,51.81,52.13,53.71,54.98,56.64,58.02,59.86,61.28,62.79,64.42]},{"d":"5/11","S":445.06,"n":4,"atm":56.3,"a":2.466,"b":1.407,"c":56.246,"rr":-4.55,"p25":55.37,"c25":59.92,"kmin":437.8,"k":[370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,480,485,490,495,500,505,510,515,520,525,530,535],"v":[77.99,75.77,74.46,73.73,71.68,70.07,68.45,67.06,65.73,64.11,63.07,61.95,61.15,60.01,59.35,58.71,58.12,57.49,57.07,56.52,56.26,55.99,55.79,55.37,55.37,55.37,55.27,55.53,55.8,55.96,56.27,56.51,56.68,57.26,57.83,58.18,58.82,59.5,59.79,60.51,60.96,61.68,62.1,63.35,64.5,65.86,67.32,68.83,70.45,72.23,74.09,75.98,78.01,80.06,82.1]},{"d":"5/12","S":433.7,"n":3,"atm":58.9,"a":3.1,"b":1.798,"c":60.314,"rr":-2.06,"p25":60.76,"c25":62.82,"kmin":427.2,"k":[367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,477.5,480,482.5,485,487.5,490,492.5,495,497.5,500,502.5,505,507.5,510,512.5],"v":[85.58,83.48,81.23,79.12,77.3,74.9,73.2,71.58,69.8,68.94,66.89,65.68,65.48,63.84,63.87,62.41,62.77,62.33,61.83,61.6,60.37,61.22,60.73,60.8,60.9,60.82,59.49,58.4,58.73,59.21,61.17,60.43,61.09,63.05,62.69,65.02,64.96,65.99,67.01,69.08,69.46,71.47,72.04,73.84,75.26,75.72,77.78,78.78,80.15,81.4,82.05,83.8,85.06,86.11,87.46,88.68,89.82,90.88,91.43]},{"d":"5/13","S":445.2,"n":2,"atm":58.44,"a":2.499,"b":0.197,"c":59.255,"rr":-4.97,"p25":58.11,"c25":63.08,"kmin":444.5,"k":[390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,477.5,480,482.5,485,487.5,490,492.5,495,497.5,500,502.5,505,507.5,510],"v":[85.73,82.86,80.56,78.03,75.6,73.4,71.15,69.02,67.19,65.22,63.98,62.58,61.47,60.26,59.6,59.01,58.44,58.16,57.89,57.79,57.9,57.78,58.26,59.73,60.12,60.99,61.44,62.31,63.07,63.62,64.32,65.05,65.72,66.56,67.51,68.09,68.83,69.65,70.32,71.03,71.91,72.75,73.38,74.58,75.85,76.17,77.77,78.62,79.65]},{"d":"5/14","S":443.36,"n":1,"atm":58.05,"a":2.596,"b":0.746,"c":58.316,"rr":-2.86,"p25":58.18,"c25":61.03,"kmin":441.5,"k":[402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,432.5,435,437.5,440,442.5,445,447.5,450,452.5,455,457.5,460,462.5,465,467.5,470,472.5,475,477.5,480,482.5,485,487.5],"v":[84.49,81.25,77.57,74.55,71.18,68.75,66.16,64.4,62.54,61.15,60.06,59.2,58.6,58.09,57.93,57.97,58.48,57.31,58.51,59.35,60.59,61.91,63.33,64.54,66.2,67.5,68.98,70.52,71.53,73.28,74.92,76.48,79.05,81.32,82.06]}],"SURF":[{"e":"4/15","n":2,"atm":42.49,"F":352.44,"k":[310,312.5,315,317.5,320,322.5,325,327.5,330,332.5,335,337.5,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395],"v":[73.97,70.59,67.28,64.34,60.76,59.09,56.0,53.98,52.01,50.25,49.0,47.83,46.8,45.63,44.53,43.21,42.29,42.49,41.64,41.21,41.25,41.6,42.37,43.36,44.58,46.08,47.99,50.1,52.23,54.57,56.53,59.13,61.5,63.21,65.04]},{"e":"4/17","n":4,"atm":42.2,"F":352.53,"k":[285,287.5,290,292.5,295,297.5,300,302.5,305,307.5,310,312.5,315,317.5,320,322.5,325,327.5,330,332.5,335,337.5,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410],"v":[82.8,79.78,77.51,75.06,72.67,70.18,67.71,65.58,63.36,60.08,59.55,57.8,55.7,53.84,52.94,51.58,50.69,49.66,48.93,48.04,47.21,46.4,45.6,44.74,44.09,43.42,42.8,42.2,42.43,42.26,42.03,42.17,42.2,42.31,42.53,42.76,43.1,43.64,44.24,44.75,45.62,46.29,47.36,48.77,49.93,50.84,52.28,53.52,55.11,56.74,58.84]},{"e":"4/20","n":7,"atm":37.44,"F":352.65,"k":[270,275,280,282.5,285,287.5,290,292.5,295,297.5,300,302.5,305,307.5,310,312.5,315,317.5,320,322.5,325,327.5,330,332.5,335,337.5,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,415,420],"v":[76.71,70.72,70.59,68.62,66.63,65.03,63.69,62.15,60.01,58.34,56.59,55.2,53.52,52.23,50.71,49.5,48.31,47.19,46.23,45.23,44.22,43.39,42.59,41.91,41.19,40.57,39.95,39.26,38.86,38.32,37.92,37.42,37.79,37.41,37.45,37.13,37.08,37.14,37.17,37.32,37.56,37.91,38.42,38.95,39.58,40.29,40.98,41.92,42.75,43.73,44.69,45.51,46.54,47.53,48.7,50.09,52.51]},{"e":"4/24","n":11,"atm":54.05,"F":352.82,"k":[250,255,260,265,270,275,277.5,280,282.5,285,287.5,290,292.5,295,297.5,300,302.5,305,307.5,310,312.5,315,317.5,320,322.5,325,327.5,330,332.5,335,337.5,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,372.5,375,377.5,380,382.5,385,387.5,390,392.5,395,397.5,400,402.5,405,407.5,410,412.5,415,417.5,420,422.5,425,427.5,430,435,440,445,450,455,460,465,470],"v":[85.08,82.46,79.76,76.62,73.78,71.78,70.64,69.76,68.52,67.63,66.56,65.79,64.85,64.18,63.38,62.75,62.17,61.45,60.98,60.42,59.95,59.52,59.01,58.57,58.26,57.78,57.27,56.83,56.64,56.18,55.72,55.45,55.12,54.85,54.4,54.22,54.04,54.14,53.92,53.64,53.48,53.26,53.09,52.99,52.96,52.81,52.75,52.74,52.7,52.77,52.8,52.9,52.93,53.15,53.38,53.46,53.82,54.05,54.41,54.78,55.08,55.65,55.89,56.43,56.97,57.48,57.91,58.49,59.55,60.83,61.95,63.28,64.83,65.69,67.15,68.15]},{"e":"4/27","n":14,"atm":50.03,"F":352.94,"k":[250,260,270,280,290,300,310,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,410,420,430,440,450],"v":[76.52,71.76,67.43,63.83,60.59,57.92,55.7,53.87,53.04,52.46,51.75,51.22,50.51,50.06,50.01,49.61,49.22,49.04,48.89,48.68,48.69,48.79,48.91,49.27,50.02,52.0,53.71,55.43,58.15]},{"e":"5/1","n":18,"atm":49.29,"F":353.11,"k":[250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,332.5,335,337.5,340,342.5,345,347.5,350,352.5,355,357.5,360,362.5,365,367.5,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470],"v":[72.73,70.34,68.19,66.25,64.46,62.71,61.15,59.77,58.5,57.33,56.24,55.29,54.41,53.6,52.95,52.14,51.57,51.29,50.89,50.7,50.34,50.15,49.96,49.73,49.42,49.26,49.39,49.21,49.07,48.83,48.78,48.67,48.51,48.35,48.19,48.19,48.11,48.34,48.45,48.71,49.04,49.5,49.94,50.53,51.18,51.89,52.72,53.48,54.37,55.29,56.05,56.98,57.86]},{"e":"5/8","n":25,"atm":47.01,"F":353.4,"k":[250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470],"v":[67.3,65.48,63.43,61.66,60.01,58.41,56.96,55.71,54.57,53.6,52.66,51.9,51.18,50.38,49.83,49.26,48.69,48.25,47.85,47.37,47.05,46.99,46.75,46.46,46.28,46.1,45.95,45.87,45.76,45.83,46.04,46.09,46.3,46.54,46.88,47.24,47.6,48.07,48.59,49.22,49.79,50.45,51.11,51.82,52.5]},{"e":"5/15","n":32,"atm":46.07,"F":353.69,"k":[250,255,260,265,270,275,280,285,290,295,300,305,310,315,320,325,330,335,340,345,350,355,360,365,370,375,380,385,390,395,400,405,410,415,420,425,430,435,440,445,450,455,460,465,470],"v":[64.2,62.24,60.59,58.85,57.31,56.02,54.77,53.67,52.69,51.81,51.1,50.26,49.62,49.06,48.55,48.02,47.6,47.09,46.75,46.35,46.08,46.06,45.76,45.58,45.35,45.16,45.08,44.96,45.03,45.01,44.96,45.05,45.24,45.43,45.65,45.88,46.17,46.48,46.9,47.28,47.77,48.24,48.75,49.31,49.81]}],"SKD":[["put",0.05,271.5,57.27,-0.05,0.1076,0.2102,-0.0274],["put",0.1,293.7,52.14,-0.1,0.1831,0.1605,-0.0706],["put",0.16,309.0,49.55,-0.16,0.2539,0.1285,-0.1274],["put",0.25,324.8,47.57,-0.25,0.3315,0.0968,-0.2179],["put",0.35,338.7,46.34,-0.35,0.3864,0.0706,-0.3227],["put",0.45,350.9,45.59,-0.45,0.4129,0.0481,-0.4302],["call",0.05,452.5,48.48,0.05,0.1076,-0.1125,0.0379],["call",0.1,425.9,46.49,0.1,0.1831,-0.0743,0.0864],["call",0.16,408.2,45.58,0.16,0.2539,-0.0474,0.148],["call",0.25,390.4,45.05,0.25,0.3315,-0.0193,0.2436],["call",0.35,375.6,44.96,0.35,0.3864,0.0051,0.352],["call",0.45,362.9,45.15,0.45,0.4129,0.0268,0.4611]],"MEAS":[["put","0.02–0.07",1234,-0.0401,-0.0178,-0.0217],["put","0.07–0.13",547,-0.097,-0.0705,-0.0727],["put","0.13–0.20",391,-0.1614,-0.1319,-0.1338],["put","0.20–0.30",448,-0.244,-0.2196,-0.2229],["put","0.30–0.40",426,-0.3451,-0.3401,-0.3317],["put","0.40–0.55",717,-0.4757,-0.4975,-0.4756],["call","0.02–0.07",1999,0.0397,0.0326,0.0197],["call","0.07–0.13",774,0.0949,0.1004,0.0686],["call","0.13–0.20",631,0.1632,0.1853,0.137],["call","0.20–0.30",690,0.247,0.2975,0.2239],["call","0.30–0.40",600,0.347,0.413,0.3296],["call","0.40–0.55",752,0.472,0.5717,0.468]],"BF":{"k0":200,"dk":5,"raw":[0.0,-0.0,0.001,0.001,0.001,0.0,0.00201,0.001,0.00301,-0.0,0.00502,0.00301,0.00402,0.00703,0.00803,0.01004,0.01305,0.01305,0.01706,0.02208,0.01405,0.03011,0.03011,0.03011,0.03011,0.04015,0.03011,0.05019,0.03513,0.05019,0.03513,0.03513,0.05019,0.03513,0.04015,0.04517,0.03011,0.04517,0.02008,0.02509,0.03011,0.02509,0.01506,0.01706,0.01506,0.01104,0.01004,0.00903,0.00703,0.00703,0.00301,0.00502,0.00301,0.00301,0.00201,0.00201,0.00201,0.00201,-0.001,0.00201,0.00201,-0.001,0.0,0.00201,0.0,0.001,-0.001,-0.0,0.001,0.001,0.0,-0.00201,0.00201,0.0,-0.0,0.0,-0.001,0.00201,-0.001,0.0,0.001],"fit":[0.00093,0.00098,0.00105,0.00115,0.0013,0.00149,0.00173,0.00205,0.00244,0.00292,0.00352,0.00426,0.00516,0.00624,0.00754,0.00907,0.01087,0.01295,0.01532,0.01797,0.02087,0.02399,0.02725,0.03056,0.03383,0.03691,0.03969,0.04204,0.04385,0.04503,0.04553,0.04533,0.04444,0.04294,0.04089,0.03841,0.03561,0.03261,0.02952,0.02644,0.02345,0.02061,0.01797,0.01555,0.01338,0.01145,0.00975,0.00827,0.00699,0.0059,0.00497,0.00418,0.00351,0.00295,0.00248,0.00209,0.00176,0.00149,0.00126,0.00107,0.00091,0.00077,0.00066,0.00056,0.00048,0.00042,0.00036,0.00031,0.00027,0.00024,0.00021,0.00019,0.00016,0.00015,0.00013,0.00012,0.00011,0.0001,9e-05,8e-05,7e-05],"ln":[2e-05,3e-05,6e-05,0.00011,0.0002,0.00034,0.00055,0.00086,0.0013,0.00192,0.00274,0.00381,0.00515,0.00679,0.00873,0.01098,0.01352,0.0163,0.01927,0.02236,0.02549,0.02856,0.0315,0.03421,0.0366,0.03862,0.04021,0.04132,0.04195,0.04209,0.04176,0.04099,0.03982,0.0383,0.0365,0.03446,0.03225,0.02993,0.02756,0.02518,0.02284,0.02056,0.01839,0.01634,0.01442,0.01265,0.01104,0.00957,0.00826,0.00709,0.00605,0.00514,0.00435,0.00366,0.00307,0.00256,0.00213,0.00177,0.00146,0.0012,0.00098,0.0008,0.00065,0.00053,0.00043,0.00035,0.00028,0.00022,0.00018,0.00014,0.00011,9e-05,7e-05,6e-05,4e-05,3e-05,3e-05,2e-05,2e-05,1e-05,1e-05],"bk":[[0,250,0.0173,0.0067],[250,300,0.1012,0.1207],[300,340,0.2669,0.2851],[340,370,0.2663,0.2425],[370,420,0.2673,0.253],[420,500,0.0749,0.0875],[500,0,0.0062,0.0046]]}};
+/* DATA:end */
+
+const S0=D.S0.S, F0=D.S0.F, ATM0=D.S0.atm, T0=D.S0.t/365, SQ0=Math.sqrt(T0);
+const RATE=0.043;
+const zOf=(K,F,atm,t)=>Math.log(K/F)/(atm*Math.sqrt(t));
+const quad=(f,z)=>f.a*z*z+f.b*z+f.c;
+const md=d=>d;
+
+/* ══════════ 像素与动画共用 ══════════ */
+let C={};
+function readColors(){
+  const cs=getComputedStyle(document.documentElement), g=k=>cs.getPropertyValue(k).trim();
+  C={bg:g('--panel'),ink:g('--ink'),faint:g('--ink-faint'),soft:g('--ink-soft'),ctl:g('--control'),res:g('--result'),good:g('--good'),rule:g('--rule')};
+}
+function fitCanvas(c,w,h){
+  const box=c.parentElement, host=box.parentElement;
+  const k=Math.floor(host.clientWidth/w);
+  if(k>=2){ c.style.width=w*k+'px'; c.style.height=h*k+'px'; box.style.width=w*k+'px'; }
+  else { c.style.width='100%'; c.style.height='auto'; box.style.width='100%'; }
+}
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+function segOn(id,fn){
+  const bs=document.querySelectorAll('#'+id+' button');
+  bs.forEach(b=>b.addEventListener('click',()=>{ bs.forEach(x=>x.setAttribute('aria-pressed',x===b)); fn(b.dataset); }));
+}
+/* 按时间推进：frame(已过毫秒)，到 total 为止；减少动画时直接画最后一帧 */
+function timeline(st,total,frame){
+  st.tok=(st.tok||0)+1; const my=st.tok;
+  if(reduced){ st.e=total; frame(total); return; }
+  let t0=null;
+  const tick=ts=>{ if(st.tok!==my) return; if(t0===null) t0=ts; st.e=Math.min(total,ts-t0); frame(st.e); if(st.e<total) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+/* 按固定步长推进（像素画布用） */
+function runLoop(s,ms,step,draw,done){
+  s.tok=(s.tok||0)+1; const my=s.tok; let last=0, acc=0;
+  const tick=t=>{
+    if(s.tok!==my) return;
+    const dt=last?Math.min(t-last,100):ms; last=t; acc+=dt;
+    while(acc>=ms && !done()){ step(); acc-=ms; }
+    draw();
+    if(!done()) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+const poly=(pts,stroke,w=2,extra='')=>`<polyline points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="${stroke}" stroke-width="${w}" stroke-linejoin="round" ${extra}/>`;
+const hline=(x1,x2,y,c,w=.8,dash='')=>`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${c}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
+const vline=(x,y1,y2,c,w=.8,dash='')=>`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="${c}" stroke-width="${w}" ${dash?`stroke-dasharray="${dash}"`:''}/>`;
+
+/* ══════════ 〇 · 4/13 的整条微笑 ══════════ */
+function drawS0(){
+  const narrow=FK>1, W=640,H=narrow?470:330,L=54,R=622,T=14,B=H-46, x0=140,x1=700,y0=40,y1=116;   // 手机上图加高，标签才分得开
+  $('s0c').setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const X=k=>L+(k-x0)/(x1-x0)*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+  let g='';
+  [40,60,80,100].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
+  [200,300,400,500,600,700].forEach(k=>g+=lab(X(k),B+19,k,'var(--ink-faint)','middle',12));
+  g+=lab((L+R)/2,H-6,'行权价','var(--ink-soft)','middle',12.5);
+  g+=hline(L,R,Y(46.3),'var(--ink-soft)',1.3,'6 5');
+  g+=lab(R,Y(46.3)+17,'1.2 用的一个 σ：46.3%','var(--ink-soft)','end',12);
+  g+=vline(X(S0),T,B,'var(--ink-faint)',1,'2 4')+lab(X(S0)+5,T+10,'TSLA 352.36','var(--ink-faint)','start',12);
+  const P=D.S0.pts;
+  g+=poly(P.map(p=>[X(p[0]),Y(p[4])]),'var(--result)',1.6,'stroke-dasharray="4 3"');
+  P.forEach(p=>{ if(p[3]-p[2]>0.3) g+=vline(X(p[0]),Y(p[3]),Y(p[2]),'var(--ink-faint)',1); });
+  g+=`<g fill="var(--control)">`+P.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="2.5"/>`).join('')+'</g>';
+  const at=k=>P.find(p=>p[0]===k);
+  [[150,'150 put 112.6%','start',8,4],[200,'200 put 86.5%','start',8,4],[300,'300 put 51.1%','start',10,-12],[385,'385 最低 45.0%','middle',0,22],
+   narrow?[500,'500 call 53.5%','start',10,28]:[500,'500 call 53.5%','end',-6,-26]].forEach(([k,t,a,dx,dy])=>{
+    const p=at(k); if(!p) return;
+    g+=lab(X(k)+dx,Y(p[1])+dy,t,'var(--control)',a,12,600);
+  });
+  g+=lab(X(146),Y(61.4)+17,'平滑值 61.4%','var(--result)','start',11.5);
+  g+=lab(L+6,B-8,'左翼：虚值 put','var(--ink-faint)','start',12);
+  g+=lab(R,T+10,'右翼：虚值 call','var(--ink-faint)','end',12);
+  if(FK===1) g+=`<text transform="translate(13 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">隐含波动率</text>`;
+  $('s0c').innerHTML=g;
+}
+
+/* ══════════ 一 · 三项拼出微笑 ══════════ */
+const BUILD=(()=>{
+  const W=640,H=330,L=54,R=622,T=26,B=250, z0=-3.2,z1=3.2,y0=40,y1=76;
+  const X=z=>L+(z-z0)/(z1-z0)*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+  const f=D.FIT0, pts=D.S0.pts.map(p=>[zOf(p[0],F0,ATM0,T0),p[1]]).filter(p=>Math.abs(p[0])<=3.2);
+  const F=[z=>f.c, z=>f.c+f.b*z, z=>f.c+f.b*z+f.a*z*z];
+  const curve=(fn,xmax=z1)=>{ const o=[]; for(let z=z0;z<=xmax+1e-9;z+=0.05) o.push([X(z),Y(clamp(fn(z),y0-4,y1+4))]); return o; };
+  const STEP=['① 水平 c = 45.47','② 加上倾斜 b·z，b = −2.07','③ 加上曲率 a·z²，a = 2.07'];
+  const st={};
+  function frame(e){
+    let g='';
+    [40,50,60,70].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
+    for(let z=-3;z<=3;z++){
+      g+=vline(X(z),B,B+5,'var(--ink-faint)');
+      g+=lab(X(z),B+19,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12);
+      g+=lab(X(z),B+36,Math.round(F0*Math.exp(z*ATM0*SQ0)),'var(--ink-faint)','middle',11);
+    }
+    g+=lab(L-8,B+19,'z','var(--ink-faint)','end',12); g+=lab(L-8,B+36,'行权价','var(--ink-faint)','end',11);
+    g+=lab((L+R)/2,H-6,'离中心几个标准差','var(--ink-soft)','middle',12.5);
+    const op=clamp(e/800);
+    g+=`<g fill="var(--ink-soft)" fill-opacity="${(op*0.75).toFixed(2)}">`+pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="2.6"/>`).join('')+'</g>';
+    let k=0, line='';
+    if(e>=900 && e<2100){ const u=ease(clamp((e-900)/1000)); line=poly(curve(F[0],lerp(z0,z1,u)),'var(--control)',2.6); k=0; }
+    else if(e>=2100 && e<3700){ const u=ease(clamp((e-2100)/1300)); g+=poly(curve(F[0]),'var(--ink-faint)',1.4,'stroke-dasharray="5 4"'); line=poly(curve(z=>lerp(F[0](z),F[1](z),u)),'var(--control)',2.6); k=1; }
+    else if(e>=3700){ const u=ease(clamp((e-3700)/1500)); if(e<5200) g+=poly(curve(F[1]),'var(--ink-faint)',1.4,'stroke-dasharray="5 4"'); line=poly(curve(z=>lerp(F[1](z),F[2](z),u)),'var(--control)',2.6); k=2; }
+    g+=line;
+    if(e>=900) g+=lab(L+8,T-8,STEP[k],'var(--control)','start',13,600);
+    if(e>=5200){
+      const zm=-f.b/(2*f.a), ym=quad(f,zm);
+      g+=`<circle cx="${X(zm)}" cy="${Y(ym)}" r="4" fill="var(--paper)" stroke="var(--control)" stroke-width="2"/>`;
+      g+=lab(X(zm),Y(ym)+20,'谷底 z = +0.50，378.7','var(--control)','middle',12);
+    }
+    $('s1c').innerHTML=g;
+  }
+  return {start:()=>timeline(st,5400,frame), draw:()=>frame(st.e??5400)};
+})();
+
+/* ══════════ 一 · 敏感度 ══════════ */
+function drawSens(){
+  const W=640,H=300,L=54,R=622,T=40,B=240, z0=-2.6,z1=2.6;
+  const X=z=>L+(z-z0)/(z1-z0)*(R-L), Y=v=>B-v/1.05*(B-T);
+  const p0=npdf(0);
+  let g='';
+  [0,.5,1].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v,'var(--ink-faint)','end',12); });
+  const Q=[[-1.645,'5Δ put'],[-0.674,'25Δ put'],[0,'50Δ'],[0.674,'25Δ call'],[1.645,'5Δ call']];
+  Q.forEach(([z,t])=>{ g+=vline(X(z),T-6,B,'var(--ink-faint)',1,'2 4'); g+=lab(X(z),T-12,t,'var(--ink-soft)','middle',11.5); });
+  const cur=fn=>{ const o=[]; for(let z=z0;z<=z1+1e-9;z+=0.02) o.push([X(z),Y(fn(z))]); return o; };
+  const fc=z=>npdf(z)/p0, fb=z=>Math.abs(z)*npdf(z)/p0, fa=z=>z*z*npdf(z)/p0;
+  g+=poly(cur(fc),'var(--result)',2.4)+poly(cur(fb),'var(--control)',2.4)+poly(cur(fa),'var(--good)',2.4);
+  Q.forEach(([z])=>{ [[fc,'var(--result)'],[fb,'var(--control)'],[fa,'var(--good)']].forEach(([fn,c])=>g+=`<circle cx="${X(z)}" cy="${Y(fn(z))}" r="3.6" fill="${c}"/>`); });
+  g+=`<line x1="${X(1)}" y1="${Y(fb(1))-5}" x2="${X(1.25)}" y2="${Y(0.9)}" stroke="var(--control)"/>`+lab(X(2.6),Y(0.97),'b 的峰 z = 1，约 16Δ','var(--control)','end',11.5);
+  g+=`<line x1="${X(-Math.SQRT2)}" y1="${Y(fa(Math.SQRT2))-5}" x2="${X(-1.6)}" y2="${Y(0.9)}" stroke="var(--good)"/>`+lab(X(-2.6),Y(0.97),'a 的峰 z = √2，约 8Δ','var(--good)','start',11.5);
+  for(let z=-2;z<=2;z++) g+=lab(X(z),B+18,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12);
+  g+=lab((L+R)/2,B+40,'离中心几个标准差 z（左边是 put，右边是 call）','var(--ink-soft)','middle',12);
+  $('s1s').innerHTML=g;
+  // TSLA 表
+  // 列：vega（= c 加 1 点，r[5] 与 r[6] 相同，只列一次）、b 加 1 点、a 加 1 点；每一侧最大的标色
+  const S=D.SENS, short=t=>t.replace(/^[−+-]/,'').replace(' ','Δ ');
+  $('sensTb').innerHTML=S.map(r=>`<tr><td class="nw">${short(r[0])}</td><td>${r[1].toFixed(1)}</td><td>${fm(r[2])}</td><td>${r[3].toFixed(1)}%</td>`+
+    [5,7,8].map(i=>{ const side=r[0].includes('put')?0:1; const smx=Math.max(...S.filter(q=>(q[0].includes('put')?0:1)===side).map(q=>Math.abs(q[i])));
+      return `<td${Math.abs(r[i])===smx&&Math.abs(r[i])>0.01?' class="max"':''}>${fm(r[i],3)}</td>`; }).join('')+'</tr>').join('');
+}
+
+/* ══════════ 二 · 24 天逐日回放 ══════════ */
+const REPLAY=(()=>{
+  const W=640,H=420,L=54,R=622,T=26,B=250, S2T=300,S2B=392;
+  const DS=D.DAYS, n=DS.length, y0=35,y1=95, zr=3.2, k0=220,k1=560;
+  let mode='z', day=n-1;
+  const Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+  const fOf=d=>({a:d.a,b:d.b,c:d.c});
+  const geo=d=>{ const t=d.n/365, F=d.S*(1+RATE*t); return {t,F,atm:d.atm/100}; };
+  function draw(){
+    const d=DS[day], G=geo(d), f=fOf(d), g0=geo(DS[0]), f0=fOf(DS[0]);
+    const X= mode==='z' ? (z=>L+(z+zr)/(2*zr)*(R-L)) : (k=>L+(k-k0)/(k1-k0)*(R-L));
+    let g=`<defs><clipPath id="s2clip"><rect x="${L}" y="${T-4}" width="${R-L}" height="${B-T+8}"/></clipPath></defs>`;
+    [40,50,60,70,80,90].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
+    if(mode==='z'){ for(let z=-3;z<=3;z++) g+=lab(X(z),B+18,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12); g+=lab((L+R)/2,B+36,'离中心几个标准差 z','var(--ink-soft)','middle',12); }
+    else { [250,300,350,400,450,500,550].forEach(k=>g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',12)); g+=lab((L+R)/2,B+36,'行权价','var(--ink-soft)','middle',12); }
+    const cv=(ff,GG)=>{ const o=[];
+      if(mode==='z'){ for(let z=-zr;z<=zr+1e-9;z+=0.05) o.push([X(z),Y(quad(ff,z))]); }
+      else { for(let k=k0;k<=k1;k+=2){ const z=zOf(k,GG.F,GG.atm,GG.t); if(Math.abs(z)<=zr) o.push([X(k),Y(quad(ff,z))]); } }
+      return o; };
+    g+=`<g clip-path="url(#s2clip)">`;
+    g+=poly(cv(f0,g0),'var(--ink-faint)',1.5,'stroke-dasharray="5 4"');
+    if(mode==='k'){ g+=vline(X(d.S),T,B,'var(--result)',1.4,'4 4'); }
+    const P=d.k.map((k,i)=>[mode==='z'?X(zOf(k,G.F,G.atm,G.t)):X(k),Y(d.v[i])]);
+    g+=`<g fill="var(--ink-soft)" fill-opacity=".7">`+P.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.4"/>`).join('')+'</g>';
+    g+=poly(cv(f,G),'var(--control)',2.6);
+    if(mode==='k'){ const zm=-f.b/(2*f.a), xm=X(d.kmin), ym=Y(quad(f,zm)); g+=`<path d="M${xm-5} ${ym+14} L${xm+5} ${ym+14} L${xm} ${ym+6} Z" fill="var(--control)"/>`; }
+    g+='</g>';
+    if(mode==='k') g+=lab(clamp(X(d.S),L+40,R-40),T-8,'TSLA '+d.S.toFixed(2),'var(--result)','middle',12,600);
+    else g+=lab(L+8,T-8,d.d+'，离到期 '+d.n+' 天','var(--control)','start',13,600);
+    // 下方：b 与 a 逐日
+    const X2=i=>L+i/(n-1)*(R-L), Y2=v=>S2B-(v+2.5)/6*(S2B-S2T);
+    g+=hline(L,R,Y2(0),'var(--ink-faint)',1);
+    [-2,0,2].forEach(v=>g+=lab(L-8,Y2(v)+4,fm(v,0),'var(--ink-faint)','end',11));
+    g+=vline((X2(7)+X2(8))/2,S2T,S2B,'var(--ink-faint)',1,'2 3')+lab((X2(7)+X2(8))/2+5,Y2(-2.1),'财报','var(--ink-faint)','start',11);
+    [0,5,10,15,19,23].forEach(i=>g+=lab(X2(i),S2B+16,DS[i].d,'var(--ink-faint)','middle',11));
+    const sb=[],sa=[]; for(let i=0;i<=day;i++){ sb.push([X2(i),Y2(DS[i].b)]); sa.push([X2(i),Y2(DS[i].a)]); }
+    g+=poly(sa,'var(--good)',2.2)+poly(sb,'var(--control)',2.2);
+    g+=`<circle cx="${X2(day)}" cy="${Y2(d.a)}" r="4" fill="var(--good)"/><circle cx="${X2(day)}" cy="${Y2(d.b)}" r="4" fill="var(--control)"/>`;
+    g+=lab(L+6,Y2(2.2)-6,'曲率 a','var(--good)','start',12,600)+lab(X2(2.6),Y2(-1.8),'倾斜 b','var(--control)','start',12,600);
+    $('s2c').innerHTML=g;
+    $('s2D').textContent=d.d; $('s2Db').textContent='离到期 '+d.n+' 天';
+    $('s2S').textContent=d.S.toFixed(2); $('s2Sb').textContent=sgn((d.S/S0-1)*100,1)+'%，入场 352.36';
+    $('s2A').textContent=d.atm.toFixed(2)+'%';
+    $('s2B').textContent=sgn(d.b); $('s2K').textContent=d.a.toFixed(2); $('s2R').textContent=sgn(d.rr);
+    $('s2LgS').style.display= mode==='k'?'':'none';
+  }
+  const st={};
+  function start(){ timeline(st,n*520,e=>{ const i=Math.min(n-1,Math.floor(e/520)); if(i!==day||e===0){ day=i; draw(); } }); if(!reduced){ day=0; draw(); } }
+  segOn('s2Ax',d=>{ mode=d.v; draw(); });
+  $('s2Play').addEventListener('click',start);
+  return {start, draw};
+})();
+
+/* ══════════ 三 · 平值翻倍：乘性与加性 ══════════ */
+const SCALE=(()=>{
+  const W=640,H=330,L=54,R=622,T=20,B=270, k0=260,k1=500,y0=30,y1=126;
+  const X=k=>L+(k-k0)/(k1-k0)*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+  const P=D.S0.pts.filter(p=>p[0]>=k0&&p[0]<=k1), A=ATM0*100, p300=D.S0.pts.find(p=>p[0]===300)[1];
+  const st={};
+  function frame(e){
+    const m=1+ease(clamp((e-400)/2600));
+    let g='';
+    [40,60,80,100,120].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
+    [300,350,400,450,500].forEach(k=>g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',12));
+    g+=lab((L+R)/2,H-8,'行权价','var(--ink-soft)','middle',12.5);
+    g+=poly(P.map(p=>[X(p[0]),Y(p[1])]),'var(--ink-faint)',1.5,'stroke-dasharray="5 4"');
+    g+=poly(P.map(p=>[X(p[0]),Y(p[1]+(m-1)*A)]),'var(--result)',2,'stroke-dasharray="7 4"');
+    g+=poly(P.map(p=>[X(p[0]),Y(p[1]*m)]),'var(--control)',2.6);
+    g+=vline(X(F0),Y(A*m),B,'var(--ink-faint)',1,'2 3');
+    g+=`<circle cx="${X(F0)}" cy="${Y(A*m)}" r="4" fill="var(--ink)"/>`+lab(X(F0)+8,Y(A*m)+18,'平值 '+(A*m).toFixed(1)+'%','var(--ink)','start',12,600);
+    const vm=p300*m, va=p300+(m-1)*A;
+    g+=`<circle cx="${X(300)}" cy="${Y(vm)}" r="4.5" fill="var(--control)"/><circle cx="${X(300)}" cy="${Y(va)}" r="4.5" fill="var(--paper)" stroke="var(--result)" stroke-width="2"/>`;
+    g+=lab(X(300)+10,Y(vm)-12,'乘性 '+vm.toFixed(1)+'%','var(--control)','start',12,600);
+    g+=lab(X(300)-10,Y(va)+20,'加性 '+va.toFixed(1)+'%','var(--result)','end',12,600);
+    $('s3c').innerHTML=g;
+    $('s3A').textContent=(A*m).toFixed(1)+'%'; $('s3Ab').textContent='× '+m.toFixed(2);
+    $('s3M').textContent=vm.toFixed(1)+'%'; $('s3Mb').textContent=`高出平值 ${(vm-A*m).toFixed(1)} 点，占 ${(vm/(A*m)*100).toFixed(1)}%`;
+    $('s3P').textContent=va.toFixed(1)+'%'; $('s3Pb').textContent=`高出平值 ${(va-A*m).toFixed(1)} 点，占 ${(va/(A*m)*100).toFixed(1)}%`;
+  }
+  $('s3Play').addEventListener('click',()=>timeline(st,3200,frame));
+  return {start:()=>timeline(st,3200,frame), draw:()=>frame(st.e??3200)};
+})();
+
+/* ══════════ 四 · 热力图 ══════════ */
+function surfAt(s,k){ const K=s.k, V=s.v; if(k<K[0]||k>K[K.length-1]) return null; for(let i=1;i<K.length;i++) if(k<=K[i]){ const u=(k-K[i-1])/(K[i]-K[i-1]); return V[i-1]+u*(V[i]-V[i-1]); } return null; }
+function drawHeat(){
+  const W=640,H=300,L=96,R=566,T=16,RH=26, rows=D.SURF.length, B=T+rows*RH, k0=250,k1=470,dk=5, nc=(k1-k0)/dk+1;
+  const cw=(R-L)/nc, X=k=>L+(k-k0)/dk*cw;
+  const v0=35,v1=90, col=v=>`color-mix(in oklch,var(--control) ${(10+90*clamp((v-v0)/(v1-v0))).toFixed(0)}%,var(--panel))`;
+  let g='';
+  D.SURF.forEach((s,r)=>{
+    const y=T+r*RH;
+    for(let c=0;c<nc;c++){ const v=surfAt(s,k0+c*dk); if(v===null) continue;
+      g+=`<rect x="${(L+c*cw).toFixed(1)}" y="${y}" width="${(cw+.4).toFixed(1)}" height="${RH-1}" style="fill:${col(v)}"/>`; }
+    g+=lab(L-8,y+RH/2+4,FK>1?`${s.n} 天`:`${s.e} · ${s.n} 天`,'var(--ink-soft)','end',12);
+    g+=lab(R+10,y+RH/2+4,s.atm.toFixed(2)+'%',s.n===11?'var(--control)':'var(--ink)','start',12,s.n===11?600:400);
+  });
+  g+=lab(R+10,T-4,'平值','var(--ink-faint)','start',11);
+  g+=vline(X(S0)+cw/2,T-4,B+4,'var(--ink)',1.2,'3 3');
+  [250,300,350,400,450].forEach(k=>g+=lab(X(k)+cw/2,B+18,k,'var(--ink-faint)','middle',12));
+  g+=lab(X(S0)+cw/2+4,B+34,'TSLA 352.36','var(--ink-soft)','start',11.5);
+  g+=lab(R+10,B+18,'行权价','var(--ink-soft)','start',12);   // 放在刻度那一行的右端，手机上不压 250
+  // 图例
+  const lx=L, ly=H-18, lw=200;
+  for(let i=0;i<40;i++) g+=`<rect x="${lx+i*lw/40}" y="${ly}" width="${lw/40+.5}" height="9" style="fill:${col(v0+(v1-v0)*i/39)}"/>`;
+  [40,60,80].forEach(v=>g+=lab(lx+(v-v0)/(v1-v0)*lw,ly-4,v+'%','var(--ink-faint)','middle',11));
+  g+=lab(lx+lw+10,ly+9,'隐含波动率','var(--ink-faint)','start',11.5);
+  $('s4h').innerHTML=g;
+}
+
+/* ══════════ 四 · 8 条微笑叠成一条 ══════════ */
+const MORPH=(()=>{
+  const W=640,H=330,L=58,R=622,T=26,B=262, k0=250,k1=470, x0=-1.25,x1=1.0;
+  const S=D.SURF, nS=S.length;
+  const ya0=30, ya1=90, yb0=0.95, yb1=2.1;
+  const st={};
+  function frame(e){
+    const v=ease(clamp((e-1400)/1700)), u=ease(clamp((e-4000)/1900));
+    const Xs=k=>L+(k-k0)/(k1-k0)*(R-L), Xn=x=>L+(x-x0)/(x1-x0)*(R-L);
+    const ybH=lerp(yb1,1.5,u);
+    const Ya=w=>B-(w-ya0)/(ya1-ya0)*(B-T), Yb=w=>B-(w-yb0)/(ybH-yb0)*(B-T);
+    let g=`<defs><clipPath id="s4clip"><rect x="${L}" y="${T-4}" width="${R-L}" height="${B-T+8}"/></clipPath></defs>`;
+    // 纵轴刻度：两套交替
+    [40,60,80].forEach(w=>{ g+=`<g opacity="${(1-v).toFixed(2)}">`+hline(L,R,Ya(w),'var(--rule)')+lab(L-8,Ya(w)+4,w+'%','var(--ink-faint)','end',12)+'</g>'; });
+    [1,1.2,1.4,1.6,1.8,2].filter(w=>w<=ybH+1e-9).forEach(w=>{ g+=`<g opacity="${v.toFixed(2)}">`+hline(L,R,Yb(w),'var(--rule)')+lab(L-8,Yb(w)+4,(w*100).toFixed(0)+'%','var(--ink-faint)','end',12)+'</g>'; });
+    [300,350,400,450].forEach(k=>g+=`<g opacity="${(1-u).toFixed(2)}">`+lab(Xs(k),B+18,k,'var(--ink-faint)','middle',12)+'</g>');
+    [-1,-0.5,0,0.5,1].forEach(x=>g+=`<g opacity="${u.toFixed(2)}">`+lab(Xn(x),B+18,x===0?'0':fm(x,1),'var(--ink-faint)','middle',12)+'</g>');
+    g+=lab((L+R)/2,H-18,u<0.5?'行权价':'ln(X/S) ÷ √t','var(--ink-soft)','middle',12.5);
+    if(FK===1) g+=`<text transform="translate(14 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">${v<0.5?'隐含波动率':'隐含波动率 ÷ 平值'}</text>`;
+    g+=`<g clip-path="url(#s4clip)">`;
+    S.forEach((s,i)=>{
+      const t=s.n/365, c=`color-mix(in oklch,var(--result) ${(45+55*i/(nS-1)).toFixed(0)}%,var(--panel))`;
+      const pts=[];
+      s.k.forEach((k,j)=>{ const xn=Math.log(k/S0)/Math.sqrt(t); const px=lerp(Xs(k),Xn(xn),u), py=lerp(Ya(s.v[j]),Yb(s.v[j]/s.atm),v); pts.push([px,py]); });
+      g+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:${c}"/>`;
+    });
+    g+='</g>';
+    const stage= e<1400?'① 原始：行权价 × 隐含波动率' : e<4000?'② 纵轴除以各自的平值' : '③ 横轴换成 ln(X/S) ÷ √t';
+    g+=lab(L+8,T-8,stage,'var(--control)','start',13,600);
+    if(e>=3100 && e<4000) g+=vline(Xs(330),T,B,'var(--control)',1.2,'3 3')+lab(Xs(330)+5,T+14,'330','var(--control)','start',12);
+    if(e>=5900){ [-1,-0.3].forEach(x=>{ g+=vline(Xn(x),T,B,'var(--control)',1.2,'3 3')+lab(Xn(x)+5,T+14,fm(x,1),'var(--control)','start',12); }); }
+    $('s4m').innerHTML=g;
+    $('s4Say').textContent= e<4000 ? (e>=3100?'行权价 330：8 条线占平值从 103.3% 到 122.4%。高度对齐了，宽度还没有：近到期的线更窄、更陡。':'') :
+      (e>=5900?'ln(X/S)/√t = −0.3：8 条线占平值只从 104.1% 到 108.0%。−1.0：仍是 118.0% 到 140.5%，最高的是 7 天那条。':'');
+  }
+  $('s4Play').addEventListener('click',()=>timeline(st,6200,frame));
+  return {start:()=>timeline(st,6200,frame), draw:()=>frame(st.e??6200)};
+})();
+
+/* ══════════ 五 · 讲义算例：价格分两步 ══════════ */
+const WF=(()=>{
+  const W=640, st={};
+  const cases=[
+    {t:'95 put',lo:1.60,hi:2.10,v:[2.00,1.75,1.82],d1:'① 按模型 delta：−0.25 × 1',d2:'② 隐含 26.0% → 27.0%：+1 × 0.07',r1:'偏斜 delta = (1.82 − 2.00) ÷ 1 = −0.18',r2:'模型 delta −0.25'},
+    {t:'105 call',lo:2.20,hi:2.60,v:[2.30,2.47,2.39],d1:'① 按模型 delta：+0.17 × 1',d2:'② 隐含 21% → 20.5%：−0.5 × 0.16',r1:'偏斜 delta = (2.39 − 2.30) ÷ 1 = +0.09',r2:'模型 delta +0.17'}
+  ];
+  function frame(e){
+    const stack=FK>1, CH=392, H=stack?28+2*CH:350;
+    $('s5w').setAttribute('viewBox',`0 0 ${W} ${H}`);
+    let g='';
+    g+=lab(W/2,18,'标的 100 → 101','var(--ink)','middle',13,600);
+    cases.forEach((c,ci)=>{
+      const x0=stack?20:(ci?330:20), x1=stack?620:(ci?620:310), oy=stack?28+ci*CH:0, q=stack?FK:1;
+      const T=oy+58+(q-1)*14, B=oy+196;
+      const Y=p=>B-(p-c.lo)/(c.hi-c.lo)*(B-T), cx=[x0+44*q,x0+(x1-x0)/2,x1-44*q], mid=(x0+x1)/2;
+      g+=lab(mid,T-22*q,c.t,'var(--control)','middle',13,600);
+      g+=hline(x0,x1,B+10,'var(--rule)',1);
+      ['原价','按模型 delta','加上隐含的变化'].forEach((t,i)=>g+=lab(cx[i],B+28*q,t,'var(--ink-faint)','middle',11.5));
+      const u1=ease(clamp((e-600)/900)), u2=ease(clamp((e-2200)/900));
+      if(e>=600){ g+=`<line x1="${cx[0]}" y1="${Y(c.v[0])}" x2="${lerp(cx[0],cx[1],u1)}" y2="${lerp(Y(c.v[0]),Y(c.v[1]),u1)}" stroke="var(--ink-soft)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+        g+=lab(mid,B+54*q,c.d1,'var(--ink-soft)','middle',11.5); }
+      if(e>=2200){ g+=`<line x1="${cx[1]}" y1="${Y(c.v[1])}" x2="${lerp(cx[1],cx[2],u2)}" y2="${lerp(Y(c.v[1]),Y(c.v[2]),u2)}" stroke="var(--control)" stroke-width="2" stroke-dasharray="4 3"/>`;
+        g+=lab(mid,B+74*q,c.d2,'var(--control)','middle',11.5); }
+      const shown=[true, e>=1500, e>=3100];
+      c.v.forEach((p,i)=>{ if(!shown[i]) return; g+=`<circle cx="${cx[i]}" cy="${Y(p)}" r="5.5" fill="${i===2?'var(--control)':'var(--ink)'}"/>`+lab(cx[i],Y(p)-11,p.toFixed(2),i===2?'var(--control)':'var(--ink)','middle',12.5,600); });
+      if(e>=3500){ g+=lab(mid,B+100*q,c.r1,'var(--control)','middle',12,600)+lab(mid,B+118*q,c.r2,'var(--ink-soft)','middle',11.5); }
+    });
+    g+= stack ? hline(20,620,28+CH-6,'var(--rule)',1) : vline(W/2,28,H-8,'var(--rule)',1);
+    $('s5w').innerHTML=g;
+  }
+  $('s5Play').addEventListener('click',()=>timeline(st,3800,frame));
+  return {start:()=>timeline(st,3800,frame), draw:()=>frame(st.e??3800)};
+})();
+
+/* ══════════ 五 · 表与实测 ══════════ */
+function drawDelta(){
+  $('skdTb').innerHTML=D.SKD.map(r=>`<tr${r[1]===0.25?' class="hot"':''}><td class="nw">${Math.round(r[1]*100)}Δ ${r[0]}</td><td>${r[2].toFixed(1)}</td><td>${r[3].toFixed(2)}%</td><td>${sgn(r[4],3)}</td><td>${sgn(r[6],3)}</td><td>${sgn(r[7],3)}</td><td>${(r[7]/r[4]*100).toFixed(0)}%</td></tr>`).join('');
+  const W=640,H=310,L=58,R=622,T=20,B=250, y0=40,y1=130, M=D.MEAS;
+  const bk=[...new Set(M.map(r=>r[1]))], nb=bk.length;
+  const X=i=>L+(i+0.5)/nb*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
+  let g='';
+  [40,60,80,100,120].forEach(v=>{ g+=hline(L,R,Y(v),v===100?'var(--ink-faint)':'var(--rule)',v===100?1.4:.8); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
+  g+=lab(L+4,Y(100)-6,'和模型一样','var(--ink-faint)','start',11.5);
+  bk.forEach((b,i)=>{ const [a,c]=b.split('–').map(Number); g+=lab(X(i),B+18,`${Math.round(a*100)} 到 ${Math.round(c*100)}`,'var(--ink-faint)','middle',12); });
+  g+=lab((L+R)/2,B+40,'模型 delta 的绝对值（× 100）','var(--ink-soft)','middle',12);
+  [['put','var(--control)',-7],['call','var(--result)',7]].forEach(([side,c,dx])=>{
+    const rows=bk.map(b=>M.find(r=>r[0]===side&&r[1]===b));
+    g+=poly(rows.map((r,i)=>[X(i)+dx,Y(r[4]/r[3]*100)]),c,1.4);
+    rows.forEach((r,i)=>{
+      const ym=Y(r[4]/r[3]*100), yp=Y(r[5]/r[3]*100);
+      g+=side==='put'?`<circle cx="${X(i)+dx}" cy="${ym}" r="5" fill="${c}"/>`:`<rect x="${X(i)+dx-4.5}" y="${ym-4.5}" width="9" height="9" fill="${c}"/>`;
+      g+=side==='put'?`<circle cx="${X(i)+dx}" cy="${yp}" r="5" fill="var(--panel)" stroke="${c}" stroke-width="2"/>`:`<rect x="${X(i)+dx-4.5}" y="${yp-4.5}" width="9" height="9" fill="var(--panel)" stroke="${c}" stroke-width="2"/>`;
+    });
+  });
+  const pc=M.find(r=>r[0]==='call'&&r[1].startsWith('0.20')), pp=M.find(r=>r[0]==='put'&&r[1].startsWith('0.02'));
+  g+=lab(X(3)+7,Y(pc[4]/pc[3]*100)-12,'call 实测 '+(pc[4]/pc[3]*100).toFixed(0)+'%','var(--result)','middle',12,600);
+  g+=lab(X(0)+14,Y(pp[4]/pp[3]*100)+4,'put 实测 '+(pp[4]/pp[3]*100).toFixed(0)+'%','var(--control)','start',12,600);
+  $('s5m').innerHTML=g;
+}
+
+/* ══════════ 六 · 蝶式一张张算出分布（像素画布） ══════════ */
+const BF=(()=>{
+  const W=264,H=138, X0=11, BW=3, BASE=124, PX=0.00045;   // 每格 3 像素，每像素 0.045%
+  const cv=$('bfcv'), c=cv.getContext('2d');
+  const K0=D.BF.k0, DK=D.BF.dk, nb=D.BF.fit.length, DF=1/(1+RATE*T0);
+  let mode='fit', s={i:nb, f:0};
+  const data=()=>D.BF[mode];
+  const xOf=i=>X0+i*BW;
+  const kx=k=>X0+(k-K0)/DK*BW+1;
+  function draw(){
+    const P=data(), done=Math.min(nb,Math.floor(s.i)), part=s.i-done;
+    c.fillStyle=C.bg; c.fillRect(0,0,W,H);
+    c.fillStyle=C.rule; c.fillRect(X0-2,BASE+1,nb*BW+3,1);
+    for(let k=200;k<=600;k+=50){ c.fillStyle=C.faint; c.fillRect(Math.round(kx(k)),BASE+2,1,k%100===0?4:2); }
+    c.fillStyle=C.good; for(let y=6;y<BASE;y+=2) c.fillRect(Math.round(kx(422.32)),y,1,1);
+    c.fillStyle=C.faint; c.fillRect(Math.round(kx(S0)),BASE+7,1,3);
+    for(let i=0;i<nb;i++){
+      if(i>done) break;
+      const p=P[i], h=Math.round(Math.abs(p)/PX)*(i<done?1:clamp(part*1.2));
+      c.fillStyle= p<0 ? C.ctl : C.ink;
+      if(p>=0) c.fillRect(xOf(i),BASE-Math.round(h)+1,2,Math.round(h)); else c.fillRect(xOf(i),BASE+2,2,Math.max(1,Math.round(h)));
+    }
+    if(done>=nb){ c.fillStyle=C.res; D.BF.ln.forEach((p,i)=>{ const y=BASE-Math.round(p/PX)+1; c.fillRect(xOf(i),y,2,1); }); }
+    const i=Math.min(nb-1,done), K=K0+i*DK, p=P[i];
+    $('bfK').textContent='中心 '+K; $('bfKb').textContent=`${K-5} / ${K} / ${K+5}，价格 ${(p*5*DF).toFixed(3)}`;
+    $('bfP').textContent=(p*100).toFixed(2)+'%'; $('bfPb').textContent='对数正态 '+(D.BF.ln[i]*100).toFixed(2)+'%';
+    const sum=P.slice(0,Math.min(nb,done+1)).reduce((a,b)=>a+b,0), neg=P.slice(0,Math.min(nb,done+1)).filter(x=>x<0).length;
+    $('bfN').textContent=`${Math.min(nb,done+1)} / ${nb}`; $('bfNb').textContent=`合计 ${(sum*100).toFixed(1)}%，负数 ${neg} 张`;
+  }
+  function start(){
+    if(reduced){ s.i=nb; draw(); return; }
+    s.i=0; runLoop(s,16.7,()=>{ s.i=Math.min(nb,s.i+16.7/70); },draw,()=>s.i>=nb);
+  }
+  segOn('bfMode',d=>{ mode=d.v; start(); });
+  $('bfPlay').addEventListener('click',start);
+  // 横轴刻度（HTML，位置按比例）
+  $('bfScale').innerHTML=[200,300,400,500,600].map(k=>`<span style="left:${(kx(k)/W*100).toFixed(2)}%">${k}</span>`).join('');
+  return {start, draw, fit:()=>fitCanvas(cv,W,H), cv};
+})();
+function drawBk(){
+  $('bkTb').innerHTML=D.BF.bk.map(([lo,hi,m,l])=>{
+    const t= lo===0?`${hi} 以下`: hi===0?`${lo} 以上`:`${lo} 到 ${hi}`;
+    return `<tr><td>${t}</td><td>${(m*100).toFixed(1)}%</td><td>${(l*100).toFixed(1)}%</td><td${Math.abs(m-l)>0.01?' class="max"':''}>${sgn((m-l)*100,1)}</td></tr>`;
+  }).join('');
+}
+
+/* ══════════ 八 · 费曼检验 ══════════ */
+const QS=[
+ {q:`如果市场完全相信 Black-Scholes，同一个到期日各个行权价的隐含波动率应该画成什么形状？TSLA 4/13 实际画出来是什么形状，这说明市场相信什么？`,
+  a:['Black-Scholes 对一个标的只用一个 σ，同一到期日每张期权反推出来的 σ 都该一样，画出来是一条水平线。',
+     'TSLA 实际是一条微笑：200 的 put 86.5%，平值 46%，500 的 call 53.5%，两头高，左头更高。',
+     '两头高，说明市场认为大涨大跌比钟形算的多（正峰度）；左头更高，说明市场认为大跌比大涨更可能、更猛（负偏）。',
+     '这正是 7 讲的两条假设失效：分布两头长，下跌时波动更大。'],
+  s:'「因为虚值期权便宜，大家爱买」：只说了需求，没说出曲线形状对应的是市场眼中的分布。'},
+ {q:`y = a z² + b z + c 的三个数各管什么？为什么 ±25 delta 的期权对 b 最敏感、±5 delta 的对 a 最敏感、平值对 c 最敏感？`,
+  a:['c 是整体高度，b 是倾斜（每个标准差加减几个点），a 是弯曲（离中心 z 个标准差加 a·z² 个点）。',
+     '某个数加 1 点，一张期权的隐含波动率分别变 1、z、z² 个点；价格变化再乘上这张期权的 vega。',
+     'vega 在平值最大、往两边变小，z 在平值是 0、往两边变大，乘积的峰落在中间某处：对 b 峰在 z = 1（约 16 delta），对 a 峰在 z = √2（约 8 delta）。',
+     '在作业的 5、25、50 三档里，所以是 25 对 b 最敏感、5 对 a 最敏感、50 对 c 最敏感。'],
+  s:'「因为 25 delta 在中间」：没有说出 vega 和距离两个量一增一减相乘的道理。'},
+ {q:`讲义例子里平值从 20% 翻倍到 40%，90 的隐含波动率变成多少？如果你把 skew 记成「90 比平值贵 5 个点」，平值翻倍那天会错在哪？`,
+  a:['skew 是乘性的：90 占平值 125% 不变，所以变成 50%。',
+     '点差跟着翻倍，从 5 个点变成 10 个点。',
+     '按固定 5 个点记，你会以为 90 是 45%，低估 5 个点；拿它定价或对冲，翼会被系统性地算便宜。',
+     'TSLA 4/13 推算同样如此：300 的 put 按乘性是 102.2%，按加性只有 97.2%。'],
+  s:'「形状不变，所以还是贵 5 个点」：形状不变说的是比例不变，点数会跟着缩放。'},
+ {q:`同一个比现价低 6% 的 put，7 天到期和 32 天到期，哪个更「虚值」？为什么画曲面要把横轴换成 ln(X/S)/√t？`,
+  a:['7 天到期的更虚值。7 天里能走的典型幅度只有 32 天的 √(7/32)，同样 6% 的距离折成标准差个数更多（TSLA 330 put：−1.28 对 −0.51）。',
+     '离中心的标准差个数越多，越靠近翼，隐含波动率占平值越高（113.7% 对 103.3%），所以按行权价画，近到期的 skew 更陡。',
+     '除以 √t 把不同到期日的距离换成同一把尺子，8 条微笑就能叠在一起；再除以平值，高度也对齐。',
+     '叠完之后，中间段基本重合（−0.3 处 104.1% 到 108.0%），两翼仍差 20 个点左右（−1.0 处 118.0% 到 140.5%），最高的是财报前最后一个到期日。'],
+  s:'「32 天的离到期远，所以更虚值」：把时间长短和距离远近弄反了。时间越长，同样的距离越容易走到。'},
+ {q:`标的从 100 涨到 101，模型 delta −25 的 95 put 为什么只跌了 0.18？TSLA 的实测里，哪一侧符合这个结论，哪一侧不符合，为什么？`,
+  a:['按模型 delta 应跌 0.25。但标的上涨时微笑往右挪，95 更深地进入左翼，隐含波动率从 26% 升到 27%，vega 0.07 补回 0.07。',
+     '真实 delta ＝ 模型 delta ＋ vega × 隐含波动率的变化 ÷ 标的的变化，结果是 −18。',
+     'TSLA 4/13 到 5/8 每半小时的实测：put 一侧和推算几乎重合（25 delta：模型 −0.244，实测 −0.220）。',
+     'call 一侧不符合：推算应该缩小，实测反而大了约两成。这几周 TSLA 上涨时 call 那一侧的隐含波动率被抬高，微笑不只平移，形状也跟着变。'],
+  s:'「因为 put 有 theta」：一天之内的 theta 很小，这里说的是标的动 1 美元时 put 价格变多少。'},
+ {q:`为什么把每一张间距 5 的蝶式都买下来，到期一定值 5？由此怎么从期权价格读出市场心里的概率？为什么要除以间距？`,
+  a:['每张蝶式只在到期价落在它中心附近时才值钱，中心被命中时值 5。',
+     '行权价覆盖所有可能的价格时，到期价总会落在某一张的中心，一整套恒等于 5。',
+     '期权今天的价格是到期价值按概率加权的期望值再折回今天（1.1）。一张蝶式到期要么值 5、要么值 0，所以它的价格 ＝ 命中的概率 × 5，再折回今天；反过来，概率 ＝ 价格 ÷ 5 × (1 ＋ r·t)。一整套恒等于 5，说明这些概率加起来是 1。',
+     '除以间距，是因为命中时蝶式值的就是间距；间距越细，每一格装的概率越少，蝶式也越便宜。TSLA 用拟合的微笑算，81 张合计 100.0%。'],
+  s:'「蝶式越贵说明越可能赚钱」：没说出「价格是到期价值的期望值折回今天」和「蝶式到期只有 5 和 0 两种结果」这两步，就推不出价格对应概率。'},
+ {q:`你认为 TSLA 的 put 翼太贵，想只赌 skew 会变平，不赌方向、也不赌整体波动率。怎么搭？搭好以后还剩什么风险？`,
+  a:['卖低行权价的 put、买高行权价的 call（例如卖 325 put、买 390 call），vega 大致相等，一买一卖抵消 vega。',
+     '两张期权的 delta 都是正的（卖 put 是正、买 call 是正），合计约 +0.5，卖约 50 股标的补成 delta 中性。',
+     '赚钱的条件是建仓这两个行权价的隐含波动率之差变小（325 相对 390 变便宜）。这只在建仓那一刻等于 25 delta put 减 call 变小：TSLA 之后 25 delta 的差从 +3.04 变成 −3.19，但标的上涨把 325 推进了左翼深处，325 与 390 的差到 5/1 反而从 3.0 拉大到 11.1 个点。要跟着 25 delta 度量走，重新对冲时得把腿换到新的 25 delta 行权价。',
+     '中性只在建仓那一刻成立：标的一动，两条腿的 delta、vega、gamma 都变，要不断重新对冲；标的大幅上涨时 call 变成实值，这一组不再只是在赌形状。'],
+  s:'「买 call 卖 put 就行」：没有补 delta，这其实是一个看涨的合成多头。'}
+];
+(function(){
+  const box=$('feynman');
+  box.innerHTML=QS.map((x,i)=>`
+    <div class="q">
+      <div class="qn">第 ${i+1} 题</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="先用自己的话写出来。写不下去的地方，就是还没懂的地方。"></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">对照参考答案</button>
+        <span class="qmark" id="fmk${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>一个站得住的回答，至少要走到这几步：</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
+      </div>
+    </div>`).join('');
+  QS.forEach((_,i)=>{
+    const t=$('fq'+i);
+    try{ const v=localStorage.getItem('fin580-8-q'+i); if(v) t.value=v; }catch(e){}
+    t.addEventListener('input',()=>{ try{ localStorage.setItem('fin580-8-q'+i,t.value); }catch(e){} });
+  });
+  box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
+    a.hidden=!a.hidden;
+    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
+    $('fmk'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+  }));
+})();
+
+
+/* ══════════ 导航高亮 ══════════ */
+(function(){
+  const links=[...document.querySelectorAll('nav a')];
+  const secs=links.map(a=>$(a.getAttribute('href').slice(1))).filter(Boolean);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      links.forEach(a=>a.classList.toggle('on', a.getAttribute('href').slice(1)===e.target.id));
+    }});
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+
+/* ══════════ 主题 ══════════ */
+$('themeBtn').addEventListener('click',()=>{
+  const dark = document.documentElement.dataset.theme
+    ? document.documentElement.dataset.theme==='dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark?'light':'dark';
+  recolor();
+});
+function recolor(){ readColors(); BF.draw(); drawS0(); drawHeat(); drawSens(); drawDelta(); BUILD.draw(); REPLAY.draw(); SCALE.draw(); MORPH.draw(); WF.draw(); }
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if(!document.documentElement.dataset.theme) recolor(); });
+NARROW.addEventListener('change',e=>{ FK=e.matches?1.45:1; recolor(); });
+
+/* ══════════ 启动 ══════════ */
+readColors();
+BF.fit(); addEventListener('resize',BF.fit);
+drawS0(); drawSens(); drawHeat(); drawDelta(); drawBk();
+BUILD.draw(); REPLAY.draw(); SCALE.draw(); MORPH.draw(); WF.draw(); BF.draw();
+/* 滚到眼前才开始播放 */
+onView($('s1c'),BUILD.start); onView($('s2c'),REPLAY.start); onView($('s3c'),SCALE.start);
+onView($('s4m'),MORPH.start); onView($('s5w'),WF.start); onView(BF.cv,BF.start);
+</script>
+<script src="course-nav.js"></script>
+</body>
+</html>

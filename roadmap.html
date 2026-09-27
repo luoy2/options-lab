@@ -279,15 +279,15 @@ const NODES=[
  can:['拿一张缺了四个价格的报价表，先用 box 反推利率、再用 parity 反推股价、逐格补齐','做相对价值套利，而不是赌方向'],
  src:'S6 + S7',link:'station-5-3-box-roll-collar.html'},
 
-{id:'7',col:2,row:12,st:'todo',t:'模型假设怎么崩',d:'两条路在这里合流',deps:['6','5.3'],
+{id:'7',col:2,row:12,st:'done',t:'模型假设怎么崩',d:'两条路在这里合流',deps:['6','5.3'],
  teach:['四条 BS 假设逐条打假：用 S&amp;P 与 Bund 的真实分布、历史波动率曲线、跳跃、down faster','替代模型：CEV 与 jump-diffusion','40% 规则：0.40 × S × σ × √t 能在心算里逼近 BS'],
  can:['知道模型在什么时候不能信，以及为什么','说清 skew 来自哪条模型假设与真实分布的差距'],
- src:'S9 前半'},
+ src:'S9 前半',link:'station-7-model-assumptions.html'},
 
-{id:'8',col:2,row:13,st:'todo',t:'skew 与波动率曲面',d:'skew、kurtosis 与曲面',deps:['7'],
+{id:'8',col:2,row:13,st:'done',t:'skew 与波动率曲面',d:'skew、kurtosis 与曲面',deps:['7'],
  teach:['skew 管一阶倾斜、kurtosis 管二阶曲率，对应 y = ax² + bx + c 的 b 与 a','±25 delta 对 skew 最敏感、±5 对 kurtosis、±50 对波动率水平','skew 是<b>乘性</b>的：波动率翻倍时点差翻倍，占平值的百分比不变','曲面两维用 ln(X/S)/√t 归一；skewed delta 与模型 delta 的偏离','蝶式法反推市场隐含的分布'],
  can:['读懂一张波动率曲面，知道每一维在说什么','算出你的真实 delta 与模型 delta 差多少：两侧虚值期权的 delta 会<b>同时</b>缩小','做 skew 与 kurtosis 交易'],
- src:'S9 后半（注意：大纲说这是 S10，实际在 S9 讲义里）'},
+ src:'S9 后半（注意：大纲说这是 S10，实际在 S9 讲义里）',link:'station-8-skew-surface.html'},
 
 {id:'M',col:1,row:14,st:'side',t:'做市报价',d:'支线 · 从交易者到做市商',deps:['8'],
  teach:['双边报价实操与边际（edge）的来源','March 95 call 的全流程实例','库存与风险管理'],

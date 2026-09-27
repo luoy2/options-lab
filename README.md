@@ -23,6 +23,8 @@
 | [5.2 parity 与 conversion](https://luoy2.github.io/options-lab/station-5-2-parity-conversion.html) | 把合成关系装上价格 |
 | [9 提前行权](https://luoy2.github.io/options-lab/station-9-early-exercise.html) | 三套判据 |
 | [5.3 box · roll · collar](https://luoy2.github.io/options-lab/station-5-3-box-roll-collar.html) | 相对价值套利 |
+| [7 模型假设怎么崩](https://luoy2.github.io/options-lab/station-7-model-assumptions.html) | 两条路在这里合流 |
+| [8 skew 与波动率曲面](https://luoy2.github.io/options-lab/station-8-skew-surface.html) | skew、kurtosis 与曲面 |
 
 每个页面都是单文件 HTML，没有构建步骤；左侧课程目录由共用的 `course-nav.js` 生成。
 
