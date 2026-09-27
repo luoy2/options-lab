@@ -184,6 +184,9 @@ tr.hot td{background:var(--control-bg)}
 .hwtab td.fb{font-size:.78rem;width:9rem;font-family:"IBM Plex Mono",ui-monospace,monospace}
 .hwtab td.work{font-size:.74rem;color:var(--ink-faint);font-family:"IBM Plex Mono",ui-monospace,monospace}
 .btnrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.3rem;align-items:center}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.2rem;margin-top:.6rem;font-size:.8rem;color:var(--ink-soft)}
+.legend i{display:inline-block;width:.8rem;height:3px;margin-right:.35rem;vertical-align:.2rem;border-radius:1px}
+tr.dim td{opacity:.3}
 .reveal{margin-top:1.4rem;padding:1.1rem 1.2rem;border-radius:9px;background:var(--result-bg);color:var(--result);font-size:.93rem;line-height:1.7}
 
 details{margin-top:1.4rem;background:var(--panel);border-radius:10px;padding:0 1.3rem}
@@ -351,14 +354,18 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
   <p>后面的课都围绕这个弯：它值多少钱，怎么随时间和价格变化，几个弯怎么拼成想要的形状。</p>
 
   <h3>你不必等到到期：期权自己也在被交易</h3>
-  <p class="sub">期权合约<b>每天都有自己的市场价格</b>，买入后随时可以卖掉平仓，不必行权买股票。大多数期权是这样平仓的。<br>下图是这 25 个交易日的真实收盘：<b>黑线是 TSLA 股价，橙线是这张期权的价格</b>。</p>
+  <p class="sub">期权合约<b>每天都有自己的市场价格</b>，买入后随时可以卖掉平仓，不必行权买股票。大多数期权是这样平仓的。下面是这 25 个交易日的真实收盘，股价和期权价按天同步走。</p>
 
   <div class="panel">
-    <div class="seg" id="pathMode" role="group">
-      <button data-m="pct" aria-pressed="true">按涨跌幅看</button>
-      <button data-m="px" aria-pressed="false">按价格看</button>
+    <div class="btnrow" style="margin-top:0">
+      <div class="seg" id="pathMode" role="group">
+        <button data-m="pct" aria-pressed="true">按涨跌幅看</button>
+        <button data-m="px" aria-pressed="false">按价格看</button>
+      </div>
+      <button class="ghost" id="pathPlay">按天回放</button>
     </div>
     <svg id="path" viewBox="0 0 720 300" role="img" aria-label="标的与期权价格走势"></svg>
+    <div class="legend"><span><i style="background:var(--ink)"></i>TSLA 股价</span><span><i style="background:var(--control)"></i>这张期权的价格</span><span><i style="background:var(--result)"></i>卖出日</span></div>
 
     <div class="ctl" style="margin-top:.8rem;max-width:28rem">
       <label><span>卖出日（拖到最右＝持到到期）</span><span class="v" id="vSell">2026-05-15</span></label>
@@ -548,6 +555,10 @@ footer{padding:2.6rem 0;color:var(--ink-faint);font-size:.9rem}
       <span class="cap">市场报出的远期价 F<sub>市</sub>。滑块粗调，右边数字框精调（也可用方向键微调）。</span>
     </div>
 
+    <div class="btnrow" style="margin-top:1rem"><button class="ghost" id="arbPlay">按时间走一遍</button><span class="tiny" id="arbDay"></span></div>
+    <svg id="arbT" viewBox="0 0 720 240" role="img" aria-label="这笔套利从今天到到期，持有成本和远期价的对比"></svg>
+    <div class="legend"><span><i style="background:var(--control)"></i><span id="lgA"></span></span><span><i style="background:var(--result)"></i>F<sub>市</sub> − S</span><span>到期时两条线的差距就是白捡的钱</span></div>
+
     <table id="cf"><thead><tr><th>套利动作</th><th>现金流</th></tr></thead><tbody></tbody></table>
 
     <div class="arbbox open" id="arbbox">
@@ -687,7 +698,7 @@ const TSLA = {
   path: CASE.days.map((d,i)=>({d, c:CASE.u[i]}))
 };
 
-const po={k:'lc', stock:false, ki:TSLA.chain.findIndex(c=>c.k===350), ST:TSLA.settle, sell:CASE.days.length-1};
+const po={k:'lc', stock:false, ki:TSLA.chain.findIndex(c=>c.k===350), ST:TSLA.settle, sell:CASE.days.length-1, reveal:CASE.days.length-1};
 const KIND={lc:'买 call',sc:'卖 call',lp:'买 put',sp:'卖 put'};
 const curK = () => TSLA.chain[po.ki];
 // 买方付卖一价，卖方收买一价，不取中间价
@@ -796,6 +807,11 @@ function drawPath(){
   const os=raw.slice(); os[n-1]= isC ? Math.max(CASE.settle-K,0) : Math.max(K-CASE.settle,0);
   const X2=i=>L+i/(n-1)*(R-L);
   const lab=(x,y,t,c,a='start',s=10.5)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
+  // 按天回放：只画到第 rv 个交易日，最后一段按小数插值
+  const rv=Math.min(n-1,po.reveal), rk=Math.floor(rv), rf=rv-rk, hx=X2(rk)+(rk<n-1?(X2(rk+1)-X2(rk))*rf:0);
+  const hv=a=> rk<n-1 ? a[rk]+(a[rk+1]-a[rk])*rf : a[rk];
+  const upto=(a,Yf)=>{ const p=[]; for(let i=0;i<=rk;i++) p.push(X2(i)+','+Yf(a[i])); if(rf>0&&rk<n-1) p.push(hx+','+Yf(hv(a))); return p.join(' '); };
+  const la= hx<(L+R)/2 ? ['start',8] : ['end',-8];
   let g=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="var(--rule)" stroke-width="1"/>`;
 
   if(pathMode==='pct'){
@@ -806,10 +822,11 @@ function drawPath(){
     g+=`<line x1="${L}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" stroke="var(--ink-faint)" stroke-width="1.2"/>`;
     g+=lab(L-8,Y(0)+4,'0%','var(--ink-faint)','end');
     [Math.max(...oo),Math.max(...uu)].forEach(v=>g+=lab(L-8,Y(v)+4,v.toFixed(0)+'%','var(--ink-faint)','end'));
-    g+=`<polyline points="${uu.map((v,i)=>X2(i)+','+Y(v)).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
-    g+=`<polyline points="${oo.map((v,i)=>X2(i)+','+Y(v)).join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
-    g+=lab(R-14,Y(oo[n-1])-9,'期权 '+(oo[n-1]>=0?'+':'')+oo[n-1].toFixed(0)+'%','var(--control)','end',11.5);
-    g+=lab(R-14,Y(uu[n-1])+16,'TSLA '+(uu[n-1]>=0?'+':'')+uu[n-1].toFixed(0)+'%','var(--ink)','end',11.5);
+    g+=`<polyline points="${upto(uu,Y)}" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${upto(oo,Y)}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+    const ho=hv(oo), hu=hv(uu), oAbove=ho>=hu;
+    g+=lab(hx+la[1],Y(ho)+(oAbove?-9:16),'期权 '+(ho>=0?'+':'−')+Math.abs(ho).toFixed(0)+'%','var(--control)',la[0],11.5);
+    g+=lab(hx+la[1],Y(hu)+(oAbove?16:-9),'TSLA '+(hu>=0?'+':'−')+Math.abs(hu).toFixed(0)+'%','var(--ink)',la[0],11.5);
     g+=`<line x1="${X2(si)}" y1="${T}" x2="${X2(si)}" y2="${B}" stroke="var(--result)" stroke-width="1.6"/>`;
     g+=`<circle cx="${X2(si)}" cy="${Y(uu[si])}" r="4.5" fill="var(--ink)"/><circle cx="${X2(si)}" cy="${Y(oo[si])}" r="4.5" fill="var(--control)"/>`;
   } else {
@@ -823,8 +840,8 @@ function drawPath(){
     [oLo,oHi].forEach(v=>g+=lab(R+8,YO(v)+4,v.toFixed(oHi<20?1:0),'var(--control)'));
     g+=`<line x1="${L}" y1="${YU(K)}" x2="${R}" y2="${YU(K)}" stroke="var(--ink-faint)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
     g+=lab(R-4,YU(K)-7,'行权价 '+kFmt(K),'var(--ink-faint)','end');
-    g+=`<polyline points="${us.map((v,i)=>X2(i)+','+YU(v)).join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
-    g+=`<polyline points="${os.map((v,i)=>X2(i)+','+YO(v)).join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${upto(us,YU)}" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>`;
+    g+=`<polyline points="${upto(os,YO)}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
     g+=`<line x1="${X2(si)}" y1="${T}" x2="${X2(si)}" y2="${B}" stroke="var(--result)" stroke-width="1.6"/>`;
     g+=`<circle cx="${X2(si)}" cy="${YU(us[si])}" r="4.5" fill="var(--ink)"/><circle cx="${X2(si)}" cy="${YO(os[si])}" r="4.5" fill="var(--control)"/>`;
   }
@@ -978,7 +995,30 @@ document.querySelectorAll('#pathMode button').forEach(b=>b.addEventListener('cli
   document.querySelectorAll('#pathMode button').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.m===pathMode)));
   drawPath();
 }));
-$('iSell').addEventListener('input',e=>{ po.sell=+e.target.value; drawPath(); renderSell(); });
+$('iSell').addEventListener('input',e=>{ pathAnim.playing=false; po.reveal=CASE.u.length-1; po.sell=+e.target.value; drawPath(); renderSell(); });
+/* 按天回放：股价和期权价一天天走出来，卖出日跟着线头走 */
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function onView(el,fn){ new IntersectionObserver((es,io)=>{ if(es[0].isIntersecting){ io.disconnect(); fn(); } },{threshold:.4}).observe(el); }
+const pathAnim={playing:false};
+function playPath(){
+  const n=CASE.u.length-1;
+  pathAnim.playing=false;
+  if(reduced){ po.reveal=n; po.sell=n; $('iSell').value=n; drawPath(); renderSell(); return; }
+  po.reveal=0; po.sell=0; $('iSell').value=0; renderSell();
+  let last=0; pathAnim.playing=true;
+  const tick=t=>{
+    if(!pathAnim.playing) return;
+    const dt=last?Math.min(t-last,100):16; last=t;
+    po.reveal=Math.min(n,po.reveal+dt/300);
+    const si=Math.floor(po.reveal);
+    if(si!==po.sell){ po.sell=si; $('iSell').value=si; renderSell(); }
+    drawPath();
+    if(po.reveal>=n){ pathAnim.playing=false; return; }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+$('pathPlay').addEventListener('click',playPath);
 $('iK').addEventListener('input',e=>{ po.ki=+e.target.value; renderPayoff(); });
 $('iST').addEventListener('input',e=>{ po.ST=+e.target.value; renderPayoff(); });
 $('btnStock').addEventListener('click',()=>{ po.stock=!po.stock; renderPayoff(); });
@@ -1155,9 +1195,13 @@ function renderArb(){
     ['期间：向出借方补付分红',-D],['到期：收到股票、付远期价',-Fm],['到期：收回本息 S(1+rt)',carry]
   ];
   const total = rows.reduce((a,[,v])=>a+v,0);
+  // 时间线走到哪，表里就亮到哪：前三行在今天，分红在期间，最后两行和合计在到期
+  const when=[0,0,0,.5,1,1], u=arbT.t;
+  const cls=i=> u<when[i] ? 'dim' : (arbT.playing && u-when[i]<.2 ? 'hot' : '');
   $('cf').querySelector('tbody').innerHTML =
-    rows.map(([k,v])=>`<tr><td>${k}</td><td class="${v>0.004?'pos':(v<-0.004?'neg':'')}">${Math.abs(v)<0.004?'0.00':s2(v)}</td></tr>`).join('')
-    + `<tr class="total"><td>合计（白捡的钱）</td><td>${s2(total)}</td></tr>`;
+    rows.map(([k,v],i)=>`<tr class="${cls(i)}"><td>${k}</td><td class="${v>0.004?'pos':(v<-0.004?'neg':'')}">${Math.abs(v)<0.004?'0.00':s2(v)}</td></tr>`).join('')
+    + `<tr class="total${u<1?' dim':''}"><td>合计（白捡的钱）</td><td>${s2(total)}</td></tr>`;
+  drawArbT(forward);
 
   $('arbnum').textContent = total.toFixed(2);
   const box=$('arbbox');
@@ -1172,10 +1216,59 @@ function renderArb(){
       : `F<sub>市</sub> 太低了。<b>买远期、卖空现货</b>并把钱存起来，无风险赚走 ${prof.toFixed(2)}。这叫 reverse cash and carry（反向持有套利）。`;
   }
 }
+/* 时间线：横轴从今天到到期，纵轴是比今天的 S 多出来的钱。
+   橙线是现货路随时间累积的持有成本（利息减分红），到期时落在 F − S；蓝线是 F市 − S */
+const arbT={t:1, playing:false};
+function drawArbT(forward){
+  const S=arb.S, r=arb.r, T=arb.days/365, D=arb.D, Fm=arb.Fm, u=arbT.t;
+  const net=x=>S*r*T*x-(x>=.5?D:0), endA=net(1), lineB=Fm-S;
+  const W=720,H=240,L=58,R=W-176,Tp=22,B=180;
+  let lo=Math.min(0,endA,lineB,S*r*T*.5-D), hi=Math.max(0,S*r*T,lineB);
+  const pad=Math.max((hi-lo)*.15,.3); lo-=pad; hi+=pad;
+  const X=x=>L+x*(R-L), Y=v=>B-(v-lo)/(hi-lo)*(B-Tp);
+  const t=(x,y,s,c,a='start',z=11)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${z}" fill="${c}" font-family="IBM Plex Mono,monospace">${s}</text>`;
+  let g=`<line x1="${L}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" stroke="var(--rule)" stroke-width="1.2"/>`;
+  g+=t(L-8,Y(0)+4,'0','var(--ink-faint)','end');
+  g+=t(L,B+22,'今天','var(--ink-faint)','start',10.5)+t(R,B+22,'到期，第 '+arb.days+' 天','var(--ink-faint)','end',10.5);
+  if(D>0){ g+=`<line x1="${X(.5)}" y1="${Tp}" x2="${X(.5)}" y2="${B}" stroke="var(--ink-faint)" stroke-dasharray="3 4"/>`+t(X(.5),B+22,(forward?'收到':'补付')+'分红 '+D.toFixed(2),'var(--ink-faint)','middle',10.5); }
+  g+=`<line x1="${L}" y1="${Y(lineB)}" x2="${R}" y2="${Y(lineB)}" stroke="var(--result)" stroke-width="2.2"/>`;
+  g+=t(R+10,Y(lineB)+4,'F市 − S '+s2(lineB),'var(--result)','start',11);
+  const pts=[]; const seg=(a,b)=>{ for(let k=0;k<=20;k++){ const x=a+(b-a)*k/20; pts.push(X(x)+','+Y(S*r*T*x-(x>=.5&&a>=.5?D:0))); } };
+  if(u<=.5) seg(0,u); else { seg(0,.5); seg(.5,u); }
+  g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.6" stroke-linejoin="round"/>`;
+  g+=`<circle cx="${X(u)}" cy="${Y(net(u))}" r="5" fill="var(--control)"/>`;
+  if(u>=1){
+    g+=t(R+10,Y(endA)+(endA>lineB?-6:14),(forward?'持有成本 ':'利息收入 ')+s2(endA),'var(--control)','start',11);
+    const gap=Math.abs(lineB-endA);
+    if(gap>0.005){
+      g+=`<line x1="${R+4}" y1="${Y(lineB)}" x2="${R+4}" y2="${Y(endA)}" stroke="var(--ink)" stroke-width="1.6"/>`;
+      g+=t(R-6,(Y(lineB)+Y(endA))/2+4,'白捡 '+gap.toFixed(2),'var(--ink)','end',12);
+    } else g+=t(R-6,Y(endA)-10,'两线重合，套利关闭','var(--good)','end',12);
+  }
+  $('arbT').innerHTML=g;
+  $('lgA').textContent= forward ? '现货路：借钱买股的利息 − 收到的分红' : '卖空存钱的利息 − 补付的分红';
+  $('arbDay').textContent= arbT.playing ? '第 '+Math.round(u*arb.days)+' 天' : '';
+}
+function playArb(){
+  arbT.playing=false;
+  if(reduced){ arbT.t=1; renderArb(); return; }
+  arbT.t=0; let last=0; arbT.playing=true;
+  const tick=tm=>{
+    if(!arbT.playing) return;
+    const dt=last?Math.min(tm-last,100):16; last=tm;
+    arbT.t=Math.min(1,arbT.t+dt/5000);
+    if(arbT.t>=1) arbT.playing=false;
+    renderArb();
+    if(arbT.playing) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+$('arbPlay').addEventListener('click',playArb);
 function setFm(v){
   const lo=+$('iFm').min, hi=+$('iFm').max;
   arb.Fm=Math.min(hi,Math.max(lo,+v||0));
   $('iFm').value=arb.Fm.toFixed(2); $('nFm').value=arb.Fm.toFixed(2);
+  arbT.playing=false; arbT.t=1;
   renderArb();
 }
 $('iFm').addEventListener('input',e=>setFm(e.target.value));
@@ -1350,6 +1443,9 @@ syncArbRange();
 renderLab();
 renderCal();
 renderTrap();
+onView($('path'),playPath);
+onView($('arbT'),playArb);
 </script>
+<script src="course-nav.js"></script>
 </body>
 </html>
