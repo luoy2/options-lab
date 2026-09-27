@@ -229,25 +229,25 @@ const NODES=[
  can:['把一个多腿仓位压缩成四个数，一眼看出它在赌什么','估算一次市场变动会让整个组合赚亏多少'],
  src:'S4',link:'station-2-4-portfolio-greeks.html'},
 
-{id:'4.1',col:1,row:6,st:'todo',t:'动态对冲',d:'理论值是怎么被兑现的',deps:['2.4'],
+{id:'4.1',col:1,row:6,st:'done',t:'动态对冲',d:'理论值是怎么被兑现的',deps:['2.4'],
  teach:['十周重对冲全过程表：理论值 6.55、市价 5.50、逐周调仓','实现 P&amp;L +105.75 对上预测的 105.00','对冲频率的影响；轮盘赌类比'],
  can:['说清买到低于理论值的期权后，差价怎样通过对冲变成实现盈利','知道不对冲时赌的是方向而非波动率'],
- src:'S4'},
+ src:'S4',link:'station-4-1-dynamic-hedging.html'},
 
-{id:'3.1',col:3,row:6,st:'todo',t:'价差家族',d:'两条腿表达方向观点',deps:['2.4'],
+{id:'3.1',col:3,row:6,st:'done',t:'价差家族',d:'两条腿表达方向观点',deps:['2.4'],
  teach:['bull spread 与 bear spread，各有 call 版和 put 版','垂直价差的定价网格与手算成本','双判据选行权价：方向筛掉一半，vega 再从剩下的里挑'],
  can:['用两条腿把方向观点表达成风险有限的仓位','在两个候选价差之间说出该选哪个、为什么','读懂「平值腿在买方还是卖方」这句话的含义'],
- src:'S4 + S5 作业'},
+ src:'S4 + S5 作业',link:'station-3-1-spreads.html'},
 
 {id:'4.2',col:1,row:7,st:'todo',t:'gamma scalping',d:'盈亏平衡波动率',deps:['4.1'],
  teach:['break-even volatility = implied volatility，为什么这两个词说的是同一件事','gamma scalping 的现金流从哪来','买方与卖方各自在赌什么'],
  can:['用盈亏平衡波动率判断一张期权买贵了还是买便宜了','知道自己的仓位需要标的实际动多少才回本'],
  src:'S4 后半'},
 
-{id:'3.2',col:3,row:7,st:'todo',t:'波动率结构',d:'教材里出现的全部组合',deps:['3.1'],
+{id:'3.2',col:3,row:7,st:'done',t:'波动率结构',d:'教材里出现的全部组合',deps:['3.1'],
  teach:['straddle、strangle、<b>guts</b>（用实值做的 strangle）','butterfly（call 版与 put 版恒等）、iron butterfly','condor、iron condor、christmas tree（这三个只在 S5/S6 作业里出现）','ratio spread、calendar spread'],
  can:['把「要大动但不知道方向」「会横盘」这类观点翻译成具体合约','看到一串腿就能报出它的名字','算出任意组合的净成本'],
- src:'S4 讲义 + S5/S6 作业'},
+ src:'S4 讲义 + S5/S6 作业',link:'station-3-2-vol-structures.html'},
 
 {id:'6',col:1,row:8,st:'todo',t:'风险的动态演化',d:'今天中性不等于明天中性',deps:['4.2'],
  teach:['delta 随波动率上升向 50 靠拢','gamma 与 theta 在平值和虚值上的规律正好相反；vega 是唯一不分岔的','<b>四个希腊字母全为零、却仍然有巨大风险的仓位</b>'],

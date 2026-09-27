@@ -13,6 +13,9 @@
 | [2.2 gamma 与 theta](https://luoy2.github.io/options-lab/station-2-2-gamma-theta.html) | 时间换波动 |
 | [2.3 vega 与 rho](https://luoy2.github.io/options-lab/station-2-3-vega-rho.html) | 波动率与利率的敏感度 |
 | [2.4 组合希腊字母](https://luoy2.github.io/options-lab/station-2-4-portfolio-greeks.html) | 把多腿仓位压成四个数 |
+| [4.1 动态对冲](https://luoy2.github.io/options-lab/station-4-1-dynamic-hedging.html) | 理论值是怎么被兑现的 |
+| [3.1 价差家族](https://luoy2.github.io/options-lab/station-3-1-spreads.html) | 两条腿表达方向观点 |
+| [3.2 波动率结构](https://luoy2.github.io/options-lab/station-3-2-vol-structures.html) | 教材里出现的全部组合 |
 
 每个页面都是单文件 HTML，没有构建步骤；左侧课程目录由共用的 `course-nav.js` 生成。
 

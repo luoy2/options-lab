@@ -13,13 +13,13 @@
       ['2.4','组合希腊字母','station-2-4-portfolio-greeks.html'],
     ]],
     ['风险与对冲',[
-      ['4.1','动态对冲',''],
+      ['4.1','动态对冲','station-4-1-dynamic-hedging.html'],
       ['4.2','gamma scalping',''],
       ['6','风险的动态演化',''],
     ]],
     ['策略与组合',[
-      ['3.1','价差家族',''],
-      ['3.2','波动率结构',''],
+      ['3.1','价差家族','station-3-1-spreads.html'],
+      ['3.2','波动率结构','station-3-2-vol-structures.html'],
       ['3.3','四象限与选择',''],
       ['5.1','Synthetics',''],
       ['5.2','parity 与 conversion',''],
