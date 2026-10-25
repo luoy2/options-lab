@@ -481,7 +481,7 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
   <h3>450 上的 0.58 是白捡的吗</h3>
   <p>不是。parity 的推导默认期权只能在到期日行权，这叫<span class="sym" data-say="European option。只能在到期日行权。">欧式</span>。TSLA 的期权是<span class="sym" data-say="American option。到期前任何一天都可以行权。美国的个股期权都是美式。">美式</span>，买方到期前任何一天都能行权。</p>
   <p>reversal 里卖出的是 put。450 put 深度实值（TSLA 352.36，行权价 450），它的买方有理由提前行权：今天就按 450 卖出股票，拿到 450 美元现金去生息，比等 32 天划算。节点 9 专门讲这套判据：股票 put 的提前行权靠的是利息。</p>
-  <p>这项权利值多少钱，要用模型算。这里用的是<span class="sym" data-say="binomial tree，二叉树模型：把到期前的时间切成很多小步，每一步标的要么涨一格、要么跌一格，从到期那一步往回算出期权今天的价值。节点 9 会再用到。">二叉树模型</span>：把到期前的 32 天切成 2000 小步，每一步 TSLA 要么涨一格、要么跌一格，一格多大由波动率决定。从到期那一步往回算，美式 put 在每一步都比较两个数，现在行权拿到的 X − S 和继续拿着的价值，取大的；欧式 put 只能继续拿着。两者今天的价值之差，就是提前行权这项权利的价值，图里的蓝色虚线。波动率用 <span class="sym" data-say="ORATS：期权数据商。本课的期权报价、隐含波动率、未平仓量都来自它的分钟快照。">ORATS</span> 给每个行权价算出的<span class="sym" data-say="implied volatility，隐含波动率（1.2）：从市场上的期权价格反推出来的波动率，相当于市场的报价。">隐含波动率</span>，利率 4.3%。</p>
+  <p>这项权利值多少钱，要用模型算。这里用的是<span class="sym" data-say="binomial tree，二叉树模型：把到期前的时间切成很多小步，每一步标的要么涨一格、要么跌一格，从到期那一步往回算出期权今天的价值。节点 9 会再用到。">二叉树模型</span>：把到期前的 32 天切成 2000 小步，每一步 TSLA 要么涨一格、要么跌一格，一格多大由波动率决定。从到期那一步往回算，美式 put 在每一步都比较两个数，现在行权拿到的 X − S 和继续拿着的价值，取大的；欧式 put 只能继续拿着。两者今天的价值之差，就是提前行权这项权利的价值，图里的蓝色虚线。波动率用报价快照给每个行权价算出的<span class="sym" data-say="implied volatility，隐含波动率（1.2）：从市场上的期权价格反推出来的波动率，相当于市场的报价。">隐含波动率</span>，利率 4.3%。</p>
   <p id="amSay"></p>
   <p>平值附近这块也不是 0。350 的提前行权价值是 0.08：put 因此贵了 0.08，C − P 就低了 0.08，1.1 从 C − P 反解出的利率跟着偏低，折成利率约 0.25 个百分点。340 到 360 五个行权价都加回这一块，反解出的 4.10% 到 4.43% 变成 4.46% 到 4.62%，行权价之间的差距也缩小一半。所以 1.1 反解出的利率略微偏低；全课用的 4.3% 就是从这些美式报价反解出来的，里面已经含着这一小块。</p>
   <p>讲义那道 131.60 对 131.25 的例题说的是同一件事：parity 对不上时，先查输入。利率用得对不对，分红对不对，期权是欧式还是美式，股票借不借得到，报价是不是同一时刻。这些都查过还对不上，才轮到「市场错了」。</p>
@@ -539,7 +539,7 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
   <p>讲义的配套问答：恰好平值的期权，在到期那一刻理论价值是 0；有人还去行权它，理由是交易成本（行权换股票可能比在市场上买卖便宜）。所以对手会不会行权，没有理论答案。讲义给的是实务答案：<b>不要把平值空头期权带到到期</b>，收盘前把它买回来，代价大概是一个买卖价差。</p>
   <p>讲义还提到一个现象：临近到期，平值的 conversion 和 reversal 常按 C − P ＝ S − X 这个价成交（讲义叫 <span class="sym" data-say="even money：按 C − P ＝ S − X 成交平值的 conversion 或 reversal，不算利息。临近到期利息只剩几分钱，这个价就是公平价。">even money</span>），持有的人借此把 pin risk 交给对手。讲义问：你该不该接？要看你手里的头寸和多数人一样还是相反。相反的话，接下这笔正好把自己的头寸平掉，自己的 pin risk 也没了，可以按 even money 接；一样的话，接过来等于同样的风险再加一份，要对方让价才值得接。</p>
   <p>只有行权会产生标的头寸时才有 pin risk。<span class="sym" data-say="cash settlement。到期不交割标的，按结算价差额付现金。">现金结算</span>的品种没有：SPX、NDX、RUT 这类指数期权，以及季月到期的股指期货期权，到期只按差额付钱，不会留下股票或期货头寸。</p>
-  <p class="tiny">数据：IBKR 分钟线（美东时间，含盘后），每分钟取收盘；16:00 那一点用官方收盘价 422.32，与分钟线差几分钱。期权报价与未平仓量：ORATS 5/15 分钟快照。自动行权的门槛见 OCC 规则 805（exercise by exception，实值 0.01 美元）；到期日 17:30 的改主意截止时间见 FINRA 规则 2360(b)(23)(A)，券商常把自己客户的截止时间定得更早。</p>
+  <p class="tiny">数据：分钟线（美东时间，含盘后），每分钟取收盘；16:00 那一点用官方收盘价 422.32，与分钟线差几分钱。期权报价与未平仓量：5/15 的期权分钟快照。自动行权的门槛见 OCC 规则 805（exercise by exception，实值 0.01 美元）；到期日 17:30 的改主意截止时间见 FINRA 规则 2360(b)(23)(A)，券商常把自己客户的截止时间定得更早。</p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
@@ -614,10 +614,10 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
       <div class="gl"><div class="s">butterfly / iron butterfly</div><div class="t">买 1 卖 2 买 1 三个等距行权价 / 买中间的 straddle、卖两翼的 strangle（3.2）。两者之和到期固定值行权价间距（5.1）。</div></div>
       <div class="gl"><div class="s">期货</div><div class="t">约定到期按今天定下的价格买卖标的的合约，不付全款，盈亏每天用现金结清。</div></div>
       <div class="gl"><div class="s">保证金账户</div><div class="t">交易期货时放在经纪商那里的钱，期货的盈亏每天从这里扣或存进来。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权价格反推出的波动率（1.2）。本页的二叉树用 ORATS 给每个行权价算的值。</div></div>
+      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权价格反推出的波动率（1.2）。本页的二叉树用报价快照给每个行权价算的值。</div></div>
       <div class="gl"><div class="s">二叉树模型</div><div class="t">把到期前的时间切成很多小步，每步标的涨一格或跌一格，从到期往回算期权今天的价值。美式 put 每一步都比较「现在行权」和「继续拿着」。</div></div>
       <div class="gl"><div class="s">提前行权价值</div><div class="t">美式 put 比同样条件的欧式 put 多出的价值，本页用二叉树算。它让 C − P 偏低，从 parity 反解的利率随之偏低。</div></div>
-      <div class="gl"><div class="s">ORATS</div><div class="t">期权数据商，本课的期权报价、隐含波动率、未平仓量都来自它的分钟快照。</div></div>
+      <div class="gl"><div class="s">报价快照</div><div class="t">本页 TSLA 的真实买卖价、隐含波动率和未平仓量来自历史期权报价快照，按分钟记录。</div></div>
       <div class="gl"><div class="s">欧式 / 美式</div><div class="t">只能在到期日行权 / 到期前任何一天都能行权。parity 的等式按欧式推导。</div></div>
       <div class="gl"><div class="s">指派</div><div class="t">卖出期权的一方被对手行权选中，必须履约。</div></div>
       <div class="gl"><div class="s">未平仓量</div><div class="t">还没平掉的合约张数。</div></div>
@@ -636,7 +636,7 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
 <footer>
   <p>下一节 <a href="station-5-3-box-roll-collar.html"><b>5.3 box · roll · collar</b></a>：两个行权价上的 conversion 与 reversal 拼成 box，反推无风险利率；两个到期月拼成 roll，只剩持有成本；collar 用卖 call 的钱付 put。另一条分支是 <a href="station-9-early-exercise.html"><b>9 提前行权</b></a>：第四节那几个深度实值 put 为什么会被提前行权，三套判据。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照，价格来自 IBKR 分钟线</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
 </footer>
 
 </div>
@@ -676,12 +676,12 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 /* ══════════ 案例数据 ══════════
    由 scripts/data/station_5_2.py 生成，重跑加 --inject 会整段替换。
-   CONV：4/13 收盘 TSLA 与 5/15 到期 350 call / put 的买一、卖一（ORATS 16:00 快照）。
+   CONV：4/13 收盘 TSLA 与 5/15 到期 350 call / put 的买一、卖一（16:00 报价快照）。
    EXF：讲义 put-call parity 填空练习（r = 0，D = 0），null 是要填的格。
    CH.rows：[行权价, call 买一, call 卖一, put 买一, put 卖一, put 提前行权价值]，4/13 收盘，5/15 到期；
-            最后一列是模型值：CRR 二叉树 2000 步，σ 取 ORATS smv_vol，美式 put 减欧式 put。
-   PIN：5/15 15:00–15:59 每分钟收盘（IBKR）加官方收盘 422.32；ah 是 16:00–17:30 的分钟收盘；mon 是 5/18 开盘；
-        optc / optp 是 422.5 call / put 每分钟中间价（ORATS，15:00–16:00）；q 是 15:59 三个行权价的报价与未平仓量。 */
+            最后一列是模型值：CRR 二叉树 2000 步，σ 取平滑隐含波动率，美式 put 减欧式 put。
+   PIN：5/15 15:00–15:59 每分钟收盘（分钟线）加官方收盘 422.32；ah 是 16:00–17:30 的分钟收盘；mon 是 5/18 开盘；
+        optc / optp 是 422.5 call / put 每分钟中间价（报价快照，15:00–16:00）；q 是 15:59 三个行权价的报价与未平仓量。 */
 /* data:start */
 const CONV={"S":352.36,"K":350,"cb":21.0,"ca":21.1,"pb":17.35,"pa":17.45,"days":32,"r":0.043};
 const EXF=[[100.0,100,5.0,null],[100.0,110,null,12.0],[null,105,4.5,2.5],[106.4,null,18.0,1.6],[44.75,40,6.25,null],[44.75,45,null,2.5],[null,45,6.15,2.9],[48.0,null,1.0,8.0],[1460.0,1500,55.0,null],[null,1475,35.25,34.5],[1430.5,1450,null,29.5],[1452.0,null,38.0,11.0]];
@@ -1082,7 +1082,7 @@ const PINR=(()=>{
     $('pnTb').textContent= isMon?'5/18 开盘' : m<60?'正常交易时段':m===60?'收盘':'收盘后';
     const px=isMon?PIN.mon:cur;
     $('pnS').textContent=f2(px); $('pnSb').textContent=`离 422.5 ${sgn(px-K)}`;
-    if(!isMon && m<=60){ $('pnO').textContent=`${f2(PIN.optc[m])} / ${f2(PIN.optp[m])}`; $('pnOb').textContent=m===60?'16:00 快照':'ORATS 分钟快照'; }
+    if(!isMon && m<=60){ $('pnO').textContent=`${f2(PIN.optc[m])} / ${f2(PIN.optp[m])}`; $('pnOb').textContent=m===60?'16:00 快照':'分钟报价快照'; }
     else { $('pnO').textContent='停止交易'; $('pnOb').textContent='股票期权 16:00 收盘'; }
     $('pnX').textContent=crosses(m);
     const d=$('pnDo');

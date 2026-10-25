@@ -361,7 +361,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   </div>
   <p>前一条是第一节的寿命判据，后一条叫<b>次日判据</b>。两条都成立才今天行权；寿命判据成立而次日判据不成立，就再等。</p>
   <p>470 put 卡在第二条上：利息 1.77 远大于 call 的 0.61，但一天利息 0.0554 小于 call 一天衰减 0.0590，再等。</p>
-  <p class="tiny">theta 是模型值：先从 call 中间价反推隐含波动率，再用 Black-Scholes 算每个日历日的 theta。ORATS 数据里的 theta 列对深度虚值 call 偏小（470 call 是 −0.0376），和它自己的价格对不上，没有采用。</p>
+  <p class="tiny">theta 是模型值：先从 call 中间价反推隐含波动率，再用 Black-Scholes 算每个日历日的 theta。报价快照里的 theta 列对深度虚值 call 偏小（470 call 是 −0.0376），和它自己的价格对不上，没有采用。</p>
 
   <h3>逐日回放</h3>
   <p>同一张 put，判定每天都可能变：TSLA 一涨，伴随 call 变贵；离到期越近，利息越少。</p>
@@ -620,7 +620,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <footer>
   <p>提前行权后面没有接续的节点。5.2 的另一条后续是 <a href="station-5-3-box-roll-collar.html"><b>5.3 box · roll · collar</b></a>；它和 <a href="station-6-risk-dynamics.html"><b>6 风险的动态演化</b></a> 都学完，两条路在 <a href="station-7-model-assumptions.html"><b>7 模型假设怎么崩</b></a> 合流：Black-Scholes 的几条假设放到真实分布上逐条检验。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 期权报价来自 ORATS 历史快照 · META 分红取自公司 2026-05-28 公告</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格 · META 分红取自公司 2026-05-28 公告</p>
 </footer>
 
 </div>

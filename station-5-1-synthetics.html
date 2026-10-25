@@ -341,7 +341,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p>反过来读，这张表说了一件单独有用的事：<b>同一行权价、同一到期的 call 和 put，gamma 相同，vega 也相同</b>（情形 1 是 5 和 5、0.15 和 0.15，情形 2 是 2 和 2、0.40 和 0.40）。原因在等式里，但要多走一步：〇、一两节的等式说的是到期那一刻。到期之前，call − put 等于「标的 − 行权价」再加一笔利息（下面 24 天的图里那条虚线）。这笔利息只看利率和离到期还有几天，不随 TSLA 涨跌，也不随波动率变，所以它的 gamma、vega 是 0；标的的 gamma、vega 也是 0。于是 call − put 的 gamma、vega 都是 0，call 和 put 的 gamma 只能相等，vega 也只能相等。想从标的大动里赚钱（3.3），用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。</p>
   <p>讲义的表是欧式期权。TSLA 期权是美式的，put 多一点提前行权的价值（3.1 量过：4/13 的 380 put 比按合成关系算出的欧式价贵 0.19），所以在 TSLA 上，call − put 和标的只是近似相等，gamma、vega 也只是近似相同。</p>
 
-  <h3>TSLA：ORATS 给的 delta、gamma、vega</h3>
+  <h3>TSLA：报价快照给的 delta、gamma、vega</h3>
   <div class="tbl"><table style="max-width:40rem">
     <thead><tr><th>4/13 收盘，5/15 到期</th><th>call delta</th><th>put delta</th><th>两者之差</th><th>gamma</th><th>vega</th></tr></thead>
     <tbody>
@@ -350,7 +350,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <tr><td>行权价 400</td><td>0.1954</td><td>−0.8046</td><td>1.0000</td><td>0.00591</td><td>0.2896</td></tr>
     </tbody>
   </table></div>
-  <p>这一天 ORATS 列了 161 个行权价，每一档 call delta 减 put delta 都是 1.0000。它的表里 gamma 和 vega 各只有一列，call 和 put 共用，正是因为这两个数本来相同。这些都是 ORATS 用模型算出来的，还算不上独立的证据。独立的证据是价格本身怎么动。</p>
+  <p>这一天的报价快照列了 161 个行权价，每一档 call delta 减 put delta 都是 1.0000。它的表里 gamma 和 vega 各只有一列，call 和 put 共用，正是因为这两个数本来相同。这些都是用模型算出来的，还算不上独立的证据。独立的证据是价格本身怎么动。</p>
 
   <h3>24 个交易日的真实价格</h3>
   <p>每天收盘，把 350 call 的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价，卖一减买一叫买卖价差（3.1）。">中间价</span>减去 350 put 的中间价，就是这一天合成多头的价值；把它和「TSLA 收盘 − 350」画在一起，下面单独画出两者之差：</p>
@@ -370,7 +370,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     </div>
     <div class="say plain" id="srSay"></div>
   </div>
-  <p class="tiny">数据：ORATS 快照，每天 16:00 那一行，中间价 ＝（买一 ＋ 卖一）÷ 2。5/15 到期当天按到期价值算：350 call 值 422.32 − 350 ＝ 72.32，350 put 值 0。利息按 1.1 反解出的 4.3%，单利。</p>
+  <p class="tiny">数据：历史期权报价快照，每天 16:00 那一行，中间价 ＝（买一 ＋ 卖一）÷ 2。5/15 到期当天按到期价值算：350 call 值 422.32 − 350 ＝ 72.32，350 put 值 0。利息按 1.1 反解出的 4.3%，单利。</p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
@@ -606,7 +606,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <footer>
   <p>下一节 <a href="station-5-2-parity-conversion.html"><b>5.2 parity 与 conversion</b></a>：把合成关系装上价格。合成多头比直接买股票少赚的 1.29 在 5.2 算清楚；butterfly 加 iron butterfly 的 24.95 不到 25，化简后是一个 box，在 5.3 讲。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
 </footer>
 
 </div>
@@ -648,7 +648,7 @@ const pv = (x,tau) => x/(1+RATE*tau/365);
 })();
 
 /* ══════════ 案例数据 ══════════
-   scripts/data/station_5_1.py 生成。ORATS TSLA 快照，5/15 到期，每天 16:00，中间价 = (买一 + 卖一) / 2。
+   scripts/data/station_5_1.py 生成。TSLA 期权快照，5/15 到期，每天 16:00，中间价 = (买一 + 卖一) / 2。
    SYN：4/13 至 5/15 共 25 个交易日；tau 是离 5/15 的自然日；5/15 当天按到期价值；
         lo / hi：butterfly 与买入 iron butterfly「两个都按报价卖」能收的钱与「两个都按报价买」要付的钱。
    CH：4/13 的 300 到 420 各行权价中间价（call / put）。 */

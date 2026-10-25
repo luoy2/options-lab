@@ -218,7 +218,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
   <h2><span class="n">〇</span>delta 自己会变</h2>
-  <p class="sub">4/13 收盘买入时，ORATS 给这张 350 call 的 delta 是 0.557。第二天 TSLA 涨了 11.96 美元，delta 变成 0.651；第三天又涨 27.61，delta 变成 0.807。</p>
+  <p class="sub">4/13 收盘买入时，报价快照里这张 350 call 的 delta 是 0.557。第二天 TSLA 涨了 11.96 美元，delta 变成 0.651；第三天又涨 27.61，delta 变成 0.807。</p>
   <p>1.1 算过：整段持有下来，这张 call 实际跟上了 TSLA 涨幅的 0.734，比入场时的 0.557 大，原因就是 delta 一路在变大。这一节先量它变得有多快。</p>
 
   <h3>gamma 的定义</h3>
@@ -226,7 +226,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="math"><span class="sym" data-say="gamma，读作「伽马」。标的每动 1 美元，delta 变多少。">Γ</span> ＝ <span class="sym" data-say="delta。标的动 1 美元，期权价值动多少（2.1）。call 的 delta 在 0 到 1 之间。">Δ</span> 的变化 ÷ <span class="sym" data-say="标的价格，本页是 TSLA 的股价。">S</span> 的变化</div>
     <div class="gloss">标的每动 1 美元，delta 变多少</div>
   </div>
-  <p>ORATS 给 350 call 的入场 gamma 是 <b>0.00820</b>：TSLA 每涨 1 美元，delta 大约加 0.0082。拿真实的两天核对：</p>
+  <p>报价快照里 350 call 的入场 gamma 是 <b>0.00820</b>：TSLA 每涨 1 美元，delta 大约加 0.0082。拿真实的两天核对：</p>
   <div class="tscroll">
   <table style="white-space:nowrap">
     <thead><tr><th>这一天</th><th>TSLA 涨</th><th>delta 实际变化</th><th>按前一天的 gamma 估</th><th>当天收盘的 gamma</th></tr></thead>
@@ -237,7 +237,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   </table>
   </div>
   <p>第一天估得很准。第二天多估了三分之一：TSLA 走到 392 的路上，gamma 自己从 0.00749 掉到 0.00472。用两天 gamma 的平均值去估，是 +0.169，接近得多。<b>gamma 也在变</b>，所以它只适合估小幅变动。</p>
-  <p class="tiny">单位：ORATS 的 gamma 按小数写。讲义把 delta 写成整数（0.50 写成 50），gamma 也跟着写成整数，讲义的 gamma 2 就是小数的 0.02。</p>
+  <p class="tiny">单位：报价快照里的 gamma 按小数写。讲义把 delta 写成整数（0.50 写成 50），gamma 也跟着写成整数，讲义的 gamma 2 就是小数的 0.02。</p>
 
   <h3>讲义的两个例子</h3>
   <p>标的 100，一张 110 call 的 delta 是 30、gamma 是 2（整数写法）：</p>
@@ -259,10 +259,10 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     </tbody>
   </table>
   </div>
-  <p>标的涨，delta 加上 gamma；标的跌，delta 减去 gamma。put 的 delta 从 −50 到 −45 也是「加」，往 0 靠。<b>买 call 和买 put 的 gamma 都是正的</b>，同一个行权价、同一个到期日的 call 和 put，gamma 完全一样（ORATS 的表里 gamma 只有一列）。</p>
+  <p>标的涨，delta 加上 gamma；标的跌，delta 减去 gamma。put 的 delta 从 −50 到 −45 也是「加」，往 0 靠。<b>买 call 和买 put 的 gamma 都是正的</b>，同一个行权价、同一个到期日的 call 和 put，gamma 完全一样（报价快照的表里 gamma 只有一列）。</p>
 
   <h3>gamma 就是弯曲</h3>
-  <p>把 350 call 的价值画成 TSLA 价格的函数。某一点的切线有多陡，就是那一点的 delta；切线转得多快，就是 gamma。下面的曲线用 Black-Scholes 模型按入场时的条件算（离到期 32 天，隐含波动率 46.3%，利率 4.3%），是模型值；下图的三个点是 ORATS 当天收盘的真实 delta。</p>
+  <p>把 350 call 的价值画成 TSLA 价格的函数。某一点的切线有多陡，就是那一点的 delta；切线转得多快，就是 gamma。下面的曲线用 Black-Scholes 模型按入场时的条件算（离到期 32 天，隐含波动率 46.3%，利率 4.3%），是模型值；下图的三个点是当天收盘报价里的真实 delta。</p>
   <div class="panel">
     <div class="bar"><button class="btn ghost" id="a1Play">再扫一遍</button></div>
     <svg id="a1" viewBox="0 0 720 452" role="img" aria-label="350 call 的价值曲线与切线，以及 delta 随 TSLA 价格变化的曲线"></svg>
@@ -270,7 +270,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <span><i class="ln" style="background:var(--ink)"></i>离到期 32 天（模型）</span>
       <span style="color:var(--ink-faint)"><i class="dash"></i>到期那天</span>
       <span><i class="ln" style="background:var(--control)"></i>切线</span>
-      <span><i class="dot" style="background:var(--result)"></i>ORATS 当天收盘</span>
+      <span><i class="dot" style="background:var(--result)"></i>当天收盘报价</span>
     </div>
     <div class="stats">
       <div class="stat"><div class="k">TSLA 价格</div><div class="d" id="a1S"></div></div>
@@ -285,7 +285,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
   <h2><span class="n">一</span>gamma 在哪里大</h2>
-  <p class="sub">同一天、同一个 TSLA 价格，不同行权价、不同到期日的期权，gamma 差好几倍。下图是 4/13 收盘 ORATS 报的四个到期日，TSLA 都是 352.36。</p>
+  <p class="sub">同一天、同一个 TSLA 价格，不同行权价、不同到期日的期权，gamma 差好几倍。下图是 4/13 收盘报价里的四个到期日，TSLA 都是 352.36。</p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a2Seg">
@@ -303,7 +303,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p>theta 也一样，平值最大、越近到期越大：2 天到期的平值 call 每天流失 1.10，32 天的 0.32。讲义的说法是<b>平值期权的 gamma、theta 都比同等的实值、虚值期权大</b>。</p>
 
   <h3>350 call 自己的 gamma</h3>
-  <p>一张期权的 gamma 随着标的走动和时间流逝一直在变。下图是这 24 天里 350 call 的 gamma，和「每天换成当天离收盘价最近的行权价」的平值 call 的 gamma，都是 ORATS 收盘值。</p>
+  <p>一张期权的 gamma 随着标的走动和时间流逝一直在变。下图是这 24 天里 350 call 的 gamma，和「每天换成当天离收盘价最近的行权价」的平值 call 的 gamma，都是收盘报价里的值。</p>
   <div class="panel">
     <svg id="g350" viewBox="0 0 720 262" role="img" aria-label="350 call 与当天平值 call 的 gamma，逐日"></svg>
     <div class="legend">
@@ -322,15 +322,15 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="math"><span class="sym" data-say="theta，读作「西塔」。其他条件都不变，只过一天，期权价值变多少。买期权时是负数。">Θ</span> ＝ 只过一天、其他不变时，期权价值的变化</div>
     <div class="gloss">标的价格、波动率、利率都不动，时间往前走一天，期权少值多少</div>
   </div>
-  <p>讲义的例子：期权值 5.00，theta 是 −.05，过一天 4.95，两天 4.90，三天 4.85。ORATS 给 350 call 的 theta 是 <b>−0.319</b>：其他不变，过一天，21.05 变成约 20.73。</p>
+  <p>讲义的例子：期权值 5.00，theta 是 −.05，过一天 4.95，两天 4.90，三天 4.85。报价快照里 350 call 的 theta 是 <b>−0.319</b>：其他不变，过一天，21.05 变成约 20.73。</p>
   <p>买期权的人 theta 为负，每天都在流失；卖期权的人 theta 为正，每天都在收进来。讲义举过一个例外，要三个条件同时满足：深度实值，几乎肯定会被行权；<span class="sym" data-say="European。只能在到期那天行权，不能提前。与之相对的美式期权随时可以行权，TSLA 的个股期权是美式。">欧式</span>，只能在到期那天行权，今天拿不到内在价值；买的时候当场付全款（讲义叫股票型结算，美国的期权都这样；有的交易所买期权先不付钱，只按每天的涨跌结算盈亏）。这样的期权今天的价值是到期价值的折现，比内在价值还低，过一天少折现一天，价值反而涨一点，theta 为正。TSLA 的期权是美式的，随时可以行权，本页的期权都不属于这种。</p>
 
   <h3>如果 TSLA 一动不动</h3>
-  <p>假设 TSLA 每天都收在 352.36，隐含波动率一直是 46.3%，这张 350 call 从剩 32 天走到到期。价值曲线用模型算；下图的点是 ORATS 在真实的每一天、给当天平值 call 报的 theta，横轴按那天离 5/15 还剩几天摆放。</p>
+  <p>假设 TSLA 每天都收在 352.36，隐含波动率一直是 46.3%，这张 350 call 从剩 32 天走到到期。价值曲线用模型算；下图的点是真实的每一天收盘报价里当天平值 call 的 theta，横轴按那天离 5/15 还剩几天摆放。</p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a3Seg">
-        <button data-m="raw" aria-pressed="true">ORATS 原值</button>
+        <button data-m="raw" aria-pressed="true">报价原值</button>
         <button data-m="adj" aria-pressed="false">按入场时的股价和波动率折算</button>
       </div>
       <button class="btn ghost" id="a3Play">逐天播放</button>
@@ -340,7 +340,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <span><i class="ln" style="background:var(--ink)"></i>350 call 的价值（模型，TSLA 不动）</span>
       <span><i style="background:var(--result-bg)"></i>时间价值</span>
       <span><i class="ln" style="background:var(--control)"></i>theta 的大小（模型）</span>
-      <span><i class="dot" style="background:var(--result)"></i>ORATS：当天平值 call 的 theta</span>
+      <span><i class="dot" style="background:var(--result)"></i>收盘报价：当天平值 call 的 theta</span>
     </div>
     <div class="stats">
       <div class="stat"><div class="k">离到期</div><div class="d" id="a3N"></div></div>
@@ -352,7 +352,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   </div>
   <p>时间价值大致按<b>剩余天数的平方根</b>缩小，原因和 1.2 一样：还能走多远按 √t 算。剩一半时间，还剩约 √½ ≈ 71%；剩四分之一时间，还剩约一半。平方根曲线越靠近 0 越陡，所以 theta 越近到期越大。</p>
   <p>讲义给的平值期权例子：离到期 3 个月 theta −.03，3 周 −.06，3 天 −.16。按 1/√t 放大可以互相推出来：.03 ÷ √(3/14) ≈ .065，.06 ÷ √(3/21) ≈ .159（3 个月约 14 周，3 周 ＝ 21 天）。</p>
-  <p>ORATS 的点在最后几天远高于模型线：5/14 剩一天，平值 call 的 theta 是 −2.76，模型是 −1.66。那时 TSLA 已经涨到 443，ORATS 算希腊字母用的隐含波动率升到 58%。平值 theta 和股价 × 波动率成正比，两者合起来大了 1.57 倍。按入场时的股价和波动率折算回去，−2.76 变成 −1.75，点就回到线旁边。</p>
+  <p>报价的点在最后几天远高于模型线：5/14 剩一天，平值 call 的 theta 是 −2.76，模型是 −1.66。那时 TSLA 已经涨到 443，报价快照算希腊字母用的隐含波动率升到 58%。平值 theta 和股价 × 波动率成正比，两者合起来大了 1.57 倍。按入场时的股价和波动率折算回去，−2.76 变成 −1.75，点就回到线旁边。</p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
@@ -408,19 +408,19 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   </div>
   <p>这就是<b>买 gamma 就要付 theta</b>：gamma 越大，租金越贵，比例由 σ² × S² 定。本页把 theta 叫租金：持有期权，每天为「标的可能大动」付的钱。</p>
 
-  <h3>用 ORATS 的数字核对</h3>
-  <p>350 call 入场时：½ × 0.463² × 352.36² × 0.00820 ＝ 109.12，这是一年的租金。上面的 0.426 是把它分到 256 个交易日：109.12 ÷ 256 ＝ 0.426。ORATS 的 theta 按日历日算，周末也算，把同一笔分成 365 份：109.12 ÷ 365 ＝ <b>0.299</b>。0.426 和 0.299 是同一笔一年的租金，只是摊的天数不同，不是收入比租金多。ORATS 给的是 −0.319，比 0.299 多约 0.02。</p>
-  <p>差的是利息。对冲好的仓位是买一张 call（付 21.05）、卖 0.5574 股（收 196.41），手里净多出 175.36 美元，按 4.3% 一天利息 0.021。模型要求这个仓位平均每天不赚不赔，所以 theta 要同时抵掉 gamma 的平均收入和这笔利息：0.299 ＋ 0.021 ＝ 0.320，ORATS 给的是 0.319。讲义说 theta 来自两部分，波动价值的衰减和利息价值的衰减，就是这两项。</p>
+  <h3>用报价快照的数字核对</h3>
+  <p>350 call 入场时：½ × 0.463² × 352.36² × 0.00820 ＝ 109.12，这是一年的租金。上面的 0.426 是把它分到 256 个交易日：109.12 ÷ 256 ＝ 0.426。报价快照里的 theta 按日历日算，周末也算，把同一笔分成 365 份：109.12 ÷ 365 ＝ <b>0.299</b>。0.426 和 0.299 是同一笔一年的租金，只是摊的天数不同，不是收入比租金多。报价快照给的是 −0.319，比 0.299 多约 0.02。</p>
+  <p>差的是利息。对冲好的仓位是买一张 call（付 21.05）、卖 0.5574 股（收 196.41），手里净多出 175.36 美元，按 4.3% 一天利息 0.021。模型要求这个仓位平均每天不赚不赔，所以 theta 要同时抵掉 gamma 的平均收入和这笔利息：0.299 ＋ 0.021 ＝ 0.320，报价快照给的是 0.319。讲义说 theta 来自两部分，波动价值的衰减和利息价值的衰减，就是这两项。</p>
   <div class="panel">
-    <svg id="ver" viewBox="0 0 720 300" role="img" aria-label="5/15 到期各行权价的 ORATS theta 与公式值"></svg>
+    <svg id="ver" viewBox="0 0 720 300" role="img" aria-label="5/15 到期各行权价的报价 theta 与公式值"></svg>
     <div class="legend">
-      <span><i class="dot" style="background:var(--ink)"></i>ORATS 的 theta</span>
+      <span><i class="dot" style="background:var(--ink)"></i>报价的 theta</span>
       <span style="color:var(--result)"><i class="dash"></i>½σ²S²Γ ÷ 365（gamma 那一项）</span>
       <span><i class="ln" style="background:var(--control)"></i>再加上利息</span>
     </div>
   </div>
-  <p>整条 5/15 链都这样：300 到 410 之间，gamma 那一项占 ORATS theta 的 88% 到 97%，加上利息后和 ORATS 最多差 0.006。图最左边更深的实值档差得多一些，295 差 0.008，290 差 0.012。实值越深，delta 越大，对冲时卖出的股票越多，手里的现金越多，利息那一项越大。</p>
-  <p class="tiny">图里每个行权价用的是 ORATS 算希腊字母时用的那个隐含波动率（350 这档 46.2%），所以 350 的 gamma 项是 0.298，比上面按 46.3% 算的少 0.001。</p>
+  <p>整条 5/15 链都这样：300 到 410 之间，gamma 那一项占报价 theta 的 88% 到 97%，加上利息后和报价最多差 0.006。图最左边更深的实值档差得多一些，295 差 0.008，290 差 0.012。实值越深，delta 越大，对冲时卖出的股票越多，手里的现金越多，利息那一项越大。</p>
+  <p class="tiny">图里每个行权价用的是报价快照算希腊字母时用的那个隐含波动率（350 这档 46.2%），所以 350 的 gamma 项是 0.298，比上面按 46.3% 算的少 0.001。</p>
   <p>讲义有一张表，列出同一个标的各行权价期权的模型价值和希腊字母，讲义叫它<span class="sym" data-say="risk matrix。讲义里的一张表：同一个标的、同一个到期日，每个行权价的市价、模型价值、delta、gamma、theta、vega 排在一起。">风险矩阵</span>。它也对得上：标的 99.50，波动率 25%，利率 6%，离到期 60 天，100 call 的模型价值（讲义叫<span class="sym" data-say="theoretical value。用定价模型算出来的期权价值，就是本页说的模型值，不是市场报价。">理论值</span>）4.26，delta 54，gamma 3.9（小数 0.039），theta −.0416。gamma 项 ½ × 0.25² × 99.5² × 0.039 ÷ 365 ＝ 0.0331，利息 6% × (99.5 × 0.54 − 4.26) ÷ 365 ＝ 0.0081，合计 0.0412。</p>
 </section>
 
@@ -437,7 +437,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="note">门槛和 gamma 大小无关：gamma 大的期权赚得多，租金也同比例贵</div>
   </div>
   <p>按入场时的隐含波动率 46.3%，一天的一个标准差是 2.89%。1.2 数过：之后 24 天里有 8 天超过它。</p>
-  <p>下面的账本有两种记法。第一种先把 gamma 固定在入场时的 0.00820，租金按 1.2 的口诀按交易日摊（一年 256 份）：一年 109.12 ÷ 256 ≈ 每个交易日 0.426（只算 gamma 那一项）。这笔租金是 ½ × Γ × (S × 2.89%)²，随股价的平方变：从入场的 0.43 涨到 5 月中的 0.68。这样只看涨跌的作用。第二种用真实的 350 call：每天用 ORATS 当天收盘的 gamma 和 theta，theta 按日历日收。</p>
+  <p>下面的账本有两种记法。第一种先把 gamma 固定在入场时的 0.00820，租金按 1.2 的口诀按交易日摊（一年 256 份）：一年 109.12 ÷ 256 ≈ 每个交易日 0.426（只算 gamma 那一项）。这笔租金是 ½ × Γ × (S × 2.89%)²，随股价的平方变：从入场的 0.43 涨到 5 月中的 0.68。这样只看涨跌的作用。第二种用真实的 350 call：每天用当天收盘报价里的 gamma 和 theta，theta 按日历日收。</p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a5Seg">
@@ -511,7 +511,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <div class="gl"><div class="s">S</div><div class="t">标的价格，本页是 TSLA 的股价。</div></div>
       <div class="gl"><div class="s">σ</div><div class="t">年化波动率（1.2）。本页用买入时的隐含波动率 46.3%。</div></div>
       <div class="gl"><div class="s">½Γ(ΔS)²</div><div class="t">对冲掉方向之后，标的动了 ΔS 那一天 gamma 带来的收入。涨跌都为正，按幅度的平方增长。</div></div>
-      <div class="gl"><div class="s">½σ²S²Γ</div><div class="t">一年的租金。按日历日除以 365（ORATS 的 theta），按交易日除以 256（1.2 的口诀）。</div></div>
+      <div class="gl"><div class="s">½σ²S²Γ</div><div class="t">一年的租金。按日历日除以 365（报价快照里的 theta），按交易日除以 256（1.2 的口诀）。</div></div>
       <div class="gl"><div class="s">S × σ ÷ 16</div><div class="t">一天的一个标准差（1.2）。对冲后的买方，当天涨跌超过它就赚，不到就亏。</div></div>
       <div class="gl"><div class="s">内在价值</div><div class="t">现在马上行权能拿到的钱。call 是 max(S − 行权价, 0)（1.1）。</div></div>
       <div class="gl"><div class="s">时间价值</div><div class="t">期权价格减去内在价值，到期时归零。</div></div>
@@ -520,7 +520,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <div class="gl"><div class="s">收租 / 付租</div><div class="t">theta 为正是收租（卖期权），为负是付租（买期权）。</div></div>
       <div class="gl"><div class="s">日历日 / 交易日</div><div class="t">日历日一年 365 天，周末也算；交易日一年约 256 天，只算开市的日子。</div></div>
       <div class="gl"><div class="s">标准差 / 钟形分布</div><div class="t">标准差是一组数离中心的典型距离：每个数离中心的距离平方、求平均、再开方（1.2）。钟形分布里约三分之二的数落在一个标准差以内。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%。ORATS 算希腊字母时用的是它自己的另一列隐含波动率，350 这档是 46.2%。</div></div>
+      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%。报价快照算希腊字母时用的是另一列平滑隐含波动率（把各行权价的隐含波动率拟合成一条曲线后的值），350 这档是 46.2%。</div></div>
       <div class="gl"><div class="s">实值 / 深度实值 / 虚值</div><div class="t">call 的行权价低于股价是实值，低得多是深度实值，delta 接近 1；行权价高于股价是虚值（2.1）。</div></div>
       <div class="gl"><div class="s">欧式 / 美式</div><div class="t">欧式期权只能在到期那天行权；美式随时可以行权。TSLA 的个股期权是美式。</div></div>
       <div class="gl"><div class="s">模型值 / 理论值</div><div class="t">用定价公式（本页是 Black-Scholes，2.1）算出来的数，不是市场报价。讲义把期权的模型价值叫理论值。</div></div>
@@ -534,7 +534,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <footer>
   <p>下一节 <a href="station-2-4-portfolio-greeks.html"><b>2.4 组合希腊字母</b></a>：把多腿仓位的 delta、gamma、theta、vega 各自加起来，压成四个数。<a href="station-2-3-vega-rho.html">2.3 vega 与 rho</a> 是和本节并列的另一节，两节都学完再进 2.4。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
 </footer>
 
 </div>
@@ -575,9 +575,9 @@ const npdf = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
 })();
 
 /* ══════════ 案例数据 ══════════
-   由 scripts/data/station_2_2.py 生成。ORATS 快照每天 16:00 那一行，中间价 = (买一 + 卖一) / 2。
+   由 scripts/data/station_2_2.py 生成。期权报价快照每天 16:00 那一行，中间价 = (买一 + 卖一) / 2。
    C350：350 call 每天 [中间价, delta, gamma, theta]；ATM：当天离收盘价最近的行权价 [行权价, gamma, theta, 隐含波动率]（都是 5/15 到期）。
-   CURVES：4/13 收盘，到期 2 / 7 / 18 / 32 天的 [行权价, gamma, theta]。VER：4/13 的 5/15 链 [行权价, ORATS theta, gamma 项, 加利息]。
+   CURVES：4/13 收盘，到期 2 / 7 / 18 / 32 天的 [行权价, gamma, theta]。VER：4/13 的 5/15 链 [行权价, 报价 theta, gamma 项, 加利息]。
    TVCURVE：模型，TSLA 停在 352.36、σ 46.29% 时 350 call 剩 32 天 … 0 天的价值。 */
 const DAYS=["2026-04-13","2026-04-14","2026-04-15","2026-04-16","2026-04-17","2026-04-20","2026-04-21","2026-04-22","2026-04-23","2026-04-24","2026-04-27","2026-04-28","2026-04-29","2026-04-30","2026-05-01","2026-05-04","2026-05-05","2026-05-06","2026-05-07","2026-05-08","2026-05-11","2026-05-12","2026-05-13","2026-05-14","2026-05-15"];
 const U=[352.36,364.32,391.93,388.94,400.94,392.63,386.33,387.61,373.69,375.83,378.75,376.14,373.02,381.77,390.83,392.48,389.52,398.62,411.74,428.45,445.06,433.7,445.2,443.36,422.32];
@@ -691,7 +691,7 @@ const A1=(()=>{
   return {start,draw,el:$('a1')};
 })();
 
-/* ══════════ 一 · 四个到期日的 gamma / theta 曲线（ORATS，4/13 收盘） ══════════ */
+/* ══════════ 一 · 四个到期日的 gamma / theta 曲线（4/13 收盘报价） ══════════ */
 const A2=(()=>{
   const H=318, L=62, T=18, B=272;
   const ORD=[32,18,7,2], COL={32:'var(--ink-faint)',18:'var(--ink)',7:'var(--result)',2:'var(--control)'};
@@ -762,7 +762,7 @@ function drawG350(){
   $('g350').innerHTML=g;
 }
 
-/* ══════════ 二 · 横盘 32 天（模型）＋ ORATS 平值 theta ══════════ */
+/* ══════════ 二 · 横盘 32 天（模型）＋ 报价的平值 theta ══════════ */
 const A3=(()=>{
   const H=420, L=58, T1=16, B1=196, T2=250, B2=376;
   const VM=22, Y1=v=>B1-v/VM*(B1-T1), TM=3, Y2=v=>B2-Math.min(v,TM)/TM*(B2-T2);
@@ -911,13 +911,13 @@ function drawVer(){
   g+=poly(VER.map(r=>[X(r[0]),Y(-r[3])]),'var(--control)',2.2);
   VER.forEach(r=>g+=`<circle cx="${X(r[0]).toFixed(1)}" cy="${Y(-r[1]).toFixed(1)}" r="3.4" fill="var(--ink)"/>`);
   const r350=VER.find(r=>r[0]===350);
-  g+=lab(X(350),Y(-r350[1])-14,'350：ORATS −0.319','var(--ink)','middle',11,600);
+  g+=lab(X(350),Y(-r350[1])-14,'350：报价 −0.319','var(--ink)','middle',11,600);
   g+=lab(X(350),Y(-r350[2])+26,'gamma 项 −0.298','var(--result)','middle',11,600);
   $('ver').innerHTML=g;
 }
 
 /* ══════════ 四 · 逐日账本 ══════════
-   A：gamma 固定 0.0082，租金 = ½Γ(S × 2.89%)² 每个交易日；B：真实 350 call，ORATS 当天的 gamma 与 theta，theta × 日历日 */
+   A：gamma 固定 0.0082，租金 = ½Γ(S × 2.89%)² 每个交易日；B：真实 350 call，当天收盘报价的 gamma 与 theta，theta × 日历日 */
 const A5=(()=>{
   const H=410, L=58, T1=18, B1=226, T2=268, B2=372, n=24;
   const UP=3.7, DN=1.0, K1=(B1-T1)/(UP+DN), Y0=T1+UP*K1;
@@ -987,7 +987,7 @@ const A5=(()=>{
       say.textContent=`${wins} 天赚，${n-wins} 天亏。赚的 ${wins} 天是 ${wd}，就是 1.2 数出的那 ${wins} 天。24 天合计：gamma 赚 ${f2(G)}，租金付 ${f2(Rt)}，净 ${fm(G-Rt)}。实际波动 45.8% 和买入时付的 46.3% 几乎一样，账本就几乎打平。累计在 4/15 最高（${sgn(R_[1].cum)}），之后总体往下走，5/6 最低（${fm(Math.min(...R_.map(r=>r.cum)))}）：4/24 到 5/6 是连着 9 天的小动。`;
     } else {
       const late=R_.slice(17).reduce((a,r)=>a+r.g,0);
-      say.textContent=`真实的 350 call，${wins} 天赚。4/15 TSLA 冲到 392，gamma 掉到 0.0047；4/23 到 4/30 回落到 373 到 382，gamma 回到 0.0068 到 0.0085，4/29 的 0.0085 比入场时还高，theta 也跟着到了 −0.366；5/7 收盘之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。从 5/7 起的 7 个交易日里有 4 天涨跌超过一个标准差，gamma 一共只赚了 ${f2(late)}。ORATS 的 theta 按日历日收，周末两天的记在周一：按 46.3% 算，平常一天涨跌超过 2.42% 就回本，周一要超过 4.20%。合计 gamma 赚 ${f2(G)}，theta 付 ${f2(Rt)}，净 ${fm(G-Rt)}。1.1 里这张 call 赚的钱来自方向，方向已经对冲掉，不在这本账里。`;
+      say.textContent=`真实的 350 call，${wins} 天赚。4/15 TSLA 冲到 392，gamma 掉到 0.0047；4/23 到 4/30 回落到 373 到 382，gamma 回到 0.0068 到 0.0085，4/29 的 0.0085 比入场时还高，theta 也跟着到了 −0.366；5/7 收盘之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。从 5/7 起的 7 个交易日里有 4 天涨跌超过一个标准差，gamma 一共只赚了 ${f2(late)}。报价快照里的 theta 按日历日收，周末两天的记在周一：按 46.3% 算，平常一天涨跌超过 2.42% 就回本，周一要超过 4.20%。合计 gamma 赚 ${f2(G)}，theta 付 ${f2(Rt)}，净 ${fm(G-Rt)}。1.1 里这张 call 赚的钱来自方向，方向已经对冲掉，不在这本账里。`;
     }
   }
   function start(){
@@ -1022,7 +1022,7 @@ const QS=[
   a:['对冲掉方向之后，持有期权一天的盈亏是 ½Γ(ΔS)² 减去租金。',
      '一天 (ΔS)² 的平均值是一个标准差的平方，所以 gamma 平均每天收入 ½Γ(Sσ/16)²；一年约 256 个交易日，16² ＝ 256，一年就是 ½σ²S²Γ。',
      '如果租金只有一半，买入再对冲平均每天稳赚。人人都去买，价格被抬高，theta 变大，直到租金等于 gamma 的平均收入。',
-     'ORATS 的数字对得上：350 call 的 gamma 项按日历日一天 0.299，加利息 0.021 是 0.320，ORATS 给 −0.319。'],
+     '报价快照的数字对得上：350 call 的 gamma 项按日历日一天 0.299，加利息 0.021 是 0.320，报价快照给 −0.319。'],
   s:'「因为公式推出来就是这样」：没说出背后「平均不赚不赔」的定价要求。'},
  {q:`对冲好的 350 call，今天 TSLA 涨了 1%，买方这一天赚还是亏？涨 5% 呢？回本的门槛是多少，为什么和 gamma 大小无关？`,
   a:['门槛是一天的一个标准差 S × σ ÷ 16，按 46.3% 是 2.89%。',

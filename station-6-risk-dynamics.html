@@ -220,21 +220,21 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p>决定一张期权价值的输入里，每天都在变的有三个：标的价格、离到期的时间、隐含波动率。delta 是用这三个输入算出来的，哪一个变了，delta 都会变。</p>
 
   <h3>一个真实的晚上：4/22 到 4/23</h3>
-  <p>4/22 收盘，TSLA 5/15 到期的 350 call，期权数据商 ORATS 的收盘快照（1.1 用过）报的 delta 是 0.8220，一张 call 要卖出约 82 股来对冲。当天盘后 TSLA 发一季报（2.3 讲过）。4/23 收盘，delta 变成 0.7576，要对冲的股数少了 6 股多。三个输入都变了：</p>
+  <p>4/22 收盘，TSLA 5/15 到期的 350 call，收盘报价快照（1.1 用过）报的 delta 是 0.8220，一张 call 要卖出约 82 股来对冲。当天盘后 TSLA 发一季报（2.3 讲过）。4/23 收盘，delta 变成 0.7576，要对冲的股数少了 6 股多。三个输入都变了：</p>
   <div class="tscroll">
   <table class="t0">
     <thead><tr><th>输入</th><th>4/22</th><th>4/23</th><th>delta 因此变了</th></tr></thead>
     <tbody>
       <tr><td>标的价格</td><td>387.61</td><td>373.69</td><td>−0.0945</td></tr>
-      <tr><td>隐含波动率 smv_vol</td><td>48.7%</td><td>42.9%</td><td>+0.0272</td></tr>
+      <tr><td>平滑隐含波动率</td><td>48.7%</td><td>42.9%</td><td>+0.0272</td></tr>
       <tr><td>离到期</td><td>23 天</td><td>22 天</td><td>+0.0044</td></tr>
       <tr class="tot"><td>三块合计（模型）</td><td></td><td></td><td>−0.0630</td></tr>
-      <tr><td>ORATS 报的 delta</td><td>0.8220</td><td>0.7576</td><td>−0.0644</td></tr>
+      <tr><td>报价快照里的 delta</td><td>0.8220</td><td>0.7576</td><td>−0.0644</td></tr>
     </tbody>
   </table>
   </div>
-  <p class="tiny">smv_vol 是 ORATS 平滑过的隐含波动率，它算希腊字母用的就是这个。</p>
-  <p>拆法：用 <span class="sym" data-say="Black-Scholes 期权定价公式。输入标的价、行权价、离到期时间、利率和波动率，算出期权价值和 delta 等希腊字母（2.1 用过）。">Black-Scholes</span> 从 4/22 的三个输入出发，先把时间换成 4/23 的，重算一次 delta；再换波动率，再算一次；最后换价格。每一步的差，就是那个输入的贡献。换的顺序不同，三块的大小会变，方向不变：这一晚如果先换价格，价格那一块是 −0.0887，波动率那一块是 +0.0224。这样算出的 delta 和 ORATS 报的，4/13 到 5/14 这 24 个收盘里最多差 0.027，平均差 0.007。</p>
+  <p class="tiny">平滑隐含波动率是报价快照把各行权价的隐含波动率拟合成平滑曲线后在这个行权价上的值，快照里的希腊字母用的就是它。</p>
+  <p>拆法：用 <span class="sym" data-say="Black-Scholes 期权定价公式。输入标的价、行权价、离到期时间、利率和波动率，算出期权价值和 delta 等希腊字母（2.1 用过）。">Black-Scholes</span> 从 4/22 的三个输入出发，先把时间换成 4/23 的，重算一次 delta；再换波动率，再算一次；最后换价格。每一步的差，就是那个输入的贡献。换的顺序不同，三块的大小会变，方向不变：这一晚如果先换价格，价格那一块是 −0.0887，波动率那一块是 +0.0224。这样算出的 delta 和报价快照里的，4/13 到 5/14 这 24 个收盘里最多差 0.027，平均差 0.007。</p>
   <p>价格那一块就是 2.2 的 gamma。另外两块是这一节的内容：隐含波动率降了 5.8 个点，delta 多了 0.027；过了一天，又多了 0.004。两块加起来，抵掉了价格那一块的三分之一。</p>
   <div class="formula">
     <div class="math">明天的 <span class="sym" data-say="delta。标的动 1 美元，期权价值跟着动多少。">Δ</span> ≈ 今天的 <span class="sym" data-say="delta。标的动 1 美元，期权价值跟着动多少。">Δ</span> ＋ 价格那一块 ＋ 时间那一块 ＋ 波动率那一块</div>
@@ -250,17 +250,17 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <span><i class="ln" style="background:var(--ink)"></i>价格那一块</span>
       <span><i class="ln" style="background:var(--control)"></i>时间那一块</span>
       <span><i class="ln" style="background:var(--result)"></i>波动率那一块</span>
-      <span style="color:var(--ink-faint)"><i class="dash"></i>ORATS 报的 delta 减去入场的 0.5574</span>
+      <span style="color:var(--ink-faint)"><i class="dash"></i>报价快照里的 delta 减去入场的 0.5574</span>
     </div>
     <div class="stats">
       <div class="stat"><div class="k">日期</div><div class="d" id="a0D"></div><div class="d2" id="a0Db"></div></div>
       <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="a0S"></div></div>
-      <div class="stat"><div class="k">350 call 的 delta（ORATS）</div><div class="d" id="a0Q"></div></div>
+      <div class="stat"><div class="k">350 call 的 delta（报价快照）</div><div class="d" id="a0Q"></div></div>
       <div class="stat"><div class="k">时间那一块，累计</div><div class="d" id="a0T" style="color:var(--control)"></div></div>
     </div>
     <div class="say plain" id="a0Say"></div>
   </div>
-  <p class="tiny">模型：Black-Scholes，利率 4.3%，波动率用 ORATS 当天的 smv_vol。模型与 ORATS 差得最多的一天是 4/30，0.027。换的顺序不同，累计的三块在这个范围里变：价格 +0.325 到 +0.344，时间 +0.130 到 +0.169，波动率 −0.023 到 −0.051，方向都不变。</p>
+  <p class="tiny">模型：Black-Scholes，利率 4.3%，波动率用当天报价快照的平滑隐含波动率。模型与报价快照差得最多的一天是 4/30，0.027。换的顺序不同，累计的三块在这个范围里变：价格 +0.325 到 +0.344，时间 +0.130 到 +0.169，波动率 −0.023 到 −0.051，方向都不变。</p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
@@ -279,7 +279,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="legend">
       <span><i class="ln" style="background:var(--control)"></i>模型 delta，所有行权价用同一个 σ</span>
       <span style="color:var(--ink-faint)"><i class="dash"></i>σ ＝ 46.3%，入场那天 350 call 的隐含波动率</span>
-      <span><i class="dot" style="background:var(--result)"></i>ORATS 4/13 收盘报的 delta，每个行权价用自己的隐含波动率</span>
+      <span><i class="dot" style="background:var(--result)"></i>4/13 收盘报价里的 delta，每个行权价用自己的隐含波动率</span>
     </div>
     <div class="stats">
       <div class="stat"><div class="k">隐含波动率 σ</div><div class="d" id="a1Sig" style="color:var(--control)"></div></div>
@@ -311,7 +311,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
   <h2><span class="n">二</span>时间流逝，delta 离 0.5 更远</h2>
-  <p class="sub">4/13 收盘，TSLA 352.36，ORATS 报了 8 个到期日，从 2 天到 32 天。同一个行权价放在越来越近的到期日上，就是时间往前走时它会变成的样子。</p>
+  <p class="sub">4/13 收盘，TSLA 352.36，报价快照里有 8 个到期日，从 2 天到 32 天。同一个行权价放在越来越近的到期日上，就是时间往前走时它会变成的样子。</p>
   <p>第一节的公式里，σ 和 √t 乘在一起：离中心几个标准差，只看 σ × √t 这一个乘积，也就是 1.2 的「到期前的一个标准差」。时间一天天过去，√t 变小，效果和波动率下降一样。所以时间对 delta 的作用和第一节相反：离 0.5 越来越远，实值的奔向 1，虚值的奔向 0。</p>
   <div class="panel">
     <div class="bar"><button class="btn ghost" id="a2Play">再放一遍</button></div>
@@ -327,7 +327,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="say plain" id="a2Say"></div>
   </div>
   <p>11 天到 7 天这一段，曲线变陡得特别多，下图的线在那里拐了一下：380 call 的 delta 从 14 天到 11 天只少了 0.010，从 11 天到 7 天少了 0.137。4/24 到期的期权包含 4/22 盘后的财报，平值隐含波动率 54.7%；4/20 到期的不包含，只有 38.4%。σ × √t 在 14 天是 0.099，11 天 0.095，到 7 天降到 0.053：时间变短和 σ 变小叠在了一起。</p>
-  <p class="tiny">平值隐含波动率取 ORATS 报的 350 call 隐含波动率，和 2.3 第四节同一口径。</p>
+  <p class="tiny">平值隐含波动率取报价快照里 350 call 的隐含波动率，和 2.3 第四节同一口径。</p>
   <p>这就是〇节时间那一块的来历：4/14 以后 350 call 一直是实值，delta 每过一天都往 1 挪。一张虚值 call 反过来，每过一天往 0 挪：用卖股票对冲它的人，第二天卖出去的股数就多了。</p>
 </section>
 
@@ -359,7 +359,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p class="tiny">模型：TSLA 352.36，σ 固定 46.3%，利率 4.3%。第 i 颗粒子放在标准正态分布的 (i ＋ 0.5) ÷ 1500 分位上，按对数正态（1.2）换成价格，所以没有随机误差。gamma 是 Black-Scholes 的模型值。</p>
 
   <h3>真实的 gamma 和 theta</h3>
-  <p>回到 ORATS 那 8 个到期日。</p>
+  <p>回到报价快照里那 8 个到期日。</p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a3Seg">
@@ -379,7 +379,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     </div>
     <div class="say plain" id="a3Say"></div>
   </div>
-  <p class="tiny">ORATS 的 theta 按每个日历日。</p>
+  <p class="tiny">报价快照里的 theta 按每个日历日。</p>
   <p>380 这样离平值不远的行权价，先升后降：分布刚开始收窄时，它还在分布的高处，跟着变高；再收窄，它落进了尾部，就开始变低。离平值越远，开始变低得越早，410 从 32 天起就一路往下。</p>
   <p>theta 为什么和 gamma 一起分岔，2.2 给过一个近似：</p>
   <div class="formula">
@@ -420,16 +420,16 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     </div>
     <div class="say plain" id="a4Say"></div>
   </div>
-  <p class="tiny">ORATS 报的 vega 在个别行权价上不平滑，例如 32 天的 290 是 0.1469、295 是 0.1907，图里照原样画。</p>
+  <p class="tiny">报价快照里的 vega 在个别行权价上不平滑，例如 32 天的 290 是 0.1469、295 是 0.1907，图里照原样画。</p>
 
   <h3>为什么不分岔</h3>
   <p>2.3 第四节讲过：σ 变 1 个点，分布宽度变 √t 个点，所以期限越短，每个行权价的 vega 都越小。这里把它和 gamma 放在一起比。</p>
   <p>先看平值 gamma 升得多快。分布宽度按 √t 变化，分布下面的总面积不变（所有可能加起来是 100%）：宽度缩到一半，中间的高度就升到 2 倍。所以中间的高度按 1 ÷ √t 变化，平值 gamma 也一样。时间剩四分之一，√t 剩一半，平值 gamma 变成 2 倍。</p>
-  <p>vega 和 gamma 之间有一个恒等关系：Black-Scholes 的 gamma 公式和 vega 公式里有同一个钟形高度因子，两者相除，这个因子消掉，剩下 S² × σ × t。本页不推导，用 ORATS 的数核对：</p>
+  <p>vega 和 gamma 之间有一个恒等关系：Black-Scholes 的 gamma 公式和 vega 公式里有同一个钟形高度因子，两者相除，这个因子消掉，剩下 S² × σ × t。本页不推导，用报价快照里的数核对：</p>
   <div class="formula">
-    <div class="math">vega ＝ <span class="sym" data-say="gamma。标的每动 1 美元，delta 变多少。">Γ</span> × <span class="sym" data-say="标的价格。">S</span>² × <span class="sym" data-say="sigma，年化波动率。ORATS 算希腊字母用它平滑过的隐含波动率 smv_vol。">σ</span> × <span class="sym" data-say="离到期的时间，以年计。32 天是 32/365 年。">t</span> ÷ 100</div>
+    <div class="math">vega ＝ <span class="sym" data-say="gamma。标的每动 1 美元，delta 变多少。">Γ</span> × <span class="sym" data-say="标的价格。">S</span>² × <span class="sym" data-say="sigma，年化波动率。报价快照算希腊字母时用的是平滑隐含波动率。">σ</span> × <span class="sym" data-say="离到期的时间，以年计。32 天是 32/365 年。">t</span> ÷ 100</div>
     <div class="gloss">gamma 乘以标的价的平方、波动率、离到期的年数；除以 100 是换成每个波动率点</div>
-    <div class="note">ORATS 4/13 收盘 355 档，离到期 32 天：0.00834 × 352.36² × 0.459 × 32/365 ÷ 100 ＝ 0.4167，和 ORATS 报的 vega 一样</div>
+    <div class="note">4/13 收盘报价 355 档，离到期 32 天：0.00834 × 352.36² × 0.459 × 32/365 ÷ 100 ＝ 0.4167，和报价快照里的 vega 一样</div>
   </div>
   <p>时间剩四分之一，平值 gamma 变成 2 倍，t 变成四分之一，vega 变成一半。按模型，355 call 从 32 天到 8 天，gamma 从 0.0083 升到 0.0165，vega 从 0.416 降到 0.208。平值 gamma 翻倍也抵不过 t 缩到四分之一。离平值远的行权价，gamma 本来就在降，再乘上变小的 t，vega 降得更快。</p>
   <p>讲义的例子：1 个月的期权，波动率 20% 时值 2.30，30% 时值 3.50，vega ＝ (3.50 − 2.30) ÷ 10 ＝ 0.12；3 个月的值 4.00 和 6.00，vega 0.20。0.12 × √3 ≈ 0.21，接近 0.20。</p>
@@ -569,7 +569,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     </div>
     <div class="say plain" id="a6Say"></div>
   </div>
-  <p class="tiny">ORATS 每天 16:00 快照的中间价、delta、gamma、vega。theta 与逐日归因用 Black-Scholes 按两条腿各自的 smv_vol 算。</p>
+  <p class="tiny">每天 16:00 报价快照的中间价、delta、gamma、vega。theta 与逐日归因用 Black-Scholes 按两条腿各自的平滑隐含波动率算。</p>
   <p>一个四个数都接近 0 的仓位，24 天里最多赚过 8,359 美元（5/13），最多亏过 6,514 美元（5/5），持有到期亏 2,538 美元。</p>
 
 </section>
@@ -598,8 +598,8 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <div class="gl"><div class="s">平值、实值、虚值</div><div class="t">行权价在标的价附近、对持有人有利的一侧、不利的一侧。远虚值指离中心一个多标准差以外（第五节）。</div></div>
       <div class="gl"><div class="s">对冲、delta 中性</div><div class="t">用反向的股票把仓位的 delta 抵成 0（2.1）。抵成 0 的仓位叫 delta 中性，只在算 delta 用的那个波动率下成立。</div></div>
       <div class="gl"><div class="s">Black-Scholes</div><div class="t">期权定价公式。本页凡是只改一个输入的情形，都用它算，标为模型值。</div></div>
-      <div class="gl"><div class="s">ORATS</div><div class="t">期权数据商。本页的真实报价、delta、gamma、theta、vega 都取自它每天 16:00 的收盘快照（1.1）。</div></div>
-      <div class="gl"><div class="s">smv_vol</div><div class="t">ORATS 平滑过的隐含波动率，它算希腊字母时用这个。</div></div>
+      <div class="gl"><div class="s">报价快照</div><div class="t">本页的真实报价、delta、gamma、theta、vega 都取自历史期权报价快照，每天 16:00 那一行（1.1）。</div></div>
+      <div class="gl"><div class="s">平滑隐含波动率</div><div class="t">报价快照把各行权价的隐含波动率拟合成平滑曲线后，在某个行权价上的值；快照里的希腊字母用它算。</div></div>
       <div class="gl"><div class="s">skew</div><div class="t">同一到期日，不同行权价的隐含波动率不一样。TSLA 低行权价的更高：330 是 47.7%，390 是 44.9%。节点 8 细讲。</div></div>
       <div class="gl"><div class="s">implied delta</div><div class="t">用隐含波动率算出的 delta。换一个波动率，同一个仓位的 delta 就不同。</div></div>
       <div class="gl"><div class="s">一阶、二阶、三阶</div><div class="t">期权价值随一个输入变多少是一阶（delta、theta、vega）；一阶的数再随某个输入变是二阶（gamma、vanna、charm）；再往下一层是三阶（color、zomma、speed）。</div></div>
@@ -614,7 +614,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <footer>
   <p>下一节 <a href="station-7-model-assumptions.html"><b>7 模型假设怎么崩</b></a>：风险与对冲这条路（4.1、4.2、6）和策略与组合那条路（3.1 到 5.3）在这里合流。本页的模型值都来自 Black-Scholes，它的四条假设在真实数据上哪几条不成立，节点 7 逐条检验。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
 </footer>
 
 </div>
@@ -732,7 +732,7 @@ function playP(st,total,draw){
 }
 
 /* ══════════ 〇 · 350 call 的 delta 逐日拆成三块 ══════════
-   D350 每行：日期、TSLA、smv_vol、ORATS delta、模型 delta、价格累计、时间累计、波动率累计 */
+   D350 每行：日期、TSLA、平滑隐含波动率、报价 delta、模型 delta、价格累计、时间累计、波动率累计 */
 const A0=(()=>{
   let W=640,R=500; const H=320,L=56,T=30,B=H-40, n=D350.length-1, y0=-0.05, y1=0.5;
   const X=i=>L+i/n*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
@@ -750,7 +750,7 @@ const A0=(()=>{
     g+=`<polyline points="${path('o',f)}" fill="none" stroke="var(--ink-faint)" stroke-width="1.6" stroke-dasharray="5 4"/>`;
     SER.forEach(s=>g+=`<polyline points="${path(s.k,f)}" fill="none" stroke="${s.c}" stroke-width="2.4" stroke-linejoin="round"/>`);
     const hx=X(f), heads=SER.map(s=>({y:Y(at(s.k,f)),t:`${s.nm} ${sg(at(s.k,f),3)}`,c:s.c}));
-    heads.push({y:Y(at('o',f)),t:`ORATS ${sg(at('o',f),3)}`,c:'var(--ink-faint)'});
+    heads.push({y:Y(at('o',f)),t:`报价 ${sg(at('o',f),3)}`,c:'var(--ink-faint)'});
     SER.forEach(s=>g+=`<circle cx="${hx.toFixed(1)}" cy="${Y(at(s.k,f)).toFixed(1)}" r="3.2" fill="${s.c}"/>`);
     spread(heads,14,T,B).forEach(h=>g+=lab(hx+9,h.y+4,h.t,h.c,'start',11.5,600));
     $('a0').innerHTML=g;
@@ -788,7 +788,7 @@ const A1=(()=>{
     g+=lab(R-4,T+14,`σ ＝ ${(s*100).toFixed(1)}%`,'var(--control)','end',16,600);
     $('a1').innerHTML=g;
     $('a1Sig').textContent=(s*100).toFixed(1)+'%';
-    $('a1Say').textContent= st.p>=1 ? 'σ 从 10% 升到 100%：300 call 的 delta 从 1.000 降到 0.759，410 call 从 0.000 升到 0.363，355 call 只从 0.456 变到 0.554。离平值越远，变得越多；平值附近的几乎不动。ORATS 的点落在 46.3% 那条虚线附近：市场报的 delta 就是用它自己的隐含波动率算出来的。' : '';
+    $('a1Say').textContent= st.p>=1 ? 'σ 从 10% 升到 100%：300 call 的 delta 从 1.000 降到 0.759，410 call 从 0.000 升到 0.363，355 call 只从 0.456 变到 0.554。离平值越远，变得越多；平值附近的几乎不动。报价快照的点落在 46.3% 那条虚线附近：市场报的 delta 就是用它自己的隐含波动率算出来的。' : '';
   }
   return {start:()=>playP(st,5200,draw), draw};
 })();

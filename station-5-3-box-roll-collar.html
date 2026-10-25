@@ -322,7 +322,7 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
   <p>300/400 这个 box，4/13 收盘中间价 99.975。代进上面的式子：(100 ÷ 99.975 − 1) ÷ (32/365) ＝ <b>0.29%</b>。按 4.3% 它应该值 100 ÷ (1 ＋ 4.3% × 32/365) ＝ 99.62，市价高了 0.35，反推的利率就比 4.3% 低得多。原因有两个。</p>
 
   <h3>原因一：四个中间价，各有几分钱误差</h3>
-  <p>100 块放 32 天，按 4.3% 的利息只有 0.38。box 要从四个价格里把这 0.38 量出来，每个价格差几分钱，利率就差很多：300/350 这个 box 的价格差 1 分钱，反推的利率就差 0.23 个百分点。4/13 这一天 ORATS 有 242 个分钟快照，逐个算 300/350 这个 box：反推的利率中位数 2.86%，一半的时候落在 1.71% 到 3.43% 之间，最低 −7.37%，最高 13.85%。</p>
+  <p>100 块放 32 天，按 4.3% 的利息只有 0.38。box 要从四个价格里把这 0.38 量出来，每个价格差几分钱，利率就差很多：300/350 这个 box 的价格差 1 分钱，反推的利率就差 0.23 个百分点。4/13 这一天有 242 个分钟报价快照，逐个算 300/350 这个 box：反推的利率中位数 2.86%，一半的时候落在 1.71% 到 3.43% 之间，最低 −7.37%，最高 13.85%。</p>
 
   <h3>原因二：美式 put 可以提前行权</h3>
   <p>box 的式子默认期权只能在到期日行权，这叫<span class="sym" data-say="European option。只能在到期日行权。">欧式</span>。TSLA 的期权是<span class="sym" data-say="American option。到期前任何一天都能行权。美国的个股期权都是美式。">美式</span>，到期前哪天都能行权。400 put 是<span class="sym" data-say="in the money。现在行权就值钱：put 的行权价高于股价，call 的行权价低于股价。反过来现在行权不值钱的叫虚值（2.1）。">实值</span>（行权价 400 高于股价 352.36），买方可以提前行权，早点按 400 卖出股票，拿到现金去生息（5.2 第四节提过，节点 9 专门讲）。这个权利值钱，所以美式的 400 put 比式子里的欧式价格贵。用 5.2 第四节的<span class="sym" data-say="binomial tree。把到期前的时间切成很多小步，每一步股价要么涨一格、要么跌一格，一格多大由波动率决定；从到期那一步往回算出期权今天的价值。美式 put 每一步都比较现在行权和继续拿着哪个值钱，取大的。">二叉树模型</span>（把 32 天切成 2000 小步，每步 TSLA 涨一格或跌一格，从到期往回算；美式 put 每一步比较现在行权和继续拿着哪个值钱），按 4.3% 的利率算，这部分值 0.37；300 put 是虚值，只值 0.01。这两个数叫<span class="sym" data-say="early exercise premium。美式期权比同样条件的欧式期权多出来的价值，来自可以提前行权。这里用 CRR 二叉树模型算：同一棵树上美式 put 减欧式 put。">提前行权价值</span>。</p>
@@ -619,7 +619,7 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
       <div class="gl"><div class="s">conversion / reversal</div><div class="t">买股票、卖 call、买 put，到期一定按 X 卖出股票 / 反过来卖空股票、买 call、卖 put，到期一定按 X 买回（5.2）。</div></div>
       <div class="gl"><div class="s">Black-Scholes</div><div class="t">用股价、行权价、利率、到期时间和波动率算期权价格的公式（2.1）。本页只在第四节用它拆开 collar 两边不对称的原因。</div></div>
       <div class="gl"><div class="s">远期价</div><div class="t">今天约定、到期交割的价格。不派息时等于股价加上到期前的利息：352.36 × (1 ＋ 4.3% × 32/365) ＝ 353.69（1.1）。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出的波动率（1.2）。本页的二叉树用 ORATS 给每个行权价算的值。</div></div>
+      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出的波动率（1.2）。本页的二叉树用报价快照给每个行权价算的值。</div></div>
       <div class="gl"><div class="s">标准差</div><div class="t">一组数离平均值的典型距离（1.2）。</div></div>
       <div class="gl"><div class="s">指派 / pin risk</div><div class="t">卖出期权的一方被对手行权选中，必须履约 / 到期时股价停在行权价附近，不知道自己卖出的那张会不会被指派（5.2）。</div></div>
       <div class="gl"><div class="s">中间价 / 买一 / 卖一</div><div class="t">买一是有人愿意买的最高价，卖一是有人愿意卖的最低价，中间价是两者的平均。自己买按卖一成交，卖按买一成交。</div></div>
@@ -638,7 +638,7 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
 <footer>
   <p>下一节 <a href="station-7-model-assumptions.html"><b>7 模型假设怎么崩</b></a>：风险与对冲、策略与组合两条路在这里合流。前面的定价都建立在 Black-Scholes 的几条假设上，节点 7 用真实数据逐条看它们在哪里不成立。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照，价格来自 IBKR 分钟线</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
 </footer>
 
 </div>
@@ -682,7 +682,7 @@ const px3=v=>{ const s=v.toFixed(3); return s.endsWith('0')?v.toFixed(2):s; };
 /* ══════════ 案例数据 ══════════
    由 scripts/data/station_5_3.py 生成，重跑加 --inject 会整段替换。
    CH：[行权价, call 买一, call 卖一, put 买一, put 卖一, put 提前行权价值]，4/13 收盘，5/15 到期，280 到 420；
-       最后一列是模型值：CRR 二叉树 2000 步，σ 取 ORATS smv_vol，利率 4.3%，美式 put 减欧式 put。
+       最后一列是模型值：CRR 二叉树 2000 步，σ 取平滑隐含波动率，利率 4.3%，美式 put 减欧式 put。
    BOXQ：300/400 box 按成交价买入要付、卖出能收的钱。
    DY：4/13 到 5/15 每个交易日 16:00 的中间价。cs / ps 是 5/15 到期 300/400 call spread 与 put spread（5/15 按结算价 422.32 的到期价值）；
        c15 / p15 / c08 / p08 是 350 行权价 5/15 与 5/8 到期的 call、put（只到 5/8，5/8 那两张按收盘 428.45 的到期价值）。

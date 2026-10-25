@@ -264,7 +264,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
   <ul>
     <li><span class="sym" data-say="bid。报价的人愿意买进的价格。客户想卖，只能卖到这个价。">买价</span>：报价的人愿意买进的价格。客户想卖出，只能卖到 21.00。</li>
     <li><span class="sym" data-say="ask 或 offer。报价的人愿意卖出的价格。客户想买，要付这个价。">卖价</span>：报价的人愿意卖出的价格。客户想买入，要付 21.10。</li>
-    <li><span class="sym" data-say="size。这个价位上愿意成交多少张。写成「买的张数 × 卖的张数」，例如 300 × 300。">数量</span>：这两个价位上各挂着多少张。19 张和 6 张是 ORATS 快照记下的两个价位上的挂单合计。</li>
+    <li><span class="sym" data-say="size。这个价位上愿意成交多少张。写成「买的张数 × 卖的张数」，例如 300 × 300。">数量</span>：这两个价位上各挂着多少张。19 张和 6 张是报价快照记下的两个价位上的挂单合计。</li>
   </ul>
   <div class="formula">
     <div class="math"><span class="sym" data-say="spread，买卖价差：卖价减买价。">价差</span> ＝ 卖价 − 买价　　<span class="sym" data-say="mid，中间价：买价和卖价的平均。">中间价</span> ＝ (买价 + 卖价) ÷ 2</div>
@@ -278,7 +278,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
     <div class="math">边际 ＝ (卖出价 − 理论值) × 张数 × 100</div>
     <div class="gloss">卖得比理论值贵多少，乘上张数，再按每张 100 股折成美元；买入时是 (理论值 − 买入价)</div>
   </div>
-  <p>4/13 收盘，用 ORATS 给这个行权价的平滑波动率（<span class="sym" data-say="smv_vol。ORATS 把各个行权价的隐含波动率拟合成一条平滑的曲线，这条曲线在某个行权价上的值。本页把它当作做市商的理论波动率。">smv_vol</span>）46.2% 按 Black-Scholes（2.1 用过的期权定价公式）算，这张 call 的理论值是 21.01。以 21.10 卖给 1.1 那位买方，每张边际 (21.10 − 21.01) × 100，约 9 美元。</p>
+  <p>4/13 收盘，用报价快照给这个行权价的<span class="sym" data-say="报价快照把各个行权价的隐含波动率拟合成一条平滑的曲线，这条曲线在某个行权价上的值。本页把它当作做市商的理论波动率。">平滑隐含波动率</span> 46.2% 按 Black-Scholes（2.1 用过的期权定价公式）算，这张 call 的理论值是 21.01。以 21.10 卖给 1.1 那位买方，每张边际 (21.10 − 21.01) × 100，约 9 美元。</p>
   <p>这 9 美元只是算出来的数。卖出以后做市商手里多了一张空头 call，而接下来一个月 TSLA 涨了 20%（1.1）。讲义把做市归结成三个问题：</p>
   <ol>
     <li>我认为这张期权值多少？</li>
@@ -291,13 +291,13 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
   <h2><span class="n">一</span>真实的一天</h2>
-  <p class="sub">2026-04-13 这一天，TSLA 5/15 到期 350 call 的报价逐分钟回放。ORATS 每天只有 9:30 到 11:30、14:00 到 16:00 两段快照；9:30 那一行的期权报价还是上一个交易日留下的，当天累计成交是 0，所以从 9:31 开始。</p>
+  <p class="sub">2026-04-13 这一天，TSLA 5/15 到期 350 call 的报价逐分钟回放。报价快照每天只有 9:30 到 11:30、14:00 到 16:00 两段；9:30 那一行的期权报价还是上一个交易日留下的，当天累计成交是 0，所以从 9:31 开始。</p>
   <div class="panel">
     <div class="bar"><button class="btn ghost" id="rpPlay">重播</button></div>
     <svg id="rp" viewBox="0 0 720 352" role="img" aria-label="350 call 一天里逐分钟的买价、卖价、理论值与成交张数"></svg>
     <div class="legend">
       <span><i style="background:var(--control-bg);border:1px solid var(--control)"></i>买价到卖价</span>
-      <span><i class="ln" style="background:var(--result)"></i>理论值（smv_vol）</span>
+      <span><i class="ln" style="background:var(--result)"></i>理论值（平滑隐含波动率）</span>
     </div>
     <div class="stats">
       <div class="stat"><div class="k">时间</div><div class="d" id="rpT"></div><div class="d2" id="rpS"></div></div>
@@ -307,7 +307,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
     </div>
   </div>
   <p>这一天 TSLA 在 348.77 到 355.61 之间来回，350 call 的报价跟着上下：买价最低 19.65，卖价最高 23.50。价差很稳：241 个快照里 111 个是 0.10，93 个是 0.15，中位数 0.15，约占中间价的 0.7%；最宽的一次 0.45，在 10:15。做市商挣的是这 0.10 到 0.15，不是期权从 19.65 涨到 23.50 的那几块钱，那几块钱是持有仓位的人的盈亏。</p>
-  <p>241 分钟里有 194 分钟（80%），用 smv_vol 按 Black-Scholes 算出的理论值落在买价和卖价之间，和中间价的差中位数只有 0.035。落在外面的 47 分钟里，46 分钟在买价以下，多数只低一两分钱（中位数 0.013）；最远一次在 9:51，比中间价低 0.19。报价围着理论值，两边各让出一点。</p>
+  <p>241 分钟里有 194 分钟（80%），用平滑隐含波动率按 Black-Scholes 算出的理论值落在买价和卖价之间，和中间价的差中位数只有 0.035。落在外面的 47 分钟里，46 分钟在买价以下，多数只低一两分钱（中位数 0.013）；最远一次在 9:51，比中间价低 0.19。报价围着理论值，两边各让出一点。</p>
   <p>全天成交 6,121 张，但 241 分钟里有 98 分钟一张也没成交；9:52、9:56、9:57 三分钟各成交了一千多张（1,010、1,018、1,556），14:00 那一栏的 441 张是 11:30 到 14:00 之间累计的。客户的单子一阵一阵地来，做市商什么时候接到、接到哪一边，自己定不了。另外，成交不一定落在买价或卖价上：有成交的 143 分钟里，137 分钟的最后一笔成交价落在买价和卖价之间，做市商实际挣到的常常比半个价差少。</p>
 
   <h3>一天里的哪个时段</h3>
@@ -360,7 +360,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
   <p id="dteSay"></p>
 
   <h3>报一个自己的双边价</h3>
-  <p>给 4/13 收盘的任意一个行权价报价：理论值用 smv_vol 按 Black-Scholes 算，宽度用波动率点，再用 vega 换成价格。报价要落在最小单位上，买价往下取整、卖价往上取整。</p>
+  <p>给 4/13 收盘的任意一个行权价报价：理论值用平滑隐含波动率按 Black-Scholes 算，宽度用波动率点，再用 vega 换成价格。报价要落在最小单位上，买价往下取整、卖价往上取整。</p>
   <div class="panel">
     <div class="controls" style="margin-top:0">
       <div class="ctl"><label><span>行权价</span><span class="v" id="vK"></span></label>
@@ -516,7 +516,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
   </div>
   <p>4/15、不对冲：不偏移的做市商平均每天挣 13,781 美元，最差一天亏 101,570，最好一天赚 183,475，200 次里 76 次亏钱；偏移的平均 16,923，最差亏 1,785，200 次里只亏 2 次。价差收入两者都很稳（平均 18,609 和 17,456），决定这一天赚还是亏的是库存。偏移少挣了 6% 的价差收入，换来最差的一天从亏 10 万变成亏 1,785。4/13 平静得多，不偏移最差亏 3,250、200 次里亏 17 次，偏移最差亏 993、亏 2 次。</p>
   <p>每分钟用股票对冲 delta 之后，4/15 不偏移的平均 18,359、最差一天赚 5,185，偏移的平均 17,461、最差一天赚 11,020，200 次都不亏。对冲去掉的是方向。这里的对冲晚一分钟：这一分钟新接的仓位，要到下一分钟才对冲上。</p>
-  <p>对冲去不掉的，是三节那张表里的 gamma 和 vega：实际波动变大、隐含波动率变动。模拟用的是真实中间价，隐含波动率的变化已经算在里面。4/13 这张 call 的隐含波动率（ORATS）从 9:31 的 47.9% 降到收盘 46.3%，少 1.6 个点；4/15 从 47.6% 升到 50.8%，盘中最高 52.7%，升了 3.3 个点，是第五节财报那次降幅（5.8 个点）的一半多。对冲以后仍然不亏，是因为库存小：每分钟按「库存 × vega × 隐含波动率的变化」估这一块，4/15 这天 vega 在 0.29 到 0.39 之间，200 次里最差一次偏移的约亏 3,000，不偏移的约亏 7,200，而一天的价差收入在 1.7 万以上。库存越大，这一块越大。去掉这部分风险，只能少接同方向的单子（偏移报价），或者买卖特征相似的期权（三节的最后一问）。模拟也没算买卖股票本身的成本。</p>
+  <p>对冲去不掉的，是三节那张表里的 gamma 和 vega：实际波动变大、隐含波动率变动。模拟用的是真实中间价，隐含波动率的变化已经算在里面。4/13 这张 call 的隐含波动率（报价快照）从 9:31 的 47.9% 降到收盘 46.3%，少 1.6 个点；4/15 从 47.6% 升到 50.8%，盘中最高 52.7%，升了 3.3 个点，是第五节财报那次降幅（5.8 个点）的一半多。对冲以后仍然不亏，是因为库存小：每分钟按「库存 × vega × 隐含波动率的变化」估这一块，4/15 这天 vega 在 0.29 到 0.39 之间，200 次里最差一次偏移的约亏 3,000，不偏移的约亏 7,200，而一天的价差收入在 1.7 万以上。库存越大，这一块越大。去掉这部分风险，只能少接同方向的单子（偏移报价），或者买卖特征相似的期权（三节的最后一问）。模拟也没算买卖股票本身的成本。</p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
@@ -550,7 +550,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
       <p>不偏移也不对冲的做市商损失更大：平均从每天赚 13,781 变成亏 11,516，200 次里 117 次亏钱。4/15 一路上涨，知情的客户买得多（200 次合计买进 8,970 张、卖出 5,241 张），做市商收盘平均空 23 张，空头越积越多。做市商分不出谁知道得多，只能对所有人报同一个价差：不知情的客户付的价差，要够赔给知情的客户。</p>
     </li>
     <li>
-      <p><b>跳空与事件。</b>节点 7 讲过跳空时来不及对冲：4/22 盘后 TSLA 公布财报，按 IBKR 分钟线，4/22 收盘 387.20，4/23 开盘成交 375.28，低 3.08%。下表用 ORATS 快照，标的从 4/22 16:00 的 387.61 到 4/23 9:31 的 372.65（−3.86%），多出来的部分是开盘第一分钟继续下跌。平值 call 的价差：</p>
+      <p><b>跳空与事件。</b>节点 7 讲过跳空时来不及对冲：4/22 盘后 TSLA 公布财报，按分钟线，4/22 收盘 387.20，4/23 开盘成交 375.28，低 3.08%。下表用报价快照，标的从 4/22 16:00 的 387.61 到 4/23 9:31 的 372.65（−3.86%），多出来的部分是开盘第一分钟继续下跌。平值 call 的价差：</p>
       <table>
         <thead><tr><th>时间</th><th>标的</th><th>平值 call</th><th>买价 / 卖价</th><th>价差</th><th>折成波动率点</th><th>隐含波动率</th></tr></thead>
         <tbody id="evTb"></tbody>
@@ -595,7 +595,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
       <div class="gl"><div class="s">理论值</div><div class="t">按定价模型和自己认定的波动率算出的期权价值。</div></div>
       <div class="gl"><div class="s">边际 edge</div><div class="t">成交价离理论值的距离 × 张数；按美元算再乘 100（一张 100 股），讲义的记法只乘张数（March 95 call 的 35.00）。成交时只是算出来的数，要靠对冲兑现或用转换锁定。</div></div>
       <div class="gl"><div class="s">隐含波动率</div><div class="t">把期权的市场价格代进定价模型，反推出来的波动率（1.2）。</div></div>
-      <div class="gl"><div class="s">smv_vol</div><div class="t">ORATS 把各行权价的隐含波动率拟合成平滑曲线后，在某个行权价上的值。本页当作做市商的理论波动率。</div></div>
+      <div class="gl"><div class="s">平滑隐含波动率</div><div class="t">报价快照把各行权价的隐含波动率拟合成平滑曲线后，在某个行权价上的值。本页当作做市商的理论波动率。</div></div>
       <div class="gl"><div class="s">vega、波动率点</div><div class="t">波动率每变 1 个百分点，期权价格变多少。价格宽度 = vega × 波动率宽度。</div></div>
       <div class="gl"><div class="s">折成波动率点</div><div class="t">按卖价反推的隐含波动率减去按买价反推的隐含波动率，约等于价差 ÷ vega。</div></div>
       <div class="gl"><div class="s">delta、gamma、theta</div><div class="t">期权对标的的敏感度（2.1）、delta 变化的速度与时间价值的流失（2.2）。</div></div>
@@ -619,7 +619,7 @@ ol.steps li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600
 <footer>
   <p>这条支线到这里结束。另一条支线是 <a href="station-v-vix.html"><b>V 波动率合约与 VIX</b></a>：不经过单张期权和定价模型，直接交易波动率本身；VIX 是用一整排虚值期权的价格算出来的。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价来自 ORATS 历史快照；第四、五节的客户是固定种子的模拟</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格；第四、五节的客户是固定种子的模拟</p>
 </footer>
 
 </div>
@@ -863,7 +863,7 @@ function renderDesk(){
   const th=r[7], vg=r[5], half=vg*w/2, tick= th<3?0.01:0.05;
   const bid=Math.max(0,Math.floor((th-half)/tick+1e-9)*tick), ask=Math.ceil((th+half)/tick-1e-9)*tick;
   $('vK').textContent=r[0]+(call?' call':' put'); $('vWd').textContent=w.toFixed(2)+' 个点';
-  $('dTh').textContent=f3(th); $('dThb').textContent=`smv_vol ${f2(r[6])}%，vega ${f3(vg)}`;
+  $('dTh').textContent=f3(th); $('dThb').textContent=`平滑隐含波动率 ${f2(r[6])}%，vega ${f3(vg)}`;
   $('dQ').textContent=f2(bid)+' / '+f2(ask); $('dQb').textContent=`半个宽度 ${f3(half)}，最小单位 ${f2(tick)}`;
   $('dM').textContent=f2(r[2])+' / '+f2(r[3]); $('dMb').textContent=`价差 ${f2(r[3]-r[2])}，${f2(r[4])} 个点`;
   const eb=(th-bid)*100, ea=(ask-th)*100;

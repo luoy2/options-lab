@@ -265,7 +265,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
 <section id="s0">
   <h2><span class="n">〇</span>先按仓位算</h2>
   <p class="sub">2.2、2.3 给出的数都是「每股」的。2.1 已经把 delta 换算成整个仓位的等价标的头寸；放进仓位之前，四个数都要这样换算。</p>
-  <p>还是 1.1 那张 5/15 到期的 350 call。4/13 收盘时（TSLA 352.36），ORATS 给出它的四个希腊字母：</p>
+  <p>还是 1.1 那张 5/15 到期的 350 call。4/13 收盘时（TSLA 352.36），报价快照给出它的四个希腊字母：</p>
   <table>
     <thead><tr><th>名称</th><th>符号</th><th>350 call 每股</th><th class="txt">意思</th></tr></thead>
     <tbody>
@@ -290,7 +290,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
   </ul>
   <p>卖出同一张，四个数的符号全部翻过来：−55.74、−0.82、+31.90、−41.25。</p>
   <p>股票也可以当成一条腿。一股 TSLA 的 delta 是 1，gamma、theta、vega 都是 0：股票的价值跟着股价一比一地变，不会弯；不会随时间衰减；和隐含波动率无关。买 11 股，这条腿就是 delta 11，其余三个数都是 0。</p>
-  <p class="tiny">ORATS 的 theta 只有 call 的一列。put 的 theta 用 1.1 的 put-call parity 换算。1.1 写的是 C − P ＝ (F − X) ÷ (1 ＋ r·t)：同一行权价、同一到期日的 call 价格减 put 价格，等于远期价减行权价再折回今天。TSLA 不分红，这就是 <span class="sym" data-say="TSLA 现在的价格。">S</span> 减去行权价 <span class="sym" data-say="行权价，沿用 1.1 的写法。这里是 350。">X</span> 折回今天的值。过一天，行权价折回今天的值多出约 <span class="sym" data-say="无风险利率，1.1 从报价反解出 4.3%。">r</span> × X ÷ 365，call − put 就少这么多，所以 put 的 theta 比 call 高出这一块（r ＝ 4.3%，350 put 是 −0.278 每天，call 是 −0.319）。同一个式子的右边对 S 是一条直线、和隐含波动率无关，所以 call 与 put 的 gamma、vega 相同。</p>
+  <p class="tiny">报价快照里的 theta 只有 call 的一列。put 的 theta 用 1.1 的 put-call parity 换算。1.1 写的是 C − P ＝ (F − X) ÷ (1 ＋ r·t)：同一行权价、同一到期日的 call 价格减 put 价格，等于远期价减行权价再折回今天。TSLA 不分红，这就是 <span class="sym" data-say="TSLA 现在的价格。">S</span> 减去行权价 <span class="sym" data-say="行权价，沿用 1.1 的写法。这里是 350。">X</span> 折回今天的值。过一天，行权价折回今天的值多出约 <span class="sym" data-say="无风险利率，1.1 从报价反解出 4.3%。">r</span> × X ÷ 365，call − put 就少这么多，所以 put 的 theta 比 call 高出这一块（r ＝ 4.3%，350 put 是 −0.278 每天，call 是 −0.319）。同一个式子的右边对 S 是一条直线、和隐含波动率无关，所以 call 与 put 的 gamma、vega 相同。</p>
   <p>第五个希腊字母 <span class="sym" data-say="rho。利率涨 1 个百分点，期权价格变多少（2.3）。">ρ</span>（rho，2.3）在一个月的期权上很小：1 张 350 call 的 rho 是 15.45 美元每个百分点，而利率一个月里很少动一个百分点。本页只用四个数。</p>
 </section>
 
@@ -357,7 +357,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
     <div class="gloss">仓位每天的 theta ≈ 各条腿「−½ × 股价² × 自己的隐含波动率² × 自己的 gamma」之和，按年算出来再除以 365 换成每天</div>
   </div>
   <table id="thgTb" style="max-width:36rem">
-    <thead><tr><th>仓位</th><th>gamma</th><th>theta<br>ORATS 相加</th><th>theta<br>按上式</th></tr></thead>
+    <thead><tr><th>仓位</th><th>gamma</th><th>theta<br>报价相加</th><th>theta<br>按上式</th></tr></thead>
     <tbody></tbody>
   </table>
   <p id="thgText"></p>
@@ -452,7 +452,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
   <p id="rpText2"></p>
 
   <h3>换一个仓位、换一次变动</h3>
-  <p class="sub">5/15 到期的期权，4/13 收盘中间价与 ORATS 希腊字母。</p>
+  <p class="sub">5/15 到期的期权，4/13 收盘中间价与报价快照里的希腊字母。</p>
   <div class="panel">
     <div class="presets">
       <button data-b="short">卖跨式加股票</button><button data-b="bull">牛市价差</button><button data-b="call">买 350 call</button><button data-b="clear">清空</button>
@@ -557,7 +557,7 @@ tr.nb td{border-bottom:none;padding-bottom:.15rem}
 <footer>
   <p>下一节，两条路从这里分开。左边 <a href="station-4-1-dynamic-hedging.html"><b>4.1 动态对冲</b></a>（风险与对冲）：只盯四个数里的 delta，每周调仓把它拉回 0，看理论价值怎样一步步变成现金。右边 <a href="station-3-1-spreads.html"><b>3.1 价差家族</b></a>（策略与组合）：用两条腿表达方向观点，本页的牛市价差是其中一种。</p>
   <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例报价与希腊字母来自 ORATS 历史快照</p>
+    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
 </footer>
 
 </div>
@@ -623,12 +623,12 @@ const svgW = el => Math.round(Math.min(720, Math.max(300, el.getBoundingClientRe
 })();
 
 /* ══════════ 数据 ══════════
-   scripts/data/station_2_4.py 生成。ORATS TSLA 每天 16:00 快照，中间价 = (买一 + 卖一) / 2。
+   scripts/data/station_2_4.py 生成。TSLA 期权每天 16:00 快照，中间价 = (买一 + 卖一) / 2。
    ports：4/13 收盘的五个仓位，每条腿已乘 100 × 张数（卖为负），股票腿 delta = 股数。
      put 的 theta 由 parity 换算：θ_put = θ_call + r·K·e^(−rT)/365，r = 4.3%。thg = Σ −½σ²S²Γ/365。
    replay[仓位][daily|fixed]：每行 [ΔS, Δt, delta 项, gamma 项, theta 项, vega 项, 实际]。
      daily 用前一天收盘的四个数估当天；fixed 一直用 4/13 的四个数估从 4/13 到当天。
-   σ：每条腿自己的报价隐含波动率，call 用 C_IV、put 用 P_IV（350 call 入场 46.29%，与 1.2、2.2、2.3 同源）。
+   σ：每条腿自己的报价隐含波动率，call 腿用 call 的、put 腿用 put 的（350 call 入场 46.29%，与 1.2、2.2、2.3 同源）。
    ex：第三节算例；messy415：七条腿 4/14 → 4/15（D G T V 是 4/14 收盘的四个数）。
    trunc：4/14 收盘 4/17 到期的 365 call 与 put，4/15 收盘对照；m 是 σ、T 固定在 4/14 的模型价格变化；alt 是 5/15 的 370 put。
    chain：4/13 收盘 5/15 到期，每行 [K, call 中间价, put 中间价, call Δ, put Δ, Γ, call Θ, put Θ, ν, σ]。 */
