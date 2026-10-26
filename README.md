@@ -7,6 +7,7 @@
 | 页面 | 内容 |
 |---|---|
 | [路线图](https://luoy2.github.io/options-lab/) | 20 个学习节点的课程地图，带分叉与依赖 |
+| [一个小时速通期权交易](https://luoy2.github.io/options-lab/combos.html) | 一个视频看完 31 个常见期权组合，有配音，约 50 分钟 |
 | [1.1 远期价格](https://luoy2.github.io/options-lab/station-1-1-forward-price.html) | 期权是什么、损益图、定价的中心点 |
 | [1.2 波动率](https://luoy2.github.io/options-lab/station-1-2-volatility.html) | 分布有多宽；股价模型的假设；/16 口诀；正态 vs 对数正态 |
 | [2.1 delta](https://luoy2.github.io/options-lab/station-2-1-delta.html) | 第一个希腊字母，四种读法 |
