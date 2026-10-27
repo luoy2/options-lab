@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="lang.js"></script>
 <title>Synthetics 合成</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2024H16L27%2013'%20stroke='%23fdf6ec'%20stroke-opacity='.55'%20stroke-width='2.2'%20fill='none'%20stroke-linecap='round'/%3E%3Cpath%20d='M5%2027L27%207'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -213,217 +214,217 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 合成标的</a><a href="#s1">一 四条合成</a><a href="#s2">二 就是标的</a><a href="#s3">三 拆</a>
-  <a href="#s4">四 化简</a><a href="#s5">五 蝴蝶互补</a><a href="#s6">六 认等价</a><a href="#s7">七 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 合成标的</span><span class="l-en">0 Synthetic underlying</span></a><a href="#s1"><span class="l-zh">一 四条合成</span><span class="l-en">1 Four synthetics</span></a><a href="#s2"><span class="l-zh">二 就是标的</span><span class="l-en">2 It is the underlying</span></a><a href="#s3"><span class="l-zh">三 拆</span><span class="l-en">3 Splitting</span></a>
+  <a href="#s4"><span class="l-zh">四 化简</span><span class="l-en">4 Simplifying</span></a><a href="#s5"><span class="l-zh">五 蝴蝶互补</span><span class="l-en">5 Butterfly complements</span></a><a href="#s6"><span class="l-zh">六 认等价</span><span class="l-en">6 Spot the equivalence</span></a><a href="#s7"><span class="l-zh">七 费曼检验</span><span class="l-en">7 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 5.1</p>
-  <h1>Synthetics：合成与化简</h1>
-  <p class="lede">3.1 和 3.2 各留下一个问题。TSLA 350/380 <span class="sym" data-say="bull call spread（3.1）：同一到期，买一张低行权价的 call、卖一张高行权价的 call。开仓付钱，TSLA 涨就赚，最多赚两个行权价之差减去付的钱。">牛市 call 价差</span>开仓付 11.975，同样两个行权价的<span class="sym" data-say="bull put spread（3.1）：同一到期，买一张低行权价的 put、卖一张高行权价的 put。开仓收钱，TSLA 涨上去两张都作废，收的钱留下。">牛市 put 价差</span>开仓收 18.075，到期盈亏几乎一样；325/350/375 <span class="sym" data-say="butterfly（3.2）：三个等距行权价，买 1 张低的、卖 2 张中间的、买 1 张高的，同一种期权。到期停在中间那个行权价时最值钱，离开越远越不值钱，最少是 0。">butterfly</span> 买入付 5.60，<span class="sym" data-say="iron butterfly（3.2）：同样三个行权价，call 和 put 混着用：中间行权价的 straddle 与两边的 strangle 一买一卖。卖出 iron butterfly 开仓收钱，盈亏和买入 butterfly 一样。">iron butterfly</span> 卖出收 19.50，盈亏也一样。这一节讲合成关系：用两条腿做出第三样东西，把一堆腿化简到最简形式。案例仍是 2026-04-13 收盘、5/15 到期的 TSLA 期权。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 5.1</span><span class="l-en">FIN 580 review · Node 5.1</span></p>
+  <h1><span class="l-zh">Synthetics：合成与化简</span><span class="l-en">Synthetics: building and simplifying</span></h1>
+  <p class="lede"><span class="l-zh">3.1 和 3.2 各留下一个问题。TSLA 350/380 <span class="sym" data-say="bull call spread（3.1）：同一到期，买一张低行权价的 call、卖一张高行权价的 call。开仓付钱，TSLA 涨就赚，最多赚两个行权价之差减去付的钱。">牛市 call 价差</span>开仓付 11.975，同样两个行权价的<span class="sym" data-say="bull put spread（3.1）：同一到期，买一张低行权价的 put、卖一张高行权价的 put。开仓收钱，TSLA 涨上去两张都作废，收的钱留下。">牛市 put 价差</span>开仓收 18.075，到期盈亏几乎一样；325/350/375 <span class="sym" data-say="butterfly（3.2）：三个等距行权价，买 1 张低的、卖 2 张中间的、买 1 张高的，同一种期权。到期停在中间那个行权价时最值钱，离开越远越不值钱，最少是 0。">butterfly</span> 买入付 5.60，<span class="sym" data-say="iron butterfly（3.2）：同样三个行权价，call 和 put 混着用：中间行权价的 straddle 与两边的 strangle 一买一卖。卖出 iron butterfly 开仓收钱，盈亏和买入 butterfly 一样。">iron butterfly</span> 卖出收 19.50，盈亏也一样。这一节讲合成关系：用两条腿做出第三样东西，把一堆腿化简到最简形式。案例仍是 2026-04-13 收盘、5/15 到期的 TSLA 期权。</span><span class="l-en">3.1 and 3.2 each left a question open. The TSLA 350/380 <span class="sym" data-say="Bull call spread (3.1): same expiration, buy a lower-strike call and sell a higher-strike call. You pay to open, make money if TSLA rises, and can make at most the difference between the strikes minus what you paid.">bull call spread</span> costs 11.975 to open and the <span class="sym" data-say="Bull put spread (3.1): same expiration, buy a lower-strike put and sell a higher-strike put. You collect money to open; if TSLA rises both expire worthless and you keep what you collected.">bull put spread</span> with the same two strikes collects 18.075 to open, yet their P&amp;L at expiration is nearly the same. The 325/350/375 <span class="sym" data-say="Butterfly (3.2): three equally spaced strikes, buy 1 low, sell 2 middle, buy 1 high, all the same type of option. It is worth the most if expiration lands on the middle strike, less the farther away, and at least 0.">butterfly</span> costs 5.60 to buy and the <span class="sym" data-say="Iron butterfly (3.2): the same three strikes, mixing calls and puts: a straddle at the middle strike and a strangle at the two outer strikes, one bought and the other sold. Selling an iron butterfly collects money to open, and its P&amp;L is the same as buying a butterfly.">iron butterfly</span> collects 19.50 to sell, and their P&amp;L is also the same. This node covers synthetic relationships: using two legs to build a third thing, and reducing a pile of legs to its simplest form. The case is still TSLA options at the 2026-04-13 close, expiring 5/15.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>合成多头标的</h2>
-  <p class="sub">讲义这一课（Session 5，11 页）没有一个定价公式，只讲一件事：几张合约放在一起，到期时等于另一张合约。先看最基本的一对。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>合成多头标的</span><span class="l-en"><span class="n">0</span>Synthetic long underlying</span></h2>
+  <p class="sub"><span class="l-zh">讲义这一课（Session 5，11 页）没有一个定价公式，只讲一件事：几张合约放在一起，到期时等于另一张合约。先看最基本的一对。</span><span class="l-en">This lecture (Session 5, 11 pages) has no pricing formula. It covers one thing: several contracts held together equal another contract at expiration. Start with the most basic pair.</span></p>
 
-  <h3>记法</h3>
-  <p>讲义这样写仓位：<code>+1 December 100 call</code> 是买入 1 张 12 月到期、行权价 100 的 call，<code>−1</code> 是卖出。一张期权对应一份<span class="sym" data-say="underlying contract。期权到期时买卖的那样东西。讲义的例子是期货期权，一张期权对应一张期货合约；TSLA 期权对应 100 股 TSLA 股票。本页 TSLA 的数都按每股算。">标的合约</span>。本页 TSLA 的例子里，标的就是 TSLA 股票，一张期权对应 100 股，下面的钱数都按每股算。</p>
+  <h3><span class="l-zh">记法</span><span class="l-en">Notation</span></h3>
+  <p><span class="l-zh">讲义这样写仓位：<code>+1 December 100 call</code> 是买入 1 张 12 月到期、行权价 100 的 call，<code>−1</code> 是卖出。一张期权对应一份<span class="sym" data-say="underlying contract。期权到期时买卖的那样东西。讲义的例子是期货期权，一张期权对应一张期货合约；TSLA 期权对应 100 股 TSLA 股票。本页 TSLA 的数都按每股算。">标的合约</span>。本页 TSLA 的例子里，标的就是 TSLA 股票，一张期权对应 100 股，下面的钱数都按每股算。</span><span class="l-en">The lecture notes write positions like this: <code>+1 December 100 call</code> means buying 1 call expiring in December with a strike of 100, and <code>−1</code> means selling. One option corresponds to one <span class="sym" data-say="Underlying contract. The thing bought or sold when the option is exercised. The lecture examples are options on futures, where one option corresponds to one futures contract; one TSLA option corresponds to 100 shares of TSLA. TSLA figures on this page are per share.">underlying contract</span>. In this page's TSLA examples the underlying is TSLA stock, one option covers 100 shares, and all amounts below are per share.</span></p>
 
-  <h3>买 call、卖 put，到期会怎样</h3>
-  <p>讲义的第一个例子是 +1 December 100 call、−1 December 100 put。换成 1.1 那笔交易用的 TSLA 5/15 到期、行权价 350：买 1 张 350 call，卖 1 张 350 put。到期时 TSLA 只有三种情况：</p>
+  <h3><span class="l-zh">买 call、卖 put，到期会怎样</span><span class="l-en">Buy a call, sell a put: what happens at expiration</span></h3>
+  <p><span class="l-zh">讲义的第一个例子是 +1 December 100 call、−1 December 100 put。换成 1.1 那笔交易用的 TSLA 5/15 到期、行权价 350：买 1 张 350 call，卖 1 张 350 put。到期时 TSLA 只有三种情况：</span><span class="l-en">The lecture's first example is +1 December 100 call, −1 December 100 put. Switch to the TSLA options from the trade in 1.1, expiring 5/15 with a 350 strike: buy 1 350 call and sell 1 350 put. At expiration TSLA can be in only three places:</span></p>
   <div class="tbl"><table>
-    <thead><tr><th>5/15 TSLA 收在</th><th class="txt">买入的 350 call</th><th class="txt">卖出的 350 put</th><th class="txt">结果</th></tr></thead>
+    <thead><tr><th><span class="l-zh">5/15 TSLA 收在</span><span class="l-en">TSLA close on 5/15</span></th><th class="txt"><span class="l-zh">买入的 350 call</span><span class="l-en">Long 350 call</span></th><th class="txt"><span class="l-zh">卖出的 350 put</span><span class="l-en">Short 350 put</span></th><th class="txt"><span class="l-zh">结果</span><span class="l-en">Result</span></th></tr></thead>
     <tbody>
-      <tr><td>高于 350，比如 400</td><td class="txt">值 50，你行权：按 350 买入</td><td class="txt">没人行权，作废</td><td class="txt"><b>按 350 买入</b></td></tr>
-      <tr><td>低于 350，比如 300</td><td class="txt">作废</td><td class="txt">买 put 的人行权，把股票按 350 卖给你，你被<span class="sym" data-say="assignment。卖出期权的一方，在对方行权时必须履约：卖了 put 就必须按行权价买入，卖了 call 就必须按行权价卖出。">指派</span>，必须接</td><td class="txt"><b>按 350 买入</b></td></tr>
-      <tr><td>正好 350</td><td class="txt">值 0</td><td class="txt">值 0</td><td class="txt">按 350 买不买都一样</td></tr>
+      <tr><td><span class="l-zh">高于 350，比如 400</span><span class="l-en">Above 350, e.g. 400</span></td><td class="txt"><span class="l-zh">值 50，你行权：按 350 买入</span><span class="l-en">Worth 50; you exercise and buy at 350</span></td><td class="txt"><span class="l-zh">没人行权，作废</span><span class="l-en">No one exercises; it expires</span></td><td class="txt"><b><span class="l-zh">按 350 买入</span><span class="l-en">Buy at 350</span></b></td></tr>
+      <tr><td><span class="l-zh">低于 350，比如 300</span><span class="l-en">Below 350, e.g. 300</span></td><td class="txt"><span class="l-zh">作废</span><span class="l-en">Expires worthless</span></td><td class="txt"><span class="l-zh">买 put 的人行权，把股票按 350 卖给你，你被<span class="sym" data-say="assignment。卖出期权的一方，在对方行权时必须履约：卖了 put 就必须按行权价买入，卖了 call 就必须按行权价卖出。">指派</span>，必须接</span><span class="l-en">The put buyer exercises and sells you the stock at 350; you are <span class="sym" data-say="Assignment. The side that sold an option must perform when the other side exercises: a short put must buy at the strike, a short call must sell at the strike.">assigned</span> and must take it</span></td><td class="txt"><b><span class="l-zh">按 350 买入</span><span class="l-en">Buy at 350</span></b></td></tr>
+      <tr><td><span class="l-zh">正好 350</span><span class="l-en">Exactly 350</span></td><td class="txt"><span class="l-zh">值 0</span><span class="l-en">Worth 0</span></td><td class="txt"><span class="l-zh">值 0</span><span class="l-en">Worth 0</span></td><td class="txt"><span class="l-zh">按 350 买不买都一样</span><span class="l-en">Buying at 350 or not makes no difference</span></td></tr>
     </tbody>
   </table></div>
-  <p>不管 TSLA 到期在哪，结果都是按 350 买入 TSLA。这就是 1.1 讲的远期：今天谈好价格，到期按这个价成交。讲义把这两条腿叫做<b>合成多头标的</b>（synthetic long underlying），也叫合成远期多头（synthetic long forward）。</p>
-  <p>讲义的例子是<span class="sym" data-say="European option：只能在到期日行权。">欧式期权</span>。TSLA 期权是<span class="sym" data-say="American option：到期日之前的任何一个交易日都可以行权。">美式期权</span>，到期前任何一天都能行权，所以卖出的 put 可能在到期前就被指派。结果仍是按 350 买入，只是时间提前。什么时候会被提前指派，节点 9 讲。</p>
+  <p><span class="l-zh">不管 TSLA 到期在哪，结果都是按 350 买入 TSLA。这就是 1.1 讲的远期：今天谈好价格，到期按这个价成交。讲义把这两条腿叫做<b>合成多头标的</b>（synthetic long underlying），也叫合成远期多头（synthetic long forward）。</span><span class="l-en">Wherever TSLA ends up at expiration, the result is buying TSLA at 350. This is the forward from 1.1: agree on a price today and trade at that price at expiration. The lecture notes call these two legs a <b>synthetic long underlying</b>, also called a synthetic long forward.</span></p>
+  <p><span class="l-zh">讲义的例子是<span class="sym" data-say="European option：只能在到期日行权。">欧式期权</span>。TSLA 期权是<span class="sym" data-say="American option：到期日之前的任何一个交易日都可以行权。">美式期权</span>，到期前任何一天都能行权，所以卖出的 put 可能在到期前就被指派。结果仍是按 350 买入，只是时间提前。什么时候会被提前指派，节点 9 讲。</span><span class="l-en">The lecture examples use <span class="sym" data-say="European option: can be exercised only on the expiration date.">European options</span>. TSLA options are <span class="sym" data-say="American option: can be exercised on any trading day before expiration.">American options</span> and can be exercised on any day before expiration, so the short put may be assigned early. The result is still buying at 350, just sooner. When early assignment happens is covered in node 9.</span></p>
   <div class="formula">
-    <div class="math">+1 call(<span class="sym" data-say="行权价。两条腿必须是同一个 X。">X</span>) − 1 put(X) ＝ 到期按 X 买入 1 份标的</div>
-    <div class="gloss">买一张 call、卖一张同行权价同到期的 put，到期一定按行权价买到标的</div>
+    <div class="math">+1 call(<span class="l-zh"><span class="sym" data-say="行权价。两条腿必须是同一个 X。">X</span>) − 1 put(X) ＝ 到期按 X 买入 1 份标的</span><span class="l-en"><span class="sym" data-say="Strike. Both legs must have the same X.">X</span>) − 1 put(X) = buy 1 unit of the underlying at X at expiration</span></div>
+    <div class="gloss"><span class="l-zh">买一张 call、卖一张同行权价同到期的 put，到期一定按行权价买到标的</span><span class="l-en">Buy a call and sell a put with the same strike and expiration, and at expiration you are sure to buy the underlying at the strike</span></div>
   </div>
 
   <div class="panel">
     <div class="bar">
       <div class="seg" id="ov0Seg"></div>
-      <button class="btn ghost" id="ov0Play">再合成一遍</button>
+      <button class="btn ghost" id="ov0Play"><span class="l-zh">再合成一遍</span><span class="l-en">Build it again</span></button>
     </div>
-    <svg id="ov0Svg" role="img" aria-label="买入 call 与卖出 put 的到期价值，叠加成一条直线"></svg>
+    <svg id="ov0Svg" role="img" aria-label="买入 call 与卖出 put 的到期价值，叠加成一条直线" data-en-aria-label="Expiration values of a long call and a short put, adding up to a straight line"></svg>
     <div class="legend" id="ov0Lg"></div>
     <div class="tbl"><table id="ov0Tb"></table></div>
     <div class="say plain" id="ov0Say"></div>
   </div>
-  <p class="tiny">不含开仓时付出或收到的钱。标的腿按行权价成交计。</p>
+  <p class="tiny"><span class="l-zh">不含开仓时付出或收到的钱。标的腿按行权价成交计。</span><span class="l-en">Excludes the money paid or received at opening. The underlying leg is counted as traded at the strike.</span></p>
 
-  <h3>两个硬条件</h3>
-  <p>讲义特意写明：两条腿必须<b>同一行权价、同一到期日</b>。错开行权价，比如 350 call 配 330 put，330 到 350 之间两张都没人行权，这一段你既没买也没卖，线是平的，不再是标的。错开到期日，一张先到期、另一张还活着，先到期那天你手里只剩半个仓位。</p>
+  <h3><span class="l-zh">两个硬条件</span><span class="l-en">Two hard conditions</span></h3>
+  <p><span class="l-zh">讲义特意写明：两条腿必须<b>同一行权价、同一到期日</b>。错开行权价，比如 350 call 配 330 put，330 到 350 之间两张都没人行权，这一段你既没买也没卖，线是平的，不再是标的。错开到期日，一张先到期、另一张还活着，先到期那天你手里只剩半个仓位。</span><span class="l-en">The lecture notes state it explicitly: the two legs must have <b>the same strike and the same expiration</b>. With different strikes, say a 350 call with a 330 put, between 330 and 350 neither is exercised, so over that range you neither buy nor sell, the line is flat, and it is no longer the underlying. With different expirations, one expires while the other is still alive, and on the first expiration day you are left holding half the position.</span></p>
 
-  <h3>TSLA 的真实价格</h3>
-  <p>4/13 收盘，350 call 中间价 21.05，350 put 中间价 17.40，做一个合成多头要付 3.65。5/15 TSLA 收在 422.32：合成多头值 72.32，赚 68.67；4/13 直接按 352.36 买股票，到 5/15 赚 69.96，多 1.29。合成多头的<span class="sym" data-say="breakeven：到期时 TSLA 在这个价，仓位不赚不亏（3.1）。这里是行权价加上开仓付的钱。">盈亏平衡点</span>是 350 ＋ 3.65 ＝ 353.65，贴着 1.1 算出的远期价 353.69。为什么是 3.65、差的 1.29 从哪来，是 5.2 的内容。这一节只讲结构，不讲价格。</p>
+  <h3><span class="l-zh">TSLA 的真实价格</span><span class="l-en">Real TSLA prices</span></h3>
+  <p><span class="l-zh">4/13 收盘，350 call 中间价 21.05，350 put 中间价 17.40，做一个合成多头要付 3.65。5/15 TSLA 收在 422.32：合成多头值 72.32，赚 68.67；4/13 直接按 352.36 买股票，到 5/15 赚 69.96，多 1.29。合成多头的<span class="sym" data-say="breakeven：到期时 TSLA 在这个价，仓位不赚不亏（3.1）。这里是行权价加上开仓付的钱。">盈亏平衡点</span>是 350 ＋ 3.65 ＝ 353.65，贴着 1.1 算出的远期价 353.69。为什么是 3.65、差的 1.29 从哪来，是 5.2 的内容。这一节只讲结构，不讲价格。</span><span class="l-en">At the 4/13 close, the 350 call's mid price is 21.05 and the 350 put's is 17.40, so building a synthetic long costs 3.65. TSLA closes at 422.32 on 5/15: the synthetic long is worth 72.32, a gain of 68.67; buying the stock directly at 352.36 on 4/13 gains 69.96 by 5/15, 1.29 more. The synthetic long's <span class="sym" data-say="Breakeven: the TSLA price at expiration at which the position neither gains nor loses (3.1). Here it is the strike plus the money paid to open.">breakeven</span> is 350 + 3.65 = 353.65, right next to the forward price of 353.69 computed in 1.1. Why it is 3.65 and where the 1.29 difference comes from is the content of 5.2. This node covers only structure, not price.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>四条基本合成</h2>
-  <p class="sub">〇节写成一个等式，就是 call − put ＝ 标的。等式里的一项挪到另一边，就得到另外几条。每一条都是用两条腿做出第三样东西。</p>
+  <h2><span class="l-zh"><span class="n">一</span>四条基本合成</span><span class="l-en"><span class="n">1</span>Four basic synthetics</span></h2>
+  <p class="sub"><span class="l-zh">〇节写成一个等式，就是 call − put ＝ 标的。等式里的一项挪到另一边，就得到另外几条。每一条都是用两条腿做出第三样东西。</span><span class="l-en">Written as an equation, section 0 says call − put = underlying. Move one term to the other side and you get the others. Each one builds a third thing from two legs.</span></p>
   <div class="formula">
-    <div class="math">call − put ＝ 标的</div>
-    <div class="gloss">同一行权价、同一到期日。三样东西里任取两样，就能做出第三样</div>
+    <div class="math"><span class="l-zh">call − put ＝ 标的</span><span class="l-en">call − put = underlying</span></div>
+    <div class="gloss"><span class="l-zh">同一行权价、同一到期日。三样东西里任取两样，就能做出第三样</span><span class="l-en">Same strike, same expiration. Take any two of the three and you can build the third</span></div>
   </div>
-  <p>挪项的规则和解方程一样：一项从等号一边挪到另一边，买变卖，卖变买。</p>
+  <p><span class="l-zh">挪项的规则和解方程一样：一项从等号一边挪到另一边，买变卖，卖变买。</span><span class="l-en">The rule for moving terms is the same as in solving an equation: when a term moves to the other side of the equals sign, a buy becomes a sell and a sell becomes a buy.</span></p>
   <div class="tbl"><table>
-    <thead><tr><th>想要</th><th class="txt">用这两条腿（同行权价、同到期）</th><th class="txt">从等式怎么来</th></tr></thead>
+    <thead><tr><th><span class="l-zh">想要</span><span class="l-en">Want</span></th><th class="txt"><span class="l-zh">用这两条腿（同行权价、同到期）</span><span class="l-en">Use these two legs (same strike, same expiration)</span></th><th class="txt"><span class="l-zh">从等式怎么来</span><span class="l-en">How it follows from the equation</span></th></tr></thead>
     <tbody>
-      <tr><td>买入 call</td><td class="txt">买入 put ＋ 买入标的</td><td class="txt">call ＝ put ＋ 标的</td></tr>
-      <tr><td>卖出 call</td><td class="txt">卖出 put ＋ 卖出标的</td><td class="txt">上一行整行取反</td></tr>
-      <tr><td>买入 put</td><td class="txt">买入 call ＋ 卖出标的</td><td class="txt">put ＝ call − 标的</td></tr>
-      <tr><td>卖出 put</td><td class="txt">卖出 call ＋ 买入标的</td><td class="txt">上一行整行取反</td></tr>
-      <tr class="blk"><td colspan="3">〇节那一对</td></tr>
-      <tr><td>买入标的</td><td class="txt">买入 call ＋ 卖出 put</td><td class="txt">原式</td></tr>
-      <tr><td>卖出标的</td><td class="txt">卖出 call ＋ 买入 put</td><td class="txt">原式取反</td></tr>
+      <tr><td><span class="l-zh">买入 call</span><span class="l-en">Long call</span></td><td class="txt"><span class="l-zh">买入 put ＋ 买入标的</span><span class="l-en">Long put + long underlying</span></td><td class="txt"><span class="l-zh">call ＝ put ＋ 标的</span><span class="l-en">call = put + underlying</span></td></tr>
+      <tr><td><span class="l-zh">卖出 call</span><span class="l-en">Short call</span></td><td class="txt"><span class="l-zh">卖出 put ＋ 卖出标的</span><span class="l-en">Short put + short underlying</span></td><td class="txt"><span class="l-zh">上一行整行取反</span><span class="l-en">The row above, reversed</span></td></tr>
+      <tr><td><span class="l-zh">买入 put</span><span class="l-en">Long put</span></td><td class="txt"><span class="l-zh">买入 call ＋ 卖出标的</span><span class="l-en">Long call + short underlying</span></td><td class="txt"><span class="l-zh">put ＝ call − 标的</span><span class="l-en">put = call − underlying</span></td></tr>
+      <tr><td><span class="l-zh">卖出 put</span><span class="l-en">Short put</span></td><td class="txt"><span class="l-zh">卖出 call ＋ 买入标的</span><span class="l-en">Short call + long underlying</span></td><td class="txt"><span class="l-zh">上一行整行取反</span><span class="l-en">The row above, reversed</span></td></tr>
+      <tr class="blk"><td colspan="3"><span class="l-zh">〇节那一对</span><span class="l-en">The pair from section 0</span></td></tr>
+      <tr><td><span class="l-zh">买入标的</span><span class="l-en">Long underlying</span></td><td class="txt"><span class="l-zh">买入 call ＋ 卖出 put</span><span class="l-en">Long call + short put</span></td><td class="txt"><span class="l-zh">原式</span><span class="l-en">The original equation</span></td></tr>
+      <tr><td><span class="l-zh">卖出标的</span><span class="l-en">Short underlying</span></td><td class="txt"><span class="l-zh">卖出 call ＋ 买入 put</span><span class="l-en">Short call + long put</span></td><td class="txt"><span class="l-zh">原式取反</span><span class="l-en">The original equation, reversed</span></td></tr>
     </tbody>
   </table></div>
-  <p>讲义第 6 页把前四条列成一张清单，加上〇节那一对，一共六条，都是同一个等式。合成里的标的腿，意思都是「到期按行权价成交」。</p>
+  <p><span class="l-zh">讲义第 6 页把前四条列成一张清单，加上〇节那一对，一共六条，都是同一个等式。合成里的标的腿，意思都是「到期按行权价成交」。</span><span class="l-en">Page 6 of the lecture notes lists the first four as a checklist; with the pair from section 0 that makes six, all from the same equation. In a synthetic, the underlying leg always means "trade at the strike at expiration".</span></p>
 
   <div class="panel">
     <div class="bar">
       <div class="seg" id="ov1Seg"></div>
-      <button class="btn ghost" id="ov1Play">再合成一遍</button>
+      <button class="btn ghost" id="ov1Play"><span class="l-zh">再合成一遍</span><span class="l-en">Build it again</span></button>
     </div>
-    <svg id="ov1Svg" role="img" aria-label="两条腿的到期价值叠加成第三样东西"></svg>
+    <svg id="ov1Svg" role="img" aria-label="两条腿的到期价值叠加成第三样东西" data-en-aria-label="Expiration values of two legs adding up to a third thing"></svg>
     <div class="legend" id="ov1Lg"></div>
     <div class="tbl"><table id="ov1Tb"></table></div>
     <div class="say plain" id="ov1Say"></div>
   </div>
 
-  <h3>为什么说得通</h3>
-  <p><b>买 put ＋ 买标的 ＝ 买 call。</b>持有股票，再买一张 put 当保险：TSLA 跌破 350，put 把跌掉的部分补回来，损失停在 350；涨上去 put 作废，股票涨多少都归你。左边平、右边往上，就是一张 call 的形状。</p>
-  <p><b>买 call ＋ 卖标的 ＝ 买 put。</b>卖空股票，再买一张 call 当保险：涨过 350，call 把亏的部分补回来；跌下去 call 作废，卖空赚的都归你。左边往上、右边平，就是一张 put 的形状。</p>
+  <h3><span class="l-zh">为什么说得通</span><span class="l-en">Why it works</span></h3>
+  <p><span class="l-zh"><b>买 put ＋ 买标的 ＝ 买 call。</b>持有股票，再买一张 put 当保险：TSLA 跌破 350，put 把跌掉的部分补回来，损失停在 350；涨上去 put 作废，股票涨多少都归你。左边平、右边往上，就是一张 call 的形状。</span><span class="l-en"><b>Long put + long underlying = long call.</b> Hold the stock and buy a put as insurance: if TSLA falls below 350, the put makes up the loss and the loss stops at 350; if it rises, the put expires and every gain in the stock is yours. Flat on the left, rising on the right: the shape of a call.</span></p>
+  <p><span class="l-zh"><b>买 call ＋ 卖标的 ＝ 买 put。</b>卖空股票，再买一张 call 当保险：涨过 350，call 把亏的部分补回来；跌下去 call 作废，卖空赚的都归你。左边往上、右边平，就是一张 put 的形状。</span><span class="l-en"><b>Long call + short underlying = long put.</b> Short the stock and buy a call as insurance: above 350, the call makes up the loss; if it falls, the call expires and every gain on the short is yours. Rising on the left, flat on the right: the shape of a put.</span></p>
 
-  <h3>delta 一正一负</h3>
-  <p>合成出来的 call 或 put，<span class="sym" data-say="delta：标的动 1 美元，期权价格动多少（2.1）。买 call 为正，买 put 为负；卖出时符号反过来。标的本身的 delta 是 1。">delta</span> 在 0 和 ±1 之间；标的的 delta 是 1。所以用期权配标的时，两条腿的 delta 必须<b>一正一负</b>，互相抵掉一部分：买 put（负）配买标的（正），买 call（正）配卖标的（负）。两条腿同号，比如买 call 又买标的，delta 加起来绝对值超过 1，合成不出单张期权，也合成不出标的。它仍是一个正常的仓位（把标的换成 call − put，就是 2 张 call 减 1 张 put），只是不在上面这张表里。六节有两道题就是这种陷阱。</p>
-  <p>call 配 put 合成标的时正好反过来：买 call 为正，卖 put 也为正（卖出把 put 的负 delta 翻成正），两个加起来才能到 1。</p>
+  <h3><span class="l-zh">delta 一正一负</span><span class="l-en">One delta positive, one negative</span></h3>
+  <p><span class="l-zh">合成出来的 call 或 put，<span class="sym" data-say="delta：标的动 1 美元，期权价格动多少（2.1）。买 call 为正，买 put 为负；卖出时符号反过来。标的本身的 delta 是 1。">delta</span> 在 0 和 ±1 之间；标的的 delta 是 1。所以用期权配标的时，两条腿的 delta 必须<b>一正一负</b>，互相抵掉一部分：买 put（负）配买标的（正），买 call（正）配卖标的（负）。两条腿同号，比如买 call 又买标的，delta 加起来绝对值超过 1，合成不出单张期权，也合成不出标的。它仍是一个正常的仓位（把标的换成 call − put，就是 2 张 call 减 1 张 put），只是不在上面这张表里。六节有两道题就是这种陷阱。</span><span class="l-en">A synthetic call or put has a <span class="sym" data-say="Delta: how much the option price moves when the underlying moves $1 (2.1). Positive for a long call, negative for a long put; the sign flips when sold. The underlying itself has a delta of 1.">delta</span> between 0 and ±1, and the underlying's delta is 1. So when pairing an option with the underlying, the two legs' deltas must be <b>one positive and one negative</b>, partly canceling each other: a long put (negative) with long underlying (positive), a long call (positive) with short underlying (negative). If the two legs have the same sign, say a long call plus long underlying, their deltas add up to more than 1 in absolute value, and they cannot form a single option, nor the underlying. It is still a normal position (replace the underlying with call − put and it is 2 calls minus 1 put); it just isn't in the table above. Two questions in section 6 are this trap.</span></p>
+  <p><span class="l-zh">call 配 put 合成标的时正好反过来：买 call 为正，卖 put 也为正（卖出把 put 的负 delta 翻成正），两个加起来才能到 1。</span><span class="l-en">When pairing a call with a put to build the underlying, it is the other way around: a long call is positive, and a short put is positive too (selling flips the put's negative delta to positive); only together do they reach 1.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>不是像标的，就是标的</h2>
-  <p class="sub">〇、一两节说的是到期那一刻。到期之前，合成多头每天是不是也和标的一样动？讲义用 delta、gamma、vega 三张表验证；这里再用 TSLA 的 24 个交易日验证。</p>
+  <h2><span class="l-zh"><span class="n">二</span>不是像标的，就是标的</span><span class="l-en"><span class="n">2</span>Not like the underlying: it is the underlying</span></h2>
+  <p class="sub"><span class="l-zh">〇、一两节说的是到期那一刻。到期之前，合成多头每天是不是也和标的一样动？讲义用 delta、gamma、vega 三张表验证；这里再用 TSLA 的 24 个交易日验证。</span><span class="l-en">Sections 0 and 1 are about the moment of expiration. Before expiration, does the synthetic long also move like the underlying every day? The lecture notes check this with three tables for delta, gamma and vega; here we also check it with 24 trading days of TSLA.</span></p>
 
-  <h3>讲义的三张表</h3>
-  <p>讲义按一张标的合约记 delta ＝ 100（本页 TSLA 的数是每股 0 到 1，乘 100 就是讲义的记法）。标的合约的 <span class="sym" data-say="gamma：标的动 1 美元，delta 变多少（2.2）。标的的 delta 永远是 1，不会变，所以标的的 gamma 是 0。">gamma</span> 和 <span class="sym" data-say="vega：隐含波动率变 1 个点，价格变多少（2.3）。股票价格本身不随期权的隐含波动率变，所以标的的 vega 是 0。">vega</span> 都是 0：它的 delta 永远是 100，不会变；它的价格也不随隐含波动率变。讲义给了两种情形，买 1 张 December 100 call、卖 1 张 December 100 put：</p>
+  <h3><span class="l-zh">讲义的三张表</span><span class="l-en">The three lecture tables</span></h3>
+  <p><span class="l-zh">讲义按一张标的合约记 delta ＝ 100（本页 TSLA 的数是每股 0 到 1，乘 100 就是讲义的记法）。标的合约的 <span class="sym" data-say="gamma：标的动 1 美元，delta 变多少（2.2）。标的的 delta 永远是 1，不会变，所以标的的 gamma 是 0。">gamma</span> 和 <span class="sym" data-say="vega：隐含波动率变 1 个点，价格变多少（2.3）。股票价格本身不随期权的隐含波动率变，所以标的的 vega 是 0。">vega</span> 都是 0：它的 delta 永远是 100，不会变；它的价格也不随隐含波动率变。讲义给了两种情形，买 1 张 December 100 call、卖 1 张 December 100 put：</span><span class="l-en">The lecture notes count one underlying contract as delta = 100 (this page's TSLA numbers are per share, 0 to 1; multiply by 100 for the lecture's notation). The underlying contract's <span class="sym" data-say="Gamma: how much delta changes when the underlying moves $1 (2.2). The underlying's delta is always 1 and never changes, so its gamma is 0.">gamma</span> and <span class="sym" data-say="Vega: how much the price changes when implied volatility changes 1 point (2.3). The stock price itself does not move with the options' implied volatility, so the underlying's vega is 0.">vega</span> are both 0: its delta is always 100 and never changes, and its price does not move with implied volatility. The lecture notes give two cases, buying 1 December 100 call and selling 1 December 100 put:</span></p>
   <div class="tbl"><table style="max-width:36rem">
-    <thead><tr><th></th><th>情形 1</th><th>情形 2</th><th>标的合约</th></tr></thead>
+    <thead><tr><th></th><th><span class="l-zh">情形 1</span><span class="l-en">Case 1</span></th><th><span class="l-zh">情形 2</span><span class="l-en">Case 2</span></th><th><span class="l-zh">标的合约</span><span class="l-en">Underlying contract</span></th></tr></thead>
     <tbody>
       <tr class="blk"><td colspan="4">delta</td></tr>
-      <tr><td>买入 call</td><td>+30</td><td>+80</td><td></td></tr>
-      <tr><td>卖出 put（put 的 delta 是 −70 / −20，卖出取反）</td><td>+70</td><td>+20</td><td></td></tr>
-      <tr class="sum"><td>合计</td><td>100</td><td>100</td><td>100</td></tr>
+      <tr><td><span class="l-zh">买入 call</span><span class="l-en">Long call</span></td><td>+30</td><td>+80</td><td></td></tr>
+      <tr><td><span class="l-zh">卖出 put（put 的 delta 是 −70 / −20，卖出取反）</span><span class="l-en">Short put (put delta is −70 / −20; selling flips the sign)</span></td><td>+70</td><td>+20</td><td></td></tr>
+      <tr class="sum"><td><span class="l-zh">合计</span><span class="l-en">Total</span></td><td>100</td><td>100</td><td>100</td></tr>
       <tr class="blk"><td colspan="4">gamma</td></tr>
-      <tr><td>买入 call</td><td>5</td><td>2</td><td></td></tr>
-      <tr><td>卖出 put</td><td>−5</td><td>−2</td><td></td></tr>
-      <tr class="sum"><td>合计</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td><span class="l-zh">买入 call</span><span class="l-en">Long call</span></td><td>5</td><td>2</td><td></td></tr>
+      <tr><td><span class="l-zh">卖出 put</span><span class="l-en">Short put</span></td><td>−5</td><td>−2</td><td></td></tr>
+      <tr class="sum"><td><span class="l-zh">合计</span><span class="l-en">Total</span></td><td>0</td><td>0</td><td>0</td></tr>
       <tr class="blk"><td colspan="4">vega</td></tr>
-      <tr><td>买入 call</td><td>0.15</td><td>0.40</td><td></td></tr>
-      <tr><td>卖出 put</td><td>−0.15</td><td>−0.40</td><td></td></tr>
-      <tr class="sum"><td>合计</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td><span class="l-zh">买入 call</span><span class="l-en">Long call</span></td><td>0.15</td><td>0.40</td><td></td></tr>
+      <tr><td><span class="l-zh">卖出 put</span><span class="l-en">Short put</span></td><td>−0.15</td><td>−0.40</td><td></td></tr>
+      <tr class="sum"><td><span class="l-zh">合计</span><span class="l-en">Total</span></td><td>0</td><td>0</td><td>0</td></tr>
     </tbody>
   </table></div>
-  <p>两种情形里 call 离行权价远近不同，三项照样对上：合成多头的 delta 是 100，gamma 和 vega 是 0，和标的合约一模一样。它在风险上不是像标的，就是标的。</p>
-  <p>反过来读，这张表说了一件单独有用的事：<b>同一行权价、同一到期的 call 和 put，gamma 相同，vega 也相同</b>（情形 1 是 5 和 5、0.15 和 0.15，情形 2 是 2 和 2、0.40 和 0.40）。原因在等式里，但要多走一步：〇、一两节的等式说的是到期那一刻。到期之前，call − put 等于「标的 − 行权价」再加一笔利息（下面 24 天的图里那条虚线）。这笔利息只看利率和离到期还有几天，不随 TSLA 涨跌，也不随波动率变，所以它的 gamma、vega 是 0；标的的 gamma、vega 也是 0。于是 call − put 的 gamma、vega 都是 0，call 和 put 的 gamma 只能相等，vega 也只能相等。想从标的大动里赚钱（3.3），用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。</p>
-  <p>讲义的表是欧式期权。TSLA 期权是美式的，put 多一点提前行权的价值（3.1 量过：4/13 的 380 put 比按合成关系算出的欧式价贵 0.19），所以在 TSLA 上，call − put 和标的只是近似相等，gamma、vega 也只是近似相同。</p>
+  <p><span class="l-zh">两种情形里 call 离行权价远近不同，三项照样对上：合成多头的 delta 是 100，gamma 和 vega 是 0，和标的合约一模一样。它在风险上不是像标的，就是标的。</span><span class="l-en">In the two cases the call is at different distances from the strike, and all three items still match: the synthetic long has a delta of 100 and a gamma and vega of 0, exactly like the underlying contract. In terms of risk it is not like the underlying; it is the underlying.</span></p>
+  <p><span class="l-zh">反过来读，这张表说了一件单独有用的事：<b>同一行权价、同一到期的 call 和 put，gamma 相同，vega 也相同</b>（情形 1 是 5 和 5、0.15 和 0.15，情形 2 是 2 和 2、0.40 和 0.40）。原因在等式里，但要多走一步：〇、一两节的等式说的是到期那一刻。到期之前，call − put 等于「标的 − 行权价」再加一笔利息（下面 24 天的图里那条虚线）。这笔利息只看利率和离到期还有几天，不随 TSLA 涨跌，也不随波动率变，所以它的 gamma、vega 是 0；标的的 gamma、vega 也是 0。于是 call − put 的 gamma、vega 都是 0，call 和 put 的 gamma 只能相等，vega 也只能相等。想从标的大动里赚钱（3.3），用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。</span><span class="l-en">Read the other way, the table says something useful on its own: <b>a call and a put with the same strike and expiration have the same gamma and the same vega</b> (case 1 has 5 and 5, 0.15 and 0.15; case 2 has 2 and 2, 0.40 and 0.40). The reason is in the equation, but it takes one more step: the equations in sections 0 and 1 are about the moment of expiration. Before expiration, call − put equals "underlying − strike" plus an amount of interest (the dashed line in the 24-day chart below). This interest depends only on the interest rate and the days left to expiration; it doesn't move with TSLA or with volatility, so its gamma and vega are 0, and the underlying's gamma and vega are 0 too. So call − put has a gamma and vega of 0, which means the call's and put's gammas must be equal, and their vegas too. If you want to profit from a big move in the underlying (3.3), calls and puts make no difference in gamma or vega; they differ only in delta.</span></p>
+  <p><span class="l-zh">讲义的表是欧式期权。TSLA 期权是美式的，put 多一点提前行权的价值（3.1 量过：4/13 的 380 put 比按合成关系算出的欧式价贵 0.19），所以在 TSLA 上，call − put 和标的只是近似相等，gamma、vega 也只是近似相同。</span><span class="l-en">The lecture tables are for European options. TSLA options are American, and the put carries a little extra early-exercise value (3.1 measured it: on 4/13 the 380 put was 0.19 more expensive than the European price from the synthetic relationship). So on TSLA, call − put equals the underlying only approximately, and gamma and vega are only approximately the same.</span></p>
 
-  <h3>TSLA：报价快照给的 delta、gamma、vega</h3>
+  <h3><span class="l-zh">TSLA：报价快照给的 delta、gamma、vega</span><span class="l-en">TSLA: delta, gamma and vega from the quote snapshot</span></h3>
   <div class="tbl"><table style="max-width:40rem">
-    <thead><tr><th>4/13 收盘，5/15 到期</th><th>call delta</th><th>put delta</th><th>两者之差</th><th>gamma</th><th>vega</th></tr></thead>
+    <thead><tr><th><span class="l-zh">4/13 收盘，5/15 到期</span><span class="l-en">4/13 close, 5/15 expiration</span></th><th>call delta</th><th>put delta</th><th><span class="l-zh">两者之差</span><span class="l-en">Difference</span></th><th>gamma</th><th>vega</th></tr></thead>
     <tbody>
-      <tr><td>行权价 300</td><td>0.8825</td><td>−0.1175</td><td>1.0000</td><td>0.00376</td><td>0.2152</td></tr>
-      <tr class="hot"><td>行权价 350</td><td>0.5574</td><td>−0.4426</td><td>1.0000</td><td>0.00820</td><td>0.4125</td></tr>
-      <tr><td>行权价 400</td><td>0.1954</td><td>−0.8046</td><td>1.0000</td><td>0.00591</td><td>0.2896</td></tr>
+      <tr><td><span class="l-zh">行权价 300</span><span class="l-en">Strike 300</span></td><td>0.8825</td><td>−0.1175</td><td>1.0000</td><td>0.00376</td><td>0.2152</td></tr>
+      <tr class="hot"><td><span class="l-zh">行权价 350</span><span class="l-en">Strike 350</span></td><td>0.5574</td><td>−0.4426</td><td>1.0000</td><td>0.00820</td><td>0.4125</td></tr>
+      <tr><td><span class="l-zh">行权价 400</span><span class="l-en">Strike 400</span></td><td>0.1954</td><td>−0.8046</td><td>1.0000</td><td>0.00591</td><td>0.2896</td></tr>
     </tbody>
   </table></div>
-  <p>这一天的报价快照列了 161 个行权价，每一档 call delta 减 put delta 都是 1.0000。它的表里 gamma 和 vega 各只有一列，call 和 put 共用，正是因为这两个数本来相同。这些都是用模型算出来的，还算不上独立的证据。独立的证据是价格本身怎么动。</p>
+  <p><span class="l-zh">这一天的报价快照列了 161 个行权价，每一档 call delta 减 put delta 都是 1.0000。它的表里 gamma 和 vega 各只有一列，call 和 put 共用，正是因为这两个数本来相同。这些都是用模型算出来的，还算不上独立的证据。独立的证据是价格本身怎么动。</span><span class="l-en">That day's quote snapshot lists 161 strikes, and at every one call delta minus put delta is 1.0000. Its table has only one column each for gamma and vega, shared by calls and puts, precisely because the two numbers are the same. All of these are computed from a model, so they are not independent evidence. The independent evidence is how the prices themselves move.</span></p>
 
-  <h3>24 个交易日的真实价格</h3>
-  <p>每天收盘，把 350 call 的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价，卖一减买一叫买卖价差（3.1）。">中间价</span>减去 350 put 的中间价，就是这一天合成多头的价值；把它和「TSLA 收盘 − 350」画在一起，下面单独画出两者之差：</p>
+  <h3><span class="l-zh">24 个交易日的真实价格</span><span class="l-en">Real prices over 24 trading days</span></h3>
+  <p><span class="l-zh">每天收盘，把 350 call 的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价，卖一减买一叫买卖价差（3.1）。">中间价</span>减去 350 put 的中间价，就是这一天合成多头的价值；把它和「TSLA 收盘 − 350」画在一起，下面单独画出两者之差：</span><span class="l-en">At each day's close, the 350 call's <span class="sym" data-say="Mid price: the average of the bid and the ask. The bid is the highest price someone in the market will pay; the ask is the lowest price someone will sell at; ask minus bid is the bid-ask spread (3.1).">mid price</span> minus the 350 put's mid price is that day's value of the synthetic long. Plot it together with "TSLA close − 350", and plot the difference between the two separately below:</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="srPlay">逐天重放</button></div>
-    <svg id="srSvg" role="img" aria-label="合成多头的价值与 TSLA 收盘减 350 逐天对照，下方是两者之差"></svg>
+    <div class="bar"><button class="btn ghost" id="srPlay"><span class="l-zh">逐天重放</span><span class="l-en">Replay day by day</span></button></div>
+    <svg id="srSvg" role="img" aria-label="合成多头的价值与 TSLA 收盘减 350 逐天对照，下方是两者之差" data-en-aria-label="Value of the synthetic long against TSLA close minus 350, day by day, with the difference between them below"></svg>
     <div class="legend">
-      <span><i class="fat" style="background:var(--ink-faint)"></i>TSLA 收盘 − 350</span>
-      <span><i style="background:var(--control)"></i>合成多头：350 call − 350 put（中间价）</span>
-      <span><i class="dash" style="color:var(--result)"></i>下图虚线：350 美元晚付款省下的利息</span>
+      <span><i class="fat" style="background:var(--ink-faint)"></i><span class="l-zh">TSLA 收盘 − 350</span><span class="l-en">TSLA close − 350</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">合成多头：350 call − 350 put（中间价）</span><span class="l-en">Synthetic long: 350 call − 350 put (mid)</span></span>
+      <span><i class="dash" style="color:var(--result)"></i><span class="l-zh">下图虚线：350 美元晚付款省下的利息</span><span class="l-en">Lower chart dashed line: interest saved by paying the $350 later</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="srD"></div><div class="d2" id="srDb"></div></div>
-      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="srS"></div><div class="d2" id="srSb"></div></div>
-      <div class="stat"><div class="k">合成多头</div><div class="d" id="srY" style="color:var(--control)"></div><div class="d2" id="srYb"></div></div>
-      <div class="stat"><div class="k">两者之差</div><div class="d" id="srG"></div><div class="d2" id="srGb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="srD"></div><div class="d2" id="srDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 收盘</span><span class="l-en">TSLA close</span></div><div class="d" id="srS"></div><div class="d2" id="srSb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">合成多头</span><span class="l-en">Synthetic long</span></div><div class="d" id="srY" style="color:var(--control)"></div><div class="d2" id="srYb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">两者之差</span><span class="l-en">Difference</span></div><div class="d" id="srG"></div><div class="d2" id="srGb"></div></div>
     </div>
     <div class="say plain" id="srSay"></div>
   </div>
-  <p class="tiny">数据：历史期权报价快照，每天 16:00 那一行，中间价 ＝（买一 ＋ 卖一）÷ 2。5/15 到期当天按到期价值算：350 call 值 422.32 − 350 ＝ 72.32，350 put 值 0。利息按 1.1 反解出的 4.3%，单利。</p>
+  <p class="tiny"><span class="l-zh">数据：历史期权报价快照，每天 16:00 那一行，中间价 ＝（买一 ＋ 卖一）÷ 2。5/15 到期当天按到期价值算：350 call 值 422.32 − 350 ＝ 72.32，350 put 值 0。利息按 1.1 反解出的 4.3%，单利。</span><span class="l-en">Data: historical option quote snapshots, the 16:00 row each day, mid = (bid + ask) ÷ 2. On the 5/15 expiration day, values are at expiration: the 350 call is worth 422.32 − 350 = 72.32 and the 350 put is worth 0. Interest uses the 4.3% backed out in 1.1, simple interest.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>拆</h2>
-  <p class="sub">讲义说：任何策略都可以用合成的办法做出来。替换本身只是查一节那张表；化简的关键是先决定哪几张配成一对去换，讲义管这一步叫「拆」。</p>
+  <h2><span class="l-zh"><span class="n">三</span>拆</span><span class="l-en"><span class="n">3</span>Splitting</span></h2>
+  <p class="sub"><span class="l-zh">讲义说：任何策略都可以用合成的办法做出来。替换本身只是查一节那张表；化简的关键是先决定哪几张配成一对去换，讲义管这一步叫「拆」。</span><span class="l-en">The lecture notes say any strategy can be built synthetically. The substitution itself is just a lookup in the table from section 1; the key to simplifying is deciding first which contracts to pair up and swap. The lecture notes call this step "splitting".</span></p>
 
-  <h3>讲义第 7 页：两张 call，卖一份标的</h3>
-  <p>仓位是 +2 December 100 call，−1 标的合约。只把 call 换成 put 不行：+2 call ＝ +2 put ＋ 买 2 份标的，再加上原来卖出的 1 份，得到 +2 put、+1 标的。还是两行，只是从 call 的写法换成了 put 的写法，没有变简单。</p>
-  <p>能化出来的做法有两种。讲义的做法是先拆：两张 call 里拿出一张，和卖出的那份标的配成一对。买 call ＋ 卖标的，正是一节的合成 put；剩下那张 call 原样不动。另一种做法是换掉标的那一行：一节表里最后一行，卖出标的 ＝ 卖出 call ＋ 买入 put，换完是 +2 call、−1 call、+1 put，两行 call 合并成 +1。两种做法结果一样，都是 +1 call、+1 put：买入 December 100 <span class="sym" data-say="straddle：同一行权价、同一到期，买一张 call 加一张 put（3.2）。标的往哪边大动都赚。">straddle</span>。</p>
-  <p>两种做法都先决定了哪几张配成一对：拆出一张 call 配标的，或者让标的自己换成一对期权，再和已有的 call 合并。只把两张 call 一起换，标的那一行消不掉，从 −1 变成 +1，还是两行。这就是讲义强调「拆」的原因。</p>
+  <h3><span class="l-zh">讲义第 7 页：两张 call，卖一份标的</span><span class="l-en">Lecture page 7: two calls, one short underlying</span></h3>
+  <p><span class="l-zh">仓位是 +2 December 100 call，−1 标的合约。只把 call 换成 put 不行：+2 call ＝ +2 put ＋ 买 2 份标的，再加上原来卖出的 1 份，得到 +2 put、+1 标的。还是两行，只是从 call 的写法换成了 put 的写法，没有变简单。</span><span class="l-en">The position is +2 December 100 calls, −1 underlying contract. Just swapping the calls for puts doesn't work: +2 calls = +2 puts + buy 2 units of the underlying, and with the 1 unit already sold you get +2 puts, +1 underlying. Still two rows; it has only moved from call notation to put notation and has not become simpler.</span></p>
+  <p><span class="l-zh">能化出来的做法有两种。讲义的做法是先拆：两张 call 里拿出一张，和卖出的那份标的配成一对。买 call ＋ 卖标的，正是一节的合成 put；剩下那张 call 原样不动。另一种做法是换掉标的那一行：一节表里最后一行，卖出标的 ＝ 卖出 call ＋ 买入 put，换完是 +2 call、−1 call、+1 put，两行 call 合并成 +1。两种做法结果一样，都是 +1 call、+1 put：买入 December 100 <span class="sym" data-say="straddle：同一行权价、同一到期，买一张 call 加一张 put（3.2）。标的往哪边大动都赚。">straddle</span>。</span><span class="l-en">There are two ways to simplify it. The lecture's way is to split first: take one of the two calls and pair it with the short underlying. Long call + short underlying is exactly the synthetic put from section 1; the other call stays as it is. The other way is to replace the underlying row: by the last row of the table in section 1, short underlying = short call + long put, which gives +2 calls, −1 call, +1 put, and the two call rows merge into +1. Both ways give the same result, +1 call and +1 put: a long December 100 <span class="sym" data-say="Straddle: same strike, same expiration, buy one call plus one put (3.2). Makes money on a big move in either direction.">straddle</span>.</span></p>
+  <p><span class="l-zh">两种做法都先决定了哪几张配成一对：拆出一张 call 配标的，或者让标的自己换成一对期权，再和已有的 call 合并。只把两张 call 一起换，标的那一行消不掉，从 −1 变成 +1，还是两行。这就是讲义强调「拆」的原因。</span><span class="l-en">Both ways first decide which contracts to pair: split off one call to pair with the underlying, or turn the underlying itself into a pair of options and merge with the existing calls. If you swap both calls together, the underlying row doesn't go away; it goes from −1 to +1, and you still have two rows. This is why the lecture notes stress splitting.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="smASeg"></div>
-      <div class="btns"><button class="btn ghost" id="smAPlay">再化简一遍</button><button class="btn ghost" id="smAPrev">上一步</button><button class="btn ghost" id="smANext">下一步</button></div>
+      <div class="btns"><button class="btn ghost" id="smAPlay"><span class="l-zh">再化简一遍</span><span class="l-en">Simplify again</span></button><button class="btn ghost" id="smAPrev"><span class="l-zh">上一步</span><span class="l-en">Previous step</span></button><button class="btn ghost" id="smANext"><span class="l-zh">下一步</span><span class="l-en">Next step</span></button></div>
     </div>
     <div class="simp">
       <div><div class="stepn" id="smAStep"></div><div class="cards" id="smACards"></div><div class="stepcap" id="smACap"></div></div>
-      <div><div class="ctitle">整个仓位的到期价值</div><svg id="smASvg" role="img" aria-label="仓位到期价值，每一步都不变"></svg><div class="chk" id="smAChk"></div></div>
+      <div><div class="ctitle"><span class="l-zh">整个仓位的到期价值</span><span class="l-en">Expiration value of the whole position</span></div><svg id="smASvg" role="img" aria-label="仓位到期价值，每一步都不变" data-en-aria-label="Expiration value of the position, unchanged at every step"></svg><div class="chk" id="smAChk"></div></div>
     </div>
     <div class="say plain" id="smASay"></div>
   </div>
 
-  <h3>同一个 straddle，三种写法</h3>
+  <h3><span class="l-zh">同一个 straddle，三种写法</span><span class="l-en">One straddle, three ways to write it</span></h3>
   <div class="tbl"><table style="max-width:34rem">
-    <thead><tr><th>写法</th><th class="txt">仓位</th></tr></thead>
+    <thead><tr><th><span class="l-zh">写法</span><span class="l-en">Form</span></th><th class="txt"><span class="l-zh">仓位</span><span class="l-en">Position</span></th></tr></thead>
     <tbody>
-      <tr><td style="white-space:nowrap">写法 1</td><td class="pos">+1 December 100 call<br>+1 December 100 put</td></tr>
-      <tr><td style="white-space:nowrap">写法 2</td><td class="pos">+2 December 100 call<br>−1 标的合约</td></tr>
-      <tr><td style="white-space:nowrap">写法 3</td><td class="pos">+2 December 100 put<br>+1 标的合约</td></tr>
+      <tr><td style="white-space:nowrap"><span class="l-zh">写法 1</span><span class="l-en">Form 1</span></td><td class="pos">+1 December 100 call<br>+1 December 100 put</td></tr>
+      <tr><td style="white-space:nowrap"><span class="l-zh">写法 2</span><span class="l-en">Form 2</span></td><td class="pos">+2 December 100 call<br><span class="l-zh">−1 标的合约</span><span class="l-en">−1 underlying contract</span></td></tr>
+      <tr><td style="white-space:nowrap"><span class="l-zh">写法 3</span><span class="l-en">Form 3</span></td><td class="pos">+2 December 100 put<br><span class="l-zh">+1 标的合约</span><span class="l-en">+1 underlying contract</span></td></tr>
     </tbody>
   </table></div>
-  <p>三种写法到期完全一样。讲义说，报价时哪一种写法的<span class="sym" data-say="bid-ask spread：卖一减买一。买入按卖一成交、卖出按买一成交，每条腿都要多付半个买卖价差（3.1）。">买卖价差</span>更窄，就用哪一种成交：合成关系在实务里的用处，是多给你几条成交路径。</p>
+  <p><span class="l-zh">三种写法到期完全一样。讲义说，报价时哪一种写法的<span class="sym" data-say="bid-ask spread：卖一减买一。买入按卖一成交、卖出按买一成交，每条腿都要多付半个买卖价差（3.1）。">买卖价差</span>更窄，就用哪一种成交：合成关系在实务里的用处，是多给你几条成交路径。</span><span class="l-en">The three forms are identical at expiration. The lecture notes say that when quoting, you trade whichever form has the narrower <span class="sym" data-say="Bid-ask spread: ask minus bid. Buys fill at the ask and sells at the bid, so each leg costs an extra half spread (3.1).">bid-ask spread</span>: in practice, the use of synthetic relationships is to give you more routes to a fill.</span></p>
 
-  <h3>牛市价差：call 版就是 put 版</h3>
-  <p>讲义第 8 页：<span class="sym" data-say="bull spread，牛市价差（3.1）：同一种期权、同一到期，买低行权价、卖高行权价。标的涨就赚，最多赚两个行权价之差。">牛市价差</span> +1 December 90 call、−1 December 100 call，两条腿都换成 put：买 90 call ＝ 买 90 put ＋ 按 90 买入标的；卖 100 call ＝ 卖 100 put ＋ 按 100 卖出标的。标的一买一卖，张数对消，剩下 +1 90 put、−1 100 put，也是买低卖高，put 版的牛市价差。同行权价、同到期的 call 价差和 put 价差，是同一个东西。上面化简器的最后一个例子就是这一题。</p>
-  <p>张数对消了，钱没有对消：按 90 买、按 100 卖，到期固定多出 10。所以 call 版 ＝ put 版 ＋ 到期那笔固定的 10。这回答了 3.1 留下的问题：TSLA 350/380 牛市 call 价差开仓付 11.975，牛市 put 价差开仓收 18.075，加起来 30.05，约等于间距 30。call 版多付的钱，买的就是到期那笔固定的 30；扣掉之后，两者 5/15 的盈亏是 +18.025 和 +18.075。30.05 为什么比 30 <span class="sym" data-say="折回今天：到期才拿到的钱，按利率算出今天值多少，也叫现值（1.1）。30 按 4.3% 折 32 天是 29.89。">折回</span>今天的 29.89 还多，3.1 讲过。</p>
+  <h3><span class="l-zh">牛市价差：call 版就是 put 版</span><span class="l-en">Bull spreads: the call version is the put version</span></h3>
+  <p><span class="l-zh">讲义第 8 页：<span class="sym" data-say="bull spread，牛市价差（3.1）：同一种期权、同一到期，买低行权价、卖高行权价。标的涨就赚，最多赚两个行权价之差。">牛市价差</span> +1 December 90 call、−1 December 100 call，两条腿都换成 put：买 90 call ＝ 买 90 put ＋ 按 90 买入标的；卖 100 call ＝ 卖 100 put ＋ 按 100 卖出标的。标的一买一卖，张数对消，剩下 +1 90 put、−1 100 put，也是买低卖高，put 版的牛市价差。同行权价、同到期的 call 价差和 put 价差，是同一个东西。上面化简器的最后一个例子就是这一题。</span><span class="l-en">Lecture page 8: take the <span class="sym" data-say="Bull spread (3.1): same type of option, same expiration, buy the lower strike and sell the higher strike. Makes money if the underlying rises, at most the difference between the strikes.">bull spread</span> +1 December 90 call, −1 December 100 call and convert both legs to puts: long 90 call = long 90 put + buy the underlying at 90; short 100 call = short 100 put + sell the underlying at 100. One underlying bought and one sold, the quantities cancel, and what is left is +1 90 put, −1 100 put: also buying low and selling high, the put version of the bull spread. A call spread and a put spread with the same strikes and expiration are the same thing. The last example in the simplifier above is this exercise.</span></p>
+  <p><span class="l-zh">张数对消了，钱没有对消：按 90 买、按 100 卖，到期固定多出 10。所以 call 版 ＝ put 版 ＋ 到期那笔固定的 10。这回答了 3.1 留下的问题：TSLA 350/380 牛市 call 价差开仓付 11.975，牛市 put 价差开仓收 18.075，加起来 30.05，约等于间距 30。call 版多付的钱，买的就是到期那笔固定的 30；扣掉之后，两者 5/15 的盈亏是 +18.025 和 +18.075。30.05 为什么比 30 <span class="sym" data-say="折回今天：到期才拿到的钱，按利率算出今天值多少，也叫现值（1.1）。30 按 4.3% 折 32 天是 29.89。">折回</span>今天的 29.89 还多，3.1 讲过。</span><span class="l-en">The quantities cancel, but the money does not: buying at 90 and selling at 100 leaves a fixed extra 10 at expiration. So call version = put version + that fixed 10 at expiration. This answers the question 3.1 left open: the TSLA 350/380 bull call spread costs 11.975 to open and the bull put spread collects 18.075; together that is 30.05, about the width of 30. The extra money paid for the call version buys that fixed 30 at expiration; net of it, the two P&amp;Ls on 5/15 are +18.025 and +18.075. Why 30.05 is even more than the 29.89 you get by <span class="sym" data-say="Discounting back to today: money received only at expiration, valued today using the interest rate; also called present value (1.1). 30 discounted at 4.3% for 32 days is 29.89.">discounting</span> 30 to today was covered in 3.1.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>化简一堆腿</h2>
-  <p class="sub">腿一多，换法就固定下来：选一种期权，把另一种全部换掉，再按行权价合并。标的腿常常会自己对消，结构就露出来了。</p>
+  <h2><span class="l-zh"><span class="n">四</span>化简一堆腿</span><span class="l-en"><span class="n">4</span>Simplifying a pile of legs</span></h2>
+  <p class="sub"><span class="l-zh">腿一多，换法就固定下来：选一种期权，把另一种全部换掉，再按行权价合并。标的腿常常会自己对消，结构就露出来了。</span><span class="l-en">With many legs the method becomes fixed: pick one type of option, convert all of the other type, then merge by strike. The underlying legs often cancel by themselves, and the structure shows.</span></p>
 
-  <h3>讲义第 9 页：买 strangle、卖 straddle</h3>
-  <p>仓位是 +1 December 95 put、−1 December 100 call、−1 December 100 put、+1 December 105 call，也就是买一个 95/105 <span class="sym" data-say="strangle：同一到期，买一张低行权价的 put、一张高行权价的 call（3.2）。比 straddle 便宜，要动得更多才赚。">strangle</span>、卖一个 100 straddle。只换两张 put，两张 call 原样不动。讲义把换出来的 −1 100 call 单独写一行，和原来就有的 −1 100 call 并排，合并时正好看出 <span class="sym" data-say="butterfly：三个等距行权价，买 1 张低的、卖 2 张中间的、买 1 张高的（3.2）。中间的行权价叫身，两边的叫翼。">butterfly</span> 身上那个 −2 是怎么来的。</p>
-  <p>讲义只写到 butterfly。换出来的两份标的，一份按 95 卖、一份按 100 买，张数对消，到期还固定少 5。这个 5 就是五节那条关系里的间距。</p>
+  <h3><span class="l-zh">讲义第 9 页：买 strangle、卖 straddle</span><span class="l-en">Lecture page 9: buy a strangle, sell a straddle</span></h3>
+  <p><span class="l-zh">仓位是 +1 December 95 put、−1 December 100 call、−1 December 100 put、+1 December 105 call，也就是买一个 95/105 <span class="sym" data-say="strangle：同一到期，买一张低行权价的 put、一张高行权价的 call（3.2）。比 straddle 便宜，要动得更多才赚。">strangle</span>、卖一个 100 straddle。只换两张 put，两张 call 原样不动。讲义把换出来的 −1 100 call 单独写一行，和原来就有的 −1 100 call 并排，合并时正好看出 <span class="sym" data-say="butterfly：三个等距行权价，买 1 张低的、卖 2 张中间的、买 1 张高的（3.2）。中间的行权价叫身，两边的叫翼。">butterfly</span> 身上那个 −2 是怎么来的。</span><span class="l-en">The position is +1 December 95 put, −1 December 100 call, −1 December 100 put, +1 December 105 call: buying a 95/105 <span class="sym" data-say="Strangle: same expiration, buy a lower-strike put and a higher-strike call (3.2). Cheaper than a straddle; needs a bigger move to make money.">strangle</span> and selling a 100 straddle. Convert only the two puts; the two calls stay as they are. The lecture notes write the −1 100 call produced by the conversion on its own row, next to the −1 100 call already there, so when they are merged you can see where the −2 in the body of the <span class="sym" data-say="Butterfly: three equally spaced strikes, buy 1 low, sell 2 middle, buy 1 high (3.2). The middle strike is called the body, the outer ones the wings.">butterfly</span> comes from.</span></p>
+  <p><span class="l-zh">讲义只写到 butterfly。换出来的两份标的，一份按 95 卖、一份按 100 买，张数对消，到期还固定少 5。这个 5 就是五节那条关系里的间距。</span><span class="l-en">The lecture notes stop at the butterfly. The two units of underlying produced by the conversion, one sold at 95 and one bought at 100, cancel in quantity but leave a fixed 5 less at expiration. This 5 is the width in the relationship in section 5.</span></p>
 
-  <h3>讲义第 11 页：九行化成三行</h3>
-  <p>讲义这一课的最后一题：标的 981.50，下面这个仓位的 delta 是正、是负还是 0？</p>
+  <h3><span class="l-zh">讲义第 11 页：九行化成三行</span><span class="l-en">Lecture page 11: nine rows become three</span></h3>
+  <p><span class="l-zh">讲义这一课的最后一题：标的 981.50，下面这个仓位的 delta 是正、是负还是 0？</span><span class="l-en">The last exercise in this lecture: with the underlying at 981.50, is the delta of the position below positive, negative or 0?</span></p>
   <div class="tbl"><table style="max-width:22rem">
     <tbody>
-      <tr><td class="pos">+29 标的合约</td><td class="pos">&nbsp;</td></tr>
+      <tr><td class="pos"><span class="l-zh">+29 标的合约</span><span class="l-en">+29 underlying contracts</span></td><td class="pos">&nbsp;</td></tr>
       <tr><td class="pos">−44 June 950 call</td><td class="pos">+44 June 950 put</td></tr>
       <tr><td class="pos">+18 June 975 call</td><td class="pos">+24 June 975 put</td></tr>
       <tr><td class="pos">−33 June 1000 call</td><td class="pos">−51 June 1000 put</td></tr>
@@ -433,184 +434,189 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <div class="panel">
     <div class="bar">
       <div class="seg" id="smBSeg"></div>
-      <div class="btns"><button class="btn ghost" id="smBPlay">再化简一遍</button><button class="btn ghost" id="smBPrev">上一步</button><button class="btn ghost" id="smBNext">下一步</button></div>
+      <div class="btns"><button class="btn ghost" id="smBPlay"><span class="l-zh">再化简一遍</span><span class="l-en">Simplify again</span></button><button class="btn ghost" id="smBPrev"><span class="l-zh">上一步</span><span class="l-en">Previous step</span></button><button class="btn ghost" id="smBNext"><span class="l-zh">下一步</span><span class="l-en">Next step</span></button></div>
     </div>
     <div class="simp">
       <div><div class="stepn" id="smBStep"></div><div class="cards" id="smBCards"></div><div class="stepcap" id="smBCap"></div></div>
-      <div><div class="ctitle">整个仓位的到期价值</div><svg id="smBSvg" role="img" aria-label="仓位到期价值，每一步都不变"></svg><div class="chk" id="smBChk"></div></div>
+      <div><div class="ctitle"><span class="l-zh">整个仓位的到期价值</span><span class="l-en">Expiration value of the whole position</span></div><svg id="smBSvg" role="img" aria-label="仓位到期价值，每一步都不变" data-en-aria-label="Expiration value of the position, unchanged at every step"></svg><div class="chk" id="smBChk"></div></div>
     </div>
     <div class="say plain" id="smBSay"></div>
   </div>
-  <p>讲义把 4 行 put 逐行换成 call，按行权价合并：950 那一条整个消失，标的 29 − 44 − 24 ＋ 51 − 12 ＝ 0 全部对消，剩下 +42 975 call、−84 1000 call、+42 1025 call，是 42 手 975/1000/1025 买入 butterfly。</p>
-  <p>讲义没有印 delta 的答案，化简之后一眼能看出来：butterfly 到期在身 1000 上最值钱，标的 981.50 在身的下方，处在线往上走的一段。标的往 1000 靠，仓位变值钱，所以 <b>delta 为正</b>。九行原样摆着，很难看出这一点。</p>
-  <p class="tiny">第 11 页这一题和随机题的原仓位里有标的合约，它的买入价只让整条线上下平移，图里把最低处记为 0，只比形状。第 9 页那一题没有原始的标的腿，线是真实的到期价值。</p>
+  <p><span class="l-zh">讲义把 4 行 put 逐行换成 call，按行权价合并：950 那一条整个消失，标的 29 − 44 − 24 ＋ 51 − 12 ＝ 0 全部对消，剩下 +42 975 call、−84 1000 call、+42 1025 call，是 42 手 975/1000/1025 买入 butterfly。</span><span class="l-en">The lecture notes convert the 4 put rows to calls one by one and merge by strike: the 950 row disappears entirely, the underlying 29 − 44 − 24 + 51 − 12 = 0 cancels completely, and what is left is +42 975 calls, −84 1000 calls, +42 1025 calls: 42 long 975/1000/1025 butterflies.</span></p>
+  <p><span class="l-zh">讲义没有印 delta 的答案，化简之后一眼能看出来：butterfly 到期在身 1000 上最值钱，标的 981.50 在身的下方，处在线往上走的一段。标的往 1000 靠，仓位变值钱，所以 <b>delta 为正</b>。九行原样摆着，很难看出这一点。</span><span class="l-en">The lecture notes don't print the delta answer, but after simplifying it is obvious: the butterfly is worth the most at expiration at the body, 1000, and the underlying at 981.50 is below the body, on the rising part of the line. As the underlying moves toward 1000 the position gains value, so <b>delta is positive</b>. With nine rows laid out as given, this is hard to see.</span></p>
+  <p class="tiny"><span class="l-zh">第 11 页这一题和随机题的原仓位里有标的合约，它的买入价只让整条线上下平移，图里把最低处记为 0，只比形状。第 9 页那一题没有原始的标的腿，线是真实的到期价值。</span><span class="l-en">In the page 11 exercise and in the random exercises, the original position includes underlying contracts, whose purchase price only shifts the whole line up or down; the chart sets the lowest point to 0 and compares only the shape. The page 9 exercise has no original underlying leg, so its line is the real expiration value.</span></p>
 
-  <h3>化简的步骤</h3>
+  <h3><span class="l-zh">化简的步骤</span><span class="l-en">Steps to simplify</span></h3>
   <ol>
-    <li>选定一种期权，把另一种全部换掉：<span class="sym" data-say="q：这一行的张数。">q</span> 张 put 换成 q 张 call 加卖出 q 份标的；q 张 call 换成 q 张 put 加买入 q 份标的。哪一种行数少，就换掉哪一种。</li>
-    <li>按行权价合并同一种期权，张数相加。</li>
-    <li>把所有标的腿加起来。</li>
-    <li>标的合计不是 0 时，把剩下的标的也换掉：买 1 份标的 ＝ 买 1 张 call ＋ 卖 1 张 put，行权价用仓位里已有的那一个（和标的原来的成交价差出来的，只是到期一笔固定的钱），再合并一次，看能不能并成 straddle 这类已知结构。三节第 7 页的 +2 call −1 标的，把 −1 标的换成 −1 call +1 put，合并后是 +1 call +1 put。</li>
-    <li>读出结构：butterfly、价差、<span class="sym" data-say="ratio spread（3.2）：同一种期权、两个行权价，买卖张数不相等，比如买 1 张、卖 2 张（1×2）。多出来的那几张决定哪一边亏损没有边界。">ratio spread</span>、straddle。</li>
-    <li>每一步换完，到期价值那条线都不能变；变了，就是哪一步换错了。</li>
+    <li><span class="l-zh">选定一种期权，把另一种全部换掉：<span class="sym" data-say="q：这一行的张数。">q</span> 张 put 换成 q 张 call 加卖出 q 份标的；q 张 call 换成 q 张 put 加买入 q 份标的。哪一种行数少，就换掉哪一种。</span><span class="l-en">Pick one type of option and convert all of the other type: <span class="sym" data-say="q: the number of contracts in this row.">q</span> puts become q calls plus selling q units of the underlying; q calls become q puts plus buying q units of the underlying. Convert whichever type has fewer rows.</span></li>
+    <li><span class="l-zh">按行权价合并同一种期权，张数相加。</span><span class="l-en">Merge options of the same type by strike, adding the quantities.</span></li>
+    <li><span class="l-zh">把所有标的腿加起来。</span><span class="l-en">Add up all the underlying legs.</span></li>
+    <li><span class="l-zh">标的合计不是 0 时，把剩下的标的也换掉：买 1 份标的 ＝ 买 1 张 call ＋ 卖 1 张 put，行权价用仓位里已有的那一个（和标的原来的成交价差出来的，只是到期一笔固定的钱），再合并一次，看能不能并成 straddle 这类已知结构。三节第 7 页的 +2 call −1 标的，把 −1 标的换成 −1 call +1 put，合并后是 +1 call +1 put。</span><span class="l-en">If the underlying total is not 0, convert the remaining underlying too: buy 1 underlying = buy 1 call + sell 1 put, using a strike already in the position (the difference from the underlying's original trade price is just a fixed amount at expiration). Merge again and see whether it forms a known structure such as a straddle. For the +2 calls −1 underlying on page 7 in section 3, replace −1 underlying with −1 call +1 put; after merging it is +1 call +1 put.</span></li>
+    <li><span class="l-zh">读出结构：butterfly、价差、<span class="sym" data-say="ratio spread（3.2）：同一种期权、两个行权价，买卖张数不相等，比如买 1 张、卖 2 张（1×2）。多出来的那几张决定哪一边亏损没有边界。">ratio spread</span>、straddle。</span><span class="l-en">Read off the structure: butterfly, spread, <span class="sym" data-say="Ratio spread (3.2): same type of option, two strikes, unequal quantities bought and sold, for example buy 1 and sell 2 (1×2). The extra contracts determine which side has unlimited loss.">ratio spread</span>, straddle.</span></li>
+    <li><span class="l-zh">每一步换完，到期价值那条线都不能变；变了，就是哪一步换错了。</span><span class="l-en">After each step, the expiration value line must not change; if it does, a step was done wrong.</span></li>
   </ol>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>butterfly ＋ iron butterfly ＝ 间距</h2>
-  <p class="sub">3.2 里 TSLA 325/350/375 butterfly 买入付 5.60，同样三个行权价的 iron butterfly 卖出收 19.50，收付的钱差很多，盈亏却一样。原因是一条不用任何定价模型的关系。</p>
-  <p>3.2 讲过：butterfly 买两翼、卖两张身；<span class="sym" data-say="iron butterfly：同样三个行权价，call 和 put 混着用。买入（讲义 long iron butterfly）= 买身上的 straddle、卖两翼的 strangle；卖出反过来。">iron butterfly</span> 买入是买身上的 straddle、卖两翼的 strangle（讲义叫 long iron butterfly），卖出反过来。讲义第 10 页给了这条关系，例子里间距是 5：</p>
+  <h2><span class="l-zh"><span class="n">五</span>butterfly ＋ iron butterfly ＝ 间距</span><span class="l-en"><span class="n">5</span>Butterfly + iron butterfly = width</span></h2>
+  <p class="sub"><span class="l-zh">3.2 里 TSLA 325/350/375 butterfly 买入付 5.60，同样三个行权价的 iron butterfly 卖出收 19.50，收付的钱差很多，盈亏却一样。原因是一条不用任何定价模型的关系。</span><span class="l-en">In 3.2, the TSLA 325/350/375 butterfly costs 5.60 to buy and the iron butterfly with the same three strikes collects 19.50 to sell. The cash paid and collected differs a lot, yet the P&amp;L is the same. The reason is a relationship that needs no pricing model.</span></p>
+  <p><span class="l-zh">3.2 讲过：butterfly 买两翼、卖两张身；<span class="sym" data-say="iron butterfly：同样三个行权价，call 和 put 混着用。买入（讲义 long iron butterfly）= 买身上的 straddle、卖两翼的 strangle；卖出反过来。">iron butterfly</span> 买入是买身上的 straddle、卖两翼的 strangle（讲义叫 long iron butterfly），卖出反过来。讲义第 10 页给了这条关系，例子里间距是 5：</span><span class="l-en">As 3.2 explained: a butterfly buys the two wings and sells two bodies; buying an <span class="sym" data-say="Iron butterfly: the same three strikes, mixing calls and puts. Buying it (the lecture's long iron butterfly) = buy the straddle at the body and sell the strangle at the wings; selling it is the reverse.">iron butterfly</span> means buying the straddle at the body and selling the strangle at the wings (the lecture notes call it a long iron butterfly); selling is the reverse. Lecture page 10 gives this relationship, with a width of 5 in the example:</span></p>
   <div class="formula">
-    <div class="math">butterfly ＋ 买入 iron butterfly ＝ 相邻行权价的<span class="sym" data-say="相邻两个行权价之差。325/350/375 的间距是 25；讲义例子 95/100/105 的间距是 5。">间距</span></div>
-    <div class="gloss">到期时两者的价值加起来处处等于间距，所以今天的价格加起来，就是「到期一定拿到间距」这件事今天的价格</div>
+    <div class="math"><span class="l-zh">butterfly ＋ 买入 iron butterfly ＝ 相邻行权价的<span class="sym" data-say="相邻两个行权价之差。325/350/375 的间距是 25；讲义例子 95/100/105 的间距是 5。">间距</span></span><span class="l-en">butterfly + long iron butterfly = <span class="sym" data-say="The difference between two adjacent strikes. 325/350/375 has a width of 25; the lecture example 95/100/105 has a width of 5.">width</span> between adjacent strikes</span></div>
+    <div class="gloss"><span class="l-zh">到期时两者的价值加起来处处等于间距，所以今天的价格加起来，就是「到期一定拿到间距」这件事今天的价格</span><span class="l-en">At expiration the two values add up to the width everywhere, so their prices today add up to today's price of "receiving the width for sure at expiration"</span></div>
   </div>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="fcPlay">再叠一遍</button></div>
-    <svg id="fcSvg" role="img" aria-label="butterfly 的三角形与买入 iron butterfly 的形状叠成一条水平线"></svg>
+    <div class="bar"><button class="btn ghost" id="fcPlay"><span class="l-zh">再叠一遍</span><span class="l-en">Stack them again</span></button></div>
+    <svg id="fcSvg" role="img" aria-label="butterfly 的三角形与买入 iron butterfly 的形状叠成一条水平线" data-en-aria-label="The butterfly's triangle and the long iron butterfly's shape stack into a horizontal line"></svg>
     <div class="legend">
-      <span><i class="dash" style="color:var(--result)"></i>butterfly：买 325、375 call，卖 2 张 350 call</span>
-      <span><i style="background:var(--good)"></i>买入 iron butterfly：买 350 straddle，卖 325/375 strangle</span>
-      <span><i style="background:var(--control)"></i>两者合计</span>
+      <span><i class="dash" style="color:var(--result)"></i><span class="l-zh">butterfly：买 325、375 call，卖 2 张 350 call</span><span class="l-en">Butterfly: buy 325 and 375 calls, sell 2 350 calls</span></span>
+      <span><i style="background:var(--good)"></i><span class="l-zh">买入 iron butterfly：买 350 straddle，卖 325/375 strangle</span><span class="l-en">Long iron butterfly: buy the 350 straddle, sell the 325/375 strangle</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">两者合计</span><span class="l-en">Sum of the two</span></span>
     </div>
     <div class="tbl"><table id="fcTb"></table></div>
   </div>
-  <p>butterfly 到期的价值是一个三角形：在身 350 最高，是 25，离开 350 每 1 美元少 1，到 325 和 375 变成 0。买入 iron butterfly 正好相反：straddle 的价值是 TSLA 离 350 的距离，卖出的 strangle 在 325 以下和 375 以上把超过 25 的部分收走，所以它的价值是「离 350 的距离，最多 25」。butterfly 少多少，它就多多少，加起来处处是 25。</p>
+  <p><span class="l-zh">butterfly 到期的价值是一个三角形：在身 350 最高，是 25，离开 350 每 1 美元少 1，到 325 和 375 变成 0。买入 iron butterfly 正好相反：straddle 的价值是 TSLA 离 350 的距离，卖出的 strangle 在 325 以下和 375 以上把超过 25 的部分收走，所以它的价值是「离 350 的距离，最多 25」。butterfly 少多少，它就多多少，加起来处处是 25。</span><span class="l-en">The butterfly's value at expiration is a triangle: highest at the 350 body, where it is 25, dropping 1 for every $1 away from 350, and reaching 0 at 325 and 375. The long iron butterfly is the opposite: the straddle is worth TSLA's distance from 350, and the short strangle takes away anything beyond 25 below 325 and above 375, so its value is "the distance from 350, capped at 25". Whatever the butterfly loses, it gains, and together they are 25 everywhere.</span></p>
 
-  <h3>用化简的办法再看一遍</h3>
+  <h3><span class="l-zh">用化简的办法再看一遍</span><span class="l-en">Look at it again by simplifying</span></h3>
   <div class="panel">
     <div class="bar">
-      <div class="btns"><button class="btn ghost" id="smCPlay">再化简一遍</button><button class="btn ghost" id="smCPrev">上一步</button><button class="btn ghost" id="smCNext">下一步</button></div>
+      <div class="btns"><button class="btn ghost" id="smCPlay"><span class="l-zh">再化简一遍</span><span class="l-en">Simplify again</span></button><button class="btn ghost" id="smCPrev"><span class="l-zh">上一步</span><span class="l-en">Previous step</span></button><button class="btn ghost" id="smCNext"><span class="l-zh">下一步</span><span class="l-en">Next step</span></button></div>
     </div>
     <div class="simp">
       <div><div class="stepn" id="smCStep"></div><div class="cards" id="smCCards"></div><div class="stepcap" id="smCCap"></div></div>
-      <div><div class="ctitle">整个仓位的到期价值</div><svg id="smCSvg" role="img" aria-label="butterfly 加 iron butterfly 的到期价值，处处是 25"></svg><div class="chk" id="smCChk"></div></div>
+      <div><div class="ctitle"><span class="l-zh">整个仓位的到期价值</span><span class="l-en">Expiration value of the whole position</span></div><svg id="smCSvg" role="img" aria-label="butterfly 加 iron butterfly 的到期价值，处处是 25" data-en-aria-label="Expiration value of butterfly plus iron butterfly, 25 everywhere"></svg><div class="chk" id="smCChk"></div></div>
     </div>
     <div class="say plain" id="smCSay"></div>
   </div>
-  <p>七行、八张期权全部对消，只剩两份标的，一份按 325 买、一份按 350 卖，到期固定多出 25。按两个行权价一买一卖两个合成标的，这个组合叫 <span class="sym" data-say="box：一个行权价上的合成多头标的，加另一个行权价上的合成空头标的，同一到期。到期一定拿到两个行权价之差。5.3 专门讲。">box</span>，5.3 讲。</p>
+  <p><span class="l-zh">七行、八张期权全部对消，只剩两份标的，一份按 325 买、一份按 350 卖，到期固定多出 25。按两个行权价一买一卖两个合成标的，这个组合叫 <span class="sym" data-say="box：一个行权价上的合成多头标的，加另一个行权价上的合成空头标的，同一到期。到期一定拿到两个行权价之差。5.3 专门讲。">box</span>，5.3 讲。</span><span class="l-en">All seven rows and eight options cancel, leaving only two units of underlying, one bought at 325 and one sold at 350, which leave a fixed extra 25 at expiration. Buying one synthetic underlying and selling another at two strikes is called a <span class="sym" data-say="Box: a synthetic long underlying at one strike plus a synthetic short underlying at another strike, same expiration. At expiration it is sure to pay the difference between the two strikes. 5.3 covers it.">box</span>, covered in 5.3.</span></p>
 
-  <h3>讲义那个约等号</h3>
-  <p>讲义写的是 long butterfly ≈ short iron butterfly（买入 butterfly 约等于卖出 iron butterfly）。约等号来自那个固定的数：买入 butterfly ＝ 25 − 买入 iron butterfly，也就是卖出一个 iron butterfly，再加上到期固定拿到的 25。四节讲义第 9 页那一题化简后多出的 −5 也是它。</p>
-  <p>3.2 的成交价：买 butterfly 付 5.60，卖 iron butterfly 收 19.50，合计 25.10，接近 25。所以买 butterfly 最多赚 25 − 5.60 ＝ 19.40，卖 iron butterfly 最多赚 19.50；最多亏的是 5.60 和 25 − 19.50 ＝ 5.50。两种挂法开仓的现金差了 25 左右，盈亏只差 0.10。</p>
+  <h3><span class="l-zh">讲义那个约等号</span><span class="l-en">The lecture's approximately-equal sign</span></h3>
+  <p><span class="l-zh">讲义写的是 long butterfly ≈ short iron butterfly（买入 butterfly 约等于卖出 iron butterfly）。约等号来自那个固定的数：买入 butterfly ＝ 25 − 买入 iron butterfly，也就是卖出一个 iron butterfly，再加上到期固定拿到的 25。四节讲义第 9 页那一题化简后多出的 −5 也是它。</span><span class="l-en">The lecture notes write long butterfly ≈ short iron butterfly. The approximately-equal sign comes from that fixed number: long butterfly = 25 − long iron butterfly, which is a short iron butterfly plus a fixed 25 received at expiration. The extra −5 after simplifying the lecture's page 9 exercise in section 4 is the same thing.</span></p>
+  <p><span class="l-zh">3.2 的成交价：买 butterfly 付 5.60，卖 iron butterfly 收 19.50，合计 25.10，接近 25。所以买 butterfly 最多赚 25 − 5.60 ＝ 19.40，卖 iron butterfly 最多赚 19.50；最多亏的是 5.60 和 25 − 19.50 ＝ 5.50。两种挂法开仓的现金差了 25 左右，盈亏只差 0.10。</span><span class="l-en">Trade prices from 3.2: buying the butterfly costs 5.60 and selling the iron butterfly collects 19.50, 25.10 in total, close to 25. So buying the butterfly makes at most 25 − 5.60 = 19.40 and selling the iron butterfly makes at most 19.50; the maximum losses are 5.60 and 25 − 19.50 = 5.50. The two ways of putting it on differ by about 25 in cash at opening, but their P&amp;L differs by only 0.10.</span></p>
 
-  <h3>TSLA 的 24 个交易日</h3>
-  <p>4/13 收盘按中间价，butterfly 5.25，买入 iron butterfly 19.70，合计 24.95。25 要到 5/15 才拿到，按 1.1 的 4.3% 折回 4/13 是 24.91，差 0.04。之后每一天：</p>
+  <h3><span class="l-zh">TSLA 的 24 个交易日</span><span class="l-en">24 trading days of TSLA</span></h3>
+  <p><span class="l-zh">4/13 收盘按中间价，butterfly 5.25，买入 iron butterfly 19.70，合计 24.95。25 要到 5/15 才拿到，按 1.1 的 4.3% 折回 4/13 是 24.91，差 0.04。之后每一天：</span><span class="l-en">At the 4/13 close, at mid prices, the butterfly is 5.25 and the long iron butterfly 19.70, 24.95 in total. The 25 arrives only on 5/15; discounted back to 4/13 at the 4.3% from 1.1 it is 24.91, a difference of 0.04. Each day after that:</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="fdPlay">逐天重放</button></div>
-    <svg id="fdSvg" role="img" aria-label="butterfly、买入 iron butterfly 与两者之和的逐日中间价"></svg>
+    <div class="bar"><button class="btn ghost" id="fdPlay"><span class="l-zh">逐天重放</span><span class="l-en">Replay day by day</span></button></div>
+    <svg id="fdSvg" role="img" aria-label="butterfly、买入 iron butterfly 与两者之和的逐日中间价" data-en-aria-label="Daily mid prices of the butterfly, the long iron butterfly, and their sum"></svg>
     <div class="legend">
       <span><i class="dash" style="color:var(--result)"></i>butterfly</span>
-      <span><i style="background:var(--good)"></i>买入 iron butterfly</span>
-      <span><i style="background:var(--control)"></i>两者合计</span>
-      <span><i class="fat" style="background:var(--control)"></i>浅色带：两个都按报价卖能收的钱，到两个都按报价买要付的钱</span>
-      <span><i class="dash" style="color:var(--ink-soft)"></i>25 折回当天</span>
+      <span><i style="background:var(--good)"></i><span class="l-zh">买入 iron butterfly</span><span class="l-en">Long iron butterfly</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">两者合计</span><span class="l-en">Sum of the two</span></span>
+      <span><i class="fat" style="background:var(--control)"></i><span class="l-zh">浅色带：两个都按报价卖能收的钱，到两个都按报价买要付的钱</span><span class="l-en">Shaded band: from what you collect selling both at the quotes, to what you pay buying both at the quotes</span></span>
+      <span><i class="dash" style="color:var(--ink-soft)"></i><span class="l-zh">25 折回当天</span><span class="l-en">25 discounted to that day</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="fdD"></div><div class="d2" id="fdDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="fdD"></div><div class="d2" id="fdDb"></div></div>
       <div class="stat"><div class="k">butterfly</div><div class="d" id="fdF" style="color:var(--result)"></div></div>
-      <div class="stat"><div class="k">买入 iron butterfly</div><div class="d" id="fdI" style="color:var(--good)"></div></div>
-      <div class="stat"><div class="k">两者合计</div><div class="d" id="fdSum" style="color:var(--control)"></div><div class="d2" id="fdSumb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">买入 iron butterfly</span><span class="l-en">Long iron butterfly</span></div><div class="d" id="fdI" style="color:var(--good)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">两者合计</span><span class="l-en">Sum of the two</span></div><div class="d" id="fdSum" style="color:var(--control)"></div><div class="d2" id="fdSumb"></div></div>
     </div>
     <div class="say plain" id="fdSay"></div>
   </div>
 
-  <h3>用这条关系查报价</h3>
-  <p>同一天、同一个身 350，两翼放在 350 减、加间距的位置，间距从 5 到 50，十组 butterfly 和 iron butterfly（间距 25 那一行就是 325/350/375）：</p>
+  <h3><span class="l-zh">用这条关系查报价</span><span class="l-en">Using this relationship to check quotes</span></h3>
+  <p><span class="l-zh">同一天、同一个身 350，两翼放在 350 减、加间距的位置，间距从 5 到 50，十组 butterfly 和 iron butterfly（间距 25 那一行就是 325/350/375）：</span><span class="l-en">Same day, same 350 body, wings at 350 minus and plus the width, widths from 5 to 50: ten pairs of butterflies and iron butterflies (the width-25 row is 325/350/375):</span></p>
   <div class="tbl"><table id="wTb"></table></div>
   <p id="wSay"></p>
-  <p>一个真实的例子。同一天 250/255/260 call butterfly 按中间价算是 −0.25。butterfly 到期最少值 0，价格不可能是负的。毛病在报价上：这三张 call <span class="sym" data-say="实值：现在行权就值钱，call 是行权价低于现价（3.2）。深度实值是离现价很远的实值，价格几乎全是内在价值，交易少，买卖价差宽。">深度实值</span>，买卖价差 2.60 到 2.85，三张中间价的误差叠起来比 butterfly 本身还大。同样三个行权价的 put butterfly 是 0.015，这三张 put 的买卖价差只有 0.02 到 0.03。算 butterfly 时，用<span class="sym" data-say="虚值：现在行权不值钱，call 是行权价高于现价，put 是行权价低于现价（3.2）。250/255/260 的 put 离现价 352 很远，价格很小，买卖价差也窄。">虚值</span>那一边的期权，数更可靠。上面逐天重放里 5/14 那天 butterfly 是 −0.38，原因相同：325 call 那天买一 116.80、卖一 119.20。</p>
-  <p class="tiny">讲义 Session 4 的价格表（标的 100）上，95/100/105 butterfly 是 1.00，买入 iron butterfly 是 4.60 ＋ 3.40 − 1.60 − 2.50 ＝ 3.90，合计 4.90 不是 5。3.1 讲过：这张表按约 2% 折了现，5 要到期才拿到。</p>
+  <p><span class="l-zh">一个真实的例子。同一天 250/255/260 call butterfly 按中间价算是 −0.25。butterfly 到期最少值 0，价格不可能是负的。毛病在报价上：这三张 call <span class="sym" data-say="实值：现在行权就值钱，call 是行权价低于现价（3.2）。深度实值是离现价很远的实值，价格几乎全是内在价值，交易少，买卖价差宽。">深度实值</span>，买卖价差 2.60 到 2.85，三张中间价的误差叠起来比 butterfly 本身还大。同样三个行权价的 put butterfly 是 0.015，这三张 put 的买卖价差只有 0.02 到 0.03。算 butterfly 时，用<span class="sym" data-say="虚值：现在行权不值钱，call 是行权价高于现价，put 是行权价低于现价（3.2）。250/255/260 的 put 离现价 352 很远，价格很小，买卖价差也窄。">虚值</span>那一边的期权，数更可靠。上面逐天重放里 5/14 那天 butterfly 是 −0.38，原因相同：325 call 那天买一 116.80、卖一 119.20。</span><span class="l-en">A real example. On the same day the 250/255/260 call butterfly comes out at −0.25 at mid prices. A butterfly is worth at least 0 at expiration, so its price cannot be negative. The problem is in the quotes: these three calls are <span class="sym" data-say="In the money: worth something if exercised now; for a call, the strike is below the current price (3.2). Deep in the money means far from the current price; the price is almost all intrinsic value, there is little trading, and the bid-ask spread is wide.">deep in the money</span> with bid-ask spreads of 2.60 to 2.85, and the errors in the three mid prices add up to more than the butterfly itself. The put butterfly with the same three strikes is 0.015, and those three puts have spreads of only 0.02 to 0.03. When pricing a butterfly, the numbers from the <span class="sym" data-say="Out of the money: worth nothing if exercised now; for a call, the strike is above the current price; for a put, below (3.2). The 250/255/260 puts are far from the current price of 352, so their prices are small and their bid-ask spreads narrow.">out-of-the-money</span> side are more reliable. In the day-by-day replay above, the butterfly shows −0.38 on 5/14 for the same reason: that day the 325 call was bid 116.80, ask 119.20.</span></p>
+  <p class="tiny"><span class="l-zh">讲义 Session 4 的价格表（标的 100）上，95/100/105 butterfly 是 1.00，买入 iron butterfly 是 4.60 ＋ 3.40 − 1.60 − 2.50 ＝ 3.90，合计 4.90 不是 5。3.1 讲过：这张表按约 2% 折了现，5 要到期才拿到。</span><span class="l-en">On the price table in lecture Session 4 (underlying at 100), the 95/100/105 butterfly is 1.00 and the long iron butterfly is 4.60 + 3.40 − 1.60 − 2.50 = 3.90; together that is 4.90, not 5. As 3.1 explained, that table discounts at about 2%, and the 5 arrives only at expiration.</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>认出等价的头寸</h2>
-  <p class="sub">讲义最后列了六组两条腿的仓位，左右各一个，幻灯片上没有题目要求，也没有答案。两种读法都做：每一边是什么，左右是否等价。</p>
+  <h2><span class="l-zh"><span class="n">六</span>认出等价的头寸</span><span class="l-en"><span class="n">6</span>Spotting equivalent positions</span></h2>
+  <p class="sub"><span class="l-zh">讲义最后列了六组两条腿的仓位，左右各一个，幻灯片上没有题目要求，也没有答案。两种读法都做：每一边是什么，左右是否等价。</span><span class="l-en">The lecture ends with six pairs of two-leg positions, one on the left and one on the right; the slide gives no instructions and no answers. Both readings are done here: what each side is, and whether left and right are equivalent.</span></p>
   <div class="tbl"><table>
-    <thead><tr><th>组</th><th class="txt">左边</th><th class="txt">右边</th><th class="txt">答案</th></tr></thead>
+    <thead><tr><th><span class="l-zh">组</span><span class="l-en">Pair</span></th><th class="txt"><span class="l-zh">左边</span><span class="l-en">Left</span></th><th class="txt"><span class="l-zh">右边</span><span class="l-en">Right</span></th><th class="txt"><span class="l-zh">答案</span><span class="l-en">Answer</span></th></tr></thead>
     <tbody>
-      <tr><td>1</td><td class="pos">+1 Jun 100 call<br>−1 Jun 100 put</td><td class="pos">+1 标的<br>+1 Aug 70 put</td><td class="txt"><details><summary>展开</summary><div>左：合成多头标的。右：合成多头 Aug 70 call。不等价：一条直线，一条先平后涨。</div></details></td></tr>
-      <tr><td>2</td><td class="pos">−1 Sep 80 call<br>−1 Sep 80 put</td><td class="pos">+1 Jul 40 call<br>+1 标的</td><td class="txt"><details><summary>展开</summary><div>左：卖出 Sep 80 straddle。右：两条腿 delta 都为正，合成不出单张期权，也合成不出标的（它等于 2 张 Jul 40 call 减 1 张 Jul 40 put）。不等价。</div></details></td></tr>
-      <tr><td>3</td><td class="pos">−1 Oct 50 put<br>−1 标的</td><td class="pos">+1 Nov 65 call<br>−1 标的</td><td class="txt"><details><summary>展开</summary><div>左：合成空头 Oct 50 call。右：合成多头 Nov 65 put。不等价。</div></details></td></tr>
-      <tr><td>4</td><td class="pos">−1 May 75 call<br>+1 标的</td><td class="pos">−1 标的<br>−1 Dec 90 put</td><td class="txt"><details><summary>展开</summary><div>左：合成空头 May 75 put。右：合成空头 Dec 90 call。不等价。</div></details></td></tr>
-      <tr><td>5</td><td class="pos">+1 Jun 55 call<br>+1 Jun 55 put</td><td class="pos">−1 Jul 45 call<br>+1 Jul 45 put</td><td class="txt"><details><summary>展开</summary><div>左：买入 Jun 55 straddle。右：合成空头标的。不等价。</div></details></td></tr>
-      <tr><td>6</td><td class="pos">−1 Nov 50 put<br>+1 标的</td><td class="pos">+1 Oct 65 put<br>+1 标的</td><td class="txt"><details><summary>展开</summary><div>左：卖 put 的 delta 为正，标的也为正，合成不出单张期权，也合成不出标的（它等于 1 张 Nov 50 call 减 2 张 Nov 50 put）。右：合成多头 Oct 65 call。不等价。</div></details></td></tr>
+      <tr><td>1</td><td class="pos">+1 Jun 100 call<br>−1 Jun 100 put</td><td class="pos"><span class="l-zh">+1 标的</span><span class="l-en">+1 underlying</span><br>+1 Aug 70 put</td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：合成多头标的。右：合成多头 Aug 70 call。不等价：一条直线，一条先平后涨。</span><span class="l-en">Left: synthetic long underlying. Right: synthetic long Aug 70 call. Not equivalent: one is a straight line, the other flat then rising.</span></div></details></td></tr>
+      <tr><td>2</td><td class="pos">−1 Sep 80 call<br>−1 Sep 80 put</td><td class="pos">+1 Jul 40 call<br><span class="l-zh">+1 标的</span><span class="l-en">+1 underlying</span></td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：卖出 Sep 80 straddle。右：两条腿 delta 都为正，合成不出单张期权，也合成不出标的（它等于 2 张 Jul 40 call 减 1 张 Jul 40 put）。不等价。</span><span class="l-en">Left: short Sep 80 straddle. Right: both legs have positive delta, so they form neither a single option nor the underlying (it equals 2 Jul 40 calls minus 1 Jul 40 put). Not equivalent.</span></div></details></td></tr>
+      <tr><td>3</td><td class="pos">−1 Oct 50 put<br><span class="l-zh">−1 标的</span><span class="l-en">−1 underlying</span></td><td class="pos">+1 Nov 65 call<br><span class="l-zh">−1 标的</span><span class="l-en">−1 underlying</span></td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：合成空头 Oct 50 call。右：合成多头 Nov 65 put。不等价。</span><span class="l-en">Left: synthetic short Oct 50 call. Right: synthetic long Nov 65 put. Not equivalent.</span></div></details></td></tr>
+      <tr><td>4</td><td class="pos">−1 May 75 call<br><span class="l-zh">+1 标的</span><span class="l-en">+1 underlying</span></td><td class="pos"><span class="l-zh">−1 标的</span><span class="l-en">−1 underlying</span><br>−1 Dec 90 put</td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：合成空头 May 75 put。右：合成空头 Dec 90 call。不等价。</span><span class="l-en">Left: synthetic short May 75 put. Right: synthetic short Dec 90 call. Not equivalent.</span></div></details></td></tr>
+      <tr><td>5</td><td class="pos">+1 Jun 55 call<br>+1 Jun 55 put</td><td class="pos">−1 Jul 45 call<br>+1 Jul 45 put</td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：买入 Jun 55 straddle。右：合成空头标的。不等价。</span><span class="l-en">Left: long Jun 55 straddle. Right: synthetic short underlying. Not equivalent.</span></div></details></td></tr>
+      <tr><td>6</td><td class="pos">−1 Nov 50 put<br><span class="l-zh">+1 标的</span><span class="l-en">+1 underlying</span></td><td class="pos">+1 Oct 65 put<br><span class="l-zh">+1 标的</span><span class="l-en">+1 underlying</span></td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：卖 put 的 delta 为正，标的也为正，合成不出单张期权，也合成不出标的（它等于 1 张 Nov 50 call 减 2 张 Nov 50 put）。右：合成多头 Oct 65 call。不等价。</span><span class="l-en">Left: the short put has positive delta and so does the underlying, so they form neither a single option nor the underlying (it equals 1 Nov 50 call minus 2 Nov 50 puts). Right: synthetic long Oct 65 call. Not equivalent.</span></div></details></td></tr>
     </tbody>
   </table></div>
-  <p>六组没有一组左右等价，所以这套练习的用意更可能是逐个叫出名字。要留意的是第 2 组右边和第 6 组左边：期权配标的，两条腿 delta 同号，这是一节说的陷阱。快速判断用下面这张表。</p>
+  <p><span class="l-zh">六组没有一组左右等价，所以这套练习的用意更可能是逐个叫出名字。要留意的是第 2 组右边和第 6 组左边：期权配标的，两条腿 delta 同号，这是一节说的陷阱。快速判断用下面这张表。</span><span class="l-en">None of the six pairs is equivalent, so the exercise is more likely meant for naming each side. Watch the right side of pair 2 and the left side of pair 6: an option paired with the underlying where both legs have the same delta sign, the trap from section 1. Use the table below for a quick check.</span></p>
   <div class="tbl"><table>
-    <thead><tr><th>两条腿</th><th class="txt">delta 符号</th><th class="txt">合成出来的</th></tr></thead>
+    <thead><tr><th><span class="l-zh">两条腿</span><span class="l-en">Two legs</span></th><th class="txt"><span class="l-zh">delta 符号</span><span class="l-en">Delta signs</span></th><th class="txt"><span class="l-zh">合成出来的</span><span class="l-en">What they form</span></th></tr></thead>
     <tbody>
-      <tr><td>期权 ＋ 标的</td><td class="txt">一正一负</td><td class="txt">一张期权：买 put ＋ 买标的 ＝ 买 call，等等</td></tr>
-      <tr><td>期权 ＋ 标的</td><td class="txt">同号</td><td class="txt">合成不出单张期权或标的（delta 加起来绝对值超过 1）</td></tr>
-      <tr><td>同行权价的 call、put，一买一卖</td><td class="txt">同号</td><td class="txt">标的：买 call 卖 put 是多头，卖 call 买 put 是空头</td></tr>
-      <tr><td>同行权价的 call、put，同买或同卖</td><td class="txt">一正一负</td><td class="txt">straddle，不是合成</td></tr>
+      <tr><td><span class="l-zh">期权 ＋ 标的</span><span class="l-en">Option + underlying</span></td><td class="txt"><span class="l-zh">一正一负</span><span class="l-en">One positive, one negative</span></td><td class="txt"><span class="l-zh">一张期权：买 put ＋ 买标的 ＝ 买 call，等等</span><span class="l-en">A single option: long put + long underlying = long call, and so on</span></td></tr>
+      <tr><td><span class="l-zh">期权 ＋ 标的</span><span class="l-en">Option + underlying</span></td><td class="txt"><span class="l-zh">同号</span><span class="l-en">Same sign</span></td><td class="txt"><span class="l-zh">合成不出单张期权或标的（delta 加起来绝对值超过 1）</span><span class="l-en">Neither a single option nor the underlying (the deltas add up to more than 1 in absolute value)</span></td></tr>
+      <tr><td><span class="l-zh">同行权价的 call、put，一买一卖</span><span class="l-en">Call and put at the same strike, one bought, one sold</span></td><td class="txt"><span class="l-zh">同号</span><span class="l-en">Same sign</span></td><td class="txt"><span class="l-zh">标的：买 call 卖 put 是多头，卖 call 买 put 是空头</span><span class="l-en">Underlying: long call + short put is long; short call + long put is short</span></td></tr>
+      <tr><td><span class="l-zh">同行权价的 call、put，同买或同卖</span><span class="l-en">Call and put at the same strike, both bought or both sold</span></td><td class="txt"><span class="l-zh">一正一负</span><span class="l-en">One positive, one negative</span></td><td class="txt"><span class="l-zh">straddle，不是合成</span><span class="l-en">A straddle, not a synthetic</span></td></tr>
     </tbody>
   </table></div>
-  <p class="tiny">这六组里凡是两张期权配在一起的，行权价和到期都相同，所以没有考〇节那两个硬条件。</p>
+  <p class="tiny"><span class="l-zh">这六组里凡是两张期权配在一起的，行权价和到期都相同，所以没有考〇节那两个硬条件。</span><span class="l-en">In these six pairs, whenever two options are paired they have the same strike and expiration, so the two hard conditions from section 0 are not tested.</span></p>
 
-  <h3>补两组等价的</h3>
-  <p>讲义的六组都不等价。下面两组取自三节和四节，左右看起来不同，先各自化简再比。</p>
+  <h3><span class="l-zh">补两组等价的</span><span class="l-en">Two equivalent pairs to add</span></h3>
+  <p><span class="l-zh">讲义的六组都不等价。下面两组取自三节和四节，左右看起来不同，先各自化简再比。</span><span class="l-en">None of the lecture's six pairs is equivalent. The two pairs below come from sections 3 and 4; left and right look different, so simplify each first, then compare.</span></p>
   <div class="tbl"><table>
-    <thead><tr><th>组</th><th class="txt">左边</th><th class="txt">右边</th><th class="txt">答案</th></tr></thead>
+    <thead><tr><th><span class="l-zh">组</span><span class="l-en">Pair</span></th><th class="txt"><span class="l-zh">左边</span><span class="l-en">Left</span></th><th class="txt"><span class="l-zh">右边</span><span class="l-en">Right</span></th><th class="txt"><span class="l-zh">答案</span><span class="l-en">Answer</span></th></tr></thead>
     <tbody>
-      <tr><td>7</td><td class="pos">+2 Dec 100 call<br>−1 标的</td><td class="pos">+2 Dec 100 put<br>+1 标的</td><td class="txt"><details><summary>展开</summary><div>左边拆出一张 call 配卖出的标的，换成一张 put；右边拆出一张 put 配买入的标的，换成一张 call。两边都是 +1 call +1 put，买入 Dec 100 straddle。等价。</div></details></td></tr>
-      <tr><td>8</td><td class="pos">+1 Dec 95 call<br>−2 Dec 100 call<br>+1 Dec 105 call</td><td class="pos">+1 Dec 95 put<br>−1 Dec 100 call<br>−1 Dec 100 put<br>+1 Dec 105 call</td><td class="txt"><details><summary>展开</summary><div>左：买入 butterfly。右：买 95/105 strangle、卖 100 straddle，也就是卖出 iron butterfly。把右边两张 put 换成 call，化简后是同一个 butterfly，另外到期固定少 5（四节讲义第 9 页）。形状完全一样，右边处处比左边少 5；右边加上到期固定拿到的 5，才和左边等价，讲义因此写约等号。</div></details></td></tr>
+      <tr><td>7</td><td class="pos">+2 Dec 100 call<br><span class="l-zh">−1 标的</span><span class="l-en">−1 underlying</span></td><td class="pos">+2 Dec 100 put<br><span class="l-zh">+1 标的</span><span class="l-en">+1 underlying</span></td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左边拆出一张 call 配卖出的标的，换成一张 put；右边拆出一张 put 配买入的标的，换成一张 call。两边都是 +1 call +1 put，买入 Dec 100 straddle。等价。</span><span class="l-en">On the left, split off one call to pair with the short underlying and swap it for a put; on the right, split off one put to pair with the long underlying and swap it for a call. Both sides become +1 call +1 put, a long Dec 100 straddle. Equivalent.</span></div></details></td></tr>
+      <tr><td>8</td><td class="pos">+1 Dec 95 call<br>−2 Dec 100 call<br>+1 Dec 105 call</td><td class="pos">+1 Dec 95 put<br>−1 Dec 100 call<br>−1 Dec 100 put<br>+1 Dec 105 call</td><td class="txt"><details><summary><span class="l-zh">展开</span><span class="l-en">Expand</span></summary><div><span class="l-zh">左：买入 butterfly。右：买 95/105 strangle、卖 100 straddle，也就是卖出 iron butterfly。把右边两张 put 换成 call，化简后是同一个 butterfly，另外到期固定少 5（四节讲义第 9 页）。形状完全一样，右边处处比左边少 5；右边加上到期固定拿到的 5，才和左边等价，讲义因此写约等号。</span><span class="l-en">Left: long butterfly. Right: buy the 95/105 strangle and sell the 100 straddle, which is a short iron butterfly. Convert the two puts on the right to calls and it simplifies to the same butterfly, plus a fixed 5 less at expiration (lecture page 9, section 4). The shapes are identical, and the right side is 5 lower everywhere; only after adding the fixed 5 received at expiration is the right side equivalent to the left, which is why the lecture notes use an approximately-equal sign.</span></div></details></td></tr>
     </tbody>
   </table></div>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">七</span>费曼检验</span><span class="l-en"><span class="n">7</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">+1 / −1</div><div class="t">讲义写仓位的记法：+ 是买入，− 是卖出，数字是张数。+1 December 100 call ＝ 买入 1 张 12 月到期、行权价 100 的 call。</div></div>
-      <div class="gl"><div class="s">X</div><div class="t">行权价。合成的两条腿必须同一个 X、同一个到期日。</div></div>
-      <div class="gl"><div class="s">q</div><div class="t">化简步骤里一行的张数。</div></div>
-      <div class="gl"><div class="s">标的合约</div><div class="t">期权到期时买卖的那样东西。讲义是期货合约，TSLA 期权是 100 股股票。</div></div>
-      <div class="gl"><div class="s">指派</div><div class="t">卖出期权的一方在对方行权时必须履约。卖了 put 被指派，就要按行权价买入。</div></div>
-      <div class="gl"><div class="s">欧式 / 美式期权</div><div class="t">欧式只能在到期日行权；美式到期前任何一天都能行权。讲义的例子是欧式，TSLA 期权是美式，put 因此多一点提前行权的价值，本页的合成关系在 TSLA 上近似成立。提前行权在节点 9 讲。</div></div>
-      <div class="gl"><div class="s">合成（synthetic）</div><div class="t">用别的合约拼出一张合约的到期损益。call − put ＝ 标的，三样里任取两样做出第三样。</div></div>
-      <div class="gl"><div class="s">合成多头标的</div><div class="t">买 call、卖同行权价同到期的 put，到期一定按行权价买入标的。也叫合成远期多头。</div></div>
-      <div class="gl"><div class="s">delta</div><div class="t">标的动 1 美元，期权价格动多少。讲义按一张标的合约记 100，本页 TSLA 按每股记 1。</div></div>
-      <div class="gl"><div class="s">gamma, vega</div><div class="t">delta 的变化速度；隐含波动率每变 1 个点的价格变化。标的的这两个数都是 0，所以同行权价同到期的 call 和 put 这两个数相同。</div></div>
-      <div class="gl"><div class="s">拆</div><div class="t">化简时先决定哪几张配成一对去换。可以从一行里拆出一张和标的腿配对，也可以把标的换成 call − put，再和已有的期权合并。</div></div>
-      <div class="gl"><div class="s">straddle</div><div class="t">同行权价同到期，一张 call 加一张 put。</div></div>
-      <div class="gl"><div class="s">strangle</div><div class="t">同到期，一张低行权价的 put 加一张高行权价的 call。</div></div>
-      <div class="gl"><div class="s">butterfly</div><div class="t">三个等距行权价，+1 / −2 / +1。中间叫身，两边叫翼。到期价值在 0 和间距之间。</div></div>
-      <div class="gl"><div class="s">iron butterfly</div><div class="t">身上的 straddle 与两翼的 strangle 一买一卖。买 straddle、卖 strangle 是买入（long）。</div></div>
-      <div class="gl"><div class="s">间距</div><div class="t">相邻两个行权价之差。butterfly ＋ 买入 iron butterfly ＝ 间距。</div></div>
-      <div class="gl"><div class="s">牛市价差</div><div class="t">同一种期权，买低行权价、卖高行权价（3.1）。call 版 ＝ put 版 ＋ 到期固定的间距。</div></div>
-      <div class="gl"><div class="s">熊市价差</div><div class="t">同一种期权，买高行权价、卖低行权价，标的跌才赚（3.1）。随机题里会出现。</div></div>
-      <div class="gl"><div class="s">condor</div><div class="t">四个等距行权价、同一种期权，+1 / −1 / −1 / +1，到期停在中间两个行权价之间时拿满（3.2）。随机题里会出现。</div></div>
-      <div class="gl"><div class="s">ratio spread（1×2）</div><div class="t">同一种期权、两个行权价，买卖张数不相等，1×2 是买 1 张、卖 2 张（3.2）。多出来的那几张决定哪一边亏损没有边界。</div></div>
-      <div class="gl"><div class="s">box</div><div class="t">两个行权价上一买一卖两个合成标的，到期固定拿到两个行权价之差。5.3 讲。</div></div>
-      <div class="gl"><div class="s">中间价</div><div class="t">（买一 ＋ 卖一）÷ 2。买一是有人愿意买的最高价，卖一是有人愿意卖的最低价。</div></div>
-      <div class="gl"><div class="s">买卖价差</div><div class="t">卖一减买一。买入按卖一成交、卖出按买一成交，每条腿多付半个买卖价差（3.1）。深度实值期权的买卖价差宽，中间价的误差也大。</div></div>
-      <div class="gl"><div class="s">实值 / 虚值 / 深度实值</div><div class="t">现在行权就值钱的叫实值，不值钱的叫虚值（3.2）。call 行权价低于现价是实值，put 行权价高于现价是实值。深度实值是离现价很远的实值。</div></div>
-      <div class="gl"><div class="s">盈亏平衡点</div><div class="t">到期时标的在这个价，仓位不赚不亏（3.1）。合成多头 350 是 350 ＋ 3.65 ＝ 353.65。</div></div>
-      <div class="gl"><div class="s">折回（现值）</div><div class="t">到期才拿到的钱，按利率算出今天值多少（1.1）。本页用 4.3%、单利：25 折 32 天是 24.91。</div></div>
+      <div class="gl"><div class="s">+1 / −1</div><div class="t"><span class="l-zh">讲义写仓位的记法：+ 是买入，− 是卖出，数字是张数。+1 December 100 call ＝ 买入 1 张 12 月到期、行权价 100 的 call。</span><span class="l-en">The lecture's notation for positions: + is buy, − is sell, the number is the quantity. +1 December 100 call = buy 1 call expiring in December with a strike of 100.</span></div></div>
+      <div class="gl"><div class="s">X</div><div class="t"><span class="l-zh">行权价。合成的两条腿必须同一个 X、同一个到期日。</span><span class="l-en">Strike. The two legs of a synthetic must have the same X and the same expiration.</span></div></div>
+      <div class="gl"><div class="s">q</div><div class="t"><span class="l-zh">化简步骤里一行的张数。</span><span class="l-en">The quantity in one row of the simplifying steps.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">标的合约</span><span class="l-en">Underlying contract</span></div><div class="t"><span class="l-zh">期权到期时买卖的那样东西。讲义是期货合约，TSLA 期权是 100 股股票。</span><span class="l-en">The thing bought or sold when the option is exercised. In the lecture notes it is a futures contract; for TSLA options it is 100 shares of stock.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">指派</span><span class="l-en">Assignment</span></div><div class="t"><span class="l-zh">卖出期权的一方在对方行权时必须履约。卖了 put 被指派，就要按行权价买入。</span><span class="l-en">The side that sold an option must perform when the other side exercises. A short put that is assigned has to buy at the strike.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">欧式 / 美式期权</span><span class="l-en">European / American options</span></div><div class="t"><span class="l-zh">欧式只能在到期日行权；美式到期前任何一天都能行权。讲义的例子是欧式，TSLA 期权是美式，put 因此多一点提前行权的价值，本页的合成关系在 TSLA 上近似成立。提前行权在节点 9 讲。</span><span class="l-en">European options can be exercised only on the expiration date; American options on any day before expiration. The lecture examples are European; TSLA options are American, so the put carries a little extra early-exercise value, and the synthetic relationships on this page hold only approximately on TSLA. Early exercise is covered in node 9.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">合成（synthetic）</span><span class="l-en">Synthetic</span></div><div class="t"><span class="l-zh">用别的合约拼出一张合约的到期损益。call − put ＝ 标的，三样里任取两样做出第三样。</span><span class="l-en">Building one contract's expiration payoff from other contracts. call − put = underlying: take any two of the three to build the third.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">合成多头标的</span><span class="l-en">Synthetic long underlying</span></div><div class="t"><span class="l-zh">买 call、卖同行权价同到期的 put，到期一定按行权价买入标的。也叫合成远期多头。</span><span class="l-en">Buy a call and sell a put with the same strike and expiration; at expiration you are sure to buy the underlying at the strike. Also called a synthetic long forward.</span></div></div>
+      <div class="gl"><div class="s">delta</div><div class="t"><span class="l-zh">标的动 1 美元，期权价格动多少。讲义按一张标的合约记 100，本页 TSLA 按每股记 1。</span><span class="l-en">How much the option price moves when the underlying moves $1. The lecture notes count one underlying contract as 100; this page counts TSLA per share as 1.</span></div></div>
+      <div class="gl"><div class="s">gamma, vega</div><div class="t"><span class="l-zh">delta 的变化速度；隐含波动率每变 1 个点的价格变化。标的的这两个数都是 0，所以同行权价同到期的 call 和 put 这两个数相同。</span><span class="l-en">How fast delta changes; the price change for each 1-point change in implied volatility. Both are 0 for the underlying, so a call and a put with the same strike and expiration have the same values for both.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">拆</span><span class="l-en">Splitting</span></div><div class="t"><span class="l-zh">化简时先决定哪几张配成一对去换。可以从一行里拆出一张和标的腿配对，也可以把标的换成 call − put，再和已有的期权合并。</span><span class="l-en">When simplifying, decide first which contracts to pair up and swap. You can split one contract off a row to pair with the underlying leg, or replace the underlying with call − put and merge it with the existing options.</span></div></div>
+      <div class="gl"><div class="s">straddle</div><div class="t"><span class="l-zh">同行权价同到期，一张 call 加一张 put。</span><span class="l-en">Same strike, same expiration, one call plus one put.</span></div></div>
+      <div class="gl"><div class="s">strangle</div><div class="t"><span class="l-zh">同到期，一张低行权价的 put 加一张高行权价的 call。</span><span class="l-en">Same expiration, a lower-strike put plus a higher-strike call.</span></div></div>
+      <div class="gl"><div class="s">butterfly</div><div class="t"><span class="l-zh">三个等距行权价，+1 / −2 / +1。中间叫身，两边叫翼。到期价值在 0 和间距之间。</span><span class="l-en">Three equally spaced strikes, +1 / −2 / +1. The middle is the body, the outer ones the wings. Its value at expiration is between 0 and the width.</span></div></div>
+      <div class="gl"><div class="s">iron butterfly</div><div class="t"><span class="l-zh">身上的 straddle 与两翼的 strangle 一买一卖。买 straddle、卖 strangle 是买入（long）。</span><span class="l-en">A straddle at the body and a strangle at the wings, one bought and one sold. Buying the straddle and selling the strangle is the long side.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">间距</span><span class="l-en">Width</span></div><div class="t"><span class="l-zh">相邻两个行权价之差。butterfly ＋ 买入 iron butterfly ＝ 间距。</span><span class="l-en">The difference between two adjacent strikes. Butterfly + long iron butterfly = width.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">牛市价差</span><span class="l-en">Bull spread</span></div><div class="t"><span class="l-zh">同一种期权，买低行权价、卖高行权价（3.1）。call 版 ＝ put 版 ＋ 到期固定的间距。</span><span class="l-en">Same type of option, buy the lower strike, sell the higher strike (3.1). Call version = put version + the fixed width at expiration.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">熊市价差</span><span class="l-en">Bear spread</span></div><div class="t"><span class="l-zh">同一种期权，买高行权价、卖低行权价，标的跌才赚（3.1）。随机题里会出现。</span><span class="l-en">Same type of option, buy the higher strike, sell the lower strike; makes money only if the underlying falls (3.1). Appears in the random exercises.</span></div></div>
+      <div class="gl"><div class="s">condor</div><div class="t"><span class="l-zh">四个等距行权价、同一种期权，+1 / −1 / −1 / +1，到期停在中间两个行权价之间时拿满（3.2）。随机题里会出现。</span><span class="l-en">Four equally spaced strikes, same type of option, +1 / −1 / −1 / +1; pays the full amount if expiration lands between the two middle strikes (3.2). Appears in the random exercises.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">ratio spread（1×2）</span><span class="l-en">Ratio spread (1×2)</span></div><div class="t"><span class="l-zh">同一种期权、两个行权价，买卖张数不相等，1×2 是买 1 张、卖 2 张（3.2）。多出来的那几张决定哪一边亏损没有边界。</span><span class="l-en">Same type of option, two strikes, unequal quantities bought and sold; 1×2 means buy 1 and sell 2 (3.2). The extra contracts determine which side has unlimited loss.</span></div></div>
+      <div class="gl"><div class="s">box</div><div class="t"><span class="l-zh">两个行权价上一买一卖两个合成标的，到期固定拿到两个行权价之差。5.3 讲。</span><span class="l-en">Buying one synthetic underlying and selling another at two strikes; at expiration it pays the difference between the two strikes for sure. Covered in 5.3.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">中间价</span><span class="l-en">Mid price</span></div><div class="t"><span class="l-zh">（买一 ＋ 卖一）÷ 2。买一是有人愿意买的最高价，卖一是有人愿意卖的最低价。</span><span class="l-en">(Bid + ask) ÷ 2. The bid is the highest price someone will pay; the ask is the lowest price someone will sell at.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">买卖价差</span><span class="l-en">Bid-ask spread</span></div><div class="t"><span class="l-zh">卖一减买一。买入按卖一成交、卖出按买一成交，每条腿多付半个买卖价差（3.1）。深度实值期权的买卖价差宽，中间价的误差也大。</span><span class="l-en">Ask minus bid. Buys fill at the ask and sells at the bid, so each leg costs an extra half spread (3.1). Deep-in-the-money options have wide spreads, and their mid prices have large errors.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">实值 / 虚值 / 深度实值</span><span class="l-en">In the money / out of the money / deep in the money</span></div><div class="t"><span class="l-zh">现在行权就值钱的叫实值，不值钱的叫虚值（3.2）。call 行权价低于现价是实值，put 行权价高于现价是实值。深度实值是离现价很远的实值。</span><span class="l-en">An option worth something if exercised now is in the money; one worth nothing is out of the money (3.2). A call is in the money when its strike is below the current price, a put when its strike is above it. Deep in the money means far from the current price.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">盈亏平衡点</span><span class="l-en">Breakeven</span></div><div class="t"><span class="l-zh">到期时标的在这个价，仓位不赚不亏（3.1）。合成多头 350 是 350 ＋ 3.65 ＝ 353.65。</span><span class="l-en">The underlying price at expiration at which the position neither gains nor loses (3.1). For the 350 synthetic long it is 350 + 3.65 = 353.65.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">折回（现值）</span><span class="l-en">Discounting (present value)</span></div><div class="t"><span class="l-zh">到期才拿到的钱，按利率算出今天值多少（1.1）。本页用 4.3%、单利：25 折 32 天是 24.91。</span><span class="l-en">Money received only at expiration, valued today using the interest rate (1.1). This page uses 4.3%, simple interest: 25 discounted for 32 days is 24.91.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-5-2-parity-conversion.html"><b>5.2 parity 与 conversion</b></a>：把合成关系装上价格。合成多头比直接买股票少赚的 1.29 在 5.2 算清楚；butterfly 加 iron butterfly 的 24.95 不到 25，化简后是一个 box，在 5.3 讲。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-5-2-parity-conversion.html"><b>5.2 parity 与 conversion</b></a>：把合成关系装上价格。合成多头比直接买股票少赚的 1.29 在 5.2 算清楚；butterfly 加 iron butterfly 的 24.95 不到 25，化简后是一个 box，在 5.3 讲。</span><span class="l-en">Next: <a href="station-5-2-parity-conversion.html"><b>5.2 Parity and conversion</b></a>: putting prices on the synthetic relationships. The 1.29 by which the synthetic long trails buying the stock is worked out in 5.2; the butterfly plus iron butterfly at 24.95 falls short of 25 and simplifies to a box, covered in 5.3.</span></p>
+  <p><a href="./"><span class="l-zh">← 回到课程路线图</span><span class="l-en">← Back to the course roadmap</span></a></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
 <script>
+/* 英文模式（lang.js）：页面标题，以及带 data-en-* 的悬停说明、title、aria-label 换成英文 */
+document.title=L(document.title,'Synthetics');
+if(LANG==='en') document.querySelectorAll('[data-en-say],[data-en-title],[data-en-aria-label],[data-en-placeholder]').forEach(e=>{
+  for(const a of ['say','title','aria-label','placeholder']){ const v=e.getAttribute('data-en-'+a); if(v!=null) e.setAttribute(a==='say'?'data-say':a,v); }
+});
 const $ = id => document.getElementById(id);
 const f2 = n => n.toFixed(2), f3 = n => n.toFixed(3);
 const fm = (n,d=2) => (n<0&&Math.abs(n)>=0.5*Math.pow(10,-d)?'−':'')+Math.abs(n).toFixed(d);   // 负数用真正的减号
@@ -703,10 +709,10 @@ function Overlay(p,rels){
   function draw(){
     const r=rels[st.i], pr=st.prog, A=s=>legVal(r.a.legs,s), Bf=s=>legVal(r.b.legs,s);
     svg.setAttribute('viewBox',`0 0 ${W} ${FK>1?326:308}`);
-    let g=lab(L,T-14,'到期价值（每股美元）','var(--ink-soft)','start',11.5*FK);
+    let g=lab(L,T-14,window.L('到期价值（每股美元）','Value at expiration ($ per share)'),'var(--ink-soft)','start',11.5*FK);
     for(let v=-50;v<=50;v+=25){ g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,fm(v,0),'var(--ink-faint)','end',12*FK); }
     for(let s=300;s<=400;s+=25) g+=lab(X(s),B+20,s,'var(--ink-faint)','middle',12*FK);
-    g+=lab(Rr,B+22+20*FK,'到期时 TSLA','var(--ink-faint)','end',12*FK);
+    g+=lab(Rr,B+22+20*FK,window.L('到期时 TSLA','TSLA at expiration'),'var(--ink-faint)','end',12*FK);
     r.ks.forEach(k=>g+=`<line x1="${X(k)}" y1="${T}" x2="${X(k)}" y2="${B}" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 4"/>`);
     const a=clamp(pr,0,1), b=clamp(pr-1,0,1), c=clamp(pr-2,0,1);
     if(pr>2) g+=line(s=>A(s)+c*Bf(s),X1,'var(--control)',7).replace('/>',' stroke-opacity=".55"/>');
@@ -718,11 +724,11 @@ function Overlay(p,rels){
   }
   function info(){
     const r=rels[st.i];
-    $(p+'Lg').innerHTML=`<span><i style="background:var(--result)"></i>${r.a.name}</span><span><i style="background:var(--good)"></i>${r.b.name}</span><span><i style="background:var(--control)"></i>合计：${r.sum}</span>`;
+    $(p+'Lg').innerHTML=window.L(`<span><i style="background:var(--result)"></i>${r.a.name}</span><span><i style="background:var(--good)"></i>${r.b.name}</span><span><i style="background:var(--control)"></i>合计：${r.sum}</span>`,`<span><i style="background:var(--result)"></i>${r.a.name}</span><span><i style="background:var(--good)"></i>${r.b.name}</span><span><i style="background:var(--control)"></i>Total: ${r.sum}</span>`);
     const Ss=[300,325,350,375,400];
-    $(p+'Tb').innerHTML=`<thead><tr><th>到期时 TSLA</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`+
+    $(p+'Tb').innerHTML=window.L(`<thead><tr><th>到期时 TSLA</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`,`<thead><tr><th>TSLA at expiration</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`)+
       [[r.a.name,r.a.legs],[r.b.name,r.b.legs]].map(([n,l])=>`<tr><td>${n}</td>${Ss.map(s=>`<td>${fm(legVal(l,s),0)}</td>`).join('')}</tr>`).join('')+
-      `<tr class="sum"><td>合计</td>${Ss.map(s=>`<td>${fm(legVal(r.a.legs,s)+legVal(r.b.legs,s),0)}</td>`).join('')}</tr></tbody>`;
+      window.L(`<tr class="sum"><td>合计</td>${Ss.map(s=>`<td>${fm(legVal(r.a.legs,s)+legVal(r.b.legs,s),0)}</td>`).join('')}</tr></tbody>`,`<tr class="sum"><td>Total</td>${Ss.map(s=>`<td>${fm(legVal(r.a.legs,s)+legVal(r.b.legs,s),0)}</td>`).join('')}</tr></tbody>`);
   }
   function start(){
     st.playing=false; info();
@@ -735,22 +741,22 @@ function Overlay(p,rels){
   return {start,draw,el:svg};
 }
 const OV0=Overlay('ov0',[
-  {label:'同一行权价 350',a:{name:'买入 350 call',legs:[[1,'C',350]]},b:{name:'卖出 350 put',legs:[[-1,'P',350]]},sum:'按 350 买入 TSLA',ks:[350],short:'合计 ＝ 按 350 买入',lx:400,ly:-14,
-   say:'两条线各有一个弯，都在 350。左边 call 是 0，卖出的 put 每跌 1 亏 1；右边 put 是 0，call 每涨 1 赚 1。拼起来是一条穿过 350 的直线：TSLA 到期每高 1 美元，合计就多 1 美元，和持有股票一样。'},
-  {label:'错开：350 call 配 330 put',a:{name:'买入 350 call',legs:[[1,'C',350]]},b:{name:'卖出 330 put',legs:[[-1,'P',330]]},sum:'中间一段是平的',ks:[330,350],short:'330 到 350 是平的',lx:398,ly:-14,
-   say:'行权价错开 20：TSLA 到期在 330 和 350 之间时，call 和 put 都没人行权，合计是 0，这一段 TSLA 动多少都与你无关。线不再是直的，就不是标的。'}
+  {label:L('同一行权价 350','Same strike, 350'),a:{name:L('买入 350 call','Long 350 call'),legs:[[1,'C',350]]},b:{name:L('卖出 350 put','Short 350 put'),legs:[[-1,'P',350]]},sum:L('按 350 买入 TSLA','Buy TSLA at 350'),ks:[350],short:L('合计 ＝ 按 350 买入','Total = buy at 350'),lx:400,ly:-14,
+   say:L('两条线各有一个弯，都在 350。左边 call 是 0，卖出的 put 每跌 1 亏 1；右边 put 是 0，call 每涨 1 赚 1。拼起来是一条穿过 350 的直线：TSLA 到期每高 1 美元，合计就多 1 美元，和持有股票一样。','Each line has one kink, both at 350. On the left the call is 0 and the short put loses 1 for every 1 drop; on the right the put is 0 and the call gains 1 for every 1 rise. Together they form a straight line through 350: for every dollar TSLA is higher at expiration, the total is a dollar higher, the same as holding the stock.')},
+  {label:L('错开：350 call 配 330 put','Mismatched: 350 call with 330 put'),a:{name:L('买入 350 call','Long 350 call'),legs:[[1,'C',350]]},b:{name:L('卖出 330 put','Short 330 put'),legs:[[-1,'P',330]]},sum:L('中间一段是平的','Flat in the middle'),ks:[330,350],short:L('330 到 350 是平的','Flat from 330 to 350'),lx:398,ly:-14,
+   say:L('行权价错开 20：TSLA 到期在 330 和 350 之间时，call 和 put 都没人行权，合计是 0，这一段 TSLA 动多少都与你无关。线不再是直的，就不是标的。','Strikes 20 apart: if TSLA expires between 330 and 350, neither the call nor the put is exercised, the total is 0, and however much TSLA moves in that range has nothing to do with you. The line is no longer straight, so it is not the underlying.')}
 ]);
 const OV1=Overlay('ov1',[
-  {label:'合成买入 call',a:{name:'买入 350 put',legs:[[1,'P',350]]},b:{name:'买入标的（按 350）',legs:[[1,'U',350]]},sum:'买入 350 call',ks:[350],short:'合计 ＝ 买入 350 call',lx:398,ly:-14,
-   say:'350 以下，put 每多 1 美元正好补上股票跌掉的 1 美元，合计停在 0；350 以上 put 作废，股票涨多少合计就涨多少。先平后涨，就是 350 call。'},
-  {label:'合成卖出 call',a:{name:'卖出 350 put',legs:[[-1,'P',350]]},b:{name:'卖出标的（按 350）',legs:[[-1,'U',350]]},sum:'卖出 350 call',ks:[350],short:'合计 ＝ 卖出 350 call',lx:398,ly:22,
-   say:'上一个例子整个取反：卖出的 put 与卖出的标的在 350 以下互相抵掉，350 以上卖空每涨 1 亏 1。先平后跌，就是卖出一张 350 call。'},
-  {label:'合成买入 put',a:{name:'买入 350 call',legs:[[1,'C',350]]},b:{name:'卖出标的（按 350）',legs:[[-1,'U',350]]},sum:'买入 350 put',ks:[350],short:'合计 ＝ 买入 350 put',lx:296,ly:-14,la:'start',
-   say:'350 以上，call 每多 1 美元正好补上卖空亏掉的 1 美元，合计停在 0；350 以下 call 作废，TSLA 每跌 1 卖空赚 1。这是 350 put 的形状。'},
-  {label:'合成卖出 put',a:{name:'卖出 350 call',legs:[[-1,'C',350]]},b:{name:'买入标的（按 350）',legs:[[1,'U',350]]},sum:'卖出 350 put',ks:[350],short:'合计 ＝ 卖出 350 put',lx:296,ly:22,la:'start',
-   say:'持有股票、卖出 350 call：涨过 350 的部分被 call 拿走，合计停在 0；跌下去股票亏多少合计就亏多少。这是卖出 350 put 的形状，也就是备兑卖 call（5.3 的 collar 会再用到它）。'},
-  {label:'合成卖出标的',a:{name:'卖出 350 call',legs:[[-1,'C',350]]},b:{name:'买入 350 put',legs:[[1,'P',350]]},sum:'按 350 卖出 TSLA',ks:[350],short:'合计 ＝ 按 350 卖出',lx:296,ly:-14,la:'start',
-   say:'〇节整个取反：TSLA 到期在 350 以上，你被 call 指派，按 350 卖出；在 350 以下，你行权 put，也按 350 卖出。一条向下的直线，和卖空股票一样。'}
+  {label:L('合成买入 call','Synthetic long call'),a:{name:L('买入 350 put','Long 350 put'),legs:[[1,'P',350]]},b:{name:L('买入标的（按 350）','Long underlying (at 350)'),legs:[[1,'U',350]]},sum:L('买入 350 call','Long 350 call'),ks:[350],short:L('合计 ＝ 买入 350 call','Total = long 350 call'),lx:398,ly:-14,
+   say:L('350 以下，put 每多 1 美元正好补上股票跌掉的 1 美元，合计停在 0；350 以上 put 作废，股票涨多少合计就涨多少。先平后涨，就是 350 call。','Below 350, each extra dollar on the put makes up exactly the dollar the stock lost, and the total stays at 0; above 350 the put expires, and the total rises as much as the stock. Flat then rising: a 350 call.')},
+  {label:L('合成卖出 call','Synthetic short call'),a:{name:L('卖出 350 put','Short 350 put'),legs:[[-1,'P',350]]},b:{name:L('卖出标的（按 350）','Short underlying (at 350)'),legs:[[-1,'U',350]]},sum:L('卖出 350 call','Short 350 call'),ks:[350],short:L('合计 ＝ 卖出 350 call','Total = short 350 call'),lx:398,ly:22,
+   say:L('上一个例子整个取反：卖出的 put 与卖出的标的在 350 以下互相抵掉，350 以上卖空每涨 1 亏 1。先平后跌，就是卖出一张 350 call。','The previous example reversed: below 350 the short put and the short underlying cancel; above 350 the short loses 1 for every 1 rise. Flat then falling: a short 350 call.')},
+  {label:L('合成买入 put','Synthetic long put'),a:{name:L('买入 350 call','Long 350 call'),legs:[[1,'C',350]]},b:{name:L('卖出标的（按 350）','Short underlying (at 350)'),legs:[[-1,'U',350]]},sum:L('买入 350 put','Long 350 put'),ks:[350],short:L('合计 ＝ 买入 350 put','Total = long 350 put'),lx:296,ly:-14,la:'start',
+   say:L('350 以上，call 每多 1 美元正好补上卖空亏掉的 1 美元，合计停在 0；350 以下 call 作废，TSLA 每跌 1 卖空赚 1。这是 350 put 的形状。','Above 350, each extra dollar on the call makes up exactly the dollar lost on the short, and the total stays at 0; below 350 the call expires, and the short gains 1 for every 1 TSLA falls. This is the shape of a 350 put.')},
+  {label:L('合成卖出 put','Synthetic short put'),a:{name:L('卖出 350 call','Short 350 call'),legs:[[-1,'C',350]]},b:{name:L('买入标的（按 350）','Long underlying (at 350)'),legs:[[1,'U',350]]},sum:L('卖出 350 put','Short 350 put'),ks:[350],short:L('合计 ＝ 卖出 350 put','Total = short 350 put'),lx:L(296,290),ly:22,la:'start',   // 英文长，左移免得压到横轴的 350
+   say:L('持有股票、卖出 350 call：涨过 350 的部分被 call 拿走，合计停在 0；跌下去股票亏多少合计就亏多少。这是卖出 350 put 的形状，也就是备兑卖 call（5.3 的 collar 会再用到它）。','Hold the stock and sell a 350 call: anything above 350 is taken by the call and the total stays at 0; below, the total loses as much as the stock. This is the shape of a short 350 put, also known as a covered call (5.3\'s collar uses it again).')},
+  {label:L('合成卖出标的','Synthetic short underlying'),a:{name:L('卖出 350 call','Short 350 call'),legs:[[-1,'C',350]]},b:{name:L('买入 350 put','Long 350 put'),legs:[[1,'P',350]]},sum:L('按 350 卖出 TSLA','Sell TSLA at 350'),ks:[350],short:L('合计 ＝ 按 350 卖出','Total = sell at 350'),lx:296,ly:-14,la:'start',
+   say:L('〇节整个取反：TSLA 到期在 350 以上，你被 call 指派，按 350 卖出；在 350 以下，你行权 put，也按 350 卖出。一条向下的直线，和卖空股票一样。','Section 0 reversed: if TSLA expires above 350, the call is assigned and you sell at 350; below 350, you exercise the put and also sell at 350. A straight line sloping down, the same as shorting the stock.')}
 ]);
 
 /* ══════════ 二 · 合成多头与 TSLA 逐天对照 ══════════ */
@@ -777,7 +783,7 @@ const SR=(()=>{
     for(let v=0;v<=100;v+=25) g+=hline(L,Rr,Y1(v))+lab(L-7,Y1(v)+4,v,'var(--ink-faint)','end',12*FK);
     [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B1+18,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
     [0,0.5,1].forEach(v=>g+=hline(L,Rr,Y2(v),'var(--rule)',v?0.8:1.4)+lab(L-7,Y2(v)+4,v.toFixed(1),'var(--ink-faint)','end',12*FK));
-    g+=lab(L,T2-18,'两者之差：合成多头 − (TSLA − 350)','var(--ink-soft)','start',12.5*FK);
+    g+=lab(L,T2-18,window.L('两者之差：合成多头 − (TSLA − 350)','Difference: synthetic long − (TSLA − 350)'),'var(--ink-soft)','start',12.5*FK);
     [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B2+18,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
     g+=`<polyline points="${poly(US,Y1,pr)}" fill="none" stroke="var(--ink-faint)" stroke-opacity=".38" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>`;
     g+=`<polyline points="${poly(SY,Y1,pr)}" fill="none" stroke="var(--control)" stroke-width="2.2" stroke-linejoin="round"/>`;
@@ -788,13 +794,13 @@ const SR=(()=>{
     const hx=X(pr), hy=Y1(SY[k]+(k<n?(SY[k+1]-SY[k])*(pr-k):0));
     g+=`<circle cx="${hx}" cy="${hy}" r="4" fill="var(--control)"/>`;
     svg.innerHTML=g;
-    $('srD').textContent=md(SYN.days[k]); $('srDb').textContent=`第 ${k} 个交易日`;
-    $('srS').textContent=f2(S[k]); $('srSb').textContent='减 350 是 '+fm(US[k]);
-    $('srY').textContent=fm(SY[k],3); $('srYb').textContent=k<n?`${f3(SYN.C[350][k])} − ${f3(SYN.P[350][k])}`:'到期价值 72.32 − 0';
-    $('srG').textContent=fm(GAP[k],3); $('srGb').textContent='利息 '+f3(INT[k]);
+    $('srD').textContent=md(SYN.days[k]); $('srDb').textContent=window.L(`第 ${k} 个交易日`,`Trading day ${k}`);
+    $('srS').textContent=f2(S[k]); $('srSb').textContent=window.L('减 350 是 ','Minus 350:')+fm(US[k]);
+    $('srY').textContent=fm(SY[k],3); $('srYb').textContent=k<n?`${f3(SYN.C[350][k])} − ${f3(SYN.P[350][k])}`:window.L('到期价值 72.32 − 0','Value at expiration 72.32 − 0');
+    $('srG').textContent=fm(GAP[k],3); $('srGb').textContent=window.L('利息 ','Interest')+f3(INT[k]);
     $('srSay').textContent= pr<n ? '' :
-      `${md(SYN.days[big+1])} TSLA 一天涨 ${f2(dS[big])}，合成多头同一天涨 ${f3(dY[big])}。24 个交易日里，TSLA 每动 1 美元，合成多头平均动 ${slope.toFixed(4)} 美元。`+
-      `两者之差从 4/13 的 ${f2(GAP[0])} 一路缩到到期的 0，贴着虚线走：虚线是 350 美元晚到 5/15 才付、按 4.3% 省下的利息，4/13 是 ${f2(INT[0])}，5.2 讲。差额离虚线平均 ${f2(devMean)}，到期前 24 天里有 23 天在 350 call、350 put 各半个买卖价差之和以内，是报价误差。最多的一天是 ${md(SYN.days[devDay])}，差 ${f2(devMax)}，超出了这个范围：快照里 TSLA 的价格和期权报价不在同一瞬间。那天 340 到 390 各行权价按合成关系反推的 TSLA 都在 376.16 到 376.26 之间，快照记的是 ${f2(S[devDay])}。`;
+      window.L(`${md(SYN.days[big+1])} TSLA 一天涨 ${f2(dS[big])}，合成多头同一天涨 ${f3(dY[big])}。24 个交易日里，TSLA 每动 1 美元，合成多头平均动 ${slope.toFixed(4)} 美元。`,`On ${md(SYN.days[big+1])}, TSLA rose ${f2(dS[big])} in one day and the synthetic long rose ${f3(dY[big])}. Over the 24 trading days, for each $1 TSLA moved, the synthetic long moved $${slope.toFixed(4)} on average.`)+
+      window.L(`两者之差从 4/13 的 ${f2(GAP[0])} 一路缩到到期的 0，贴着虚线走：虚线是 350 美元晚到 5/15 才付、按 4.3% 省下的利息，4/13 是 ${f2(INT[0])}，5.2 讲。差额离虚线平均 ${f2(devMean)}，到期前 24 天里有 23 天在 350 call、350 put 各半个买卖价差之和以内，是报价误差。最多的一天是 ${md(SYN.days[devDay])}，差 ${f2(devMax)}，超出了这个范围：快照里 TSLA 的价格和期权报价不在同一瞬间。那天 340 到 390 各行权价按合成关系反推的 TSLA 都在 376.16 到 376.26 之间，快照记的是 ${f2(S[devDay])}。`,`The difference shrinks from ${f2(GAP[0])} on 4/13 all the way to 0 at expiration, tracking the dashed line: the dashed line is the interest saved by paying the $350 later, on 5/15, at 4.3%; on 4/13 it is ${f2(INT[0])}, covered in 5.2. The difference sits ${f2(devMean)} from the dashed line on average, and on 23 of the 24 days before expiration it is within half the 350 call's bid-ask spread plus half the 350 put's, which is quote error. The largest is on ${md(SYN.days[devDay])}, ${f2(devMax)}, beyond that range: in the snapshot, the TSLA price and the option quotes were not taken at the same instant. That day, the TSLA price backed out of the synthetic relationship at every strike from 340 to 390 is between 376.16 and 376.26, while the snapshot records ${f2(S[devDay])}.`);
   }
   const svg=$('srSvg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   function start(){
@@ -829,23 +835,23 @@ function autoFrames(pr){
     } else f1.push({...c,row:r++});
   });
   F.push({cards:f1,fade:fade1,cap: to==='C'
-    ? `换：${nO} 行 put 各换成同行权价的 call，再卖出同样张数的标的（买 put ＝ 买 call ＋ 卖标的）。call 那几行原样不动。`
-    : `换：${nO} 行 call 各换成同行权价的 put，再买入同样张数的标的（买 call ＝ 买 put ＋ 买标的）。put 那几行原样不动。`});
+    ? L(`换：${nO} 行 put 各换成同行权价的 call，再卖出同样张数的标的（买 put ＝ 买 call ＋ 卖标的）。call 那几行原样不动。`,`Swap: each of the ${nO} put rows becomes a call at the same strike, plus selling the same number of units of the underlying (long put = long call + short underlying). The call rows stay as they are.`)
+    : L(`换：${nO} 行 call 各换成同行权价的 put，再买入同样张数的标的（买 call ＝ 买 put ＋ 买标的）。put 那几行原样不动。`,`Swap: each of the ${nO} call rows becomes a put at the same strike, plus buying the same number of units of the underlying (long call = long put + long underlying). The put rows stay as they are.`)});
   const opts=f1.filter(c=>c.t===to), unds=f1.filter(c=>c.t==='U');
   const ks=[...new Set(opts.map(c=>c.k))].sort((a,b)=>a-b), f2=[], fade2={}, parts=[];
   ks.forEach((k,j)=>{
     const g=opts.filter(c=>c.k===k), s=g.reduce((a,c)=>a+c.q,0);
     f2.push({id:g[0].id,q:s,t:to,k,row:j,hl:g.length>1?1:0});
     g.slice(1).forEach(c=>fade2[c.id]=j);
-    parts.push(`${k} ${TY[to]}：${terms(g.map(c=>c.q))}`);
+    parts.push(L(`${k} ${TY[to]}：${terms(g.map(c=>c.q))}`,`${k} ${TY[to]}: ${terms(g.map(c=>c.q))}`));
   });
   if(unds.length){
     const j=ks.length, Q=unds.reduce((a,c)=>a+c.q,0), off=unds.reduce((a,c)=>a+(c.k==null?0:c.q*c.k),0);
     f2.push({id:unds[0].id,q:Q,t:'U',off,merged:1,row:j,hl:unds.length>1?1:0});
     unds.slice(1).forEach(c=>fade2[c.id]=j);
-    parts.push(`标的：${terms(unds.map(c=>c.q))}`);
+    parts.push(L(`标的：${terms(unds.map(c=>c.q))}`,`Underlying: ${terms(unds.map(c=>c.q))}`));
   }
-  F.push({cards:f2,fade:fade2,cap:'合并：同一个行权价的张数相加，标的也相加。'+parts.join('；')+'。'});
+  F.push({cards:f2,fade:fade2,cap:L('合并：同一个行权价的张数相加，标的也相加。','Merge: add the quantities at each strike, and add the underlying too.')+parts.join(L('；',';'))+L('。','.')});
   const f3=[], fade3={}; let rr=0;
   f2.forEach(c=>{
     if(c.q!==0){ f3.push({...c,row:rr++,hl:0}); return; }
@@ -862,8 +868,8 @@ function Simp(p,presets,sel=0){
   let pr=null, frames=[], fi=0, timer=null, els={}, grid=[], base=[], yr=[0,1];
   const lbl=(c)=>{
     if(c.t==='C'||c.t==='P') return `${pr.mon} ${c.k} ${TY[c.t]}`;
-    if(c.t==='U') return c.merged?'标的合计':(c.k==null?'标的合约':`标的（${c.k}）`);
-    return `到期固定${c.q>=0?'多出':'少'} ${Math.abs(c.q)}`;
+    if(c.t==='U') return c.merged?window.L('标的合计','Underlying total'):(c.k==null?window.L('标的合约','Underlying contract'):window.L(`标的（${c.k}）`,`Underlying (${c.k})`));
+    return window.L(`到期固定${c.q>=0?'多出':'少'} ${Math.abs(c.q)}`,`Fixed ${c.q>=0?'+':'−'}${Math.abs(c.q)} at expiration`);
   };
   const html=c=> c.t==='cash' ? `<span class="ct">${lbl(c)}</span>` : `<span class="cq">${c.q===0?'0':si(c.q)}</span><span class="ct">${lbl(c)}</span>`;
   function setPos(el,pos,op,instant){
@@ -891,7 +897,7 @@ function Simp(p,presets,sel=0){
     const mn=Math.min(0,...base), mx=Math.max(0,...base), pad=(mx-mn||1)*0.14;
     yr=[mn-(mn<0?pad:0), mx+pad];
     box.innerHTML=''; els={};
-    $(p+'Play').textContent = pr.make ? '换一题' : '再化简一遍';
+    $(p+'Play').textContent = pr.make ? window.L('换一题','New exercise') : window.L('再化简一遍','Simplify again');
   }
   function drawChart(f){
     const lo=grid[0], hi=grid[grid.length-1], X=s=>L+(s-lo)/(hi-lo)*(Rr-L), Y=v=>B-(v-yr[0])/(yr[1]-yr[0])*(B-T);
@@ -906,11 +912,11 @@ function Simp(p,presets,sel=0){
     if(pr.mark!=null){
       const j=grid.reduce((b,s,i)=>Math.abs(s-pr.mark)<Math.abs(grid[b]-pr.mark)?i:b,0);
       g+=`<line x1="${X(pr.mark)}" y1="${T}" x2="${X(pr.mark)}" y2="${B}" stroke="var(--result)" stroke-dasharray="3 3"/>`;
-      g+=`<circle cx="${X(pr.mark)}" cy="${Y(ys[j])}" r="4" fill="var(--result)"/>`+lab(X(pr.mark)-6,T+10,'现价 '+pr.mark.toFixed(2),'var(--result)','end',11);
+      g+=`<circle cx="${X(pr.mark)}" cy="${Y(ys[j])}" r="4" fill="var(--result)"/>`+lab(X(pr.mark)-6,T+10,window.L('现价 ','Spot')+pr.mark.toFixed(2),'var(--result)','end',11);
     }
     svg.innerHTML=g;
     const dmax=Math.max(...ys.map((y,j)=>Math.abs(y-base[j])));
-    $(p+'Chk').textContent= fi===0 ? (pr.exact?'原仓位到期时的价值（每股）':'原仓位到期价值的形状（最低处记为 0）') : `与第 1 步逐点相比，最大差 ${f2(dmax)}`;
+    $(p+'Chk').textContent= fi===0 ? (pr.exact?window.L('原仓位到期时的价值（每股）','Value of the original position at expiration (per share)'):window.L('原仓位到期价值的形状（最低处记为 0）','Shape of the original position\'s value at expiration (lowest point set to 0)')) : window.L(`与第 1 步逐点相比，最大差 ${f2(dmax)}`,`Compared point by point with step 1, largest difference ${f2(dmax)}`);
   }
   function show(i,instant){
     fi=i; const f=frames[i], present=new Set(f.cards.map(c=>c.id));
@@ -928,7 +934,7 @@ function Simp(p,presets,sel=0){
     Object.keys(els).forEach(id=>{ if(present.has(id)) return; const el=els[id];
       const to=f.fade&&f.fade[id]!=null?{row:f.fade[id],col:0,half:0}:el._pos; setPos(el,to,0,instant); });
     box.style.height=(Math.max(0,...f.cards.map(c=>c.row))+1)*RH+'rem';
-    $(p+'Cap').innerHTML=f.cap; $(p+'Step').textContent=`第 ${i+1} / ${frames.length} 步`;
+    $(p+'Cap').innerHTML=f.cap; $(p+'Step').textContent=window.L(`第 ${i+1} / ${frames.length} 步`,`Step ${i+1} / ${frames.length}`);
     drawChart(f);
     $(p+'Say').innerHTML= i===frames.length-1 && pr.say ? pr.say : '';
   }
@@ -949,37 +955,37 @@ function Simp(p,presets,sel=0){
 
 /* 三：讲义第 7 页（两张 call 卖一份标的）与第 8 页的牛市价差 */
 const C_SPLIT=[
-  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'u',q:-1,t:'U',k:null,row:1}],cap:'讲义第 7 页：+2 December 100 call，−1 标的合约。两张 call 一模一样。'},
-  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'b',q:1,t:'C',k:100,row:1,from:'a',hl:1},{id:'u',q:-1,t:'U',k:null,row:2,hl:1}],cap:'拆：两张 call 拿出一张，和卖出的那份标的放在一起。另一张原样不动。'},
-  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1,from:'b',hl:1}],fade:{b:1,u:1},cap:'换：买 call ＋ 卖标的 ＝ 买 put（一节第三条），这一对换成一张 put。'},
-  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1}],cap:'剩下 +1 call、+1 put：买入 December 100 straddle。'}
+  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'u',q:-1,t:'U',k:null,row:1}],cap:L('讲义第 7 页：+2 December 100 call，−1 标的合约。两张 call 一模一样。','Lecture page 7: +2 December 100 calls, −1 underlying contract. The two calls are identical.')},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'b',q:1,t:'C',k:100,row:1,from:'a',hl:1},{id:'u',q:-1,t:'U',k:null,row:2,hl:1}],cap:L('拆：两张 call 拿出一张，和卖出的那份标的放在一起。另一张原样不动。','Split: take one of the two calls and put it with the short underlying. The other one stays as it is.')},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1,from:'b',hl:1}],fade:{b:1,u:1},cap:L('换：买 call ＋ 卖标的 ＝ 买 put（一节第三条），这一对换成一张 put。','Swap: long call + short underlying = long put (the third row in section 1); this pair becomes one put.')},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1}],cap:L('剩下 +1 call、+1 put：买入 December 100 straddle。','Left with +1 call, +1 put: a long December 100 straddle.')}
 ];
 const C_OTHER=[
-  {cards:[{id:'a',q:2,t:'P',k:100,row:0},{id:'u',q:1,t:'U',k:null,row:1}],cap:'讲义第 7 页第二例：+2 December 100 put，+1 标的合约。'},
-  {cards:[{id:'a',q:1,t:'P',k:100,row:0},{id:'b',q:1,t:'P',k:100,row:1,from:'a',hl:1},{id:'u',q:1,t:'U',k:null,row:2,hl:1}],cap:'拆：两张 put 拿出一张，和买入的那份标的放在一起。'},
-  {cards:[{id:'a',q:1,t:'P',k:100,row:0},{id:'c',q:1,t:'C',k:100,row:1,from:'b',hl:1}],fade:{b:1,u:1},cap:'换：买 put ＋ 买标的 ＝ 买 call（一节第一条）。'},
-  {cards:[{id:'c',q:1,t:'C',k:100,row:0},{id:'a',q:1,t:'P',k:100,row:1}],cap:'剩下 +1 call、+1 put：还是买入 December 100 straddle。'}
+  {cards:[{id:'a',q:2,t:'P',k:100,row:0},{id:'u',q:1,t:'U',k:null,row:1}],cap:L('讲义第 7 页第二例：+2 December 100 put，+1 标的合约。','Lecture page 7, second example: +2 December 100 puts, +1 underlying contract.')},
+  {cards:[{id:'a',q:1,t:'P',k:100,row:0},{id:'b',q:1,t:'P',k:100,row:1,from:'a',hl:1},{id:'u',q:1,t:'U',k:null,row:2,hl:1}],cap:L('拆：两张 put 拿出一张，和买入的那份标的放在一起。','Split: take one of the two puts and put it with the long underlying.')},
+  {cards:[{id:'a',q:1,t:'P',k:100,row:0},{id:'c',q:1,t:'C',k:100,row:1,from:'b',hl:1}],fade:{b:1,u:1},cap:L('换：买 put ＋ 买标的 ＝ 买 call（一节第一条）。','Swap: long put + long underlying = long call (the first row in section 1).')},
+  {cards:[{id:'c',q:1,t:'C',k:100,row:0},{id:'a',q:1,t:'P',k:100,row:1}],cap:L('剩下 +1 call、+1 put：还是买入 December 100 straddle。','Left with +1 call, +1 put: again a long December 100 straddle.')}
 ];
 const C_UND=[
-  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'u',q:-1,t:'U',k:null,row:1}],cap:'还是 +2 December 100 call、−1 标的合约。这次两张 call 不动，换标的那一行。'},
-  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'c',q:-1,t:'C',k:100,row:1,half:1,col:0,from:'u',hl:1},{id:'p',q:1,t:'P',k:100,row:1,half:1,col:1,from:'u',hl:1}],fade:{u:1},cap:'换：卖出标的 ＝ 卖出 call ＋ 买入 put（一节表里最后一行）。'},
-  {cards:[{id:'a',q:1,t:'C',k:100,row:0,hl:1},{id:'p',q:1,t:'P',k:100,row:1}],fade:{c:0},cap:'合并：100 call 2 − 1 ＝ 1。'},
-  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1}],cap:'剩下 +1 call、+1 put：买入 December 100 straddle，和先拆再换的结果一样。'}
+  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'u',q:-1,t:'U',k:null,row:1}],cap:L('还是 +2 December 100 call、−1 标的合约。这次两张 call 不动，换标的那一行。','Again +2 December 100 calls, −1 underlying contract. This time the two calls stay and the underlying row is swapped.')},
+  {cards:[{id:'a',q:2,t:'C',k:100,row:0},{id:'c',q:-1,t:'C',k:100,row:1,half:1,col:0,from:'u',hl:1},{id:'p',q:1,t:'P',k:100,row:1,half:1,col:1,from:'u',hl:1}],fade:{u:1},cap:L('换：卖出标的 ＝ 卖出 call ＋ 买入 put（一节表里最后一行）。','Swap: short underlying = short call + long put (the last row of the table in section 1).')},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0,hl:1},{id:'p',q:1,t:'P',k:100,row:1}],fade:{c:0},cap:L('合并：100 call 2 − 1 ＝ 1。','Merge: 100 calls 2 − 1 = 1.')},
+  {cards:[{id:'a',q:1,t:'C',k:100,row:0},{id:'p',q:1,t:'P',k:100,row:1}],cap:L('剩下 +1 call、+1 put：买入 December 100 straddle，和先拆再换的结果一样。','Left with +1 call, +1 put: a long December 100 straddle, the same result as splitting first and then swapping.')}
 ];
 const SMA=Simp('smA',[
-  {label:'第 7 页：先拆再换',mon:'Dec',ks:[100],frames:C_SPLIT,exact:false,
-   say:'整个过程只用了一节的一条关系。难的是第 2 步：把 +2 拆成 1 ＋ 1，才有一对能换的腿。'},
-  {label:'换掉标的',mon:'Dec',ks:[100],frames:C_UND,exact:false,
-   say:'这一次换的是标的那一行。和先拆再换一样，都是先决定哪几张配成一对：这里是让标的自己变成一对期权，再和已有的 call 合并。'},
-  {label:'只把 call 换成 put',mon:'Dec',legs:[[2,'C',100],[-1,'U',null]],to:'P',exact:false,
-   cap0:'还是 +2 December 100 call、−1 标的合约，这次不拆，两张 call 一起换成 put。',
-   name:'换完还是两行：+2 put、+1 标的。只是换了一种写法（下一个例子），没有变简单。'},
-  {label:'第 7 页第二例',mon:'Dec',ks:[100],frames:C_OTHER,exact:false,
-   say:'+2 call −1 标的、+2 put +1 标的、+1 call +1 put，是同一个 straddle 的三种写法。'},
-  {label:'牛市价差：call 版换 put 版',mon:'Dec',legs:[[1,'C',90],[-1,'C',100]],to:'P',exact:true,
-   cap0:'讲义第 8 页：+1 December 90 call、−1 December 100 call，call 版的牛市价差。',
-   name:'剩下 +1 90 put、−1 100 put，是 put 版的牛市价差；两份标的一份按 90 买、一份按 100 卖，到期固定多出 10。call 版 ＝ put 版 ＋ 10。',
-   say:'右边的线从头到尾没动：call 版牛市价差到期值 0 到 10。put 版自己值 −10 到 0，加上那笔固定的 10，正好是同一条线。'}
+  {label:L('第 7 页：先拆再换','Page 7: split, then swap'),mon:'Dec',ks:[100],frames:C_SPLIT,exact:false,
+   say:L('整个过程只用了一节的一条关系。难的是第 2 步：把 +2 拆成 1 ＋ 1，才有一对能换的腿。','The whole process uses just one relationship from section 1. The hard part is step 2: splitting +2 into 1 + 1 to get a pair of legs that can be swapped.')},
+  {label:L('换掉标的','Swap the underlying'),mon:'Dec',ks:[100],frames:C_UND,exact:false,
+   say:L('这一次换的是标的那一行。和先拆再换一样，都是先决定哪几张配成一对：这里是让标的自己变成一对期权，再和已有的 call 合并。','This time the underlying row is swapped. As with splitting first, the first decision is which contracts to pair: here the underlying itself becomes a pair of options, which then merges with the existing calls.')},
+  {label:L('只把 call 换成 put','Only swap calls for puts'),mon:'Dec',legs:[[2,'C',100],[-1,'U',null]],to:'P',exact:false,
+   cap0:L('还是 +2 December 100 call、−1 标的合约，这次不拆，两张 call 一起换成 put。','Again +2 December 100 calls, −1 underlying contract; this time no splitting, both calls are swapped for puts together.'),
+   name:L('换完还是两行：+2 put、+1 标的。只是换了一种写法（下一个例子），没有变简单。','Still two rows after the swap: +2 puts, +1 underlying. It is just another way of writing it (the next example), no simpler.')},
+  {label:L('第 7 页第二例','Page 7, second example'),mon:'Dec',ks:[100],frames:C_OTHER,exact:false,
+   say:L('+2 call −1 标的、+2 put +1 标的、+1 call +1 put，是同一个 straddle 的三种写法。','+2 calls −1 underlying, +2 puts +1 underlying, and +1 call +1 put are three ways of writing the same straddle.')},
+  {label:L('牛市价差：call 版换 put 版','Bull spread: call version to put version'),mon:'Dec',legs:[[1,'C',90],[-1,'C',100]],to:'P',exact:true,
+   cap0:L('讲义第 8 页：+1 December 90 call、−1 December 100 call，call 版的牛市价差。','Lecture page 8: +1 December 90 call, −1 December 100 call, the call version of a bull spread.'),
+   name:L('剩下 +1 90 put、−1 100 put，是 put 版的牛市价差；两份标的一份按 90 买、一份按 100 卖，到期固定多出 10。call 版 ＝ put 版 ＋ 10。','Left with +1 90 put, −1 100 put, the put version of the bull spread; the two units of underlying, one bought at 90 and one sold at 100, leave a fixed extra 10 at expiration. Call version = put version + 10.'),
+   say:L('右边的线从头到尾没动：call 版牛市价差到期值 0 到 10。put 版自己值 −10 到 0，加上那笔固定的 10，正好是同一条线。','The line on the right never moves: the call bull spread is worth 0 to 10 at expiration. The put version on its own is worth −10 to 0; add the fixed 10 and it is exactly the same line.')}
 ]);
 
 /* 四：讲义第 9 页、第 11 页、随机一题 */
@@ -988,12 +994,12 @@ function randomPuzzle(){
   const d=pick([5,5,10]), b0=pick([40,45,50,55,60,65,70,75,80,85,90]), n=5+Math.floor(rnd()*36), to=rnd()<0.6?'C':'P';
   const TN=TY[to];
   const SH=[
-    {q:[n,-2*n,n],nm:ks=>`${n} 手买入 ${TN} butterfly（${ks.join(' / ')}）`},
-    {q:[-n,2*n,-n],nm:ks=>`${n} 手卖出 ${TN} butterfly（${ks.join(' / ')}）`},
-    {q:[n,-n],nm:ks=>`${n} 手 ${TN} 牛市价差（买 ${ks[0]}、卖 ${ks[1]}）`},
-    {q:[-n,n],nm:ks=>`${n} 手 ${TN} 熊市价差（买 ${ks[1]}、卖 ${ks[0]}）`},
-    {q:[n,-2*n],nm:ks=>`${TN} 1×2 ratio spread：买 ${n} 张 ${ks[0]}、卖 ${2*n} 张 ${ks[1]}`},
-    {q:[n,-n,-n,n],nm:ks=>`${n} 手买入 ${TN} condor（${ks.join(' / ')}）`}
+    {q:[n,-2*n,n],nm:ks=>L(`${n} 手买入 ${TN} butterfly（${ks.join(' / ')}）`,`${n} long ${TN} butterfly (${ks.join(' / ')})`)},
+    {q:[-n,2*n,-n],nm:ks=>L(`${n} 手卖出 ${TN} butterfly（${ks.join(' / ')}）`,`${n} short ${TN} butterfly (${ks.join(' / ')})`)},
+    {q:[n,-n],nm:ks=>L(`${n} 手 ${TN} 牛市价差（买 ${ks[0]}、卖 ${ks[1]}）`,`${n} ${TN} bull spread (buy ${ks[0]}, sell ${ks[1]})`)},
+    {q:[-n,n],nm:ks=>L(`${n} 手 ${TN} 熊市价差（买 ${ks[1]}、卖 ${ks[0]}）`,`${n} ${TN} bear spread (buy ${ks[1]}, sell ${ks[0]})`)},
+    {q:[n,-2*n],nm:ks=>L(`${TN} 1×2 ratio spread：买 ${n} 张 ${ks[0]}、卖 ${2*n} 张 ${ks[1]}`,`${TN} 1×2 ratio spread: buy ${n} ${ks[0]}, sell ${2*n} ${ks[1]}`)},
+    {q:[n,-n,-n,n],nm:ks=>L(`${n} 手买入 ${TN} condor（${ks.join(' / ')}）`,`${n} long ${TN} condor (${ks.join(' / ')})`)}
   ];
   const sh=pick(SH), ks=sh.q.map((_,i)=>b0+i*d);
   const st=sh.q.map((q,i)=>({k:ks[i],q}));
@@ -1010,29 +1016,29 @@ function randomPuzzle(){
   });
   if(und!==0) legs.unshift([und,'U',null]);
   return {legs,to,mon:pick(['Mar','May','Jun','Jul','Sep','Dec']),exact:und===0,
-    cap0:`随机一题：${legs.length} 行。先自己在纸上化简，再对照后面几步。`,
-    name:'结果：'+sh.nm(ks)+'。', say:''};
+    cap0:L(`随机一题：${legs.length} 行。先自己在纸上化简，再对照后面几步。`,`Random exercise: ${legs.length} rows. Simplify it on paper yourself first, then compare with the steps that follow.`),
+    name:L('结果：','Result:')+sh.nm(ks)+L('。','.'), say:''};
 }
 const PRE_B=[
-  {label:'讲义第 9 页',mon:'Dec',legs:[[1,'P',95],[-1,'C',100],[-1,'P',100],[1,'C',105]],to:'C',exact:true,
-   cap0:'讲义第 9 页：买 95/105 strangle（+1 95 put、+1 105 call），卖 100 straddle（−1 100 call、−1 100 put）。',
-   name:'+1 95 call、−2 100 call、+1 105 call：买入 butterfly。两份标的一份按 95 卖、一份按 100 买，到期固定少 5。',
-   say:'到期价值从头到尾是同一条线：最高 0，在 100；离开 95 到 105 之间是 −5。把 butterfly 的三角形整个往下挪 5，就是这个仓位，所以讲义说它「约等于」butterfly。'},
-  {label:'讲义第 11 页',mon:'Jun',legs:[[29,'U',null],[-44,'C',950],[44,'P',950],[18,'C',975],[24,'P',975],[-33,'C',1000],[-51,'P',1000],[30,'C',1025],[12,'P',1025]],to:'C',exact:false,mark:981.5,
-   cap0:'讲义第 11 页：九行，标的现价 981.50。',
-   name:'剩下 +42 975 call、−84 1000 call、+42 1025 call：42 手买入 call butterfly。950 那一条和标的全部消失。',
-   say:'981.50 在身 1000 的下方，线在这一段往上走：标的往 1000 靠，仓位变值钱，delta 为正。到期时 981.50 这一点的价值是身上最高点的 26%（42 × 6.5 ＝ 273，对 42 × 25 ＝ 1,050）。'},
-  {label:'随机一题',manual:true,make:randomPuzzle}
+  {label:L('讲义第 9 页','Lecture page 9'),mon:'Dec',legs:[[1,'P',95],[-1,'C',100],[-1,'P',100],[1,'C',105]],to:'C',exact:true,
+   cap0:L('讲义第 9 页：买 95/105 strangle（+1 95 put、+1 105 call），卖 100 straddle（−1 100 call、−1 100 put）。','Lecture page 9: buy the 95/105 strangle (+1 95 put, +1 105 call), sell the 100 straddle (−1 100 call, −1 100 put).'),
+   name:L('+1 95 call、−2 100 call、+1 105 call：买入 butterfly。两份标的一份按 95 卖、一份按 100 买，到期固定少 5。','+1 95 call, −2 100 calls, +1 105 call: a long butterfly. The two units of underlying, one sold at 95 and one bought at 100, leave a fixed 5 less at expiration.'),
+   say:L('到期价值从头到尾是同一条线：最高 0，在 100；离开 95 到 105 之间是 −5。把 butterfly 的三角形整个往下挪 5，就是这个仓位，所以讲义说它「约等于」butterfly。','The expiration value is the same line from start to finish: highest at 0, at 100; −5 outside 95 to 105. Shift the butterfly\'s triangle down by 5 and you have this position, which is why the lecture notes say it is "approximately equal" to a butterfly.')},
+  {label:L('讲义第 11 页','Lecture page 11'),mon:'Jun',legs:[[29,'U',null],[-44,'C',950],[44,'P',950],[18,'C',975],[24,'P',975],[-33,'C',1000],[-51,'P',1000],[30,'C',1025],[12,'P',1025]],to:'C',exact:false,mark:981.5,
+   cap0:L('讲义第 11 页：九行，标的现价 981.50。','Lecture page 11: nine rows, underlying at 981.50.'),
+   name:L('剩下 +42 975 call、−84 1000 call、+42 1025 call：42 手买入 call butterfly。950 那一条和标的全部消失。','Left with +42 975 calls, −84 1000 calls, +42 1025 calls: 42 long call butterflies. The 950 row and the underlying disappear entirely.'),
+   say:L('981.50 在身 1000 的下方，线在这一段往上走：标的往 1000 靠，仓位变值钱，delta 为正。到期时 981.50 这一点的价值是身上最高点的 26%（42 × 6.5 ＝ 273，对 42 × 25 ＝ 1,050）。','981.50 is below the 1000 body, where the line rises: as the underlying moves toward 1000 the position gains value, so delta is positive. At expiration, the value at 981.50 is 26% of the peak at the body (42 × 6.5 = 273, against 42 × 25 = 1,050).')},
+  {label:L('随机一题','Random exercise'),manual:true,make:randomPuzzle}
 ];
 const SMB=Simp('smB',PRE_B,1);
 
 /* 五：butterfly + 买入 iron butterfly */
 const SMC=Simp('smC',[
-  {label:'butterfly ＋ iron butterfly',mon:'May',to:'C',exact:true,
+  {label:L('butterfly ＋ iron butterfly','Butterfly + iron butterfly'),mon:'May',to:'C',exact:true,
    legs:[[1,'C',325],[-2,'C',350],[1,'C',375],[1,'C',350],[1,'P',350],[-1,'P',325],[-1,'C',375]],
-   cap0:'前三行是 325/350/375 butterfly，后四行是买入 iron butterfly（买 350 straddle、卖 325/375 strangle）。',
-   name:'期权全部对消，只剩一笔固定的钱：一份标的按 325 买、一份按 350 卖，到期多出 25。',
-   say:'七行、八张期权，两种期权、三个行权价，化简到最后什么期权都不剩。到期价值是一条 25 的水平线，TSLA 到哪都一样。'}
+   cap0:L('前三行是 325/350/375 butterfly，后四行是买入 iron butterfly（买 350 straddle、卖 325/375 strangle）。','The first three rows are the 325/350/375 butterfly; the last four are the long iron butterfly (buy the 350 straddle, sell the 325/375 strangle).'),
+   name:L('期权全部对消，只剩一笔固定的钱：一份标的按 325 买、一份按 350 卖，到期多出 25。','All the options cancel, leaving one fixed amount: one unit of underlying bought at 325 and one sold at 350, an extra 25 at expiration.'),
+   say:L('七行、八张期权，两种期权、三个行权价，化简到最后什么期权都不剩。到期价值是一条 25 的水平线，TSLA 到哪都一样。','Seven rows, eight options, two option types, three strikes, and after simplifying no options are left. The expiration value is a horizontal line at 25, wherever TSLA ends up.')}
 ]);
 
 /* ══════════ 五 · butterfly 的三角形与它的补 ══════════ */
@@ -1046,7 +1052,7 @@ const FC=(()=>{
   const F=s=>legVal(fly,s), I=s=>legVal(ib,s);
   function draw(){
     const pr=st.prog, a=clamp(pr,0,1), b=clamp(pr-1,0,1), c=clamp(pr-2,0,1);
-    let g=lab(L,T-14,'到期价值（每股美元）','var(--ink-soft)','start',11.5*FK);
+    let g=lab(L,T-14,window.L('到期价值（每股美元）','Value at expiration ($ per share)'),'var(--ink-soft)','start',11.5*FK);
     [0,10,25].forEach(v=>g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',12*FK));
     [300,325,350,375,400].forEach(s=>g+=lab(X(s),B+20,s,'var(--ink-faint)','middle',12*FK));
     [325,350,375].forEach(k=>g+=`<line x1="${X(k)}" y1="${T}" x2="${X(k)}" y2="${B}" stroke="var(--ink-faint)" stroke-dasharray="2 4"/>`);
@@ -1058,13 +1064,13 @@ const FC=(()=>{
       g+=`<polygon points="${lo.join(' ')} ${up.join(' ')}" fill="var(--good)" fill-opacity=".16"/>`;
       g+=`<polyline points="${pts(s=>I(s)+c*F(s),X1)}" fill="none" stroke="var(--control)" stroke-width="3.6" stroke-linejoin="round"/>`;
     }
-    if(pr>=3) g+=lab(X(398),Y(25)-9,'合计 ＝ 25 ＝ 间距','var(--control)','end',13.5*FK,600);
+    if(pr>=3) g+=lab(X(398),Y(25)-9,window.L('合计 ＝ 25 ＝ 间距','Total = 25 = width'),'var(--control)','end',13.5*FK,600);
     svg.innerHTML=g;
   }
   const Ss=[300,325,340,350,360,375,400];
-  $('fcTb').innerHTML=`<thead><tr><th>到期时 TSLA</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`+
-    `<tr><td>butterfly</td>${Ss.map(s=>`<td>${F(s)}</td>`).join('')}</tr><tr><td>买入 iron butterfly</td>${Ss.map(s=>`<td>${I(s)}</td>`).join('')}</tr>`+
-    `<tr class="sum"><td>合计</td>${Ss.map(s=>`<td>${F(s)+I(s)}</td>`).join('')}</tr></tbody>`;
+  $('fcTb').innerHTML=window.L(`<thead><tr><th>到期时 TSLA</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`,`<thead><tr><th>TSLA at expiration</th>${Ss.map(s=>`<th>${s}</th>`).join('')}</tr></thead><tbody>`)+
+    window.L(`<tr><td>butterfly</td>${Ss.map(s=>`<td>${F(s)}</td>`).join('')}</tr><tr><td>买入 iron butterfly</td>${Ss.map(s=>`<td>${I(s)}</td>`).join('')}</tr>`,`<tr><td>butterfly</td>${Ss.map(s=>`<td>${F(s)}</td>`).join('')}</tr><tr><td>Long iron butterfly</td>${Ss.map(s=>`<td>${I(s)}</td>`).join('')}</tr>`)+
+    window.L(`<tr class="sum"><td>合计</td>${Ss.map(s=>`<td>${F(s)+I(s)}</td>`).join('')}</tr></tbody>`,`<tr class="sum"><td>Total</td>${Ss.map(s=>`<td>${F(s)+I(s)}</td>`).join('')}</tr></tbody>`);
   function start(){
     st.playing=false;
     if(reduced){ st.prog=3; draw(); return; }
@@ -1089,7 +1095,7 @@ const FD=(()=>{
   const inside=SYN.lo.slice(0,n).filter((l,i)=>l<=PV[i]&&PV[i]<=SYN.hi[i]).length;
   const im=a=>a.slice(0,n).reduce((b,x,i)=>x<a[b]?i:b,0), iM=a=>a.slice(0,n).reduce((b,x,i)=>x>a[b]?i:b,0);
   function draw(){
-    const pr=st.prog; let g=lab(L,T-14,'每股价格（中间价，美元）','var(--ink-soft)','start',11.5*FK);
+    const pr=st.prog; let g=lab(L,T-14,window.L('每股价格（中间价，美元）','Price per share (mid, $)'),'var(--ink-soft)','start',11.5*FK);
     [0,10,20,30].forEach(v=>g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',12*FK));
     [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B+20,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
     const up=poly(SYN.hi,pr), dn=poly(SYN.lo,pr).reverse();
@@ -1103,11 +1109,11 @@ const FD=(()=>{
     svg.innerHTML=g;
     $('fdD').textContent=md(SYN.days[k]); $('fdDb').textContent=`TSLA ${f2(SYN.S[k])}`;
     $('fdF').textContent=fm(FL[k],3); $('fdI').textContent=f3(IB[k]); $('fdSum').textContent=f3(SM[k]);
-    $('fdSumb').textContent= k<n ? `25 折回当天 ${f3(PV[k])}` : '到期：0 ＋ 25';
+    $('fdSumb').textContent= k<n ? window.L(`25 折回当天 ${f3(PV[k])}`,`25 discounted to that day ${f3(PV[k])}`) : window.L('到期：0 ＋ 25','Expiration: 0 + 25');
     const a=im(FL), b=iM(FL), c=im(SM), d=iM(SM);
     $('fdSay').textContent= pr<n ? '' :
-      `这 24 天 TSLA 从 352.36 最高涨到 445.20，离身 350 越来越远。butterfly 的中间价最高 ${f2(FL[b])}（${md(SYN.days[b])}），之后跌到接近 0；iron butterfly 在 ${f2(Math.min(...IB.slice(0,n)))} 到 ${f2(Math.max(...IB.slice(0,n)))} 之间；两者之和一直在 ${f2(SM[c])} 到 ${f2(SM[d])} 之间。`+
-      `25 折回当天的值，${n} 个交易日里有 ${inside} 天落在浅色带里：按真实报价成交，这条关系没有给出白拿的钱。带子越往后越宽，是因为 325、350 call 越来越深度实值，买卖价差变宽（4/13 带宽 ${f2(SYN.hi[0]-SYN.lo[0])}，5/12 是 ${f2(SYN.hi[21]-SYN.lo[21])}）。`;
+      window.L(`这 24 天 TSLA 从 352.36 最高涨到 445.20，离身 350 越来越远。butterfly 的中间价最高 ${f2(FL[b])}（${md(SYN.days[b])}），之后跌到接近 0；iron butterfly 在 ${f2(Math.min(...IB.slice(0,n)))} 到 ${f2(Math.max(...IB.slice(0,n)))} 之间；两者之和一直在 ${f2(SM[c])} 到 ${f2(SM[d])} 之间。`,`Over these 24 days TSLA rose from 352.36 to a high of 445.20, moving farther and farther from the 350 body. The butterfly's mid price peaked at ${f2(FL[b])} (${md(SYN.days[b])}) and then fell close to 0; the iron butterfly stayed between ${f2(Math.min(...IB.slice(0,n)))} and ${f2(Math.max(...IB.slice(0,n)))}; their sum stayed between ${f2(SM[c])} and ${f2(SM[d])} throughout.`)+
+      window.L(`25 折回当天的值，${n} 个交易日里有 ${inside} 天落在浅色带里：按真实报价成交，这条关系没有给出白拿的钱。带子越往后越宽，是因为 325、350 call 越来越深度实值，买卖价差变宽（4/13 带宽 ${f2(SYN.hi[0]-SYN.lo[0])}，5/12 是 ${f2(SYN.hi[21]-SYN.lo[21])}）。`,`On ${inside} of the ${n} trading days, the value of 25 discounted to that day falls inside the shaded band: trading at real quotes, this relationship offered no free money. The band widens over time because the 325 and 350 calls go deeper in the money and their bid-ask spreads widen (band width ${f2(SYN.hi[0]-SYN.lo[0])} on 4/13, ${f2(SYN.hi[21]-SYN.lo[21])} on 5/12).`);
   }
   function start(){
     st.playing=false;
@@ -1127,57 +1133,57 @@ const FD=(()=>{
     mx=Math.max(mx,Math.abs(s-v)); dmin=Math.min(dmin,s-v); dmax=Math.max(dmax,s-v);
     rows+=`<tr${w===25?' class="hot"':''}><td>${w}</td><td>${f3(fl)}</td><td>${f3(ib)}</td><td>${f3(s)}</td><td>${f3(v)}</td><td>${sgn(s-v,3)}</td></tr>`;
   }
-  $('wTb').innerHTML=`<thead><tr><th style="white-space:nowrap">间距</th><th>butterfly</th><th>买入 iron<br>butterfly</th><th>合计</th><th>间距<br>折回 4/13</th><th>差</th></tr></thead><tbody>${rows}</tbody>`;
-  $('wSay').textContent=`十组的合计与间距折回今天，差在 ${sgn(dmin,2)} 到 ${sgn(dmax,2)} 之间，十行全是正的，不像随机的报价误差。合计里的 put 只有两张：买入的 350 put 和卖出的低行权价 put。TSLA 期权是美式的，put 多一点提前行权的价值，行权价越高、越实值，多得越多，所以合计系统地高出一点，方向和二节说的一致。报价表里如果有哪一个 butterfly 或 iron butterfly 让这一列差出去很多，要么报价错了，要么有钱可赚；先怀疑报价。`;
+  $('wTb').innerHTML=L(`<thead><tr><th style="white-space:nowrap">间距</th><th>butterfly</th><th>买入 iron<br>butterfly</th><th>合计</th><th>间距<br>折回 4/13</th><th>差</th></tr></thead><tbody>${rows}</tbody>`,`<thead><tr><th style="white-space:nowrap">Width</th><th>butterfly</th><th>Long iron<br>butterfly</th><th>Total</th><th>Width<br>discounted to 4/13</th><th>Difference</th></tr></thead><tbody>${rows}</tbody>`);
+  $('wSay').textContent=L(`十组的合计与间距折回今天，差在 ${sgn(dmin,2)} 到 ${sgn(dmax,2)} 之间，十行全是正的，不像随机的报价误差。合计里的 put 只有两张：买入的 350 put 和卖出的低行权价 put。TSLA 期权是美式的，put 多一点提前行权的价值，行权价越高、越实值，多得越多，所以合计系统地高出一点，方向和二节说的一致。报价表里如果有哪一个 butterfly 或 iron butterfly 让这一列差出去很多，要么报价错了，要么有钱可赚；先怀疑报价。`,`Across the ten pairs, the total minus the width discounted to today is between ${sgn(dmin,2)} and ${sgn(dmax,2)}. All ten rows are positive, which doesn't look like random quote error. The total contains only two puts: the long 350 put and the short lower-strike put. TSLA options are American, and puts carry a little extra early-exercise value, more the higher the strike and the deeper in the money, so the total comes out systematically a bit high, in the direction described in section 2. If some butterfly or iron butterfly in a quote table pushes this column far off, either the quote is wrong or there is money to be made; suspect the quote first.`);
 })();
 
 /* ══════════ 七 · 费曼检验 ══════════ */
 const QS=[
- {q:'不用公式，向没学过期权的人解释：为什么「买一张 350 call、卖一张 350 put」到期时一定等于按 350 买入 TSLA？',
-  a:['到期 TSLA 在 350 以上：call 值钱，你行权，按 350 买入；put 没人行权。',
-     '在 350 以下：call 作废；买 put 的人会行权，把股票按 350 卖给你，你必须接。',
-     '正好 350：两张都不值钱，按 350 买和不买没有差别。',
-     '三种情况结局都是按 350 买入，所以到期盈亏是一条穿过 350 的 45 度直线，和持有股票一样。'],
-  s:'「因为 call 的 delta 加 put 的 delta 等于 1」：这是到期前某一刻的性质，没讲到期时发生了什么。'},
- {q:'为什么合成的两条腿必须同一行权价、同一到期？如果用 350 call 配 330 put，会怎样？',
-  a:['330 到 350 之间两张都没人行权，没有买入发生，那一段线是平的，不再是一条直线。',
-     '所以它不是标的：TSLA 在那一段里动多少都与你无关。',
-     '到期日不同时，一张先到期，另一张还活着，先到期那天你只剩半个仓位。'],
-  s:'「规则就是这么定的」：没说出错开之后到期损益哪里变了。'},
- {q:'同一行权价、同一到期的 call 和 put，为什么 gamma 一定相等、vega 也一定相等？',
-  a:['call − put ＝ 标的，这个关系在到期前也成立（差的只是一个不随标的和波动率变的利息）。',
-     '标的的 delta 永远是 1，不会变，所以 gamma 是 0；股价不随隐含波动率变，所以 vega 是 0。',
-     '两者之差的 gamma、vega 都是 0，只能是 call 和 put 的 gamma 相等、vega 相等。',
-     '所以想从标的大动里赚钱，用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。TSLA 这类美式期权上，put 多一点提前行权的价值，这些只是近似成立。'],
-  s:'「因为 call 和 put 是对称的」：它们的形状并不对称，相等来自合成关系。'},
- {q:'+2 December 100 call −1 标的合约，为什么是 straddle？只把两张 call 都换成 put，为什么换不出来？',
-  a:['只换 call：+2 call ＝ +2 put ＋ 买 2 份标的，再加原来卖出的 1 份，得到 +2 put +1 标的，标的那一行消不掉，只是换了一种写法。',
-     '做法一，先拆：两张 call 拿出一张，和卖出的那份标的配成一对。买 call ＋ 卖标的 ＝ 买 put，剩下那张 call 不动。',
-     '做法二，换标的：卖出标的 ＝ 卖出 call ＋ 买入 put，换完是 +2 call −1 call +1 put，call 合并成 +1。',
-     '两种做法都得到 +1 call +1 put，就是 100 straddle。替换只是查表，先决定哪几张配成一对才是要想的。'],
-  s:'「只把 call 换成 put」：两张 call 一起换，得到 +2 put +1 标的，从一种写法变到另一种写法，没有变简单。'},
- {q:'面对一个九行的 call、put、标的混合仓位，化简的步骤是什么？怎么知道自己没换错？',
-  a:['选一种期权，把另一种全部换掉：q 张 put 换成 q 张 call 加卖出 q 份标的。',
-     '按行权价合并同一种期权，张数相加；把标的腿加起来。',
-     '标的合计不为 0 时，把剩下的标的换成同行权价的 call − put 再合并一次，看能不能并成 straddle 这类已知结构。',
-     '读出结构，并检查：每一步到期价值那条线都不能变。讲义第 11 页那一题化简后是 42 手 975/1000/1025 butterfly，981.50 在身的下方，delta 为正。'],
-  s:'「把相同行权价的加起来」：call 和 put 不先统一成一种，加不到一起。'},
- {q:'butterfly ＋ 买入 iron butterfly ＝ 行权价间距。不用任何定价公式，怎么说明这件事？TSLA 4/13 两者中间价加起来是 24.95，不是 25，为什么不算错？',
-  a:['到期时 butterfly 值「25 减去离 350 的距离」，最少 0；买入 iron butterfly 值「离 350 的距离，最多 25」。',
-     '一个少多少，另一个就多多少，加起来处处是 25。',
-     '到期处处一样的东西，今天的价格也一样：两者加起来就是「到期一定拿到 25」今天的价格。',
-     '25 要等 32 天才拿到，按 4.3% 今天值 24.91；再加上中间价的误差，24.95 在合理范围里。'],
-  s:'「因为 butterfly 最多值 25」：只说了一边的上限，没说两者为什么处处互补。'},
- {q:'3.1 里 TSLA 350/380 牛市 call 价差开仓付 11.975，牛市 put 价差开仓收 18.075，到期盈亏几乎一样。为什么一个付钱、一个收钱，盈亏还一样？两个数加起来为什么接近 30？',
-  a:['把 call 价差的两条腿换成合成形式：买 350 call ＝ 买 350 put ＋ 按 350 买标的；卖 380 call ＝ 卖 380 put ＋ 按 380 卖标的。',
-     '标的一买一卖，张数对消，只剩一个固定的结果：低买高卖，到期一定多出 30。',
-     '所以 call 价差 ＝ put 价差 ＋ 到期的 30。开仓时 call 版多付的钱，就是这 30 今天的价格：11.975 ＋ 18.075 ＝ 30.05。',
-     '到期时这 30 抵掉了开仓多付的钱，两者盈亏一样。'],
-  s:'「因为两者形状一样」：形状一样只说明盈亏跟着 TSLA 变的方式一样，没说明开仓现金为什么差 30。'}
+ {q:L('不用公式，向没学过期权的人解释：为什么「买一张 350 call、卖一张 350 put」到期时一定等于按 350 买入 TSLA？','Without formulas, explain to someone who has never studied options: why is "buy a 350 call, sell a 350 put" sure to equal buying TSLA at 350 at expiration?'),
+  a:[L('到期 TSLA 在 350 以上：call 值钱，你行权，按 350 买入；put 没人行权。','TSLA above 350 at expiration: the call is worth something, you exercise and buy at 350; no one exercises the put.'),
+     L('在 350 以下：call 作废；买 put 的人会行权，把股票按 350 卖给你，你必须接。','Below 350: the call expires; the put buyer exercises and sells you the stock at 350, and you must take it.'),
+     L('正好 350：两张都不值钱，按 350 买和不买没有差别。','Exactly 350: neither is worth anything, and buying at 350 or not makes no difference.'),
+     L('三种情况结局都是按 350 买入，所以到期盈亏是一条穿过 350 的 45 度直线，和持有股票一样。','All three cases end with buying at 350, so the P&amp;L at expiration is a 45-degree line through 350, the same as holding the stock.')],
+  s:L('「因为 call 的 delta 加 put 的 delta 等于 1」：这是到期前某一刻的性质，没讲到期时发生了什么。','"Because the call\'s delta plus the put\'s delta equals 1": that is a property at some moment before expiration and says nothing about what happens at expiration.')},
+ {q:L('为什么合成的两条腿必须同一行权价、同一到期？如果用 350 call 配 330 put，会怎样？','Why must the two legs of a synthetic have the same strike and the same expiration? What happens if you pair a 350 call with a 330 put?'),
+  a:[L('330 到 350 之间两张都没人行权，没有买入发生，那一段线是平的，不再是一条直线。','Between 330 and 350 neither is exercised, no purchase takes place, and that part of the line is flat; it is no longer a straight line.'),
+     L('所以它不是标的：TSLA 在那一段里动多少都与你无关。','So it is not the underlying: however much TSLA moves in that range has nothing to do with you.'),
+     L('到期日不同时，一张先到期，另一张还活着，先到期那天你只剩半个仓位。','With different expirations, one expires while the other is still alive, and on the first expiration day you are left with half the position.')],
+  s:L('「规则就是这么定的」：没说出错开之后到期损益哪里变了。','"That\'s just the rule": this doesn\'t say where the expiration payoff changes once they are mismatched.')},
+ {q:L('同一行权价、同一到期的 call 和 put，为什么 gamma 一定相等、vega 也一定相等？','Why must a call and a put with the same strike and expiration have equal gamma and equal vega?'),
+  a:[L('call − put ＝ 标的，这个关系在到期前也成立（差的只是一个不随标的和波动率变的利息）。','call − put = underlying, and this holds before expiration too (the difference is just interest that doesn\'t move with the underlying or volatility).'),
+     L('标的的 delta 永远是 1，不会变，所以 gamma 是 0；股价不随隐含波动率变，所以 vega 是 0。','The underlying\'s delta is always 1 and never changes, so its gamma is 0; the stock price doesn\'t move with implied volatility, so its vega is 0.'),
+     L('两者之差的 gamma、vega 都是 0，只能是 call 和 put 的 gamma 相等、vega 相等。','The difference between the two has a gamma and vega of 0, so the call\'s and the put\'s gammas must be equal, and their vegas too.'),
+     L('所以想从标的大动里赚钱，用 call 还是用 put，在 gamma、vega 上没有区别，区别只在 delta。TSLA 这类美式期权上，put 多一点提前行权的价值，这些只是近似成立。','So if you want to profit from a big move in the underlying, calls and puts make no difference in gamma or vega; they differ only in delta. On American options like TSLA\'s, the put carries a little extra early-exercise value, so these hold only approximately.')],
+  s:L('「因为 call 和 put 是对称的」：它们的形状并不对称，相等来自合成关系。','"Because calls and puts are symmetric": their shapes are not symmetric; the equality comes from the synthetic relationship.')},
+ {q:L('+2 December 100 call −1 标的合约，为什么是 straddle？只把两张 call 都换成 put，为什么换不出来？','Why is +2 December 100 calls −1 underlying contract a straddle? Why doesn\'t swapping both calls for puts get you there?'),
+  a:[L('只换 call：+2 call ＝ +2 put ＋ 买 2 份标的，再加原来卖出的 1 份，得到 +2 put +1 标的，标的那一行消不掉，只是换了一种写法。','Swapping only the calls: +2 calls = +2 puts + buy 2 units of the underlying; with the 1 unit sold originally, you get +2 puts +1 underlying. The underlying row doesn\'t go away; it is just another way of writing it.'),
+     L('做法一，先拆：两张 call 拿出一张，和卖出的那份标的配成一对。买 call ＋ 卖标的 ＝ 买 put，剩下那张 call 不动。','Method one, split first: take one of the two calls and pair it with the short underlying. Long call + short underlying = long put, and the remaining call stays.'),
+     L('做法二，换标的：卖出标的 ＝ 卖出 call ＋ 买入 put，换完是 +2 call −1 call +1 put，call 合并成 +1。','Method two, swap the underlying: short underlying = short call + long put, giving +2 calls −1 call +1 put, and the calls merge into +1.'),
+     L('两种做法都得到 +1 call +1 put，就是 100 straddle。替换只是查表，先决定哪几张配成一对才是要想的。','Both methods give +1 call +1 put, the 100 straddle. Substitution is just a table lookup; what takes thought is deciding first which contracts to pair.')],
+  s:L('「只把 call 换成 put」：两张 call 一起换，得到 +2 put +1 标的，从一种写法变到另一种写法，没有变简单。','"Just swap the calls for puts": swapping both calls together gives +2 puts +1 underlying, going from one notation to another without becoming simpler.')},
+ {q:L('面对一个九行的 call、put、标的混合仓位，化简的步骤是什么？怎么知道自己没换错？','Faced with a nine-row position mixing calls, puts and the underlying, what are the steps to simplify it? How do you know you haven\'t swapped something wrong?'),
+  a:[L('选一种期权，把另一种全部换掉：q 张 put 换成 q 张 call 加卖出 q 份标的。','Pick one type of option and convert all of the other type: q puts become q calls plus selling q units of the underlying.'),
+     L('按行权价合并同一种期权，张数相加；把标的腿加起来。','Merge options of the same type by strike, adding quantities; add up the underlying legs.'),
+     L('标的合计不为 0 时，把剩下的标的换成同行权价的 call − put 再合并一次，看能不能并成 straddle 这类已知结构。','If the underlying total is not 0, replace the rest of the underlying with call − put at an existing strike and merge again, to see whether it forms a known structure such as a straddle.'),
+     L('读出结构，并检查：每一步到期价值那条线都不能变。讲义第 11 页那一题化简后是 42 手 975/1000/1025 butterfly，981.50 在身的下方，delta 为正。','Read off the structure and check: the expiration value line must not change at any step. The lecture\'s page 11 exercise simplifies to 42 975/1000/1025 butterflies; 981.50 is below the body, so delta is positive.')],
+  s:L('「把相同行权价的加起来」：call 和 put 不先统一成一种，加不到一起。','"Add up the ones with the same strike": calls and puts can\'t be added together until they are converted to one type.')},
+ {q:L('butterfly ＋ 买入 iron butterfly ＝ 行权价间距。不用任何定价公式，怎么说明这件事？TSLA 4/13 两者中间价加起来是 24.95，不是 25，为什么不算错？','Butterfly + long iron butterfly = strike width. How do you show this without any pricing formula? On 4/13 the two TSLA mid prices add up to 24.95, not 25; why isn\'t that wrong?'),
+  a:[L('到期时 butterfly 值「25 减去离 350 的距离」，最少 0；买入 iron butterfly 值「离 350 的距离，最多 25」。','At expiration the butterfly is worth "25 minus the distance from 350", at least 0; the long iron butterfly is worth "the distance from 350, at most 25".'),
+     L('一个少多少，另一个就多多少，加起来处处是 25。','Whatever one loses, the other gains, and together they are 25 everywhere.'),
+     L('到期处处一样的东西，今天的价格也一样：两者加起来就是「到期一定拿到 25」今天的价格。','Things that are equal everywhere at expiration have the same price today: the two together are today\'s price of "receiving 25 for sure at expiration".'),
+     L('25 要等 32 天才拿到，按 4.3% 今天值 24.91；再加上中间价的误差，24.95 在合理范围里。','The 25 arrives only after 32 days, so at 4.3% it is worth 24.91 today; add the error in the mid prices and 24.95 is within a reasonable range.')],
+  s:L('「因为 butterfly 最多值 25」：只说了一边的上限，没说两者为什么处处互补。','"Because a butterfly is worth at most 25": this gives only one side\'s upper limit and doesn\'t say why the two complement each other everywhere.')},
+ {q:L('3.1 里 TSLA 350/380 牛市 call 价差开仓付 11.975，牛市 put 价差开仓收 18.075，到期盈亏几乎一样。为什么一个付钱、一个收钱，盈亏还一样？两个数加起来为什么接近 30？','In 3.1, the TSLA 350/380 bull call spread costs 11.975 to open and the bull put spread collects 18.075, and their P&amp;L at expiration is nearly the same. Why does one cost money and the other collect money, yet the P&amp;L is the same? Why do the two numbers add up to about 30?'),
+  a:[L('把 call 价差的两条腿换成合成形式：买 350 call ＝ 买 350 put ＋ 按 350 买标的；卖 380 call ＝ 卖 380 put ＋ 按 380 卖标的。','Write the call spread\'s two legs in synthetic form: long 350 call = long 350 put + buy the underlying at 350; short 380 call = short 380 put + sell the underlying at 380.'),
+     L('标的一买一卖，张数对消，只剩一个固定的结果：低买高卖，到期一定多出 30。','One underlying bought and one sold: the quantities cancel, leaving one fixed result: buying low and selling high, an extra 30 for sure at expiration.'),
+     L('所以 call 价差 ＝ put 价差 ＋ 到期的 30。开仓时 call 版多付的钱，就是这 30 今天的价格：11.975 ＋ 18.075 ＝ 30.05。','So call spread = put spread + 30 at expiration. The extra paid for the call version at opening is today\'s price of this 30: 11.975 + 18.075 = 30.05.'),
+     L('到期时这 30 抵掉了开仓多付的钱，两者盈亏一样。','At expiration this 30 offsets the extra paid at opening, and the two P&amp;Ls are the same.')],
+  s:L('「因为两者形状一样」：形状一样只说明盈亏跟着 TSLA 变的方式一样，没说明开仓现金为什么差 30。','"Because the two have the same shape": the same shape only means the P&amp;L moves with TSLA in the same way; it doesn\'t explain why the opening cash differs by 30.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1191,7 +1197,20 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-5-1-q'+i); if(v) t.value=v; }catch(e){}
@@ -1200,8 +1219,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? L('对照参考答案','Compare with the reference answer') : L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 

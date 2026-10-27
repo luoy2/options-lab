@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>gamma 与 theta</title>
+<script src="lang.js"></script><script>document.title=L('gamma 与 theta','Gamma and theta');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2025C13%2025%2019%2020%2027%207'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3Cpath%20d='M9%2029L27%2013'%20stroke='%23fdf6ec'%20stroke-width='1.4'%20stroke-dasharray='2%202'%20fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -196,345 +197,346 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stat .d{font-size:1.12rem}
 }
+span.l-zh,span.l-en{display:contents}
 </style>
 </head>
 <body>
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 delta 会变</a><a href="#s1">一 gamma 在哪大</a><a href="#s2">二 theta</a><a href="#s3">三 成比例</a>
-  <a href="#s4">四 逐日账本</a><a href="#s5">五 收租付租</a><a href="#s6">六 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 delta 会变</span><span class="l-en">0 Delta changes</span></a><a href="#s1"><span class="l-zh">一 gamma 在哪大</span><span class="l-en">1 Where gamma is large</span></a><a href="#s2"><span class="l-zh">二 theta</span><span class="l-en">2 Theta</span></a><a href="#s3"><span class="l-zh">三 成比例</span><span class="l-en">3 Proportional</span></a>
+  <a href="#s4"><span class="l-zh">四 逐日账本</span><span class="l-en">4 Daily ledger</span></a><a href="#s5"><span class="l-zh">五 收租付租</span><span class="l-en">5 Collecting rent, paying rent</span></a><a href="#s6"><span class="l-zh">六 费曼检验</span><span class="l-en">6 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 2.2</p>
-  <h1>gamma 与 theta</h1>
-  <p class="lede">2.1 讲了 delta：标的动 1 美元，期权跟着动多少。这一节讲两件事：delta 自己变得多快（gamma），持有期权每天流失多少时间价值（theta）。模型把这两个数绑在一个固定比例上。案例还是 2026-04-13 收盘买入的 TSLA 5/15 到期 350 call。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 2.2</span><span class="l-en">FIN 580 review · Node 2.2</span></p>
+  <h1><span class="l-zh">gamma 与 theta</span><span class="l-en">Gamma and theta</span></h1>
+  <p class="lede"><span class="l-zh">2.1 讲了 delta：标的动 1 美元，期权跟着动多少。这一节讲两件事：delta 自己变得多快（gamma），持有期权每天流失多少时间价值（theta）。模型把这两个数绑在一个固定比例上。案例还是 2026-04-13 收盘买入的 TSLA 5/15 到期 350 call。</span><span class="l-en">2.1 covered delta: when the underlying moves 1 dollar, how much the option moves with it. This node covers two things: how fast delta itself changes (gamma), and how much time value an option loses each day you hold it (theta). The model ties these two numbers together in a fixed ratio. The case is still the TSLA 350 call expiring 5/15, bought at the 2026-04-13 close.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>delta 自己会变</h2>
-  <p class="sub">4/13 收盘买入时，报价快照里这张 350 call 的 delta 是 0.557。第二天 TSLA 涨了 11.96 美元，delta 变成 0.651；第三天又涨 27.61，delta 变成 0.807。</p>
-  <p>1.1 算过：整段持有下来，这张 call 实际跟上了 TSLA 涨幅的 0.734，比入场时的 0.557 大，原因就是 delta 一路在变大。这一节先量它变得有多快。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>delta 自己会变</span><span class="l-en"><span class="n">0</span>Delta changes on its own</span></h2>
+  <p class="sub"><span class="l-zh">4/13 收盘买入时，报价快照里这张 350 call 的 delta 是 0.557。第二天 TSLA 涨了 11.96 美元，delta 变成 0.651；第三天又涨 27.61，delta 变成 0.807。</span><span class="l-en">At entry at the 4/13 close, this 350 call's delta in the quote snapshot was 0.557. The next day TSLA rose 11.96 dollars and delta became 0.651; the day after, it rose another 27.61 and delta became 0.807.</span></p>
+  <p><span class="l-zh">1.1 算过：整段持有下来，这张 call 实际跟上了 TSLA 涨幅的 0.734，比入场时的 0.557 大，原因就是 delta 一路在变大。这一节先量它变得有多快。</span><span class="l-en">1.1 worked it out: over the whole holding period, this call actually captured 0.734 of TSLA's gain, more than the 0.557 at entry, because delta kept growing along the way. This node first measures how fast it changes.</span></p>
 
-  <h3>gamma 的定义</h3>
+  <h3><span class="l-zh">gamma 的定义</span><span class="l-en">Definition of gamma</span></h3>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="gamma，读作「伽马」。标的每动 1 美元，delta 变多少。">Γ</span> ＝ <span class="sym" data-say="delta。标的动 1 美元，期权价值动多少（2.1）。call 的 delta 在 0 到 1 之间。">Δ</span> 的变化 ÷ <span class="sym" data-say="标的价格，本页是 TSLA 的股价。">S</span> 的变化</div>
-    <div class="gloss">标的每动 1 美元，delta 变多少</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="gamma，读作「伽马」。标的每动 1 美元，delta 变多少。">Γ</span> ＝ <span class="sym" data-say="delta。标的动 1 美元，期权价值动多少（2.1）。call 的 delta 在 0 到 1 之间。">Δ</span> 的变化 ÷ <span class="sym" data-say="标的价格，本页是 TSLA 的股价。">S</span> 的变化</span><span class="l-en"><span class="sym" data-say="Gamma, the Greek letter Γ. When the underlying moves 1 dollar, how much delta changes.">Γ</span> = change in <span class="sym" data-say="Delta. When the underlying moves 1 dollar, how much the option value moves (2.1). A call's delta is between 0 and 1.">Δ</span> ÷ change in <span class="sym" data-say="The underlying price; on this page, TSLA's stock price.">S</span></span></div>
+    <div class="gloss"><span class="l-zh">标的每动 1 美元，delta 变多少</span><span class="l-en">When the underlying moves 1 dollar, how much delta changes</span></div>
   </div>
-  <p>报价快照里 350 call 的入场 gamma 是 <b>0.00820</b>：TSLA 每涨 1 美元，delta 大约加 0.0082。拿真实的两天核对：</p>
+  <p><span class="l-zh">报价快照里 350 call 的入场 gamma 是 <b>0.00820</b>：TSLA 每涨 1 美元，delta 大约加 0.0082。拿真实的两天核对：</span><span class="l-en">In the quote snapshot the 350 call's gamma at entry is <b>0.00820</b>: for each 1-dollar rise in TSLA, delta goes up by about 0.0082. Check it against two real days:</span></p>
   <div class="tscroll">
   <table style="white-space:nowrap">
-    <thead><tr><th>这一天</th><th>TSLA 涨</th><th>delta 实际变化</th><th>按前一天的 gamma 估</th><th>当天收盘的 gamma</th></tr></thead>
+    <thead><tr><th><span class="l-zh">这一天</span><span class="l-en">Day</span></th><th><span class="l-zh">TSLA 涨</span><span class="l-en">TSLA rise</span></th><th><span class="l-zh">delta 实际变化</span><span class="l-en">Actual change in delta</span></th><th><span class="l-zh">按前一天的 gamma 估</span><span class="l-en">Estimate from the previous day's gamma</span></th><th><span class="l-zh">当天收盘的 gamma</span><span class="l-en">Gamma at that day's close</span></th></tr></thead>
     <tbody>
-      <tr><td>4/13 → 4/14</td><td>+11.96</td><td>0.557 → 0.651，+0.094</td><td>0.00820 × 11.96 ＝ +0.098</td><td>0.00749</td></tr>
-      <tr><td>4/14 → 4/15</td><td>+27.61</td><td>0.651 → 0.807，+0.156</td><td>0.00749 × 27.61 ＝ +0.207</td><td>0.00472</td></tr>
+      <tr><td>4/13 → 4/14</td><td>+11.96</td><td><span class="l-zh">0.557 → 0.651，+0.094</span><span class="l-en">0.557 → 0.651, +0.094</span></td><td><span class="l-zh">0.00820 × 11.96 ＝ +0.098</span><span class="l-en">0.00820 × 11.96 = +0.098</span></td><td>0.00749</td></tr>
+      <tr><td>4/14 → 4/15</td><td>+27.61</td><td><span class="l-zh">0.651 → 0.807，+0.156</span><span class="l-en">0.651 → 0.807, +0.156</span></td><td><span class="l-zh">0.00749 × 27.61 ＝ +0.207</span><span class="l-en">0.00749 × 27.61 = +0.207</span></td><td>0.00472</td></tr>
     </tbody>
   </table>
   </div>
-  <p>第一天估得很准。第二天多估了三分之一：TSLA 走到 392 的路上，gamma 自己从 0.00749 掉到 0.00472。用两天 gamma 的平均值去估，是 +0.169，接近得多。<b>gamma 也在变</b>，所以它只适合估小幅变动。</p>
-  <p class="tiny">单位：报价快照里的 gamma 按小数写。讲义把 delta 写成整数（0.50 写成 50），gamma 也跟着写成整数，讲义的 gamma 2 就是小数的 0.02。</p>
+  <p><span class="l-zh">第一天估得很准。第二天多估了三分之一：TSLA 走到 392 的路上，gamma 自己从 0.00749 掉到 0.00472。用两天 gamma 的平均值去估，是 +0.169，接近得多。<b>gamma 也在变</b>，所以它只适合估小幅变动。</span><span class="l-en">The first day's estimate is very close. The second day's is a third too high: on TSLA's way to 392, gamma itself fell from 0.00749 to 0.00472. Estimating with the average of the two days' gammas gives +0.169, much closer. <b>Gamma changes too</b>, so it is only good for estimating small moves.</span></p>
+  <p class="tiny"><span class="l-zh">单位：报价快照里的 gamma 按小数写。讲义把 delta 写成整数（0.50 写成 50），gamma 也跟着写成整数，讲义的 gamma 2 就是小数的 0.02。</span><span class="l-en">Units: gamma in the quote snapshot is written as a decimal. The lecture notes write delta as a whole number (0.50 as 50), and gamma follows suit, so the lecture notes' gamma 2 is 0.02 as a decimal.</span></p>
 
-  <h3>讲义的两个例子</h3>
-  <p>标的 100，一张 110 call 的 delta 是 30、gamma 是 2（整数写法）：</p>
+  <h3><span class="l-zh">讲义的两个例子</span><span class="l-en">Two examples from the lecture notes</span></h3>
+  <p><span class="l-zh">标的 100，一张 110 call 的 delta 是 30、gamma 是 2（整数写法）：</span><span class="l-en">Underlying at 100, a 110 call with delta 30 and gamma 2 (whole number format):</span></p>
   <div class="tscroll">
   <table style="max-width:36rem">
-    <thead><tr><th>标的</th><th>97</th><th>98</th><th>99</th><th>100</th><th>101</th><th>102</th></tr></thead>
+    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th>97</th><th>98</th><th>99</th><th>100</th><th>101</th><th>102</th></tr></thead>
     <tbody><tr><td>delta</td><td>24</td><td>26</td><td>28</td><td>30</td><td>32</td><td>34</td></tr></tbody>
   </table>
   </div>
-  <p>照这个速度算，标的跌到 75 时 delta 是 30 − 25 × 2 ＝ −20。call 的 delta 不可能是负数，说明 gamma 不是常数，离得远了就不能这样线性外推。</p>
-  <p>另一个例子是同一个行权价的 call 和 put。标的 100，100 call 的 delta 是 +50，100 put 是 −50，两者的 gamma 都是 5：</p>
+  <p><span class="l-zh">照这个速度算，标的跌到 75 时 delta 是 30 − 25 × 2 ＝ −20。call 的 delta 不可能是负数，说明 gamma 不是常数，离得远了就不能这样线性外推。</span><span class="l-en">At this rate, with the underlying down at 75, delta would be 30 − 25 × 2 = −20. A call's delta cannot be negative, which shows gamma is not a constant: far from where you start, you cannot extrapolate linearly like this.</span></p>
+  <p><span class="l-zh">另一个例子是同一个行权价的 call 和 put。标的 100，100 call 的 delta 是 +50，100 put 是 −50，两者的 gamma 都是 5：</span><span class="l-en">The other example is a call and a put at the same strike. Underlying at 100, the 100 call has delta +50 and the 100 put −50, and both have gamma 5:</span></p>
   <div class="tscroll">
   <table style="max-width:36rem">
     <thead><tr><th></th><th>100 call</th><th>100 put</th></tr></thead>
     <tbody>
-      <tr><td>现在</td><td>+50</td><td>−50</td></tr>
-      <tr><td>涨到 101</td><td>+55</td><td>−45</td></tr>
-      <tr><td>跌到 99</td><td>+45</td><td>−55</td></tr>
+      <tr><td><span class="l-zh">现在</span><span class="l-en">Now</span></td><td>+50</td><td>−50</td></tr>
+      <tr><td><span class="l-zh">涨到 101</span><span class="l-en">Up to 101</span></td><td>+55</td><td>−45</td></tr>
+      <tr><td><span class="l-zh">跌到 99</span><span class="l-en">Down to 99</span></td><td>+45</td><td>−55</td></tr>
     </tbody>
   </table>
   </div>
-  <p>标的涨，delta 加上 gamma；标的跌，delta 减去 gamma。put 的 delta 从 −50 到 −45 也是「加」，往 0 靠。<b>买 call 和买 put 的 gamma 都是正的</b>，同一个行权价、同一个到期日的 call 和 put，gamma 完全一样（报价快照的表里 gamma 只有一列）。</p>
+  <p><span class="l-zh">标的涨，delta 加上 gamma；标的跌，delta 减去 gamma。put 的 delta 从 −50 到 −45 也是「加」，往 0 靠。<b>买 call 和买 put 的 gamma 都是正的</b>，同一个行权价、同一个到期日的 call 和 put，gamma 完全一样（报价快照的表里 gamma 只有一列）。</span><span class="l-en">When the underlying rises, delta adds gamma; when it falls, delta subtracts gamma. The put's delta going from −50 to −45 is also an "add", toward 0. <b>Long calls and long puts both have positive gamma</b>, and a call and a put with the same strike and the same expiration have exactly the same gamma (the quote snapshot's table has only one gamma column).</span></p>
 
-  <h3>gamma 就是弯曲</h3>
-  <p>把 350 call 的价值画成 TSLA 价格的函数。某一点的切线有多陡，就是那一点的 delta；切线转得多快，就是 gamma。下面的曲线用 Black-Scholes 模型按入场时的条件算（离到期 32 天，隐含波动率 46.3%，利率 4.3%），是模型值；下图的三个点是当天收盘报价里的真实 delta。</p>
+  <h3><span class="l-zh">gamma 就是弯曲</span><span class="l-en">Gamma is curvature</span></h3>
+  <p><span class="l-zh">把 350 call 的价值画成 TSLA 价格的函数。某一点的切线有多陡，就是那一点的 delta；切线转得多快，就是 gamma。下面的曲线用 Black-Scholes 模型按入场时的条件算（离到期 32 天，隐含波动率 46.3%，利率 4.3%），是模型值；下图的三个点是当天收盘报价里的真实 delta。</span><span class="l-en">Draw the 350 call's value as a function of TSLA's price. How steep the tangent is at a point is the delta at that point; how fast the tangent turns is gamma. The curve below is computed with the Black-Scholes model under the conditions at entry (32 days to expiration, implied volatility 46.3%, rate 4.3%), so it is a model value; the three dots in the lower chart are the real deltas from that day's closing quotes.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="a1Play">再扫一遍</button></div>
-    <svg id="a1" viewBox="0 0 720 452" role="img" aria-label="350 call 的价值曲线与切线，以及 delta 随 TSLA 价格变化的曲线"></svg>
+    <div class="bar"><button class="btn ghost" id="a1Play"><span class="l-zh">再扫一遍</span><span class="l-en">Sweep again</span></button></div>
+    <svg id="a1" viewBox="0 0 720 452" role="img" aria-label="350 call 的价值曲线与切线，以及 delta 随 TSLA 价格变化的曲线" data-en-aria-label="The 350 call's value curve with its tangent line, and the curve of delta against TSLA's price"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink)"></i>离到期 32 天（模型）</span>
-      <span style="color:var(--ink-faint)"><i class="dash"></i>到期那天</span>
-      <span><i class="ln" style="background:var(--control)"></i>切线</span>
-      <span><i class="dot" style="background:var(--result)"></i>当天收盘报价</span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--ink)"></i>离到期 32 天（模型）</span><span class="l-en"><i class="ln" style="background:var(--ink)"></i>32 days to expiration (model)</span></span>
+      <span style="color:var(--ink-faint)"><span class="l-zh"><i class="dash"></i>到期那天</span><span class="l-en"><i class="dash"></i>Expiration day</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--control)"></i>切线</span><span class="l-en"><i class="ln" style="background:var(--control)"></i>Tangent line</span></span>
+      <span><span class="l-zh"><i class="dot" style="background:var(--result)"></i>当天收盘报价</span><span class="l-en"><i class="dot" style="background:var(--result)"></i>That day's closing quote</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">TSLA 价格</div><div class="d" id="a1S"></div></div>
-      <div class="stat"><div class="k">delta（切线斜率）</div><div class="d" id="a1D" style="color:var(--control)"></div></div>
-      <div class="stat"><div class="k">gamma（delta 线的斜率）</div><div class="d" id="a1G"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 价格</span><span class="l-en">TSLA price</span></div><div class="d" id="a1S"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">delta（切线斜率）</span><span class="l-en">Delta (tangent slope)</span></div><div class="d" id="a1D" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">gamma（delta 线的斜率）</span><span class="l-en">Gamma (slope of the delta line)</span></div><div class="d" id="a1G"></div></div>
     </div>
   </div>
-  <p>到期那天的价值是一条折线（1.1）：350 左边斜率 0，右边斜率 1，delta 在 350 上一步从 0 跳到 1。离到期还有 32 天，折角被磨成了圆弧：TSLA 在 300 时切线斜率 0.15，在 410 时 0.89，中间一路慢慢转过来。圆弧最弯的一段在行权价附近，切线在那里转得最快，gamma 最大；两头几乎是直线，gamma 接近 0。</p>
-  <p>真实的三个点：4/14 的 0.651 和模型一样；4/15 的 0.807 比模型的 0.822 略低，那两天隐含波动率从 46% 升到约 51%，时间也过去了两天。</p>
+  <p><span class="l-zh">到期那天的价值是一条折线（1.1）：350 左边斜率 0，右边斜率 1，delta 在 350 上一步从 0 跳到 1。离到期还有 32 天，折角被磨成了圆弧：TSLA 在 300 时切线斜率 0.15，在 410 时 0.89，中间一路慢慢转过来。圆弧最弯的一段在行权价附近，切线在那里转得最快，gamma 最大；两头几乎是直线，gamma 接近 0。</span><span class="l-en">The value on expiration day is a kinked line (1.1): slope 0 left of 350, slope 1 to the right, and delta jumps from 0 to 1 in a single step at 350. With 32 days to go, the kink is worn into a rounded arc: the tangent slope is 0.15 with TSLA at 300 and 0.89 at 410, turning gradually in between. The arc bends most near the strike, where the tangent turns fastest and gamma is largest; the two ends are nearly straight, with gamma close to 0.</span></p>
+  <p><span class="l-zh">真实的三个点：4/14 的 0.651 和模型一样；4/15 的 0.807 比模型的 0.822 略低，那两天隐含波动率从 46% 升到约 51%，时间也过去了两天。</span><span class="l-en">The three real points: 4/14's 0.651 matches the model; 4/15's 0.807 is slightly below the model's 0.822. Over those two days implied volatility rose from 46% to about 51%, and two days of time also passed.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>gamma 在哪里大</h2>
-  <p class="sub">同一天、同一个 TSLA 价格，不同行权价、不同到期日的期权，gamma 差好几倍。下图是 4/13 收盘报价里的四个到期日，TSLA 都是 352.36。</p>
+  <h2><span class="l-zh"><span class="n">一</span>gamma 在哪里大</span><span class="l-en"><span class="n">1</span>Where gamma is large</span></h2>
+  <p class="sub"><span class="l-zh">同一天、同一个 TSLA 价格，不同行权价、不同到期日的期权，gamma 差好几倍。下图是 4/13 收盘报价里的四个到期日，TSLA 都是 352.36。</span><span class="l-en">On the same day and at the same TSLA price, options with different strikes and expirations can differ in gamma several times over. The chart below shows four expirations from the 4/13 closing quotes, all with TSLA at 352.36.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a2Seg">
         <button data-m="g" aria-pressed="true">gamma</button>
         <button data-m="th" aria-pressed="false">theta</button>
       </div>
-      <button class="btn ghost" id="a2Play">再画一遍</button>
+      <button class="btn ghost" id="a2Play"><span class="l-zh">再画一遍</span><span class="l-en">Redraw</span></button>
     </div>
-    <svg id="a2" viewBox="0 0 720 318" role="img" aria-label="4/13 收盘四个到期日的 gamma 随行权价的曲线"></svg>
+    <svg id="a2" viewBox="0 0 720 318" role="img" aria-label="4/13 收盘四个到期日的 gamma 随行权价的曲线" data-en-aria-label="Gamma against strike for four expirations at the 4/13 close"></svg>
     <div class="legend" id="a2Leg"></div>
   </div>
-  <p><b>越近行权价越大。</b>每条线都在平值附近（352.5 到 360 这几档）最高，往两边落下去。离平值远的期权，delta 贴在 0 或 1 附近，标的动一点它几乎不变。</p>
-  <p><b>越近到期越大。</b>平值附近，2 天到期的 gamma 是 0.0367，32 天的是 0.0084，差 4.4 倍。原因要回到 1.2 的一个标准差（远期价 × 隐含波动率 × √t）：到期前 delta 要从接近 0 爬到接近 1，爬坡大约占几个标准差宽。离到期 32 天，1.2 算过，一个标准差约 48.5 美元；离到期 2 天，平值那档的隐含波动率是 42.5%，一个标准差只有约 11.1 美元。同样的爬升挤进约四分之一的宽度，坡就陡了约 4 倍。√(32/2) ＝ 4；两个到期日的隐含波动率不同（46.3% 对 42.5%），再乘 46.3 ÷ 42.5，是 4.4 倍，和 gamma 的倍数对得上。</p>
-  <p>离平值远的地方反过来：320 这档，2 天到期的 gamma 只有 0.0022，比 32 天的 0.0059 还小。32 美元对 2 天的期权约是三个标准差，delta 早已贴在 1 附近不动了。这种反转节点 6 细讲。</p>
-  <p>theta 也一样，平值最大、越近到期越大：2 天到期的平值 call 每天流失 1.10，32 天的 0.32。讲义的说法是<b>平值期权的 gamma、theta 都比同等的实值、虚值期权大</b>。</p>
+  <p><span class="l-zh"><b>越近行权价越大。</b>每条线都在平值附近（352.5 到 360 这几档）最高，往两边落下去。离平值远的期权，delta 贴在 0 或 1 附近，标的动一点它几乎不变。</span><span class="l-en"><b>Larger closer to the strike.</b> Every line peaks near the money (the 352.5 to 360 strikes) and falls off on both sides. For options far from the money, delta sits near 0 or 1, and a small move in the underlying barely changes it.</span></p>
+  <p><span class="l-zh"><b>越近到期越大。</b>平值附近，2 天到期的 gamma 是 0.0367，32 天的是 0.0084，差 4.4 倍。原因要回到 1.2 的一个标准差（远期价 × 隐含波动率 × √t）：到期前 delta 要从接近 0 爬到接近 1，爬坡大约占几个标准差宽。离到期 32 天，1.2 算过，一个标准差约 48.5 美元；离到期 2 天，平值那档的隐含波动率是 42.5%，一个标准差只有约 11.1 美元。同样的爬升挤进约四分之一的宽度，坡就陡了约 4 倍。√(32/2) ＝ 4；两个到期日的隐含波动率不同（46.3% 对 42.5%），再乘 46.3 ÷ 42.5，是 4.4 倍，和 gamma 的倍数对得上。</span><span class="l-en"><b>Larger closer to expiration.</b> Near the money, the 2-day gamma is 0.0367 and the 32-day gamma is 0.0084, 4.4 times apart. The reason goes back to the standard deviation from 1.2 (forward price × implied volatility × √t): before expiration, delta has to climb from near 0 to near 1, and the climb spans a few standard deviations. With 32 days to go, as 1.2 worked out, one standard deviation is about 48.5 dollars; with 2 days to go, the at-the-money strike's implied volatility is 42.5%, and one standard deviation is only about 11.1 dollars. The same climb squeezed into about a quarter of the width makes the slope about 4 times steeper. √(32/2) = 4; the two expirations have different implied volatilities (46.3% vs. 42.5%), so multiply by 46.3 ÷ 42.5 to get 4.4 times, which matches the ratio of the gammas.</span></p>
+  <p><span class="l-zh">离平值远的地方反过来：320 这档，2 天到期的 gamma 只有 0.0022，比 32 天的 0.0059 还小。32 美元对 2 天的期权约是三个标准差，delta 早已贴在 1 附近不动了。这种反转节点 6 细讲。</span><span class="l-en">Far from the money it is the other way around: at the 320 strike, the 2-day gamma is only 0.0022, smaller than the 32-day 0.0059. For a 2-day option, 32 dollars is about three standard deviations, and delta has long since settled near 1. Node 6 covers this reversal in detail.</span></p>
+  <p><span class="l-zh">theta 也一样，平值最大、越近到期越大：2 天到期的平值 call 每天流失 1.10，32 天的 0.32。讲义的说法是<b>平值期权的 gamma、theta 都比同等的实值、虚值期权大</b>。</span><span class="l-en">Theta follows the same pattern, largest at the money and larger closer to expiration: the 2-day at-the-money call loses 1.10 a day, the 32-day one 0.32. In the lecture notes' words, <b>at-the-money options have larger gamma and theta than comparable in-the-money and out-of-the-money options</b>.</span></p>
 
-  <h3>350 call 自己的 gamma</h3>
-  <p>一张期权的 gamma 随着标的走动和时间流逝一直在变。下图是这 24 天里 350 call 的 gamma，和「每天换成当天离收盘价最近的行权价」的平值 call 的 gamma，都是收盘报价里的值。</p>
+  <h3><span class="l-zh">350 call 自己的 gamma</span><span class="l-en">The 350 call's own gamma</span></h3>
+  <p><span class="l-zh">一张期权的 gamma 随着标的走动和时间流逝一直在变。下图是这 24 天里 350 call 的 gamma，和「每天换成当天离收盘价最近的行权价」的平值 call 的 gamma，都是收盘报价里的值。</span><span class="l-en">An option's gamma keeps changing as the underlying moves and time passes. The chart below shows the 350 call's gamma over these 24 days, alongside the gamma of an at-the-money call that "switches each day to the strike closest to that day's close"; both are values from the closing quotes.</span></p>
   <div class="panel">
-    <svg id="g350" viewBox="0 0 720 262" role="img" aria-label="350 call 与当天平值 call 的 gamma，逐日"></svg>
+    <svg id="g350" viewBox="0 0 720 262" role="img" aria-label="350 call 与当天平值 call 的 gamma，逐日" data-en-aria-label="Daily gamma of the 350 call and of that day's at-the-money call"></svg>
     <div class="legend">
       <span><i class="ln" style="background:var(--control)"></i>350 call</span>
-      <span><i class="ln" style="background:var(--result)"></i>当天的平值 call（行权价每天换）</span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--result)"></i>当天的平值 call（行权价每天换）</span><span class="l-en"><i class="ln" style="background:var(--result)"></i>That day's at-the-money call (strike changes daily)</span></span>
     </div>
   </div>
-  <p>4/15 TSLA 涨到 392，350 离平值远了，gamma 从 0.0082 掉到 0.0047。4/23 到 4/30 TSLA 回落到 373 到 382，gamma 又回到 0.0068 到 0.0085。5/7 之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。同一段时间，平值 call 的 gamma 跟着到期日临近一路涨，5/14 剩一天时是 0.0295。</p>
+  <p><span class="l-zh">4/15 TSLA 涨到 392，350 离平值远了，gamma 从 0.0082 掉到 0.0047。4/23 到 4/30 TSLA 回落到 373 到 382，gamma 又回到 0.0068 到 0.0085。5/7 之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。同一段时间，平值 call 的 gamma 跟着到期日临近一路涨，5/14 剩一天时是 0.0295。</span><span class="l-en">On 4/15 TSLA rose to 392, the 350 strike moved away from the money, and gamma fell from 0.0082 to 0.0047. From 4/23 to 4/30 TSLA fell back to 373 to 382, and gamma returned to 0.0068 to 0.0085. After 5/7 TSLA was above 410, the 350 call was deep in the money, and gamma was below 0.001. Over the same period, the at-the-money call's gamma kept rising as expiration approached, reaching 0.0295 on 5/14 with one day left.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>theta：时间价值每天流失多少</h2>
-  <p class="sub">1.1 讲过，期权价格 ＝ 内在价值 ＋ 时间价值。入场时 350 call 值 21.05：内在价值 352.36 − 350 ＝ 2.36，剩下 18.69 是时间价值，付的是「到期前 TSLA 还可能走多远」。到期那一刻时间价值归零，theta 量的是它每天流失多快。</p>
+  <h2><span class="l-zh"><span class="n">二</span>theta：时间价值每天流失多少</span><span class="l-en"><span class="n">2</span>Theta: how much time value is lost each day</span></h2>
+  <p class="sub"><span class="l-zh">1.1 讲过，期权价格 ＝ 内在价值 ＋ 时间价值。入场时 350 call 值 21.05：内在价值 352.36 − 350 ＝ 2.36，剩下 18.69 是时间价值，付的是「到期前 TSLA 还可能走多远」。到期那一刻时间价值归零，theta 量的是它每天流失多快。</span><span class="l-en">As 1.1 explained, option price = intrinsic value + time value. At entry the 350 call was worth 21.05: intrinsic value 352.36 − 350 = 2.36, and the remaining 18.69 is time value, paid for "how far TSLA might still move before expiration". At expiration time value goes to zero; theta measures how fast it drains each day.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="theta，读作「西塔」。其他条件都不变，只过一天，期权价值变多少。买期权时是负数。">Θ</span> ＝ 只过一天、其他不变时，期权价值的变化</div>
-    <div class="gloss">标的价格、波动率、利率都不动，时间往前走一天，期权少值多少</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="theta，读作「西塔」。其他条件都不变，只过一天，期权价值变多少。买期权时是负数。">Θ</span> ＝ 只过一天、其他不变时，期权价值的变化</span><span class="l-en"><span class="sym" data-say="Theta, the Greek letter Θ. With everything else unchanged and one day passing, how much the option value changes. Negative when you buy an option.">Θ</span> = change in option value when one day passes and nothing else changes</span></div>
+    <div class="gloss"><span class="l-zh">标的价格、波动率、利率都不动，时间往前走一天，期权少值多少</span><span class="l-en">The underlying price, volatility and interest rate stay put and time moves forward one day: how much less the option is worth</span></div>
   </div>
-  <p>讲义的例子：期权值 5.00，theta 是 −.05，过一天 4.95，两天 4.90，三天 4.85。报价快照里 350 call 的 theta 是 <b>−0.319</b>：其他不变，过一天，21.05 变成约 20.73。</p>
-  <p>买期权的人 theta 为负，每天都在流失；卖期权的人 theta 为正，每天都在收进来。讲义举过一个例外，要三个条件同时满足：深度实值，几乎肯定会被行权；<span class="sym" data-say="European。只能在到期那天行权，不能提前。与之相对的美式期权随时可以行权，TSLA 的个股期权是美式。">欧式</span>，只能在到期那天行权，今天拿不到内在价值；买的时候当场付全款（讲义叫股票型结算，美国的期权都这样；有的交易所买期权先不付钱，只按每天的涨跌结算盈亏）。这样的期权今天的价值是到期价值的折现，比内在价值还低，过一天少折现一天，价值反而涨一点，theta 为正。TSLA 的期权是美式的，随时可以行权，本页的期权都不属于这种。</p>
+  <p><span class="l-zh">讲义的例子：期权值 5.00，theta 是 −.05，过一天 4.95，两天 4.90，三天 4.85。报价快照里 350 call 的 theta 是 <b>−0.319</b>：其他不变，过一天，21.05 变成约 20.73。</span><span class="l-en">The lecture notes' example: an option worth 5.00 with theta −.05 is worth 4.95 after one day, 4.90 after two, 4.85 after three. In the quote snapshot the 350 call's theta is <b>−0.319</b>: with everything else unchanged, after one day 21.05 becomes about 20.73.</span></p>
+  <p><span class="l-zh">买期权的人 theta 为负，每天都在流失；卖期权的人 theta 为正，每天都在收进来。讲义举过一个例外，要三个条件同时满足：深度实值，几乎肯定会被行权；<span class="sym" data-say="European。只能在到期那天行权，不能提前。与之相对的美式期权随时可以行权，TSLA 的个股期权是美式。">欧式</span>，只能在到期那天行权，今天拿不到内在价值；买的时候当场付全款（讲义叫股票型结算，美国的期权都这样；有的交易所买期权先不付钱，只按每天的涨跌结算盈亏）。这样的期权今天的价值是到期价值的折现，比内在价值还低，过一天少折现一天，价值反而涨一点，theta 为正。TSLA 的期权是美式的，随时可以行权，本页的期权都不属于这种。</span><span class="l-en">An option buyer's theta is negative, losing value every day; an option seller's theta is positive, taking it in every day. The lecture notes give one exception, which needs three conditions at once: deep in the money, almost certain to be exercised; <span class="sym" data-say="European: can be exercised only on the expiration date, not earlier. American options, by contrast, can be exercised at any time; TSLA's stock options are American.">European</span>, exercisable only on the expiration date, so the intrinsic value cannot be collected today; and paid for in full at purchase (the lecture notes call this stock-type settlement, which is how all US options work; on some exchanges you pay nothing up front for an option and only settle each day's gains and losses). Such an option is worth today the discounted value at expiration, less than its intrinsic value; with each day that passes there is one day less of discounting, so its value actually rises a little, and theta is positive. TSLA's options are American and can be exercised at any time, so none of the options on this page are of this kind.</span></p>
 
-  <h3>如果 TSLA 一动不动</h3>
-  <p>假设 TSLA 每天都收在 352.36，隐含波动率一直是 46.3%，这张 350 call 从剩 32 天走到到期。价值曲线用模型算；下图的点是真实的每一天收盘报价里当天平值 call 的 theta，横轴按那天离 5/15 还剩几天摆放。</p>
+  <h3><span class="l-zh">如果 TSLA 一动不动</span><span class="l-en">If TSLA does not move at all</span></h3>
+  <p><span class="l-zh">假设 TSLA 每天都收在 352.36，隐含波动率一直是 46.3%，这张 350 call 从剩 32 天走到到期。价值曲线用模型算；下图的点是真实的每一天收盘报价里当天平值 call 的 theta，横轴按那天离 5/15 还剩几天摆放。</span><span class="l-en">Suppose TSLA closes at 352.36 every day and implied volatility stays at 46.3% while this 350 call goes from 32 days left to expiration. The value curve is computed with the model; the dots in the lower chart are the real theta of each day's at-the-money call from that day's closing quotes, placed on the horizontal axis by how many days that day had left until 5/15.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a3Seg">
-        <button data-m="raw" aria-pressed="true">报价原值</button>
-        <button data-m="adj" aria-pressed="false">按入场时的股价和波动率折算</button>
+        <button data-m="raw" aria-pressed="true"><span class="l-zh">报价原值</span><span class="l-en">Quoted values</span></button>
+        <button data-m="adj" aria-pressed="false"><span class="l-zh">按入场时的股价和波动率折算</span><span class="l-en">Rescaled to entry price and volatility</span></button>
       </div>
-      <button class="btn ghost" id="a3Play">逐天播放</button>
+      <button class="btn ghost" id="a3Play"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button>
     </div>
-    <svg id="a3" viewBox="0 0 720 420" role="img" aria-label="TSLA 不动时 350 call 的价值逐日下降；下方是每天的 theta"></svg>
+    <svg id="a3" viewBox="0 0 720 420" role="img" aria-label="TSLA 不动时 350 call 的价值逐日下降；下方是每天的 theta" data-en-aria-label="Value of the 350 call falling day by day while TSLA does not move; below, each day's theta"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink)"></i>350 call 的价值（模型，TSLA 不动）</span>
-      <span><i style="background:var(--result-bg)"></i>时间价值</span>
-      <span><i class="ln" style="background:var(--control)"></i>theta 的大小（模型）</span>
-      <span><i class="dot" style="background:var(--result)"></i>收盘报价：当天平值 call 的 theta</span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--ink)"></i>350 call 的价值（模型，TSLA 不动）</span><span class="l-en"><i class="ln" style="background:var(--ink)"></i>Value of the 350 call (model, TSLA unchanged)</span></span>
+      <span><span class="l-zh"><i style="background:var(--result-bg)"></i>时间价值</span><span class="l-en"><i style="background:var(--result-bg)"></i>Time value</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--control)"></i>theta 的大小（模型）</span><span class="l-en"><i class="ln" style="background:var(--control)"></i>Size of theta (model)</span></span>
+      <span><span class="l-zh"><i class="dot" style="background:var(--result)"></i>收盘报价：当天平值 call 的 theta</span><span class="l-en"><i class="dot" style="background:var(--result)"></i>Closing quote: theta of that day's at-the-money call</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">离到期</div><div class="d" id="a3N"></div></div>
-      <div class="stat"><div class="k">期权价值</div><div class="d" id="a3V"></div><div class="d2">内在价值 2.36</div></div>
-      <div class="stat"><div class="k">其中时间价值</div><div class="d" id="a3TV" style="color:var(--result)"></div><div class="d2" id="a3TVb"></div></div>
-      <div class="stat"><div class="k">这一天的 theta</div><div class="d" id="a3Th" style="color:var(--control)"></div><div class="d2">每天，模型</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">离到期</span><span class="l-en">Time to expiration</span></div><div class="d" id="a3N"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">期权价值</span><span class="l-en">Option value</span></div><div class="d" id="a3V"></div><div class="d2"><span class="l-zh">内在价值 2.36</span><span class="l-en">Intrinsic value 2.36</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">其中时间价值</span><span class="l-en">Of which time value</span></div><div class="d" id="a3TV" style="color:var(--result)"></div><div class="d2" id="a3TVb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这一天的 theta</span><span class="l-en">Theta on this day</span></div><div class="d" id="a3Th" style="color:var(--control)"></div><div class="d2"><span class="l-zh">每天，模型</span><span class="l-en">Per day, model</span></div></div>
     </div>
     <div class="say plain" id="a3Say"></div>
   </div>
-  <p>时间价值大致按<b>剩余天数的平方根</b>缩小，原因和 1.2 一样：还能走多远按 √t 算。剩一半时间，还剩约 √½ ≈ 71%；剩四分之一时间，还剩约一半。平方根曲线越靠近 0 越陡，所以 theta 越近到期越大。</p>
-  <p>讲义给的平值期权例子：离到期 3 个月 theta −.03，3 周 −.06，3 天 −.16。按 1/√t 放大可以互相推出来：.03 ÷ √(3/14) ≈ .065，.06 ÷ √(3/21) ≈ .159（3 个月约 14 周，3 周 ＝ 21 天）。</p>
-  <p>报价的点在最后几天远高于模型线：5/14 剩一天，平值 call 的 theta 是 −2.76，模型是 −1.66。那时 TSLA 已经涨到 443，报价快照算希腊字母用的隐含波动率升到 58%。平值 theta 和股价 × 波动率成正比，两者合起来大了 1.57 倍。按入场时的股价和波动率折算回去，−2.76 变成 −1.75，点就回到线旁边。</p>
+  <p><span class="l-zh">时间价值大致按<b>剩余天数的平方根</b>缩小，原因和 1.2 一样：还能走多远按 √t 算。剩一半时间，还剩约 √½ ≈ 71%；剩四分之一时间，还剩约一半。平方根曲线越靠近 0 越陡，所以 theta 越近到期越大。</span><span class="l-en">Time value shrinks roughly with <b>the square root of the days left</b>, for the same reason as in 1.2: how far the price can still move scales with √t. With half the time left, about √½ ≈ 71% remains; with a quarter of the time left, about half remains. The square root curve gets steeper closer to 0, so theta grows as expiration approaches.</span></p>
+  <p><span class="l-zh">讲义给的平值期权例子：离到期 3 个月 theta −.03，3 周 −.06，3 天 −.16。按 1/√t 放大可以互相推出来：.03 ÷ √(3/14) ≈ .065，.06 ÷ √(3/21) ≈ .159（3 个月约 14 周，3 周 ＝ 21 天）。</span><span class="l-en">The lecture notes' example for at-the-money options: theta −.03 with 3 months to expiration, −.06 with 3 weeks, −.16 with 3 days. Scaling by 1/√t, each can be derived from another: .03 ÷ √(3/14) ≈ .065, .06 ÷ √(3/21) ≈ .159 (3 months is about 14 weeks, 3 weeks = 21 days).</span></p>
+  <p><span class="l-zh">报价的点在最后几天远高于模型线：5/14 剩一天，平值 call 的 theta 是 −2.76，模型是 −1.66。那时 TSLA 已经涨到 443，报价快照算希腊字母用的隐含波动率升到 58%。平值 theta 和股价 × 波动率成正比，两者合起来大了 1.57 倍。按入场时的股价和波动率折算回去，−2.76 变成 −1.75，点就回到线旁边。</span><span class="l-en">In the last few days the quoted dots sit well above the model line: on 5/14, with one day left, the at-the-money call's theta was −2.76 against the model's −1.66. By then TSLA had risen to 443, and the implied volatility the quote snapshot used for the Greeks had risen to 58%. At-the-money theta is proportional to stock price × volatility, and together the two were 1.57 times larger. Rescaled back to the entry stock price and volatility, −2.76 becomes −1.75, and the dot returns to the line.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>为什么 gamma 和 theta 成比例</h2>
-  <p class="sub">gamma 让买方在标的大动时多赚一点，theta 让买方每天付一点。模型把两者锁在一个固定比例上。先算大动一天 gamma 多赚多少。</p>
+  <h2><span class="l-zh"><span class="n">三</span>为什么 gamma 和 theta 成比例</span><span class="l-en"><span class="n">3</span>Why gamma and theta are proportional</span></h2>
+  <p class="sub"><span class="l-zh">gamma 让买方在标的大动时多赚一点，theta 让买方每天付一点。模型把两者锁在一个固定比例上。先算大动一天 gamma 多赚多少。</span><span class="l-en">Gamma lets the buyer make a bit more when the underlying moves a lot; theta makes the buyer pay a bit every day. The model locks the two in a fixed ratio. First, work out how much extra gamma earns on a big day.</span></p>
 
-  <h3>gamma 多赚的那一块</h3>
-  <p>标的从 S 动到 S ＋ ΔS，delta 一路从 Δ 变到 Δ ＋ Γ × ΔS。这一路上 delta 的平均值是 Δ ＋ ½ × Γ × ΔS。期权价值的变化等于「标的动了多少 × 一路上的平均 delta」：</p>
+  <h3><span class="l-zh">gamma 多赚的那一块</span><span class="l-en">The extra piece gamma earns</span></h3>
+  <p><span class="l-zh">标的从 S 动到 S ＋ ΔS，delta 一路从 Δ 变到 Δ ＋ Γ × ΔS。这一路上 delta 的平均值是 Δ ＋ ½ × Γ × ΔS。期权价值的变化等于「标的动了多少 × 一路上的平均 delta」：</span><span class="l-en">As the underlying moves from S to S + ΔS, delta goes from Δ to Δ + Γ × ΔS along the way. The average delta along the way is Δ + ½ × Γ × ΔS. The change in option value equals "how far the underlying moved × the average delta along the way":</span></p>
   <div class="formula">
-    <div class="math">期权价值的变化 ≈ Δ × <span class="sym" data-say="标的这一天动了多少美元，涨为正、跌为负。">ΔS</span> ＋ ½ × Γ × (ΔS)²</div>
-    <div class="gloss">按起点的 delta 算的部分 ＋ delta 一路变大（变小）多出来的部分</div>
+    <div class="math"><span class="l-zh">期权价值的变化 ≈ Δ × <span class="sym" data-say="标的这一天动了多少美元，涨为正、跌为负。">ΔS</span> ＋ ½ × Γ × (ΔS)²</span><span class="l-en">Change in option value ≈ Δ × <span class="sym" data-say="How many dollars the underlying moved on this day, positive for a rise and negative for a fall.">ΔS</span> + ½ × Γ × (ΔS)²</span></div>
+    <div class="gloss"><span class="l-zh">按起点的 delta 算的部分 ＋ delta 一路变大（变小）多出来的部分</span><span class="l-en">The part from the starting delta + the extra from delta growing (or shrinking) along the way</span></div>
   </div>
-  <p>讲义的例子：股票 49 涨到 51，50 call 值 2.67，delta 50，gamma 5。到 51 时 delta 是 50 ＋ 2 × 5 ＝ 60，平均 55，新价值 2.67 ＋ 2 × 0.55 ＝ 3.77。用上面的式子：2.67 ＋ 2 × 0.50 ＋ ½ × 5 × 2² ÷ 100 ＝ 2.67 ＋ 1.00 ＋ 0.10 ＝ 3.77，两种算法一样。2.4 会用同一个式子估整个组合。</p>
-  <p>第一项是方向。2.1 讲过，卖出 Δ 股标的就能把它抵掉，这叫对冲。对冲之后只剩 ½ × Γ × (ΔS)²，它有两个特点：</p>
+  <p><span class="l-zh">讲义的例子：股票 49 涨到 51，50 call 值 2.67，delta 50，gamma 5。到 51 时 delta 是 50 ＋ 2 × 5 ＝ 60，平均 55，新价值 2.67 ＋ 2 × 0.55 ＝ 3.77。用上面的式子：2.67 ＋ 2 × 0.50 ＋ ½ × 5 × 2² ÷ 100 ＝ 2.67 ＋ 1.00 ＋ 0.10 ＝ 3.77，两种算法一样。2.4 会用同一个式子估整个组合。</span><span class="l-en">The lecture notes' example: the stock rises from 49 to 51, and the 50 call is worth 2.67, with delta 50 and gamma 5. At 51, delta is 50 + 2 × 5 = 60, the average is 55, and the new value is 2.67 + 2 × 0.55 = 3.77. With the formula above: 2.67 + 2 × 0.50 + ½ × 5 × 2² ÷ 100 = 2.67 + 1.00 + 0.10 = 3.77, the same either way. 2.4 uses the same formula to estimate a whole portfolio.</span></p>
+  <p><span class="l-zh">第一项是方向。2.1 讲过，卖出 Δ 股标的就能把它抵掉，这叫对冲。对冲之后只剩 ½ × Γ × (ΔS)²，它有两个特点：</span><span class="l-en">The first term is direction. As 2.1 explained, selling Δ shares of the underlying offsets it; this is called hedging. After hedging only ½ × Γ × (ΔS)² is left, and it has two properties:</span></p>
   <ul>
-    <li>ΔS 平方以后总是正的：涨也赚，跌也赚。</li>
-    <li>按幅度的平方增长：动的幅度翻倍，赚的变成 4 倍。</li>
+    <li><span class="l-zh">ΔS 平方以后总是正的：涨也赚，跌也赚。</span><span class="l-en">ΔS squared is always positive: you make money on a rise and on a fall.</span></li>
+    <li><span class="l-zh">按幅度的平方增长：动的幅度翻倍，赚的变成 4 倍。</span><span class="l-en">It grows with the square of the size: twice the move earns 4 times as much.</span></li>
   </ul>
 
-  <h3>平均一天赚多少</h3>
-  <p>明天动多少事先不知道。按 1.2，一天的一个标准差是 S × σ ÷ 16。1.2 算标准差的办法是把每天离 0 的距离平方、求平均、再开方；反过来，ΔS 平方的平均值就是一个标准差的平方。这一点对任何形状的分布都成立。所以 gamma 平均每天赚：</p>
+  <h3><span class="l-zh">平均一天赚多少</span><span class="l-en">How much it earns on an average day</span></h3>
+  <p><span class="l-zh">明天动多少事先不知道。按 1.2，一天的一个标准差是 S × σ ÷ 16。1.2 算标准差的办法是把每天离 0 的距离平方、求平均、再开方；反过来，ΔS 平方的平均值就是一个标准差的平方。这一点对任何形状的分布都成立。所以 gamma 平均每天赚：</span><span class="l-en">How far the price will move tomorrow is not known in advance. From 1.2, one standard deviation for a day is S × σ ÷ 16. 1.2 computed the standard deviation by squaring each day's distance from 0, averaging, and taking the square root; turned around, the average of ΔS squared is the square of one standard deviation. This holds for a distribution of any shape. So on an average day gamma earns:</span></p>
   <div class="formula">
-    <div class="math">平均一天 ＝ ½ × Γ × (S × <span class="sym" data-say="sigma，年化波动率。这里用买入时的隐含波动率 46.3%。">σ</span> ÷ 16)²</div>
-    <div class="gloss">把一个标准差当作这一天的 ΔS 代进 ½ × Γ × (ΔS)²</div>
-    <div class="note">350 call 入场时：½ × 0.00820 × (352.36 × 46.3% ÷ 16)² ＝ ½ × 0.00820 × 10.20² ≈ 0.426</div>
+    <div class="math"><span class="l-zh">平均一天 ＝ ½ × Γ × (S × <span class="sym" data-say="sigma，年化波动率。这里用买入时的隐含波动率 46.3%。">σ</span> ÷ 16)²</span><span class="l-en">Average day = ½ × Γ × (S × <span class="sym" data-say="Sigma, annualized volatility. Here it is the implied volatility at purchase, 46.3%.">σ</span> ÷ 16)²</span></div>
+    <div class="gloss"><span class="l-zh">把一个标准差当作这一天的 ΔS 代进 ½ × Γ × (ΔS)²</span><span class="l-en">Plug one standard deviation into ½ × Γ × (ΔS)² as the day's ΔS</span></div>
+    <div class="note"><span class="l-zh">350 call 入场时：½ × 0.00820 × (352.36 × 46.3% ÷ 16)² ＝ ½ × 0.00820 × 10.20² ≈ 0.426</span><span class="l-en">For the 350 call at entry: ½ × 0.00820 × (352.36 × 46.3% ÷ 16)² = ½ × 0.00820 × 10.20² ≈ 0.426</span></div>
   </div>
-  <p>这个平均值是怎么凑出来的，用 2000 个模拟的交易日看：每一天从钟形分布里抽一个涨跌。gamma 那天赚的钱按「动了几个标准差」的平方算：动 1 个标准差正好赚平均值那么多，动 2 个赚 4 倍，动半个只赚四分之一。图里把每天付的 theta（本页叫租金）定成这个平均值，看收入和租金怎么相抵。</p>
+  <p><span class="l-zh">这个平均值是怎么凑出来的，用 2000 个模拟的交易日看：每一天从钟形分布里抽一个涨跌。gamma 那天赚的钱按「动了几个标准差」的平方算：动 1 个标准差正好赚平均值那么多，动 2 个赚 4 倍，动半个只赚四分之一。图里把每天付的 theta（本页叫租金）定成这个平均值，看收入和租金怎么相抵。</span><span class="l-en">To see how this average comes together, look at 2000 simulated trading days: each day draws a move from a bell-shaped distribution. What gamma earns that day goes with the square of "how many standard deviations it moved": a 1 standard deviation move earns exactly the average, 2 earns 4 times as much, half a standard deviation earns only a quarter. The chart sets the theta paid each day (this page calls it rent) equal to this average, to show how income and rent offset.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="a4Play">再抽一遍</button></div>
-    <div class="stage"><div class="cvw"><canvas id="a4" width="264" height="160" aria-label="2000 个模拟交易日的涨跌堆成钟形；下方是累计 gamma 收入与累计租金之比"></canvas><div class="cvax" id="a4ax" aria-hidden="true"></div></div></div>
+    <div class="bar"><button class="btn ghost" id="a4Play"><span class="l-zh">再抽一遍</span><span class="l-en">Draw again</span></button></div>
+    <div class="stage"><div class="cvw"><canvas id="a4" width="264" height="160" aria-label="2000 个模拟交易日的涨跌堆成钟形；下方是累计 gamma 收入与累计租金之比" data-en-aria-label="Moves over 2000 simulated trading days stacked into a bell shape; below, cumulative gamma income divided by cumulative rent"></canvas><div class="cvax" id="a4ax" aria-hidden="true"></div></div></div>
     <div class="legend">
-      <span><i style="background:var(--ink-faint)"></i>动不到一个标准差：这一天亏</span>
-      <span><i style="background:var(--control)"></i>超过一个标准差：这一天赚</span>
-      <span>点线：±1 个标准差</span>
-      <span>下方：累计 gamma 收入 ÷ 累计租金</span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint)"></i>动不到一个标准差：这一天亏</span><span class="l-en"><i style="background:var(--ink-faint)"></i>Less than one standard deviation: a losing day</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>超过一个标准差：这一天赚</span><span class="l-en"><i style="background:var(--control)"></i>More than one standard deviation: a winning day</span></span>
+      <span><span class="l-zh">点线：±1 个标准差</span><span class="l-en">Dotted lines: ±1 standard deviation</span></span>
+      <span><span class="l-zh">下方：累计 gamma 收入 ÷ 累计租金</span><span class="l-en">Below: cumulative gamma income ÷ cumulative rent</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已过天数</div><div class="d" id="a4N"></div><div class="d2">共 2000 天</div></div>
-      <div class="stat"><div class="k">赚的日子</div><div class="d" id="a4W" style="color:var(--control)"></div><div class="d2">钟形理论 31.7%</div></div>
-      <div class="stat"><div class="k">这些日子带来的 gamma 收入</div><div class="d" id="a4I"></div><div class="d2">钟形理论 80.1%</div></div>
-      <div class="stat"><div class="k">收入 ÷ 租金</div><div class="d" id="a4R" style="color:var(--result)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已过天数</span><span class="l-en">Days elapsed</span></div><div class="d" id="a4N"></div><div class="d2"><span class="l-zh">共 2000 天</span><span class="l-en">2000 days in all</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">赚的日子</span><span class="l-en">Winning days</span></div><div class="d" id="a4W" style="color:var(--control)"></div><div class="d2"><span class="l-zh">钟形理论 31.7%</span><span class="l-en">Bell curve: 31.7%</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这些日子带来的 gamma 收入</span><span class="l-en">Gamma income from those days</span></div><div class="d" id="a4I"></div><div class="d2"><span class="l-zh">钟形理论 80.1%</span><span class="l-en">Bell curve: 80.1%</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">收入 ÷ 租金</span><span class="l-en">Income ÷ rent</span></div><div class="d" id="a4R" style="color:var(--result)"></div></div>
     </div>
     <div class="say plain" id="a4Say"></div>
   </div>
 
-  <h3>公平的租金</h3>
-  <p>如果 theta 比这个平均值小，买入期权再对冲，平均每天稳赚：gamma 收进来的多于付出去的。人人都去买，期权价格被抬高，theta 跟着变大，直到每天的租金等于 gamma 的平均收入。反过来卖方稳赚，价格被压低。</p>
-  <p>上面算的是一个交易日。一年约 256 个交易日，而 16² ＝ 256，所以一年的 gamma 平均收入是 ½ × Γ × (S × σ ÷ 16)² × 256 ＝ ½ × σ² × S² × Γ，16 正好消掉。所以在模型里：</p>
+  <h3><span class="l-zh">公平的租金</span><span class="l-en">A fair rent</span></h3>
+  <p><span class="l-zh">如果 theta 比这个平均值小，买入期权再对冲，平均每天稳赚：gamma 收进来的多于付出去的。人人都去买，期权价格被抬高，theta 跟着变大，直到每天的租金等于 gamma 的平均收入。反过来卖方稳赚，价格被压低。</span><span class="l-en">If theta were smaller than this average, buying the option and hedging would make money on average every day: gamma would bring in more than goes out. Everyone would buy, the option price would be pushed up, and theta would grow with it, until the daily rent equaled gamma's average income. The other way around, sellers would make money for sure and the price would be pushed down.</span></p>
+  <p><span class="l-zh">上面算的是一个交易日。一年约 256 个交易日，而 16² ＝ 256，所以一年的 gamma 平均收入是 ½ × Γ × (S × σ ÷ 16)² × 256 ＝ ½ × σ² × S² × Γ，16 正好消掉。所以在模型里：</span><span class="l-en">The calculation above is for one trading day. A year has about 256 trading days, and 16² = 256, so a year's average gamma income is ½ × Γ × (S × σ ÷ 16)² × 256 = ½ × σ² × S² × Γ, and the 16 cancels exactly. So in the model:</span></p>
   <div class="formula">
     <div class="math">Θ ≈ −½ × σ² × S² × Γ</div>
-    <div class="gloss">一年要付的租金 ＝ ½ × 波动率² × 股价² × gamma；换成每天，除以一年的天数</div>
+    <div class="gloss"><span class="l-zh">一年要付的租金 ＝ ½ × 波动率² × 股价² × gamma；换成每天，除以一年的天数</span><span class="l-en">Rent paid per year = ½ × volatility² × stock price² × gamma; for a day, divide by the number of days in a year</span></div>
   </div>
-  <p>这就是<b>买 gamma 就要付 theta</b>：gamma 越大，租金越贵，比例由 σ² × S² 定。本页把 theta 叫租金：持有期权，每天为「标的可能大动」付的钱。</p>
+  <p><span class="l-zh">这就是<b>买 gamma 就要付 theta</b>：gamma 越大，租金越贵，比例由 σ² × S² 定。本页把 theta 叫租金：持有期权，每天为「标的可能大动」付的钱。</span><span class="l-en">This is <b>buy gamma, pay theta</b>: the larger the gamma, the higher the rent, in a ratio set by σ² × S². This page calls theta rent: what you pay each day you hold an option, for the chance that the underlying makes a big move.</span></p>
 
-  <h3>用报价快照的数字核对</h3>
-  <p>350 call 入场时：½ × 0.463² × 352.36² × 0.00820 ＝ 109.12，这是一年的租金。上面的 0.426 是把它分到 256 个交易日：109.12 ÷ 256 ＝ 0.426。报价快照里的 theta 按日历日算，周末也算，把同一笔分成 365 份：109.12 ÷ 365 ＝ <b>0.299</b>。0.426 和 0.299 是同一笔一年的租金，只是摊的天数不同，不是收入比租金多。报价快照给的是 −0.319，比 0.299 多约 0.02。</p>
-  <p>差的是利息。对冲好的仓位是买一张 call（付 21.05）、卖 0.5574 股（收 196.41），手里净多出 175.36 美元，按 4.3% 一天利息 0.021。模型要求这个仓位平均每天不赚不赔，所以 theta 要同时抵掉 gamma 的平均收入和这笔利息：0.299 ＋ 0.021 ＝ 0.320，报价快照给的是 0.319。讲义说 theta 来自两部分，波动价值的衰减和利息价值的衰减，就是这两项。</p>
+  <h3><span class="l-zh">用报价快照的数字核对</span><span class="l-en">Checking against the quote snapshot</span></h3>
+  <p><span class="l-zh">350 call 入场时：½ × 0.463² × 352.36² × 0.00820 ＝ 109.12，这是一年的租金。上面的 0.426 是把它分到 256 个交易日：109.12 ÷ 256 ＝ 0.426。报价快照里的 theta 按日历日算，周末也算，把同一笔分成 365 份：109.12 ÷ 365 ＝ <b>0.299</b>。0.426 和 0.299 是同一笔一年的租金，只是摊的天数不同，不是收入比租金多。报价快照给的是 −0.319，比 0.299 多约 0.02。</span><span class="l-en">For the 350 call at entry: ½ × 0.463² × 352.36² × 0.00820 = 109.12, the rent for a year. The 0.426 above spreads it over 256 trading days: 109.12 ÷ 256 = 0.426. Theta in the quote snapshot counts calendar days, weekends included, and splits the same amount into 365 parts: 109.12 ÷ 365 = <b>0.299</b>. 0.426 and 0.299 are the same year's rent spread over different numbers of days; it does not mean income exceeds rent. The quote snapshot gives −0.319, about 0.02 more than 0.299.</span></p>
+  <p><span class="l-zh">差的是利息。对冲好的仓位是买一张 call（付 21.05）、卖 0.5574 股（收 196.41），手里净多出 175.36 美元，按 4.3% 一天利息 0.021。模型要求这个仓位平均每天不赚不赔，所以 theta 要同时抵掉 gamma 的平均收入和这笔利息：0.299 ＋ 0.021 ＝ 0.320，报价快照给的是 0.319。讲义说 theta 来自两部分，波动价值的衰减和利息价值的衰减，就是这两项。</span><span class="l-en">The difference is interest. The hedged position is long one call (paying 21.05) and short 0.5574 shares (receiving 196.41), leaving 175.36 dollars of net cash, which earns 0.021 a day at 4.3%. The model requires this position to break even on an average day, so theta has to offset both gamma's average income and this interest: 0.299 + 0.021 = 0.320, and the quote snapshot gives 0.319. The lecture notes say theta comes from two parts, the decay of volatility value and the decay of interest value; these are the two terms.</span></p>
   <div class="panel">
-    <svg id="ver" viewBox="0 0 720 300" role="img" aria-label="5/15 到期各行权价的报价 theta 与公式值"></svg>
+    <svg id="ver" viewBox="0 0 720 300" role="img" aria-label="5/15 到期各行权价的报价 theta 与公式值" data-en-aria-label="Quoted theta and formula values at each strike, 5/15 expiration"></svg>
     <div class="legend">
-      <span><i class="dot" style="background:var(--ink)"></i>报价的 theta</span>
-      <span style="color:var(--result)"><i class="dash"></i>½σ²S²Γ ÷ 365（gamma 那一项）</span>
-      <span><i class="ln" style="background:var(--control)"></i>再加上利息</span>
+      <span><span class="l-zh"><i class="dot" style="background:var(--ink)"></i>报价的 theta</span><span class="l-en"><i class="dot" style="background:var(--ink)"></i>Quoted theta</span></span>
+      <span style="color:var(--result)"><span class="l-zh"><i class="dash"></i>½σ²S²Γ ÷ 365（gamma 那一项）</span><span class="l-en"><i class="dash"></i>½σ²S²Γ ÷ 365 (the gamma term)</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--control)"></i>再加上利息</span><span class="l-en"><i class="ln" style="background:var(--control)"></i>Plus interest</span></span>
     </div>
   </div>
-  <p>整条 5/15 链都这样：300 到 410 之间，gamma 那一项占报价 theta 的 88% 到 97%，加上利息后和报价最多差 0.006。图最左边更深的实值档差得多一些，295 差 0.008，290 差 0.012。实值越深，delta 越大，对冲时卖出的股票越多，手里的现金越多，利息那一项越大。</p>
-  <p class="tiny">图里每个行权价用的是报价快照算希腊字母时用的那个隐含波动率（350 这档 46.2%），所以 350 的 gamma 项是 0.298，比上面按 46.3% 算的少 0.001。</p>
-  <p>讲义有一张表，列出同一个标的各行权价期权的模型价值和希腊字母，讲义叫它<span class="sym" data-say="risk matrix。讲义里的一张表：同一个标的、同一个到期日，每个行权价的市价、模型价值、delta、gamma、theta、vega 排在一起。">风险矩阵</span>。它也对得上：标的 99.50，波动率 25%，利率 6%，离到期 60 天，100 call 的模型价值（讲义叫<span class="sym" data-say="theoretical value。用定价模型算出来的期权价值，就是本页说的模型值，不是市场报价。">理论值</span>）4.26，delta 54，gamma 3.9（小数 0.039），theta −.0416。gamma 项 ½ × 0.25² × 99.5² × 0.039 ÷ 365 ＝ 0.0331，利息 6% × (99.5 × 0.54 − 4.26) ÷ 365 ＝ 0.0081，合计 0.0412。</p>
+  <p><span class="l-zh">整条 5/15 链都这样：300 到 410 之间，gamma 那一项占报价 theta 的 88% 到 97%，加上利息后和报价最多差 0.006。图最左边更深的实值档差得多一些，295 差 0.008，290 差 0.012。实值越深，delta 越大，对冲时卖出的股票越多，手里的现金越多，利息那一项越大。</span><span class="l-en">The whole 5/15 chain works this way: between 300 and 410, the gamma term makes up 88% to 97% of the quoted theta, and with interest added it differs from the quote by at most 0.006. The deeper in-the-money strikes at the far left of the chart differ a bit more: 0.008 at 295, 0.012 at 290. The deeper in the money, the larger the delta, the more stock is sold to hedge, the more cash is on hand, and the larger the interest term.</span></p>
+  <p class="tiny"><span class="l-zh">图里每个行权价用的是报价快照算希腊字母时用的那个隐含波动率（350 这档 46.2%），所以 350 的 gamma 项是 0.298，比上面按 46.3% 算的少 0.001。</span><span class="l-en">For each strike the chart uses the implied volatility the quote snapshot used to compute the Greeks (46.2% for 350), so the gamma term at 350 is 0.298, 0.001 less than the figure above computed with 46.3%.</span></p>
+  <p><span class="l-zh">讲义有一张表，列出同一个标的各行权价期权的模型价值和希腊字母，讲义叫它<span class="sym" data-say="risk matrix。讲义里的一张表：同一个标的、同一个到期日，每个行权价的市价、模型价值、delta、gamma、theta、vega 排在一起。">风险矩阵</span>。它也对得上：标的 99.50，波动率 25%，利率 6%，离到期 60 天，100 call 的模型价值（讲义叫<span class="sym" data-say="theoretical value。用定价模型算出来的期权价值，就是本页说的模型值，不是市场报价。">理论值</span>）4.26，delta 54，gamma 3.9（小数 0.039），theta −.0416。gamma 项 ½ × 0.25² × 99.5² × 0.039 ÷ 365 ＝ 0.0331，利息 6% × (99.5 × 0.54 − 4.26) ÷ 365 ＝ 0.0081，合计 0.0412。</span><span class="l-en">The lecture notes have a table listing the model values and Greeks of options at each strike on the same underlying, which they call the <span class="sym" data-say="Risk matrix: a table in the lecture notes listing, for the same underlying and the same expiration, each strike's market price, model value, delta, gamma, theta and vega side by side.">risk matrix</span>. It checks out too: underlying 99.50, volatility 25%, rate 6%, 60 days to expiration; the 100 call's model value (the lecture notes call it the <span class="sym" data-say="Theoretical value: the option value computed with a pricing model, which this page calls the model value; not a market quote.">theoretical value</span>) is 4.26, with delta 54, gamma 3.9 (0.039 as a decimal) and theta −.0416. Gamma term ½ × 0.25² × 99.5² × 0.039 ÷ 365 = 0.0331, interest 6% × (99.5 × 0.54 − 4.26) ÷ 365 = 0.0081, total 0.0412.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>逐日账本：买 gamma 付 theta</h2>
-  <p class="sub">买入 350 call，每天收盘按新的 delta 调一次股票，把方向对冲掉（4.1 讲具体怎么调）。这样每一天只剩两笔账：gamma 赚的 ½ × Γ × (ΔS)²，和付掉的租金。</p>
+  <h2><span class="l-zh"><span class="n">四</span>逐日账本：买 gamma 付 theta</span><span class="l-en"><span class="n">4</span>Daily ledger: buy gamma, pay theta</span></h2>
+  <p class="sub"><span class="l-zh">买入 350 call，每天收盘按新的 delta 调一次股票，把方向对冲掉（4.1 讲具体怎么调）。这样每一天只剩两笔账：gamma 赚的 ½ × Γ × (ΔS)²，和付掉的租金。</span><span class="l-en">Buy the 350 call and adjust the stock once at each close to the new delta, hedging out the direction (4.1 covers how to adjust). Each day then leaves only two entries: what gamma earned, ½ × Γ × (ΔS)², and the rent paid.</span></p>
 
-  <h3>回本的门槛是一个标准差</h3>
-  <p>gamma 赚的等于租金，就是 ½ × Γ × (ΔS)² ＝ ½ × Γ × (S × σ ÷ 16)²。两边的 ½ × Γ 消掉：</p>
+  <h3><span class="l-zh">回本的门槛是一个标准差</span><span class="l-en">The break-even threshold is one standard deviation</span></h3>
+  <p><span class="l-zh">gamma 赚的等于租金，就是 ½ × Γ × (ΔS)² ＝ ½ × Γ × (S × σ ÷ 16)²。两边的 ½ × Γ 消掉：</span><span class="l-en">Gamma's earnings equal the rent when ½ × Γ × (ΔS)² = ½ × Γ × (S × σ ÷ 16)². The ½ × Γ on both sides cancels:</span></p>
   <div class="formula">
-    <div class="math">回本的一天：|ΔS| ＝ S × σ ÷ 16</div>
-    <div class="gloss">当天的涨跌正好是一个标准差时，gamma 赚的等于租金；超过就赚，不到就亏</div>
-    <div class="note">门槛和 gamma 大小无关：gamma 大的期权赚得多，租金也同比例贵</div>
+    <div class="math"><span class="l-zh">回本的一天：|ΔS| ＝ S × σ ÷ 16</span><span class="l-en">Break-even day: |ΔS| = S × σ ÷ 16</span></div>
+    <div class="gloss"><span class="l-zh">当天的涨跌正好是一个标准差时，gamma 赚的等于租金；超过就赚，不到就亏</span><span class="l-en">When the day's move is exactly one standard deviation, gamma earns as much as the rent; above it you make money, below it you lose</span></div>
+    <div class="note"><span class="l-zh">门槛和 gamma 大小无关：gamma 大的期权赚得多，租金也同比例贵</span><span class="l-en">The threshold does not depend on the size of gamma: options with large gamma earn more, and their rent is proportionally higher</span></div>
   </div>
-  <p>按入场时的隐含波动率 46.3%，一天的一个标准差是 2.89%。1.2 数过：之后 24 天里有 8 天超过它。</p>
-  <p>下面的账本有两种记法。第一种先把 gamma 固定在入场时的 0.00820，租金按 1.2 的口诀按交易日摊（一年 256 份）：一年 109.12 ÷ 256 ≈ 每个交易日 0.426（只算 gamma 那一项）。这笔租金是 ½ × Γ × (S × 2.89%)²，随股价的平方变：从入场的 0.43 涨到 5 月中的 0.68。这样只看涨跌的作用。第二种用真实的 350 call：每天用当天收盘报价里的 gamma 和 theta，theta 按日历日收。</p>
+  <p><span class="l-zh">按入场时的隐含波动率 46.3%，一天的一个标准差是 2.89%。1.2 数过：之后 24 天里有 8 天超过它。</span><span class="l-en">At the entry implied volatility of 46.3%, one standard deviation for a day is 2.89%. 1.2 counted it: 8 of the next 24 days exceeded it.</span></p>
+  <p><span class="l-zh">下面的账本有两种记法。第一种先把 gamma 固定在入场时的 0.00820，租金按 1.2 的口诀按交易日摊（一年 256 份）：一年 109.12 ÷ 256 ≈ 每个交易日 0.426（只算 gamma 那一项）。这笔租金是 ½ × Γ × (S × 2.89%)²，随股价的平方变：从入场的 0.43 涨到 5 月中的 0.68。这样只看涨跌的作用。第二种用真实的 350 call：每天用当天收盘报价里的 gamma 和 theta，theta 按日历日收。</span><span class="l-en">The ledger below can be kept two ways. The first fixes gamma at the entry value of 0.00820 and spreads rent over trading days by the mental-math rule from 1.2 (256 a year): 109.12 a year ÷ 256 ≈ 0.426 per trading day (the gamma term only). This rent is ½ × Γ × (S × 2.89%)², which changes with the square of the stock price: from 0.43 at entry to 0.68 in mid-May. This way only the moves matter. The second uses the real 350 call: each day takes the gamma and theta from that day's closing quotes, with theta charged by calendar day.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="a5Seg">
-        <button data-m="A" aria-pressed="true">gamma 固定在入场值</button>
-        <button data-m="B" aria-pressed="false">真实的 350 call</button>
+        <button data-m="A" aria-pressed="true"><span class="l-zh">gamma 固定在入场值</span><span class="l-en">Gamma fixed at entry value</span></button>
+        <button data-m="B" aria-pressed="false"><span class="l-zh">真实的 350 call</span><span class="l-en">Real 350 call</span></button>
       </div>
-      <button class="btn ghost" id="a5Play">逐天播放</button>
+      <button class="btn ghost" id="a5Play"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button>
     </div>
-    <svg id="a5" viewBox="0 0 720 410" role="img" aria-label="24 个交易日，每天 gamma 赚的与付的租金，以及累计"></svg>
+    <svg id="a5" viewBox="0 0 720 410" role="img" aria-label="24 个交易日，每天 gamma 赚的与付的租金，以及累计" data-en-aria-label="24 trading days: what gamma earned and the rent paid each day, and the cumulative total"></svg>
     <div class="legend">
-      <span><i style="background:var(--result)"></i>向上：gamma 赚的 ½Γ(ΔS)²</span>
-      <span><i style="background:var(--control)"></i>向下：租金</span>
-      <span>柱顶数字：当天涨跌是几个标准差（只标超过 1 的日子）</span>
-      <span><i class="ln" style="background:var(--ink)"></i>下图：累计净额</span>
+      <span><span class="l-zh"><i style="background:var(--result)"></i>向上：gamma 赚的 ½Γ(ΔS)²</span><span class="l-en"><i style="background:var(--result)"></i>Up: gamma earned ½Γ(ΔS)²</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>向下：租金</span><span class="l-en"><i style="background:var(--control)"></i>Down: rent</span></span>
+      <span><span class="l-zh">柱顶数字：当天涨跌是几个标准差（只标超过 1 的日子）</span><span class="l-en">Number above a bar: the day's move in standard deviations (only days above 1)</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--ink)"></i>下图：累计净额</span><span class="l-en"><i class="ln" style="background:var(--ink)"></i>Lower chart: cumulative net</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="a5D"></div><div class="d2" id="a5Db"></div></div>
-      <div class="stat"><div class="k">当天涨跌</div><div class="d" id="a5M"></div><div class="d2" id="a5Mb"></div></div>
-      <div class="stat"><div class="k">gamma 赚 / 租金</div><div class="d" id="a5G"></div><div class="d2" id="a5Gb"></div></div>
-      <div class="stat"><div class="k">累计净额</div><div class="d" id="a5C"></div><div class="d2" id="a5Cb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="a5D"></div><div class="d2" id="a5Db"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">当天涨跌</span><span class="l-en">Day's move</span></div><div class="d" id="a5M"></div><div class="d2" id="a5Mb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">gamma 赚 / 租金</span><span class="l-en">Gamma earned / rent</span></div><div class="d" id="a5G"></div><div class="d2" id="a5Gb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">累计净额</span><span class="l-en">Cumulative net</span></div><div class="d" id="a5C"></div><div class="d2" id="a5Cb"></div></div>
     </div>
     <div class="say plain" id="a5Say"></div>
   </div>
 
-  <p>账本最后赚还是亏，看这段时间的实际波动比买入时付的隐含波动高还是低。4.2 从这里接着讲盈亏平衡波动率。</p>
+  <p><span class="l-zh">账本最后赚还是亏，看这段时间的实际波动比买入时付的隐含波动高还是低。4.2 从这里接着讲盈亏平衡波动率。</span><span class="l-en">Whether the ledger ends up ahead or behind depends on whether the actual volatility over this period was higher or lower than the implied volatility paid at purchase. 4.2 picks up from here with break-even volatility.</span></p>
 
-  <h3>横盘时买方慢慢亏</h3>
-  <p>4/24 到 5/6 这 9 个交易日，TSLA 每天都没动到一个标准差，最大的一天 2.37%。第一种账本在这 9 天里天天付租：gamma 只赚了 1.16，租金付了 4.49，净亏 3.34。</p>
-  <p>这 9 天 TSLA 其实从 373.69 涨到 398.62，涨了 6.67%。如果这 6.67% 在一天里走完，是 2.31 个标准差，gamma 那一天就赚 2.55，是当天租金的 5.3 倍。gamma 只按每一天动多大算钱，不看累计走了多远。<b>横盘和慢慢走，对买方是一样的：每天付租，等不来大动的日子。</b></p>
+  <h3><span class="l-zh">横盘时买方慢慢亏</span><span class="l-en">When the price goes sideways, the buyer slowly loses</span></h3>
+  <p><span class="l-zh">4/24 到 5/6 这 9 个交易日，TSLA 每天都没动到一个标准差，最大的一天 2.37%。第一种账本在这 9 天里天天付租：gamma 只赚了 1.16，租金付了 4.49，净亏 3.34。</span><span class="l-en">In the 9 trading days from 4/24 to 5/6, TSLA never moved one standard deviation in a day; the largest day was 2.37%. In the first ledger, those 9 days paid rent every day: gamma earned only 1.16, rent paid was 4.49, a net loss of 3.34.</span></p>
+  <p><span class="l-zh">这 9 天 TSLA 其实从 373.69 涨到 398.62，涨了 6.67%。如果这 6.67% 在一天里走完，是 2.31 个标准差，gamma 那一天就赚 2.55，是当天租金的 5.3 倍。gamma 只按每一天动多大算钱，不看累计走了多远。<b>横盘和慢慢走，对买方是一样的：每天付租，等不来大动的日子。</b></span><span class="l-en">Over those 9 days TSLA actually rose from 373.69 to 398.62, up 6.67%. Had that 6.67% happened in one day, it would be 2.31 standard deviations, and gamma would have earned 2.55 that day, 5.3 times that day's rent. Gamma pays only by how big each day's move is, not by how far the price has gone in total. <b>Going sideways and drifting slowly are the same for the buyer: rent every day, and the big days never come.</b></span></p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>收租还是付租</h2>
-  <p class="sub">gamma 为正，theta 就为负：在付租，等标的大动。gamma 为负，theta 就为正：在收租，怕标的大动。看一个就知道另一个。</p>
+  <h2><span class="l-zh"><span class="n">五</span>收租还是付租</span><span class="l-en"><span class="n">5</span>Collecting rent or paying rent</span></h2>
+  <p class="sub"><span class="l-zh">gamma 为正，theta 就为负：在付租，等标的大动。gamma 为负，theta 就为正：在收租，怕标的大动。看一个就知道另一个。</span><span class="l-en">With positive gamma, theta is negative: you are paying rent and waiting for a big move. With negative gamma, theta is positive: you are collecting rent and afraid of a big move. Knowing one tells you the other.</span></p>
   <div class="tscroll">
   <table>
-    <thead><tr><th>仓位</th><th>gamma</th><th>theta</th><th class="txt">收租还是付租</th><th class="txt">希望市场</th></tr></thead>
+    <thead><tr><th><span class="l-zh">仓位</span><span class="l-en">Position</span></th><th>gamma</th><th>theta</th><th class="txt"><span class="l-zh">收租还是付租</span><span class="l-en">Collects or pays rent</span></th><th class="txt"><span class="l-zh">希望市场</span><span class="l-en">Hopes for</span></th></tr></thead>
     <tbody>
-      <tr><td>买 call、买 put</td><td class="pos">＋</td><td class="neg">−</td><td class="txt">付租</td><td class="txt">大动、快动</td></tr>
-      <tr><td>卖 call、卖 put</td><td class="neg">−</td><td class="pos">＋</td><td class="txt">收租</td><td class="txt">不动、慢动</td></tr>
-      <tr><td>标的本身</td><td>0</td><td>0</td><td class="txt">都不是</td><td class="txt">只看方向</td></tr>
-      <tr><td>买 350 call 再对冲（本页账本）</td><td class="pos">+0.0082</td><td class="neg">−0.319</td><td class="txt">付租</td><td class="txt">每天动超过 2.89%</td></tr>
-      <tr><td>卖出这张 350 call 的人</td><td class="neg">−0.0082</td><td class="pos">+0.319</td><td class="txt">收租</td><td class="txt">每天动不到 2.89%</td></tr>
-      <tr><td>讲义：卖 10 张 95 call、买 7 手标的</td><td class="neg">−33</td><td class="pos">+0.387</td><td class="txt">收租</td><td class="txt">不动、慢动</td></tr>
+      <tr><td><span class="l-zh">买 call、买 put</span><span class="l-en">Long call, long put</span></td><td class="pos"><span class="l-zh">＋</span><span class="l-en">+</span></td><td class="neg">−</td><td class="txt"><span class="l-zh">付租</span><span class="l-en">Pays rent</span></td><td class="txt"><span class="l-zh">大动、快动</span><span class="l-en">Big, fast moves</span></td></tr>
+      <tr><td><span class="l-zh">卖 call、卖 put</span><span class="l-en">Short call, short put</span></td><td class="neg">−</td><td class="pos"><span class="l-zh">＋</span><span class="l-en">+</span></td><td class="txt"><span class="l-zh">收租</span><span class="l-en">Collects rent</span></td><td class="txt"><span class="l-zh">不动、慢动</span><span class="l-en">Quiet, slow moves</span></td></tr>
+      <tr><td><span class="l-zh">标的本身</span><span class="l-en">The underlying itself</span></td><td>0</td><td>0</td><td class="txt"><span class="l-zh">都不是</span><span class="l-en">Neither</span></td><td class="txt"><span class="l-zh">只看方向</span><span class="l-en">Direction only</span></td></tr>
+      <tr><td><span class="l-zh">买 350 call 再对冲（本页账本）</span><span class="l-en">Long 350 call, hedged (this page's ledger)</span></td><td class="pos">+0.0082</td><td class="neg">−0.319</td><td class="txt"><span class="l-zh">付租</span><span class="l-en">Pays rent</span></td><td class="txt"><span class="l-zh">每天动超过 2.89%</span><span class="l-en">Daily moves over 2.89%</span></td></tr>
+      <tr><td><span class="l-zh">卖出这张 350 call 的人</span><span class="l-en">Whoever sold this 350 call</span></td><td class="neg">−0.0082</td><td class="pos">+0.319</td><td class="txt"><span class="l-zh">收租</span><span class="l-en">Collects rent</span></td><td class="txt"><span class="l-zh">每天动不到 2.89%</span><span class="l-en">Daily moves under 2.89%</span></td></tr>
+      <tr><td><span class="l-zh">讲义：卖 10 张 95 call、买 7 手标的</span><span class="l-en">Lecture notes: short ten 95 calls, long 7 lots of the underlying</span></td><td class="neg">−33</td><td class="pos">+0.387</td><td class="txt"><span class="l-zh">收租</span><span class="l-en">Collects rent</span></td><td class="txt"><span class="l-zh">不动、慢动</span><span class="l-en">Quiet, slow moves</span></td></tr>
     </tbody>
   </table>
   </div>
-  <p>卖出 350 call 的人，账本正好是第四节反过来：平静的日子每天收租，大动的日子付出 ½ × Γ × (ΔS)²。4/15 TSLA 涨了 7.58%，是 2.62 个标准差。按第一种账本（gamma 固定在 0.0082），卖方这一天付出 3.13，是入场时一个交易日租金 0.426 的 7.3 倍。</p>
-  <p>讲义那个仓位：卖出 10 张 95 call（每张 delta 73、gamma 3.3、theta −.0387），再买 7 手标的。讲义的 1 手标的是 100 股，和 1 张期权合约对应的股数一样（1.1），整数写法下它的 delta 是 100，gamma 和 theta 都是 0。各腿相加：delta −10 × 73 ＋ 7 × 100 ＝ −30；gamma −10 × 3.3 ＝ −33；theta −10 × (−.0387) ＝ +0.387。市场不动，这个仓位每天收 0.387。可是标的涨 1 美元，delta 从 −30 变成 −63，空头自己变大，再涨亏得更快；跌也一样，delta 往正的方向走，越跌越不利。标的一天动 3 美元，gamma 那一项亏 ½ × 0.33 × 3² ≈ 1.49（gamma 33 按小数写是 0.33），约 3.8 天的租金。讲义的原话：负 gamma 想要市场平稳，正 gamma 想要市场大动。</p>
-  <p>多腿仓位，把各腿的 gamma 加起来看总数（2.4 讲加法）：总 gamma 为正，就在付租；为负，就在收租。</p>
+  <p><span class="l-zh">卖出 350 call 的人，账本正好是第四节反过来：平静的日子每天收租，大动的日子付出 ½ × Γ × (ΔS)²。4/15 TSLA 涨了 7.58%，是 2.62 个标准差。按第一种账本（gamma 固定在 0.0082），卖方这一天付出 3.13，是入场时一个交易日租金 0.426 的 7.3 倍。</span><span class="l-en">For whoever sold the 350 call, the ledger is exactly section 4 reversed: on calm days they collect rent, and on big days they pay out ½ × Γ × (ΔS)². On 4/15 TSLA rose 7.58%, 2.62 standard deviations. In the first ledger (gamma fixed at 0.0082), the seller paid out 3.13 that day, 7.3 times one trading day's rent at entry, 0.426.</span></p>
+  <p><span class="l-zh">讲义那个仓位：卖出 10 张 95 call（每张 delta 73、gamma 3.3、theta −.0387），再买 7 手标的。讲义的 1 手标的是 100 股，和 1 张期权合约对应的股数一样（1.1），整数写法下它的 delta 是 100，gamma 和 theta 都是 0。各腿相加：delta −10 × 73 ＋ 7 × 100 ＝ −30；gamma −10 × 3.3 ＝ −33；theta −10 × (−.0387) ＝ +0.387。市场不动，这个仓位每天收 0.387。可是标的涨 1 美元，delta 从 −30 变成 −63，空头自己变大，再涨亏得更快；跌也一样，delta 往正的方向走，越跌越不利。标的一天动 3 美元，gamma 那一项亏 ½ × 0.33 × 3² ≈ 1.49（gamma 33 按小数写是 0.33），约 3.8 天的租金。讲义的原话：负 gamma 想要市场平稳，正 gamma 想要市场大动。</span><span class="l-en">The lecture notes' position: short ten 95 calls (each with delta 73, gamma 3.3, theta −.0387), and long 7 lots of the underlying. In the lecture notes, 1 lot of the underlying is 100 shares, the same number of shares as one option contract covers (1.1); in whole number format its delta is 100, and its gamma and theta are both 0. Adding up the legs: delta −10 × 73 + 7 × 100 = −30; gamma −10 × 3.3 = −33; theta −10 × (−.0387) = +0.387. If the market does not move, the position collects 0.387 a day. But if the underlying rises 1 dollar, delta goes from −30 to −63: the short grows on its own, and a further rise loses money faster. A fall works the same way: delta moves in the positive direction, and the further it falls, the worse it gets. If the underlying moves 3 dollars in a day, the gamma term loses ½ × 0.33 × 3² ≈ 1.49 (gamma 33 is 0.33 as a decimal), about 3.8 days of rent. In the lecture notes' words: negative gamma wants a calm market, positive gamma wants big moves.</span></p>
+  <p><span class="l-zh">多腿仓位，把各腿的 gamma 加起来看总数（2.4 讲加法）：总 gamma 为正，就在付租；为负，就在收租。</span><span class="l-en">For a multi-leg position, add up the gammas of all the legs and look at the total (2.4 covers the addition): if the total gamma is positive, you are paying rent; if it is negative, you are collecting rent.</span></p>
 
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">六</span>费曼检验</span><span class="l-en"><span class="n">6</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">Γ</div><div class="t">gamma，读作「伽马」。标的每动 1 美元，delta 变多少。买期权为正，卖期权为负。平值、临近到期时最大。</div></div>
-      <div class="gl"><div class="s">Θ</div><div class="t">theta，读作「西塔」。只过一天、其他不变时，期权价值变多少。买期权为负，本页叫它租金。</div></div>
-      <div class="gl"><div class="s">Δ</div><div class="t">delta。标的动 1 美元，期权价值动多少（2.1）。</div></div>
-      <div class="gl"><div class="s">ΔS</div><div class="t">标的这一天动了多少美元。这里的 Δ 表示「变化量」，和 delta 用的是同一个希腊字母，但不是 delta。</div></div>
-      <div class="gl"><div class="s">S</div><div class="t">标的价格，本页是 TSLA 的股价。</div></div>
-      <div class="gl"><div class="s">σ</div><div class="t">年化波动率（1.2）。本页用买入时的隐含波动率 46.3%。</div></div>
-      <div class="gl"><div class="s">½Γ(ΔS)²</div><div class="t">对冲掉方向之后，标的动了 ΔS 那一天 gamma 带来的收入。涨跌都为正，按幅度的平方增长。</div></div>
-      <div class="gl"><div class="s">½σ²S²Γ</div><div class="t">一年的租金。按日历日除以 365（报价快照里的 theta），按交易日除以 256（1.2 的口诀）。</div></div>
-      <div class="gl"><div class="s">S × σ ÷ 16</div><div class="t">一天的一个标准差（1.2）。对冲后的买方，当天涨跌超过它就赚，不到就亏。</div></div>
-      <div class="gl"><div class="s">内在价值</div><div class="t">现在马上行权能拿到的钱。call 是 max(S − 行权价, 0)（1.1）。</div></div>
-      <div class="gl"><div class="s">时间价值</div><div class="t">期权价格减去内在价值，到期时归零。</div></div>
-      <div class="gl"><div class="s">平值</div><div class="t">行权价离标的价格最近的期权。gamma、theta 都在这里最大。</div></div>
-      <div class="gl"><div class="s">对冲</div><div class="t">买期权的同时卖出 Δ 股标的，把方向的盈亏抵掉（2.1）。</div></div>
-      <div class="gl"><div class="s">收租 / 付租</div><div class="t">theta 为正是收租（卖期权），为负是付租（买期权）。</div></div>
-      <div class="gl"><div class="s">日历日 / 交易日</div><div class="t">日历日一年 365 天，周末也算；交易日一年约 256 天，只算开市的日子。</div></div>
-      <div class="gl"><div class="s">标准差 / 钟形分布</div><div class="t">标准差是一组数离中心的典型距离：每个数离中心的距离平方、求平均、再开方（1.2）。钟形分布里约三分之二的数落在一个标准差以内。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%。报价快照算希腊字母时用的是另一列平滑隐含波动率（把各行权价的隐含波动率拟合成一条曲线后的值），350 这档是 46.2%。</div></div>
-      <div class="gl"><div class="s">实值 / 深度实值 / 虚值</div><div class="t">call 的行权价低于股价是实值，低得多是深度实值，delta 接近 1；行权价高于股价是虚值（2.1）。</div></div>
-      <div class="gl"><div class="s">欧式 / 美式</div><div class="t">欧式期权只能在到期那天行权；美式随时可以行权。TSLA 的个股期权是美式。</div></div>
-      <div class="gl"><div class="s">模型值 / 理论值</div><div class="t">用定价公式（本页是 Black-Scholes，2.1）算出来的数，不是市场报价。讲义把期权的模型价值叫理论值。</div></div>
-      <div class="gl"><div class="s">风险矩阵</div><div class="t">讲义里的一张表：同一个标的、同一个到期日，各行权价期权的市价、理论值和希腊字母。</div></div>
-      <div class="gl"><div class="s">期权链</div><div class="t">同一个标的、同一个到期日，各个行权价的期权排成的一张表（2.1）。本页的「5/15 链」是 5/15 到期的那一条。</div></div>
-      <div class="gl"><div class="s">整数写法 / 1 手标的</div><div class="t">讲义把 delta 0.50 写成 50，gamma 跟着写成整数（3.3 就是小数的 0.033）。讲义的 1 手标的是 100 股，和 1 张期权合约对应的股数一样，整数写法下 delta 是 100。</div></div>
+      <div class="gl"><div class="s">Γ</div><div class="t"><span class="l-zh">gamma，读作「伽马」。标的每动 1 美元，delta 变多少。买期权为正，卖期权为负。平值、临近到期时最大。</span><span class="l-en">Gamma, the Greek letter Γ. When the underlying moves 1 dollar, how much delta changes. Positive when you buy an option, negative when you sell one. Largest at the money and close to expiration.</span></div></div>
+      <div class="gl"><div class="s">Θ</div><div class="t"><span class="l-zh">theta，读作「西塔」。只过一天、其他不变时，期权价值变多少。买期权为负，本页叫它租金。</span><span class="l-en">Theta, the Greek letter Θ. With one day passing and nothing else changing, how much the option value changes. Negative when you buy an option; this page calls it rent.</span></div></div>
+      <div class="gl"><div class="s">Δ</div><div class="t"><span class="l-zh">delta。标的动 1 美元，期权价值动多少（2.1）。</span><span class="l-en">Delta. When the underlying moves 1 dollar, how much the option value moves (2.1).</span></div></div>
+      <div class="gl"><div class="s">ΔS</div><div class="t"><span class="l-zh">标的这一天动了多少美元。这里的 Δ 表示「变化量」，和 delta 用的是同一个希腊字母，但不是 delta。</span><span class="l-en">How many dollars the underlying moved on this day. Here Δ means "change"; it is the same Greek letter as delta, but it is not delta.</span></div></div>
+      <div class="gl"><div class="s">S</div><div class="t"><span class="l-zh">标的价格，本页是 TSLA 的股价。</span><span class="l-en">The underlying price; on this page, TSLA's stock price.</span></div></div>
+      <div class="gl"><div class="s">σ</div><div class="t"><span class="l-zh">年化波动率（1.2）。本页用买入时的隐含波动率 46.3%。</span><span class="l-en">Annualized volatility (1.2). This page uses the implied volatility at purchase, 46.3%.</span></div></div>
+      <div class="gl"><div class="s">½Γ(ΔS)²</div><div class="t"><span class="l-zh">对冲掉方向之后，标的动了 ΔS 那一天 gamma 带来的收入。涨跌都为正，按幅度的平方增长。</span><span class="l-en">With direction hedged out, the income gamma brings on a day when the underlying moved ΔS. Positive for both rises and falls, growing with the square of the size.</span></div></div>
+      <div class="gl"><div class="s">½σ²S²Γ</div><div class="t"><span class="l-zh">一年的租金。按日历日除以 365（报价快照里的 theta），按交易日除以 256（1.2 的口诀）。</span><span class="l-en">A year's rent. Divide by 365 for calendar days (theta in the quote snapshot), or by 256 for trading days (the mental-math rule from 1.2).</span></div></div>
+      <div class="gl"><div class="s">S × σ ÷ 16</div><div class="t"><span class="l-zh">一天的一个标准差（1.2）。对冲后的买方，当天涨跌超过它就赚，不到就亏。</span><span class="l-en">One standard deviation for a day (1.2). For a hedged buyer, a day's move above it makes money and below it loses.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">内在价值</span><span class="l-en">Intrinsic value</span></div><div class="t"><span class="l-zh">现在马上行权能拿到的钱。call 是 max(S − 行权价, 0)（1.1）。</span><span class="l-en">What you would get by exercising right now. For a call it is max(S − strike, 0) (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">时间价值</span><span class="l-en">Time value</span></div><div class="t"><span class="l-zh">期权价格减去内在价值，到期时归零。</span><span class="l-en">Option price minus intrinsic value; it goes to zero at expiration.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">平值</span><span class="l-en">At the money</span></div><div class="t"><span class="l-zh">行权价离标的价格最近的期权。gamma、theta 都在这里最大。</span><span class="l-en">The option whose strike is closest to the underlying price. Gamma and theta are both largest here.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">对冲</span><span class="l-en">Hedging</span></div><div class="t"><span class="l-zh">买期权的同时卖出 Δ 股标的，把方向的盈亏抵掉（2.1）。</span><span class="l-en">Buying an option while selling Δ shares of the underlying, so the gains and losses from direction offset (2.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">收租 / 付租</span><span class="l-en">Collecting / paying rent</span></div><div class="t"><span class="l-zh">theta 为正是收租（卖期权），为负是付租（买期权）。</span><span class="l-en">Positive theta is collecting rent (selling options); negative theta is paying rent (buying options).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">日历日 / 交易日</span><span class="l-en">Calendar days / trading days</span></div><div class="t"><span class="l-zh">日历日一年 365 天，周末也算；交易日一年约 256 天，只算开市的日子。</span><span class="l-en">A year has 365 calendar days, weekends included, and about 256 trading days, counting only the days the market is open.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">标准差 / 钟形分布</span><span class="l-en">Standard deviation / bell curve</span></div><div class="t"><span class="l-zh">标准差是一组数离中心的典型距离：每个数离中心的距离平方、求平均、再开方（1.2）。钟形分布里约三分之二的数落在一个标准差以内。</span><span class="l-en">Standard deviation is the typical distance of a set of numbers from their center: square each number's distance from the center, average, and take the square root (1.2). In a bell curve about two-thirds of the numbers fall within one standard deviation.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></div><div class="t"><span class="l-zh">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%。报价快照算希腊字母时用的是另一列平滑隐含波动率（把各行权价的隐含波动率拟合成一条曲线后的值），350 这档是 46.2%。</span><span class="l-en">Volatility backed out from an option's market price (1.2). For the 350 call at entry it was 46.3%. To compute the Greeks, the quote snapshot uses a separate column of smoothed implied volatility (the value after fitting each strike's implied volatility to a curve), 46.2% for the 350 strike.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">实值 / 深度实值 / 虚值</span><span class="l-en">In the money / deep in the money / out of the money</span></div><div class="t"><span class="l-zh">call 的行权价低于股价是实值，低得多是深度实值，delta 接近 1；行权价高于股价是虚值（2.1）。</span><span class="l-en">A call is in the money when the strike is below the stock price, and deep in the money when it is far below, with delta close to 1; it is out of the money when the strike is above the stock price (2.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">欧式 / 美式</span><span class="l-en">European / American</span></div><div class="t"><span class="l-zh">欧式期权只能在到期那天行权；美式随时可以行权。TSLA 的个股期权是美式。</span><span class="l-en">A European option can be exercised only on the expiration date; an American option can be exercised at any time. TSLA's stock options are American.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">模型值 / 理论值</span><span class="l-en">Model value / theoretical value</span></div><div class="t"><span class="l-zh">用定价公式（本页是 Black-Scholes，2.1）算出来的数，不是市场报价。讲义把期权的模型价值叫理论值。</span><span class="l-en">A number computed from a pricing formula (on this page Black-Scholes, 2.1), not a market quote. The lecture notes call an option's model value its theoretical value.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">风险矩阵</span><span class="l-en">Risk matrix</span></div><div class="t"><span class="l-zh">讲义里的一张表：同一个标的、同一个到期日，各行权价期权的市价、理论值和希腊字母。</span><span class="l-en">A table in the lecture notes: for the same underlying and the same expiration, the market price, theoretical value and Greeks of the option at each strike.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期权链</span><span class="l-en">Option chain</span></div><div class="t"><span class="l-zh">同一个标的、同一个到期日，各个行权价的期权排成的一张表（2.1）。本页的「5/15 链」是 5/15 到期的那一条。</span><span class="l-en">A table of the options at every strike for the same underlying and the same expiration (2.1). On this page, "the 5/15 chain" is the one expiring 5/15.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">整数写法 / 1 手标的</span><span class="l-en">Whole number format / 1 lot of the underlying</span></div><div class="t"><span class="l-zh">讲义把 delta 0.50 写成 50，gamma 跟着写成整数（3.3 就是小数的 0.033）。讲义的 1 手标的是 100 股，和 1 张期权合约对应的股数一样，整数写法下 delta 是 100。</span><span class="l-en">The lecture notes write delta 0.50 as 50, and gamma follows as a whole number (3.3 is 0.033 as a decimal). In the lecture notes 1 lot of the underlying is 100 shares, the same number of shares as one option contract covers; in whole number format its delta is 100.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-2-4-portfolio-greeks.html"><b>2.4 组合希腊字母</b></a>：把多腿仓位的 delta、gamma、theta、vega 各自加起来，压成四个数。<a href="station-2-3-vega-rho.html">2.3 vega 与 rho</a> 是和本节并列的另一节，两节都学完再进 2.4。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-2-4-portfolio-greeks.html"><b>2.4 组合希腊字母</b></a>：把多腿仓位的 delta、gamma、theta、vega 各自加起来，压成四个数。<a href="station-2-3-vega-rho.html">2.3 vega 与 rho</a> 是和本节并列的另一节，两节都学完再进 2.4。</span><span class="l-en">Next: <a href="station-2-4-portfolio-greeks.html"><b>2.4 Portfolio Greeks</b></a>: add up the delta, gamma, theta and vega of a multi-leg position separately, reducing it to four numbers. <a href="station-2-3-vega-rho.html">2.3 Vega and rho</a> is a parallel node to this one; finish both before moving on to 2.4.</span></p>
+  <p><span class="l-zh"><a href="./">← 回到课程路线图</a></span><span class="l-en"><a href="./">← Back to the course roadmap</a></span></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
@@ -656,10 +658,10 @@ const A1=(()=>{
     [0,20,40,60,80].forEach(v=>{ g+=line(L,Y1(v),R,Y1(v),'var(--rule)',v?.7:1.2); g+=lab(L-8,Y1(v)+4,v,'var(--ink-faint)','end',10.5); });
     [0,.5,1].forEach(v=>{ g+=line(L,Y2(v),R,Y2(v),'var(--rule)',v===.5?.7:1.1); g+=lab(L-8,Y2(v)+4,v===.5?'0.5':v,'var(--ink-faint)','end',10.5); });
     (NARROW()?[300,340,380,420]:[300,320,340,360,380,400,420]).forEach(v=>{ g+=lab(X(v),B2+18,v,'var(--ink-faint)','middle',10.5); g+=line(X(v),B2,X(v),B2+4,'var(--ink-faint)'); });
-    g+=lab((L+R)/2,B2+38,'TSLA 价格','var(--ink-soft)','middle',11.5);
-    g+=ylab(14,(T1+B1)/2,'期权价值')+ylab(14,(T2+B2)/2,'delta');
+    g+=lab((L+R)/2,B2+38,window.L('TSLA 价格','TSLA price'),'var(--ink-soft)','middle',11.5);
+    g+=ylab(14,(T1+B1)/2,window.L('期权价值','Option value'))+ylab(14,(T2+B2)/2,'delta');
     g+=line(X(K),T1,X(K),B2,'var(--ink-faint)',1,'stroke-dasharray="2 4"');
-    g+=lab(X(K)-6,T1+12,'行权价 350','var(--ink-faint)','end',10.5);
+    g+=lab(X(K)-6,T1+12,window.L('行权价 350','Strike 350'),'var(--ink-faint)','end',10.5);
     g+=poly([[X(lo),Y1(0)],[X(K),Y1(0)],[X(hi),Y1(hi-K)]],'var(--ink-faint)',1.6,'stroke-dasharray="6 5"');
     g+=poly(pts.map(([x,b])=>[X(x),Y1(b.v)]),'var(--ink)',2.4);
     // 切线：斜率 = delta
@@ -667,7 +669,7 @@ const A1=(()=>{
     g+=`<g clip-path="url(#a1c)">${line(tx[0][0],tx[0][1],tx[1][0],tx[1][1],'var(--control)',2.6)}</g>`;
     g+=`<circle cx="${X(s)}" cy="${Y1(m.v)}" r="5" fill="var(--control)"/>`;
     const t1= s<330 ? [X(s)+12,Y1(m.v)-24,'start'] : [X(s)-14,Y1(m.v)-14,'end'];
-    g+=lab(t1[0],Math.max(T1+30,t1[1]),(NARROW()?'斜率 = delta = ':'切线斜率 = delta = ')+m.d.toFixed(3),'var(--control)',t1[2],12,600);
+    g+=lab(t1[0],Math.max(T1+30,t1[1]),(NARROW()?window.L('斜率 = delta = ','Slope = delta = '):window.L('切线斜率 = delta = ','Tangent slope = delta = '))+m.d.toFixed(3),'var(--control)',t1[2],12,600);
     // 下图：delta 与它的切线（斜率 = gamma）
     g+=poly(pts.map(([x,b])=>[X(x),Y2(b.d)]),'var(--ink)',2.4);
     REAL.forEach(r=>{ g+=`<circle cx="${X(r.s)}" cy="${Y2(r.d)}" r="4.5" fill="var(--result)"/>`; });
@@ -678,7 +680,7 @@ const A1=(()=>{
     g+=`<g clip-path="url(#a1d)">${line(dx[0][0],dx[0][1],dx[1][0],dx[1][1],'var(--control)',2.6)}</g>`;
     g+=`<circle cx="${X(s)}" cy="${Y2(m.d)}" r="5" fill="var(--control)"/>`;
     const t2= s<330 ? [X(s)+10,Y2(m.d)-30,'start'] : s>385 ? [X(s)-16,Y2(m.d)-14,'end'] : [X(s)+14,Y2(m.d)+42,'start'];
-    g+=lab(t2[0],Math.max(T2+12,Math.min(B2-6,t2[1])),(NARROW()?'斜率 = gamma = ':'这条线的斜率 = gamma = ')+m.g.toFixed(4),'var(--control)',t2[2],12,600);
+    g+=lab(t2[0],Math.max(T2+12,Math.min(B2-6,t2[1])),(NARROW()?window.L('斜率 = gamma = ','Slope = gamma = '):window.L('这条线的斜率 = gamma = ','Slope of this line = gamma = '))+m.g.toFixed(4),'var(--control)',t2[2],12,600);
     $('a1').innerHTML=g;
     $('a1S').textContent=f2(s); $('a1D').textContent=m.d.toFixed(3); $('a1G').textContent=m.g.toFixed(5);
   }
@@ -697,9 +699,9 @@ const A2=(()=>{
   const ORD=[32,18,7,2], COL={32:'var(--ink-faint)',18:'var(--ink)',7:'var(--result)',2:'var(--control)'};
   const EXPN={32:'5/15',18:'5/1',7:'4/20',2:'4/15'};
   /* 标签放在曲线旁边的空白处：[行权价, 纵坐标, 对齐] */
-  const CFG={g:{max:0.04,ticks:[0,.01,.02,.03,.04],fmt:v=>v===0?'0':v.toFixed(2),val:(c,i)=>c.g[i],pk:v=>v.toFixed(4),word:'最高',title:'gamma',
+  const CFG={g:{max:0.04,ticks:[0,.01,.02,.03,.04],fmt:v=>v===0?'0':v.toFixed(2),val:(c,i)=>c.g[i],pk:v=>v.toFixed(4),word:window.L('最高','peak'),title:'gamma',
                pos:{2:[359,.0352,'start'],7:[371,.0205,'start'],18:[329,.0122,'end'],32:[410,.0092,'end']}},
-             th:{max:1.2,ticks:[0,.3,.6,.9,1.2],fmt:v=>v===0?'0':'−'+v.toFixed(1),val:(c,i)=>-c.th[i],pk:v=>'−'+v.toFixed(2),word:'最大',title:'theta（每天，美元）',
+             th:{max:1.2,ticks:[0,.3,.6,.9,1.2],fmt:v=>v===0?'0':'−'+v.toFixed(1),val:(c,i)=>-c.th[i],pk:v=>'−'+v.toFixed(2),word:window.L('最大','max'),title:window.L('theta（每天，美元）','theta (per day, dollars)'),
                pos:{2:[359,1.06,'start'],7:[372,.56,'start'],18:[331,.50,'end'],32:[300,.66,'start']}}};
   let mode='g'; const st={p:4, playing:false};
   function peak(n){ const c=CURVES[n], cf=CFG[mode]; let bi=0; c.K.forEach((_,i)=>{ if(cf.val(c,i)>cf.val(c,bi)) bi=i; }); return {k:c.K[bi],v:cf.val(c,bi)}; }
@@ -710,7 +712,7 @@ const A2=(()=>{
     let g='';
     cf.ticks.forEach(v=>{ g+=line(L,Y(v),R,Y(v),'var(--rule)',v===0?1.2:.7); g+=lab(L-8,Y(v)+4,cf.fmt(v),'var(--ink-faint)','end',10.5); });
     for(let k=300;k<=410;k+=10){ g+=line(X(k),B,X(k),B+4,'var(--ink-faint)'); if(k%(NARROW()?40:20)===0||(!NARROW()&&k===410)) g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',10.5); }
-    g+=lab((L+R)/2,B+38,'行权价','var(--ink-soft)','middle',11.5);
+    g+=lab((L+R)/2,B+38,window.L('行权价','Strike'),'var(--ink-soft)','middle',11.5);
     g+=ylab(12,(T+B)/2,cf.title);
     g+=line(X(S0),T,X(S0),B,'var(--ink-faint)',1,'stroke-dasharray="3 4"');
     g+=lab(X(S0)-6,T+10,'TSLA 352.36','var(--ink-faint)','end',10.5);
@@ -723,7 +725,7 @@ const A2=(()=>{
       if(f>=1){
         const pk=peak(n), [kl,yl,an]=cf.pos[n];
         g+=`<circle cx="${X(pk.k)}" cy="${Y(pk.v)}" r="3.6" fill="${COL[n]}"/>`;
-        g+=lab(X(kl),Y(yl),NARROW()?`${n} 天`:`${n} 天 · ${cf.word} ${cf.pk(pk.v)}`,COL[n],an,11.5,600);
+        g+=lab(X(kl),Y(yl),NARROW()?window.L(`${n} 天`,`${n} days`):window.L(`${n} 天 · ${cf.word} ${cf.pk(pk.v)}`,`${n} days · ${cf.word} ${cf.pk(pk.v)}`),COL[n],an,11.5,600);
       }
     });
     $('a2').innerHTML=g;
@@ -733,7 +735,7 @@ const A2=(()=>{
     if(reduced){ st.p=4; draw(); return; }
     st.p=0; runLoop(st,16.7,()=>{ st.p=Math.min(4,st.p+16.7/900); },draw,()=>st.p>=4);
   }
-  function legend(){ $('a2Leg').innerHTML=ORD.map(n=>{ const pk=peak(n); return `<span><i class="ln" style="background:${COL[n]}"></i>离到期 ${n} 天（${EXPN[n]} 到期），${CFG[mode].word} ${CFG[mode].pk(pk.v)}</span>`; }).join(''); }
+  function legend(){ $('a2Leg').innerHTML=ORD.map(n=>{ const pk=peak(n); return window.L(`<span><i class="ln" style="background:${COL[n]}"></i>离到期 ${n} 天（${EXPN[n]} 到期），${CFG[mode].word} ${CFG[mode].pk(pk.v)}</span>`,`<span><i class="ln" style="background:${COL[n]}"></i>${n} days to expiration (expires ${EXPN[n]}), ${CFG[mode].word} ${CFG[mode].pk(pk.v)}</span>`); }).join(''); }
   legend();
   segOn('a2Seg',d=>{ mode=d.m; legend(); start(); });
   $('a2Play').addEventListener('click',start);
@@ -754,11 +756,11 @@ function drawG350(){
   g+=poly(b,'var(--result)',2.4); g+=poly(a,'var(--control)',2.4);
   a.forEach(p=>g+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--control)"/>`);
   b.forEach(p=>g+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--result)"/>`);
-  g+=lab(X(23)+8,Y(ATM[23][1])+4,'平值','var(--result)','start',11.5,600);
+  g+=lab(X(23)+8,Y(ATM[23][1])+4,window.L('平值','ATM'),'var(--result)','start',11.5,600);
   g+=lab(X(23)+8,Y(ATM[23][1])+19,'0.0295','var(--result)','start',11);
   g+=lab(X(23)+8,Y(0)-4,'350','var(--control)','start',11.5,600);
-  g+=lab(X(2)+4,Y(C350[2][2])+22,NARROW()?'4/15：0.0047':'4/15 TSLA 392：0.0047','var(--control)','start',11);
-  g+=lab(X(0)+6,Y(C350[0][2])-12,NARROW()?'4/13：0.0082':'4/13 两者都是 0.0082','var(--ink-soft)','start',11);
+  g+=lab(X(2)+4,Y(C350[2][2])+22,NARROW()?window.L('4/15：0.0047','4/15: 0.0047'):window.L('4/15 TSLA 392：0.0047','4/15 TSLA 392: 0.0047'),'var(--control)','start',11);
+  g+=lab(X(0)+6,Y(C350[0][2])-12,NARROW()?window.L('4/13：0.0082','4/13: 0.0082'):window.L('4/13 两者都是 0.0082','4/13 both 0.0082'),'var(--ink-soft)','start',11);
   $('g350').innerHTML=g;
 }
 
@@ -780,8 +782,8 @@ const A3=(()=>{
     [0,5,10,15,20].forEach(v=>{ g+=line(L,Y1(v),R,Y1(v),'var(--rule)',v?.7:1.2); g+=lab(L-8,Y1(v)+4,v,'var(--ink-faint)','end',10.5); });
     [0,1,2,3].forEach(v=>{ g+=line(L,Y2(v),R,Y2(v),'var(--rule)',v?.7:1.2); g+=lab(L-8,Y2(v)+4,v?'−'+v:'0','var(--ink-faint)','end',10.5); });
     (NARROW()?[32,24,16,8,0]:[32,28,24,20,16,12,8,4,0]).forEach(k=>{ g+=line(X(k),B2,X(k),B2+4,'var(--ink-faint)'); g+=lab(X(k),B2+18,k,'var(--ink-faint)','middle',10.5); });
-    g+=lab((L+R)/2,B2+38,'离到期还剩几天','var(--ink-soft)','middle',11.5);
-    g+=ylab(12,(T1+B1)/2,'期权价值')+ylab(12,(T2+B2)/2,'theta（每天）');
+    g+=lab((L+R)/2,B2+38,window.L('离到期还剩几天','Days to expiration'),'var(--ink-soft)','middle',11.5);
+    g+=ylab(12,(T1+B1)/2,window.L('期权价值','Option value'))+ylab(12,(T2+B2)/2,window.L('theta（每天）','theta (per day)'));
     // 上图：价值与时间价值
     const full=[], done=[];
     for(let j=0;j<=32;j++){ full.push([X(32-j),Y1(TVCURVE[j])]); if(j<=p) done.push([X(32-j),Y1(TVCURVE[j])]); }
@@ -792,27 +794,27 @@ const A3=(()=>{
     g+=`<polygon points="${area}" fill="var(--result-bg)"/>`;
     g+=poly(done,'var(--ink)',2.4);
     g+=line(L,Y1(intr),R,Y1(intr),'var(--ink-soft)',1.2,'stroke-dasharray="6 4"');
-    g+=lab(X(31),Y1(intr)-6,'内在价值 2.36','var(--ink-soft)','start',10.5);
+    g+=lab(X(31),Y1(intr)-6,window.L('内在价值 2.36','Intrinsic value 2.36'),'var(--ink-soft)','start',10.5);
     g+=`<circle cx="${X(n)}" cy="${Y1(cv)}" r="5" fill="var(--ink)"/>`;
-    if(n>=0.5) g+=lab(X(n)+(n<10?-10:10),Y1(cv)-10,'时间价值 '+f2(ctv),'var(--result)',n<10?'end':'start',12,600);
+    if(n>=0.5) g+=lab(X(n)+(n<10?-10:10),Y1(cv)-10,window.L('时间价值 ','Time value ')+f2(ctv),'var(--result)',n<10?'end':'start',12,600);
     // 下图：theta
     const tl=thLine.map(([k,v])=>[X(k),Y2(v)]), tdone=thLine.filter(([k])=>k>=n).map(([k,v])=>[X(k),Y2(v)]);
     g+=poly(tl,'var(--ink-faint)',1.3,'stroke-dasharray="3 4"');
     if(tdone.length>1) g+=poly(tdone,'var(--control)',2.4);
-    if(n<=5) g+=lab(X(5),Y2(thAt(5))+20,'模型','var(--control)','middle',11,600);
+    if(n<=5) g+=lab(X(5),Y2(thAt(5))+20,window.L('模型','model'),'var(--control)','middle',11,600);
     DOTS.forEach(o=>{ if(o.n<n-1e-9) return; g+=`<circle cx="${X(o.n)}" cy="${Y2(o[mode])}" r="4" fill="var(--result)"/>`; });
     if(p>=32){
       const last=DOTS[23];
-      g+=lab(X(last.n)-10,Y2(last[mode])-9,`5/14 剩 1 天：${fm(-last[mode])}`,'var(--result)','end',11,600);
+      g+=lab(X(last.n)-10,Y2(last[mode])-9,window.L(`5/14 剩 1 天：${fm(-last[mode])}`,`5/14, 1 day left: ${fm(-last[mode])}`),'var(--result)','end',11,600);
     }
     $('a3').innerHTML=g;
     const ni=Math.round(n*1000)/1000;
-    $('a3N').textContent= ni<=0 ? '到期' : (Number.isInteger(ni)?ni:ni.toFixed(1))+' 天';
+    $('a3N').textContent= ni<=0 ? window.L('到期','At expiration') : (Number.isInteger(ni)?ni:ni.toFixed(1))+window.L(' 天',ni===1?' day':' days');
     $('a3V').textContent=f2(cv);
-    $('a3TV').textContent=f2(ctv); $('a3TVb').textContent=`入场时的 ${(ctv/TV[0]*100).toFixed(0)}%`;
+    $('a3TV').textContent=f2(ctv); $('a3TVb').textContent=window.L(`入场时的 ${(ctv/TV[0]*100).toFixed(0)}%`,`${(ctv/TV[0]*100).toFixed(0)}% of entry`);
     $('a3Th').textContent= n>0.5 ? fm(-thAt(Math.max(1,Math.round(n))),3) : '0';
     $('a3Say').textContent= p<32 ? '' :
-      `TSLA 一动不动的 32 天：前 16 天时间价值丢了 ${f2(TV[0]-TV[16])}（${((TV[0]-TV[16])/TV[0]*100).toFixed(0)}%），后 16 天丢了 ${f2(TV[16])}（${(TV[16]/TV[0]*100).toFixed(0)}%），其中最后 8 天就丢了 ${f2(TV[24])}（${(TV[24]/TV[0]*100).toFixed(0)}%）。第一天流失 ${f2(TVCURVE[0]-TVCURVE[1])}，最后一天流失 ${f2(TVCURVE[31]-TVCURVE[32])}。`;
+      window.L(`TSLA 一动不动的 32 天：前 16 天时间价值丢了 ${f2(TV[0]-TV[16])}（${((TV[0]-TV[16])/TV[0]*100).toFixed(0)}%），后 16 天丢了 ${f2(TV[16])}（${(TV[16]/TV[0]*100).toFixed(0)}%），其中最后 8 天就丢了 ${f2(TV[24])}（${(TV[24]/TV[0]*100).toFixed(0)}%）。第一天流失 ${f2(TVCURVE[0]-TVCURVE[1])}，最后一天流失 ${f2(TVCURVE[31]-TVCURVE[32])}。`,`32 days with TSLA not moving: in the first 16 days time value lost ${f2(TV[0]-TV[16])} (${((TV[0]-TV[16])/TV[0]*100).toFixed(0)}%), in the last 16 days it lost ${f2(TV[16])} (${(TV[16]/TV[0]*100).toFixed(0)}%), and the last 8 days alone lost ${f2(TV[24])} (${(TV[24]/TV[0]*100).toFixed(0)}%). The first day lost ${f2(TVCURVE[0]-TVCURVE[1])}, the last day ${f2(TVCURVE[31]-TVCURVE[32])}.`);
   }
   function start(){
     st.playing=false;
@@ -833,7 +835,7 @@ const A4=(()=>{
   /* 刻度数字放在画布上面一层 HTML 里，按画布坐标的百分比定位 */
   const pc=(v,d)=>(v/d*100).toFixed(2)+'%', ty=pc(BASE+6,H);
   $('a4ax').innerHTML=[-3,-2,-1,0,1,2,3].map(z=>`<span style="left:${pc(X0+(z+4)/0.1*BW,W)};top:${ty}">${z>0?'+'+z:z<0?'−'+(-z):'0'}</span>`).join('')+
-    `<span style="left:auto;right:0;transform:none;top:${ty}">标准差</span>`+
+    window.L(`<span style="left:auto;right:0;transform:none;top:${ty}">标准差</span>`,`<span style="left:auto;right:0;transform:none;top:${ty}">SD</span>`)+
     `<span style="left:${pc(X0-3,W)};top:${pc((LY0+LY1)/2+0.5,H)};transform:translate(-100%,-50%)">1</span>`;
   let s=null;
   function init(){
@@ -881,7 +883,7 @@ const A4=(()=>{
     $('a4I').textContent= s.sum? (s.sumW/s.sum*100).toFixed(1)+'%' : '0%';
     $('a4R').textContent= s.n? (s.sum/s.n).toFixed(2) : '0';
     $('a4Say').textContent= s.n<N ? '' :
-      `2000 天里，动不到一个标准差的日子占 ${(100-s.nW/s.n*100).toFixed(0)}%，每天都亏一点租金；超过一个标准差的 ${(s.nW/s.n*100).toFixed(0)}%，带来 ${(s.sumW/s.sum*100).toFixed(0)}% 的 gamma 收入。前 100 天收入是租金的 ${s.ratio[100].toFixed(2)} 倍，日子越多越接近 1，2000 天是 ${(s.sum/s.n).toFixed(2)}。长期平均下来，一天的收入正好等于租金。`;
+      window.L(`2000 天里，动不到一个标准差的日子占 ${(100-s.nW/s.n*100).toFixed(0)}%，每天都亏一点租金；超过一个标准差的 ${(s.nW/s.n*100).toFixed(0)}%，带来 ${(s.sumW/s.sum*100).toFixed(0)}% 的 gamma 收入。前 100 天收入是租金的 ${s.ratio[100].toFixed(2)} 倍，日子越多越接近 1，2000 天是 ${(s.sum/s.n).toFixed(2)}。长期平均下来，一天的收入正好等于租金。`,`Over 2000 days, days that moved less than one standard deviation make up ${(100-s.nW/s.n*100).toFixed(0)}%, each losing a little rent; the ${(s.nW/s.n*100).toFixed(0)}% that moved more than one standard deviation bring in ${(s.sumW/s.sum*100).toFixed(0)}% of the gamma income. Over the first 100 days income is ${s.ratio[100].toFixed(2)} times the rent; the more days, the closer it gets to 1, and over 2000 days it is ${(s.sum/s.n).toFixed(2)}. Averaged over the long run, a day's income exactly equals the rent.`);
   }
   function start(){
     if(s) s.playing=false;
@@ -905,14 +907,14 @@ function drawVer(){
   let g='';
   [.15,.2,.25,.3].forEach(v=>{ g+=line(L,Y(v),R,Y(v),'var(--rule)',.7); g+=lab(L-8,Y(v)+4,'−'+v.toFixed(2),'var(--ink-faint)','end',10.5); });
   (NARROW()?[300,340,380,420]:[300,320,340,360,380,400,420]).forEach(k=>{ g+=line(X(k),B,X(k),B+4,'var(--ink-faint)'); g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',10.5); });
-  g+=lab((L+R)/2,B+38,NARROW()?'行权价（5/15 到期）':'行权价（5/15 到期，4/13 收盘）','var(--ink-soft)','middle',11.5);
-  g+=ylab(12,(T+B)/2,'theta（每天）');
+  g+=lab((L+R)/2,B+38,NARROW()?window.L('行权价（5/15 到期）','Strike (5/15 expiration)'):window.L('行权价（5/15 到期，4/13 收盘）','Strike (5/15 expiration, 4/13 close)'),'var(--ink-soft)','middle',11.5);
+  g+=ylab(12,(T+B)/2,window.L('theta（每天）','theta (per day)'));
   g+=poly(VER.map(r=>[X(r[0]),Y(-r[2])]),'var(--result)',2,'stroke-dasharray="6 4"');
   g+=poly(VER.map(r=>[X(r[0]),Y(-r[3])]),'var(--control)',2.2);
   VER.forEach(r=>g+=`<circle cx="${X(r[0]).toFixed(1)}" cy="${Y(-r[1]).toFixed(1)}" r="3.4" fill="var(--ink)"/>`);
   const r350=VER.find(r=>r[0]===350);
-  g+=lab(X(350),Y(-r350[1])-14,'350：报价 −0.319','var(--ink)','middle',11,600);
-  g+=lab(X(350),Y(-r350[2])+26,'gamma 项 −0.298','var(--result)','middle',11,600);
+  g+=lab(X(350),Y(-r350[1])-14,window.L('350：报价 −0.319','350: quoted −0.319'),'var(--ink)','middle',11,600);
+  g+=lab(X(350),Y(-r350[2])+26,window.L('gamma 项 −0.298','gamma term −0.298'),'var(--result)','middle',11,600);
   $('ver').innerHTML=g;
 }
 
@@ -937,8 +939,8 @@ const A5=(()=>{
     const R_=rows[mode], p=st.p, k=Math.min(n,Math.floor(p)), fr=p-k;
     let g='';
     [3,2,1,0,-1].forEach(v=>{ const y=Y0-v*K1; g+=line(L,y,R,y,'var(--rule)',v===0?1.3:.7); g+=lab(L-8,y+4,v>0?'+'+v:v<0?'−'+(-v):'0','var(--ink-faint)','end',10.5); });
-    g+=lab(R,T1+10,'↑ gamma 赚的','var(--result)','end',11,600);
-    g+=lab(R,B1-2,'↓ 租金','var(--control)','end',11,600);
+    g+=lab(R,T1+10,window.L('↑ gamma 赚的','↑ gamma earned'),'var(--result)','end',11,600);
+    g+=lab(R,B1-2,window.L('↓ 租金','↓ rent'),'var(--control)','end',11,600);
     if(k<n && p>0) g+=`<rect x="${(L+k*bw).toFixed(1)}" y="${T1}" width="${bw.toFixed(1)}" height="${B1-T1}" fill="var(--panel2)"/>`;
     let lastLab={i:-9,y:0};
     for(let i=0;i<n;i++){
@@ -955,7 +957,7 @@ const A5=(()=>{
     }
     // 下图：累计
     [-2,0,2].forEach(v=>{ g+=line(L,Yc(v),R,Yc(v),'var(--rule)',v===0?1.3:.7); g+=lab(L-8,Yc(v)+4,v>0?'+'+v:v<0?'−'+(-v):'0','var(--ink-faint)','end',10.5); });
-    g+=ylab(12,(T2+B2)/2,'累计')+ylab(12,(T1+B1)/2,'每天，美元');
+    g+=ylab(12,(T2+B2)/2,window.L('累计','Cumulative'))+ylab(12,(T1+B1)/2,window.L('每天，美元','Per day, dollars'));
     const pts=[[L,Yc(0)]];
     for(let i=0;i<n;i++){
       if(i<k) pts.push([XC(i),Yc(R_[i].cum)]);
@@ -968,26 +970,26 @@ const A5=(()=>{
     $('a5').innerHTML=g;
     // 读数
     const ci= p>=n ? n-1 : (fr>0 ? k : k-1);
-    if(ci<0){ ['a5Db','a5M','a5Mb','a5G','a5Gb','a5C','a5Cb'].forEach(id=>$(id).textContent=''); $('a5D').textContent='4/13'; $('a5Db').textContent='入场'; }
+    if(ci<0){ ['a5Db','a5M','a5Mb','a5G','a5Gb','a5C','a5Cb'].forEach(id=>$(id).textContent=''); $('a5D').textContent='4/13'; $('a5Db').textContent=window.L('入场','Entry'); }
     else {
       const r=R_[ci];
-      $('a5D').textContent=md(DAYS[ci+1]); $('a5Db').textContent=`第 ${ci+1} 个交易日`;
-      $('a5M').textContent=sgn(mv[ci]*100)+'%'; $('a5Mb').textContent=sgn(mv[ci]/SD1)+' 个标准差';
+      $('a5D').textContent=md(DAYS[ci+1]); $('a5Db').textContent=window.L(`第 ${ci+1} 个交易日`,`Trading day ${ci+1}`);
+      $('a5M').textContent=sgn(mv[ci]*100)+'%'; $('a5Mb').textContent=sgn(mv[ci]/SD1)+window.L(' 个标准差',' SD');
       $('a5G').textContent=`${f3(r.g)} / ${f3(r.r)}`;
-      $('a5Gb').textContent= mode==='A' ? '½Γ(ΔS)² / ½Γ(S×2.89%)²' : `theta ${fm(r.th,4)} × ${r.days} 天`;
+      $('a5Gb').textContent= mode==='A' ? '½Γ(ΔS)² / ½Γ(S×2.89%)²' : window.L(`theta ${fm(r.th,4)} × ${r.days} 天`,`theta ${fm(r.th,4)} × ${r.days} day${r.days===1?'':'s'}`);
       const cum= ci<k||p>=n ? r.cum : (ci?R_[ci-1].cum:0);
       $('a5C').textContent=sgn(cum); $('a5C').style.color= cum>=0?'var(--result)':'var(--control)';
-      $('a5Cb').textContent= Math.abs(r.g-r.r)<5e-4 ? '这一天不赚不亏' : r.g>r.r ? '这一天赚' : '这一天亏';
+      $('a5Cb').textContent= Math.abs(r.g-r.r)<5e-4 ? window.L('这一天不赚不亏','Broke even this day') : r.g>r.r ? window.L('这一天赚','Net gain this day') : window.L('这一天亏','Net loss this day');
     }
     const say=$('a5Say');
     if(p<n){ say.textContent=''; return; }
     const G=R_.reduce((a,r)=>a+r.g,0), Rt=R_.reduce((a,r)=>a+r.r,0), wins=R_.filter(r=>r.g>r.r).length;
     if(mode==='A'){
-      const wd=R_.map((r,i)=>r.g>r.r?md(DAYS[i+1]):null).filter(Boolean).join('、');
-      say.textContent=`${wins} 天赚，${n-wins} 天亏。赚的 ${wins} 天是 ${wd}，就是 1.2 数出的那 ${wins} 天。24 天合计：gamma 赚 ${f2(G)}，租金付 ${f2(Rt)}，净 ${fm(G-Rt)}。实际波动 45.8% 和买入时付的 46.3% 几乎一样，账本就几乎打平。累计在 4/15 最高（${sgn(R_[1].cum)}），之后总体往下走，5/6 最低（${fm(Math.min(...R_.map(r=>r.cum)))}）：4/24 到 5/6 是连着 9 天的小动。`;
+      const wd=R_.map((r,i)=>r.g>r.r?md(DAYS[i+1]):null).filter(Boolean).join(window.L('、',', '));
+      say.textContent=window.L(`${wins} 天赚，${n-wins} 天亏。赚的 ${wins} 天是 ${wd}，就是 1.2 数出的那 ${wins} 天。24 天合计：gamma 赚 ${f2(G)}，租金付 ${f2(Rt)}，净 ${fm(G-Rt)}。实际波动 45.8% 和买入时付的 46.3% 几乎一样，账本就几乎打平。累计在 4/15 最高（${sgn(R_[1].cum)}），之后总体往下走，5/6 最低（${fm(Math.min(...R_.map(r=>r.cum)))}）：4/24 到 5/6 是连着 9 天的小动。`,`${wins} days made money, ${n-wins} days lost. The ${wins} winning days are ${wd}, the same ${wins} days counted in 1.2. Totals over 24 days: gamma earned ${f2(G)}, rent paid ${f2(Rt)}, net ${fm(G-Rt)}. Actual volatility of 45.8% was almost the same as the 46.3% paid at purchase, so the ledger almost breaks even. The cumulative total peaked on 4/15 (${sgn(R_[1].cum)}), then trended down to its low on 5/6 (${fm(Math.min(...R_.map(r=>r.cum)))}): 4/24 to 5/6 was 9 small-move days in a row.`);
     } else {
       const late=R_.slice(17).reduce((a,r)=>a+r.g,0);
-      say.textContent=`真实的 350 call，${wins} 天赚。4/15 TSLA 冲到 392，gamma 掉到 0.0047；4/23 到 4/30 回落到 373 到 382，gamma 回到 0.0068 到 0.0085，4/29 的 0.0085 比入场时还高，theta 也跟着到了 −0.366；5/7 收盘之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。从 5/7 起的 7 个交易日里有 4 天涨跌超过一个标准差，gamma 一共只赚了 ${f2(late)}。报价快照里的 theta 按日历日收，周末两天的记在周一：按 46.3% 算，平常一天涨跌超过 2.42% 就回本，周一要超过 4.20%。合计 gamma 赚 ${f2(G)}，theta 付 ${f2(Rt)}，净 ${fm(G-Rt)}。1.1 里这张 call 赚的钱来自方向，方向已经对冲掉，不在这本账里。`;
+      say.textContent=window.L(`真实的 350 call，${wins} 天赚。4/15 TSLA 冲到 392，gamma 掉到 0.0047；4/23 到 4/30 回落到 373 到 382，gamma 回到 0.0068 到 0.0085，4/29 的 0.0085 比入场时还高，theta 也跟着到了 −0.366；5/7 收盘之后 TSLA 在 410 以上，350 call 深度实值，gamma 不到 0.001。从 5/7 起的 7 个交易日里有 4 天涨跌超过一个标准差，gamma 一共只赚了 ${f2(late)}。报价快照里的 theta 按日历日收，周末两天的记在周一：按 46.3% 算，平常一天涨跌超过 2.42% 就回本，周一要超过 4.20%。合计 gamma 赚 ${f2(G)}，theta 付 ${f2(Rt)}，净 ${fm(G-Rt)}。1.1 里这张 call 赚的钱来自方向，方向已经对冲掉，不在这本账里。`,`The real 350 call made money on ${wins} days. On 4/15 TSLA shot up to 392 and gamma fell to 0.0047; from 4/23 to 4/30 it fell back to 373 to 382, and gamma returned to 0.0068 to 0.0085. 4/29's 0.0085 was higher than at entry, and theta followed it to −0.366. After the 5/7 close TSLA was above 410, the 350 call was deep in the money, and gamma was below 0.001. In the 7 trading days from 5/7 on, 4 days moved more than one standard deviation, yet gamma earned only ${f2(late)} in total. Theta in the quote snapshot is charged by calendar day, with the two weekend days booked on Monday: at 46.3%, an ordinary day breaks even on a move above 2.42%, and a Monday needs more than 4.20%. In total gamma earned ${f2(G)}, theta paid ${f2(Rt)}, net ${fm(G-Rt)}. The money this call made in 1.1 came from direction, which is hedged out and not in this ledger.`);
     }
   }
   function start(){
@@ -1003,48 +1005,48 @@ const A5=(()=>{
 
 /* ══════════ 六 · 费曼检验 ══════════ */
 const QS=[
- {q:`不许用「导数」「二阶」这类词，向没学过的人解释 gamma 是什么。再解释：TSLA 从 352 涨到 392，350 call 的 gamma 为什么从 0.0082 掉到 0.0047。`,
-  a:['delta 是期权跟着标的动的比例；gamma 是这个比例本身变得多快：标的每动 1 美元，delta 变多少。',
-     'call 的 delta 在 0 和 1 之间：标的远低于行权价时贴近 0，远高于时贴近 1，只在行权价附近往上爬。gamma 就是这段爬坡有多陡。',
-     '352 就在 350 旁边，delta 正在爬，gamma 大。到 392，delta 已经 0.81，离 1 不远，能爬的余地小了，gamma 就小。'],
-  s:'「gamma 是 delta 的导数」：换了个名字，没说出它在期权上意味着什么。'},
- {q:`同一天、TSLA 都是 352.36，2 天到期的平值 call gamma 是 0.0367，32 天到期的只有 0.0084。为什么越近到期 gamma 越大？为什么 320 这种离平值远的行权价，反而是 32 天的 gamma 大？`,
-  a:['到期那一刻，delta 不是 0 就是 1，在行权价上一步跳过去。离到期越近，delta 从 0 爬到 1 的价格范围越窄。',
-     '这段范围大约几个标准差宽，一个标准差按 √t 缩小：32 天约 48.5 美元，2 天约 11 美元。同样的爬升挤进四分之一的宽度，坡陡了约 4 倍。',
-     '320 离 352 有 32 美元：对 2 天的期权约是三个标准差，delta 早已贴在 1 附近不动；对 32 天的期权还不到一个标准差，delta 还在爬。'],
-  s:'「快到期了风险大」：没说出 gamma 大是因为 delta 爬得陡，也解释不了 320 的反例。'},
- {q:`假设 TSLA 一直停在 352.36，这张 350 call 的时间价值 18.69 会怎样流失？为什么最后 8 天丢得比前 16 天还多？`,
-  a:['时间价值付的是「到期前还可能走多远」，这个距离按剩余天数的平方根算（1.2）。',
-     '所以时间价值大致跟 √剩余天数 成正比：剩 16 天还剩约 71%，剩 8 天还剩约一半。',
-     '前 16 天只丢了约三成（5.92），最后 8 天丢了近一半（8.64）。平方根越靠近 0 越陡，每天的流失越来越大：第一天 0.32，最后一天 2.37。'],
-  s:'「时间价值每天均匀减少」：那样前 16 天和后 16 天应该丢得一样多。'},
- {q:`为什么说「买 gamma 就要付 theta」？如果有一张期权，theta 只有 ½σ²S²Γ 的一半，会发生什么？`,
-  a:['对冲掉方向之后，持有期权一天的盈亏是 ½Γ(ΔS)² 减去租金。',
-     '一天 (ΔS)² 的平均值是一个标准差的平方，所以 gamma 平均每天收入 ½Γ(Sσ/16)²；一年约 256 个交易日，16² ＝ 256，一年就是 ½σ²S²Γ。',
-     '如果租金只有一半，买入再对冲平均每天稳赚。人人都去买，价格被抬高，theta 变大，直到租金等于 gamma 的平均收入。',
-     '报价快照的数字对得上：350 call 的 gamma 项按日历日一天 0.299，加利息 0.021 是 0.320，报价快照给 −0.319。'],
-  s:'「因为公式推出来就是这样」：没说出背后「平均不赚不赔」的定价要求。'},
- {q:`对冲好的 350 call，今天 TSLA 涨了 1%，买方这一天赚还是亏？涨 5% 呢？回本的门槛是多少，为什么和 gamma 大小无关？`,
-  a:['门槛是一天的一个标准差 S × σ ÷ 16，按 46.3% 是 2.89%。',
-     '涨 1%：gamma 收入是 (1 ÷ 2.89)² ≈ 0.12 份租金，这一天亏掉约九成的租金。涨 5%：1.73 个标准差，收入约 3 份租金。',
-     'gamma 收入 ½Γ(ΔS)²，租金 ½Γ(Sσ/16)²，两边都乘 ½Γ，一比 Γ 就消掉了。gamma 大的期权赚得多，租金也同比例贵。'],
-  s:'「涨了就赚」：方向已经对冲掉了。跌 5% 同样赚，涨 1% 同样亏。'},
- {q:`4/24 到 5/6，TSLA 从 373.69 涨到 398.62，涨了 6.67%。为什么对冲好的买方这 9 天天天在亏？如果同样的 6.67% 在一天里走完呢？`,
-  a:['每天收盘重新对冲一次，gamma 只按当天的涨跌算钱，不看累计走了多远。',
-     '这 9 天最大的一天 2.37%，都没到 2.89%：gamma 9 天只赚 1.16，租金付了 4.49，净亏 3.34。',
-     '一天走完 6.67% 是 2.31 个标准差，gamma 那一天就赚 2.55，是当天租金的 5 倍多。',
-     '对买方来说，慢慢走和横盘一样：每天付租，等不来大动的日子。'],
-  s:'「TSLA 涨了，买 call 应该赚」：方向那部分已经对冲掉，这里只算 gamma 和 theta。'},
- {q:`讲义的仓位：卖 10 张 95 call、买 7 手标的，合计 delta −30、gamma −33、theta +0.387。这个人在收租还是付租？他希望市场怎样？标的涨 1 美元会怎样？`,
-  a:['theta 为正、gamma 为负：收租。市场不动，每天收 0.387。',
-     '他希望标的不动或慢动。讲义原话：负 gamma 想要市场平稳。',
-     '标的涨 1 美元，delta 从 −30 变成 −63，空头自己变大，再涨亏得更快；跌的时候 delta 往正的方向走，也是越走越不利。',
-     '一天动 3 美元，gamma 那一项亏 ½ × 0.33 × 3² ≈ 1.49，差不多 4 天的租金。'],
-  s:'「delta 只有 −30，风险很小」：只看了 delta，没看到 gamma 会让 delta 自己变大。'}
+ {q:window.L(`不许用「导数」「二阶」这类词，向没学过的人解释 gamma 是什么。再解释：TSLA 从 352 涨到 392，350 call 的 gamma 为什么从 0.0082 掉到 0.0047。`,`Without words like "derivative" or "second order", explain to someone who has never studied this what gamma is. Then explain why the 350 call's gamma fell from 0.0082 to 0.0047 as TSLA rose from 352 to 392.`),
+  a:[window.L('delta 是期权跟着标的动的比例；gamma 是这个比例本身变得多快：标的每动 1 美元，delta 变多少。','Delta is the ratio at which the option follows the underlying; gamma is how fast that ratio itself changes: when the underlying moves 1 dollar, how much delta changes.'),
+     window.L('call 的 delta 在 0 和 1 之间：标的远低于行权价时贴近 0，远高于时贴近 1，只在行权价附近往上爬。gamma 就是这段爬坡有多陡。','A call\'s delta is between 0 and 1: near 0 when the underlying is far below the strike, near 1 when it is far above, and it climbs only near the strike. Gamma is how steep that climb is.'),
+     window.L('352 就在 350 旁边，delta 正在爬，gamma 大。到 392，delta 已经 0.81，离 1 不远，能爬的余地小了，gamma 就小。','352 is right next to 350, delta is in the middle of its climb, and gamma is large. At 392 delta is already 0.81, not far from 1, with little room left to climb, so gamma is small.')],
+  s:window.L('「gamma 是 delta 的导数」：换了个名字，没说出它在期权上意味着什么。','"Gamma is the derivative of delta": that just renames it without saying what it means for an option.')},
+ {q:window.L(`同一天、TSLA 都是 352.36，2 天到期的平值 call gamma 是 0.0367，32 天到期的只有 0.0084。为什么越近到期 gamma 越大？为什么 320 这种离平值远的行权价，反而是 32 天的 gamma 大？`,`On the same day, with TSLA at 352.36, the 2-day at-the-money call has gamma 0.0367 and the 32-day one only 0.0084. Why is gamma larger closer to expiration? And why, at a strike far from the money like 320, is the 32-day gamma the larger one?`),
+  a:[window.L('到期那一刻，delta 不是 0 就是 1，在行权价上一步跳过去。离到期越近，delta 从 0 爬到 1 的价格范围越窄。','At the moment of expiration, delta is either 0 or 1, jumping in one step at the strike. The closer to expiration, the narrower the price range over which delta climbs from 0 to 1.'),
+     window.L('这段范围大约几个标准差宽，一个标准差按 √t 缩小：32 天约 48.5 美元，2 天约 11 美元。同样的爬升挤进四分之一的宽度，坡陡了约 4 倍。','That range is a few standard deviations wide, and one standard deviation shrinks with √t: about 48.5 dollars at 32 days, about 11 dollars at 2 days. The same climb squeezed into a quarter of the width makes the slope about 4 times steeper.'),
+     window.L('320 离 352 有 32 美元：对 2 天的期权约是三个标准差，delta 早已贴在 1 附近不动；对 32 天的期权还不到一个标准差，delta 还在爬。','320 is 32 dollars from 352: for the 2-day option that is about three standard deviations, and delta has long since settled near 1; for the 32-day option it is less than one standard deviation, and delta is still climbing.')],
+  s:window.L('「快到期了风险大」：没说出 gamma 大是因为 delta 爬得陡，也解释不了 320 的反例。','"Close to expiration the risk is high": that does not say gamma is large because delta climbs steeply, and it cannot explain the 320 counterexample.')},
+ {q:window.L(`假设 TSLA 一直停在 352.36，这张 350 call 的时间价值 18.69 会怎样流失？为什么最后 8 天丢得比前 16 天还多？`,`Suppose TSLA stays at 352.36 the whole time. How does this 350 call's time value of 18.69 drain away? Why do the last 8 days lose more than the first 16?`),
+  a:[window.L('时间价值付的是「到期前还可能走多远」，这个距离按剩余天数的平方根算（1.2）。','Time value pays for "how far the price might still move before expiration", and that distance scales with the square root of the days left (1.2).'),
+     window.L('所以时间价值大致跟 √剩余天数 成正比：剩 16 天还剩约 71%，剩 8 天还剩约一半。','So time value is roughly proportional to √(days left): with 16 days left about 71% remains, with 8 days left about half.'),
+     window.L('前 16 天只丢了约三成（5.92），最后 8 天丢了近一半（8.64）。平方根越靠近 0 越陡，每天的流失越来越大：第一天 0.32，最后一天 2.37。','The first 16 days lose only about 30% (5.92); the last 8 days lose nearly half (8.64). The square root gets steeper closer to 0, so the daily loss keeps growing: 0.32 on the first day, 2.37 on the last.')],
+  s:window.L('「时间价值每天均匀减少」：那样前 16 天和后 16 天应该丢得一样多。','"Time value decreases evenly every day": then the first 16 days and the last 16 days would lose the same amount.')},
+ {q:window.L(`为什么说「买 gamma 就要付 theta」？如果有一张期权，theta 只有 ½σ²S²Γ 的一半，会发生什么？`,`Why do we say "buy gamma, pay theta"? If an option had a theta only half of ½σ²S²Γ, what would happen?`),
+  a:[window.L('对冲掉方向之后，持有期权一天的盈亏是 ½Γ(ΔS)² 减去租金。','With direction hedged out, a day of holding the option makes ½Γ(ΔS)² minus the rent.'),
+     window.L('一天 (ΔS)² 的平均值是一个标准差的平方，所以 gamma 平均每天收入 ½Γ(Sσ/16)²；一年约 256 个交易日，16² ＝ 256，一年就是 ½σ²S²Γ。','The average of (ΔS)² for a day is the square of one standard deviation, so gamma\'s average daily income is ½Γ(Sσ/16)²; a year has about 256 trading days and 16² = 256, so for a year it is ½σ²S²Γ.'),
+     window.L('如果租金只有一半，买入再对冲平均每天稳赚。人人都去买，价格被抬高，theta 变大，直到租金等于 gamma 的平均收入。','If the rent were only half, buying and hedging would make money on average every day. Everyone would buy, the price would be pushed up, and theta would grow until the rent equaled gamma\'s average income.'),
+     window.L('报价快照的数字对得上：350 call 的 gamma 项按日历日一天 0.299，加利息 0.021 是 0.320，报价快照给 −0.319。','The quote snapshot\'s numbers match: the 350 call\'s gamma term is 0.299 a day by calendar day, plus 0.021 of interest makes 0.320, and the quote snapshot gives −0.319.')],
+  s:window.L('「因为公式推出来就是这样」：没说出背后「平均不赚不赔」的定价要求。','"Because the formula says so": that misses the pricing requirement behind it, that on average you neither make nor lose money.')},
+ {q:window.L(`对冲好的 350 call，今天 TSLA 涨了 1%，买方这一天赚还是亏？涨 5% 呢？回本的门槛是多少，为什么和 gamma 大小无关？`,`A hedged 350 call: today TSLA rose 1%. Did the buyer make or lose money on the day? What about a 5% rise? What is the break-even threshold, and why does it not depend on the size of gamma?`),
+  a:[window.L('门槛是一天的一个标准差 S × σ ÷ 16，按 46.3% 是 2.89%。','The threshold is one standard deviation for a day, S × σ ÷ 16, which is 2.89% at 46.3%.'),
+     window.L('涨 1%：gamma 收入是 (1 ÷ 2.89)² ≈ 0.12 份租金，这一天亏掉约九成的租金。涨 5%：1.73 个标准差，收入约 3 份租金。','Up 1%: gamma income is (1 ÷ 2.89)² ≈ 0.12 of the rent, so the day loses about nine-tenths of the rent. Up 5%: 1.73 standard deviations, income about 3 times the rent.'),
+     window.L('gamma 收入 ½Γ(ΔS)²，租金 ½Γ(Sσ/16)²，两边都乘 ½Γ，一比 Γ 就消掉了。gamma 大的期权赚得多，租金也同比例贵。','Gamma income is ½Γ(ΔS)² and rent is ½Γ(Sσ/16)²; both carry ½Γ, so Γ cancels in the ratio. Options with large gamma earn more, and their rent is proportionally higher.')],
+  s:window.L('「涨了就赚」：方向已经对冲掉了。跌 5% 同样赚，涨 1% 同样亏。','"A rise means a gain": direction is already hedged out. A 5% fall makes money just the same, and a 1% rise loses just the same.')},
+ {q:window.L(`4/24 到 5/6，TSLA 从 373.69 涨到 398.62，涨了 6.67%。为什么对冲好的买方这 9 天天天在亏？如果同样的 6.67% 在一天里走完呢？`,`From 4/24 to 5/6 TSLA rose from 373.69 to 398.62, up 6.67%. Why did the hedged buyer lose money on every one of these 9 days? What if the same 6.67% had happened in a single day?`),
+  a:[window.L('每天收盘重新对冲一次，gamma 只按当天的涨跌算钱，不看累计走了多远。','Rehedging once at each close, gamma pays only on that day\'s move, not on how far the price has gone in total.'),
+     window.L('这 9 天最大的一天 2.37%，都没到 2.89%：gamma 9 天只赚 1.16，租金付了 4.49，净亏 3.34。','The largest of these 9 days was 2.37%, none reaching 2.89%: over 9 days gamma earned only 1.16, rent paid was 4.49, a net loss of 3.34.'),
+     window.L('一天走完 6.67% 是 2.31 个标准差，gamma 那一天就赚 2.55，是当天租金的 5 倍多。','Covering 6.67% in one day is 2.31 standard deviations, and gamma would have earned 2.55 that day, more than 5 times that day\'s rent.'),
+     window.L('对买方来说，慢慢走和横盘一样：每天付租，等不来大动的日子。','For the buyer, drifting slowly is the same as going sideways: rent every day, and the big days never come.')],
+  s:window.L('「TSLA 涨了，买 call 应该赚」：方向那部分已经对冲掉，这里只算 gamma 和 theta。','"TSLA rose, so a long call should make money": the directional part is hedged out; here only gamma and theta count.')},
+ {q:window.L(`讲义的仓位：卖 10 张 95 call、买 7 手标的，合计 delta −30、gamma −33、theta +0.387。这个人在收租还是付租？他希望市场怎样？标的涨 1 美元会怎样？`,`The lecture notes' position: short ten 95 calls and long 7 lots of the underlying, for a total delta of −30, gamma −33 and theta +0.387. Is this trader collecting rent or paying rent? What kind of market do they want? What happens if the underlying rises 1 dollar?`),
+  a:[window.L('theta 为正、gamma 为负：收租。市场不动，每天收 0.387。','Theta is positive and gamma negative: collecting rent. If the market does not move, the position collects 0.387 a day.'),
+     window.L('他希望标的不动或慢动。讲义原话：负 gamma 想要市场平稳。','They want the underlying to stay still or move slowly. In the lecture notes\' words: negative gamma wants a calm market.'),
+     window.L('标的涨 1 美元，delta 从 −30 变成 −63，空头自己变大，再涨亏得更快；跌的时候 delta 往正的方向走，也是越走越不利。','If the underlying rises 1 dollar, delta goes from −30 to −63: the short grows on its own, and a further rise loses money faster. On a fall, delta moves in the positive direction, and it also gets worse the further it goes.'),
+     window.L('一天动 3 美元，gamma 那一项亏 ½ × 0.33 × 3² ≈ 1.49，差不多 4 天的租金。','A 3-dollar move in a day loses ½ × 0.33 × 3² ≈ 1.49 on the gamma term, nearly 4 days of rent.')],
+  s:window.L('「delta 只有 −30，风险很小」：只看了 delta，没看到 gamma 会让 delta 自己变大。','"Delta is only −30, so the risk is small": that looks only at delta and misses how gamma makes delta grow on its own.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>window.L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1058,7 +1060,21 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`
+    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-2-2-q'+i); if(v) t.value=v; }catch(e){}
@@ -1067,8 +1083,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? window.L('对照参考答案','Compare with the reference answer') : window.L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? window.L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 
@@ -1110,6 +1126,7 @@ drawAll();
 /* 滚到眼前才开始播放 */
 onView(A1.el,A1.start); onView(A2.el,A2.start); onView(A3.el,A3.start); onView(A4.el,A4.start); onView(A5.el,A5.start);
 </script>
+<script>/* 英文模式：属性文字换成英文 */if(window.LANG==='en')document.querySelectorAll('[data-en-aria-label],[data-en-placeholder],[data-en-title],[data-en-alt]').forEach(function(e){['aria-label','placeholder','title','alt'].forEach(function(a){var v=e.getAttribute('data-en-'+a);if(v!=null)e.setAttribute(a,v);});});</script>
 <script src="course-nav.js"></script>
 </body>
 </html>

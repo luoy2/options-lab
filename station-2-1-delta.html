@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>delta</title>
+<script src="lang.js"></script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2025C15%2025%2016%207%2027%207'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -190,347 +191,348 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   .formula .math{font-size:1rem}
   .stat .d{font-size:1.12rem}
 }
+span.l-zh,span.l-en{display:contents}
 </style>
 </head>
 <body>
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 斜率</a><a href="#s1">一 三种读法</a><a href="#s2">二 正负号</a><a href="#s3">三 为什么会变</a>
-  <a href="#s4">四 逐天回放</a><a href="#s5">五 对冲</a><a href="#s6">六 实值概率</a><a href="#s7">七 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 斜率</span><span class="l-en">0 Slope</span></a><a href="#s1"><span class="l-zh">一 三种读法</span><span class="l-en">1 Three readings</span></a><a href="#s2"><span class="l-zh">二 正负号</span><span class="l-en">2 Signs</span></a><a href="#s3"><span class="l-zh">三 为什么会变</span><span class="l-en">3 Why it changes</span></a>
+  <a href="#s4"><span class="l-zh">四 逐天回放</span><span class="l-en">4 Day-by-day replay</span></a><a href="#s5"><span class="l-zh">五 对冲</span><span class="l-en">5 Hedging</span></a><a href="#s6"><span class="l-zh">六 实值概率</span><span class="l-en">6 Probability of finishing ITM</span></a><a href="#s7"><span class="l-zh">七 费曼检验</span><span class="l-en">7 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 2.1</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 2.1</span><span class="l-en">FIN 580 review · Node 2.1</span></p>
   <h1>delta</h1>
-  <p class="lede">1.1 留下一个问题：TSLA 350 call 入场时的 delta 是 0.557，整段持有下来，期权的涨幅却是标的涨幅的 0.734。这一节讲 delta 是什么、有哪几种读法、为什么它自己会变，最后回答这两个数为什么不相等。案例还是同一笔交易：2026-04-13 收盘买入 TSLA 5/15 到期的 350 call。</p>
+  <p class="lede"><span class="l-zh">1.1 留下一个问题：TSLA 350 call 入场时的 delta 是 0.557，整段持有下来，期权的涨幅却是标的涨幅的 0.734。这一节讲 delta 是什么、有哪几种读法、为什么它自己会变，最后回答这两个数为什么不相等。案例还是同一笔交易：2026-04-13 收盘买入 TSLA 5/15 到期的 350 call。</span><span class="l-en">Node 1.1 left a question: the TSLA 350 call had a delta of 0.557 at entry, yet over the whole holding period the option's gain was 0.734 of the underlying's gain. This node covers what delta is, the ways to read it, why it changes on its own, and finally why these two numbers differ. The case is the same trade: a TSLA 350 call expiring 5/15, bought at the 2026-04-13 close.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>delta 是一条斜率</h2>
-  <p class="sub">标的价格动一点，期权价格跟着动多少。这个比例叫 delta。</p>
-  <p>4/14 这一天，TSLA 从 352.36 涨到 364.32，涨了 11.96 美元；350 call 的买卖中间价从 21.05 涨到 28.20，涨了 7.15 美元。期权涨的是标的的 7.15 ÷ 11.96 ≈ 0.60。</p>
-  <p>期权不跟着标的一比一地动，原因在 1.1：call 是一个权利，到期时 TSLA 高于 350 才有用。TSLA 今天涨 1 美元，到期时会不会高于 350 还说不准，所以这张 call 只多值这 1 美元的一部分。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>delta 是一条斜率</span><span class="l-en"><span class="n">0</span>Delta is a slope</span></h2>
+  <p class="sub"><span class="l-zh">标的价格动一点，期权价格跟着动多少。这个比例叫 delta。</span><span class="l-en">When the underlying price moves a little, how much does the option price move? That ratio is called delta.</span></p>
+  <p><span class="l-zh">4/14 这一天，TSLA 从 352.36 涨到 364.32，涨了 11.96 美元；350 call 的买卖中间价从 21.05 涨到 28.20，涨了 7.15 美元。期权涨的是标的的 7.15 ÷ 11.96 ≈ 0.60。</span><span class="l-en">On 4/14, TSLA rose from 352.36 to 364.32, up 11.96 dollars; the 350 call's bid-ask mid rose from 21.05 to 28.20, up 7.15 dollars. The option rose 7.15 ÷ 11.96 ≈ 0.60 of the underlying's move.</span></p>
+  <p><span class="l-zh">期权不跟着标的一比一地动，原因在 1.1：call 是一个权利，到期时 TSLA 高于 350 才有用。TSLA 今天涨 1 美元，到期时会不会高于 350 还说不准，所以这张 call 只多值这 1 美元的一部分。</span><span class="l-en">The option does not move one-for-one with the underlying, for the reason in 1.1: a call is a right, and it is useful only if TSLA is above 350 at expiration. If TSLA rises 1 dollar today, it is still uncertain whether it will be above 350 at expiration, so the call gains only part of that dollar.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="delta，希腊字母 Δ。期权价格对标的价格的敏感度：标的动 1 美元，期权每股动多少美元。">Δ</span> ≈ 期权价格的变化 ÷ 标的价格的变化</div>
-    <div class="gloss">标的动 1 美元，期权大约动 Δ 美元。标的动得越少，这个近似越准。</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="delta，希腊字母 Δ。期权价格对标的价格的敏感度：标的动 1 美元，期权每股动多少美元。">Δ</span> ≈ 期权价格的变化 ÷ 标的价格的变化</span><span class="l-en"><span class="sym" data-say="Delta, the Greek letter Δ. How sensitive the option price is to the underlying price: when the underlying moves 1 dollar, how many dollars per share the option moves.">Δ</span> ≈ change in option price ÷ change in underlying price</span></div>
+    <div class="gloss"><span class="l-zh">标的动 1 美元，期权大约动 Δ 美元。标的动得越少，这个近似越准。</span><span class="l-en">When the underlying moves 1 dollar, the option moves about Δ dollars. The smaller the underlying's move, the better the approximation.</span></div>
   </div>
-  <p>期权交易里习惯用希腊字母给这类敏感度命名，这一组统称<span class="sym" data-say="Greeks。delta、gamma、theta、vega、rho，各自说明期权价格对一样东西有多敏感：标的价格、delta 本身、时间、波动率、利率。">希腊字母</span>。delta 管标的价格，是第一个；其余几个在 2.2 和 2.3。</p>
+  <p><span class="l-zh">期权交易里习惯用希腊字母给这类敏感度命名，这一组统称<span class="sym" data-say="Greeks。delta、gamma、theta、vega、rho，各自说明期权价格对一样东西有多敏感：标的价格、delta 本身、时间、波动率、利率。">希腊字母</span>。delta 管标的价格，是第一个；其余几个在 2.2 和 2.3。</span><span class="l-en">In options trading, sensitivities like this are named with Greek letters, collectively called the <span class="sym" data-say="Greeks: delta, gamma, theta, vega, rho. Each says how sensitive the option price is to one thing: the underlying price, delta itself, time, volatility, interest rates.">Greeks</span>. Delta covers the underlying price and is the first; the others are in 2.2 and 2.3.</span></p>
 
-  <h3>画出来是曲线的斜率</h3>
-  <p>横轴放 TSLA 的价格，纵轴放 350 call 的价值，画出来是一条弯曲的线。下图这条线是用 <span class="sym" data-say="Black-Scholes。1973 年提出的期权定价公式：用股价、行权价、波动率、离到期的时间和利率算出期权价值。本页只用它的结果，公式本身不展开。">Black-Scholes</span> 公式算的<span class="sym" data-say="用公式算出来的数，不是市场报价。本页〇节的曲线、第六节的概率和两年期的例子都是模型值。">模型值</span>（波动率 46.3%，离到期 32 天，利率 4.3%）：TSLA 在 352.36 时它给出 21.05，和 4/13 收盘市场的中间价一样。公式本身不在本页范围，这里只用它画出曲线的形状。</p>
+  <h3><span class="l-zh">画出来是曲线的斜率</span><span class="l-en">Drawn out, it is the slope of a curve</span></h3>
+  <p><span class="l-zh">横轴放 TSLA 的价格，纵轴放 350 call 的价值，画出来是一条弯曲的线。下图这条线是用 <span class="sym" data-say="Black-Scholes。1973 年提出的期权定价公式：用股价、行权价、波动率、离到期的时间和利率算出期权价值。本页只用它的结果，公式本身不展开。">Black-Scholes</span> 公式算的<span class="sym" data-say="用公式算出来的数，不是市场报价。本页〇节的曲线、第六节的概率和两年期的例子都是模型值。">模型值</span>（波动率 46.3%，离到期 32 天，利率 4.3%）：TSLA 在 352.36 时它给出 21.05，和 4/13 收盘市场的中间价一样。公式本身不在本页范围，这里只用它画出曲线的形状。</span><span class="l-en">Put TSLA's price on the horizontal axis and the 350 call's value on the vertical axis, and you get a curved line. The line below is a <span class="sym" data-say="A number computed from a formula, not a market quote. On this page the curve in section 0, the probabilities in section 6 and the two-year example are model values.">model value</span> computed with the <span class="sym" data-say="Black-Scholes: an option pricing formula published in 1973. It computes an option's value from the stock price, strike, volatility, time to expiration and interest rate. This page uses only its results and does not go into the formula.">Black-Scholes</span> formula (volatility 46.3%, 32 days to expiration, rate 4.3%): with TSLA at 352.36 it gives 21.05, the same as the market mid at the 4/13 close. The formula itself is beyond this page; here it only draws the shape of the curve.</span></p>
   <div class="panel">
-    <svg id="tan" viewBox="0 0 720 330" role="img" aria-label="350 call 的模型价值随 TSLA 价格变化的曲线，以及某一点的切线"></svg>
+    <svg id="tan" viewBox="0 0 720 330" role="img" aria-label="350 call 的模型价值随 TSLA 价格变化的曲线，以及某一点的切线" data-en-aria-label="Curve of the 350 call's model value against TSLA's price, with the tangent at one point"></svg>
     <div class="legend">
-      <span><i style="background:var(--ink);height:3px;vertical-align:.25rem"></i>离到期 32 天的模型价值</span>
-      <span><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>虚线：到期那天的价值（1.1 的折线）</span>
-      <span><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>切线，斜率就是 delta</span>
-      <span><i style="border:2px solid var(--result);border-radius:50%"></i>4/13 收盘中间价 21.05</span>
+      <span><span class="l-zh"><i style="background:var(--ink);height:3px;vertical-align:.25rem"></i>离到期 32 天的模型价值</span><span class="l-en"><i style="background:var(--ink);height:3px;vertical-align:.25rem"></i>model value with 32 days to expiration</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>虚线：到期那天的价值（1.1 的折线）</span><span class="l-en"><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>dashed: value on expiration day (the kinked line from 1.1)</span></span>
+      <span><span class="l-zh"><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>切线，斜率就是 delta</span><span class="l-en"><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>tangent line; its slope is delta</span></span>
+      <span><span class="l-zh"><i style="border:2px solid var(--result);border-radius:50%"></i>4/13 收盘中间价 21.05</span><span class="l-en"><i style="border:2px solid var(--result);border-radius:50%"></i>4/13 closing mid 21.05</span></span>
     </div>
-    <div class="ctl" style="margin-top:1rem;max-width:30rem"><label><span>TSLA 价格 <span class="sym" data-say="标的今天的价格，S 来自 spot。">S</span></span><span class="v" id="vS"></span></label>
-      <input type="range" id="iS" min="280" max="460" step="0.01" value="352.36" aria-label="TSLA 价格"></div>
+    <div class="ctl" style="margin-top:1rem;max-width:30rem"><label><span class="l-zh"><span>TSLA 价格 <span class="sym" data-say="标的今天的价格，S 来自 spot。">S</span></span></span><span class="l-en"><span>TSLA price <span class="sym" data-say="The underlying's price today; S stands for spot.">S</span></span></span><span class="v" id="vS"></span></label>
+      <input type="range" id="iS" min="280" max="460" step="0.01" value="352.36" aria-label="TSLA 价格" data-en-aria-label="TSLA price"></div>
     <div class="stats">
-      <div class="stat"><div class="k">350 call 模型价值</div><div class="d" id="tnV"></div><div class="d2">每股，美元</div></div>
-      <div class="stat"><div class="k">这一点的斜率 delta</div><div class="d" id="tnD" style="color:var(--control)"></div><div class="d2" id="tnDb"></div></div>
-      <div class="stat"><div class="k">TSLA 再涨 20 美元，曲线上</div><div class="d" id="tnJ"></div><div class="d2" id="tnJb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">350 call 模型价值</span><span class="l-en">350 call model value</span></div><div class="d" id="tnV"></div><div class="d2"><span class="l-zh">每股，美元</span><span class="l-en">per share, dollars</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这一点的斜率 delta</span><span class="l-en">Slope at this point (delta)</span></div><div class="d" id="tnD" style="color:var(--control)"></div><div class="d2" id="tnDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 再涨 20 美元，曲线上</span><span class="l-en">If TSLA rises another 20 dollars, on the curve</span></div><div class="d" id="tnJ"></div><div class="d2" id="tnJb"></div></div>
     </div>
   </div>
-  <p>delta 是这条线在某一点的<b>斜率</b>：往右走 1 美元，线往上升多少。只在这一点碰到曲线、方向和曲线一致的直线叫<span class="sym" data-say="tangent line。和曲线在一点相碰，在那一点方向和曲线一致的直线。">切线</span>，切线的斜率就是这一点的 delta。</p>
-  <p>曲线是弯的，每一点的斜率都不一样。按模型，TSLA 在 300 时斜率是 0.152，在 352.36 时是 0.558，在 420 时是 0.923。往左越走越平，贴近 0；往右越来越贴近到期那条折线的斜边，斜率 1。第三节用真实的<span class="sym" data-say="option chain。同一个标的、同一个到期日，各个行权价的 call 和 put 排成的一张表。">期权链</span>看同一件事。</p>
-  <p>切线是直的，曲线往上弯，所以标的大涨时，按 delta 算出的涨幅会偏少。4/15 TSLA 一天涨了 27.61，按前一天收盘的 delta 0.651 算，期权该涨 17.98，实际涨了 21.47。delta 自己变化的速度叫 <span class="sym" data-say="gamma。delta 的变化速度：标的动 1 美元，delta 变多少。2.2 讲。">gamma</span>，2.2 讲。</p>
+  <p><span class="l-zh">delta 是这条线在某一点的<b>斜率</b>：往右走 1 美元，线往上升多少。只在这一点碰到曲线、方向和曲线一致的直线叫<span class="sym" data-say="tangent line。和曲线在一点相碰，在那一点方向和曲线一致的直线。">切线</span>，切线的斜率就是这一点的 delta。</span><span class="l-en">Delta is the <b>slope</b> of this line at a point: move 1 dollar to the right, and how much the line rises. The straight line that touches the curve only at this point and runs in the same direction as the curve there is the <span class="sym" data-say="Tangent line: a straight line that touches the curve at one point and runs in the same direction as the curve at that point.">tangent</span>, and its slope is the delta at this point.</span></p>
+  <p><span class="l-zh">曲线是弯的，每一点的斜率都不一样。按模型，TSLA 在 300 时斜率是 0.152，在 352.36 时是 0.558，在 420 时是 0.923。往左越走越平，贴近 0；往右越来越贴近到期那条折线的斜边，斜率 1。第三节用真实的<span class="sym" data-say="option chain。同一个标的、同一个到期日，各个行权价的 call 和 put 排成的一张表。">期权链</span>看同一件事。</span><span class="l-en">The curve bends, so the slope is different at every point. In the model, the slope is 0.152 with TSLA at 300, 0.558 at 352.36 and 0.923 at 420. To the left it flattens toward 0; to the right it approaches the sloped side of the expiration line, with slope 1. Section 3 looks at the same thing in a real <span class="sym" data-say="Option chain: a table of the calls and puts at every strike for the same underlying and the same expiration.">option chain</span>.</span></p>
+  <p><span class="l-zh">切线是直的，曲线往上弯，所以标的大涨时，按 delta 算出的涨幅会偏少。4/15 TSLA 一天涨了 27.61，按前一天收盘的 delta 0.651 算，期权该涨 17.98，实际涨了 21.47。delta 自己变化的速度叫 <span class="sym" data-say="gamma。delta 的变化速度：标的动 1 美元，delta 变多少。2.2 讲。">gamma</span>，2.2 讲。</span><span class="l-en">The tangent is straight and the curve bends upward, so when the underlying rises a lot, the gain computed from delta falls short. On 4/15 TSLA rose 27.61 in one day; at the previous close's delta of 0.651, the option should have risen 17.98, but it actually rose 21.47. The rate at which delta itself changes is called <span class="sym" data-say="Gamma: the rate at which delta changes: when the underlying moves 1 dollar, how much delta changes. Covered in 2.2.">gamma</span>, covered in 2.2.</span></p>
 
-  <h3>单位</h3>
-  <p>delta 按每股算。1.1 讲过一张合约是 100 股，所以 delta 0.557 的一张 350 call，TSLA 每涨 1 美元，这张合约大约多值 55.7 美元。讲义和交易员常把 0.557 写成 55.7 或 56，讲义叫<span class="sym" data-say="whole number format。把 delta 乘以 100 写成整数：0.50 写成 50，−0.25 写成 −25。这个数正好是一张合约相当于多少股。">整数写法</span>：50 就是 0.50，−25 就是 −0.25。</p>
+  <h3><span class="l-zh">单位</span><span class="l-en">Units</span></h3>
+  <p><span class="l-zh">delta 按每股算。1.1 讲过一张合约是 100 股，所以 delta 0.557 的一张 350 call，TSLA 每涨 1 美元，这张合约大约多值 55.7 美元。讲义和交易员常把 0.557 写成 55.7 或 56，讲义叫<span class="sym" data-say="whole number format。把 delta 乘以 100 写成整数：0.50 写成 50，−0.25 写成 −25。这个数正好是一张合约相当于多少股。">整数写法</span>：50 就是 0.50，−25 就是 −0.25。</span><span class="l-en">Delta is per share. As 1.1 explained, one contract is 100 shares, so for one 350 call with delta 0.557, each 1-dollar rise in TSLA makes the contract worth about 55.7 dollars more. The lecture notes and traders often write 0.557 as 55.7 or 56; the lecture notes call this the <span class="sym" data-say="Whole number format: delta times 100 written as a whole number: 0.50 is written 50, −0.25 is written −25. The number is exactly how many shares one contract is equivalent to.">whole number format</span>: 50 means 0.50, −25 means −0.25.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>同一个数的三种读法</h2>
-  <p class="sub">讲义给 delta 四种读法。前三种是同一个数从三个角度看；第四种是一个概率，只是近似，放到第六节。</p>
-  <p>先说清三个词，后面一直要用。期权的买方使用这个权利，叫<span class="sym" data-say="exercise。期权的买方使用权利：call 按行权价买入标的，put 按行权价卖出标的。">行权</span>。call 的行权价低于股价，现在行权就有钱赚，叫<span class="sym" data-say="in the money。call：行权价低于股价；put：行权价高于股价。现在行权有钱赚。">实值</span>；行权价高于股价，现在行权没用，叫<span class="sym" data-say="out of the money。call：行权价高于股价；put：行权价低于股价。现在行权没用。">虚值</span>；两者差不多，叫<span class="sym" data-say="at the money。行权价约等于标的价格。1.1 讲过实务里以远期价为准。">平值</span>。put 反过来。</p>
+  <h2><span class="l-zh"><span class="n">一</span>同一个数的三种读法</span><span class="l-en"><span class="n">1</span>Three readings of the same number</span></h2>
+  <p class="sub"><span class="l-zh">讲义给 delta 四种读法。前三种是同一个数从三个角度看；第四种是一个概率，只是近似，放到第六节。</span><span class="l-en">The lecture notes give four readings of delta. The first three look at the same number from three angles; the fourth is a probability, only an approximation, and is left to section 6.</span></p>
+  <p><span class="l-zh">先说清三个词，后面一直要用。期权的买方使用这个权利，叫<span class="sym" data-say="exercise。期权的买方使用权利：call 按行权价买入标的，put 按行权价卖出标的。">行权</span>。call 的行权价低于股价，现在行权就有钱赚，叫<span class="sym" data-say="in the money。call：行权价低于股价；put：行权价高于股价。现在行权有钱赚。">实值</span>；行权价高于股价，现在行权没用，叫<span class="sym" data-say="out of the money。call：行权价高于股价；put：行权价低于股价。现在行权没用。">虚值</span>；两者差不多，叫<span class="sym" data-say="at the money。行权价约等于标的价格。1.1 讲过实务里以远期价为准。">平值</span>。put 反过来。</span><span class="l-en">First, three terms that will be used throughout. When the buyer of an option uses the right, that is called <span class="sym" data-say="Exercise: the option buyer uses the right: a call buys the underlying at the strike, a put sells the underlying at the strike.">exercise</span>. A call whose strike is below the stock price makes money if exercised now and is called <span class="sym" data-say="In the money. Call: strike below the stock price; put: strike above the stock price. Exercising now makes money.">in the money</span>; with the strike above the stock price, exercising now is useless, and it is called <span class="sym" data-say="Out of the money. Call: strike above the stock price; put: strike below the stock price. Exercising now is useless.">out of the money</span>; when the two are about equal it is <span class="sym" data-say="At the money: strike roughly equal to the underlying price. As 1.1 explained, in practice the forward price is the reference.">at the money</span>. For puts it is the other way around.</span></p>
   <table>
-    <thead><tr><th>读法</th><th class="txt">说的是什么</th><th class="txt">350 call，Δ = 0.557</th></tr></thead>
+    <thead><tr><th><span class="l-zh">读法</span><span class="l-en">Reading</span></th><th class="txt"><span class="l-zh">说的是什么</span><span class="l-en">What it says</span></th><th class="txt"><span class="l-zh">350 call，Δ = 0.557</span><span class="l-en">350 call, Δ = 0.557</span></th></tr></thead>
     <tbody>
-      <tr><td>① 价格变化速度</td><td class="txt">标的动 1 美元，期权每股动多少美元</td><td class="txt">TSLA 涨 1 美元，期权约涨 0.557 美元</td></tr>
-      <tr><td>② 等价标的头寸</td><td class="txt">期权的方向风险相当于持有多少股标的</td><td class="txt">买 1 张，约等于持有 55.7 股 TSLA</td></tr>
-      <tr><td>③ 对冲比率</td><td class="txt">要抵消方向风险，标的要反向做多少</td><td class="txt">买 1 张，同时卖出约 56 股</td></tr>
-      <tr><td>④ 实值概率（近似）</td><td class="txt">到期落在实值的可能性</td><td class="txt">按 delta 读约 56%；模型算出的实值概率是 50.3%</td></tr>
+      <tr><td><span class="l-zh">① 价格变化速度</span><span class="l-en">① Rate of price change</span></td><td class="txt"><span class="l-zh">标的动 1 美元，期权每股动多少美元</span><span class="l-en">When the underlying moves 1 dollar, how many dollars per share the option moves</span></td><td class="txt"><span class="l-zh">TSLA 涨 1 美元，期权约涨 0.557 美元</span><span class="l-en">TSLA up 1 dollar, option up about 0.557 dollars</span></td></tr>
+      <tr><td><span class="l-zh">② 等价标的头寸</span><span class="l-en">② Equivalent underlying position</span></td><td class="txt"><span class="l-zh">期权的方向风险相当于持有多少股标的</span><span class="l-en">How many shares of the underlying the option's directional risk is equivalent to</span></td><td class="txt"><span class="l-zh">买 1 张，约等于持有 55.7 股 TSLA</span><span class="l-en">Buying 1 contract is about the same as holding 55.7 shares of TSLA</span></td></tr>
+      <tr><td><span class="l-zh">③ 对冲比率</span><span class="l-en">③ Hedge ratio</span></td><td class="txt"><span class="l-zh">要抵消方向风险，标的要反向做多少</span><span class="l-en">How much of the underlying to trade in the opposite direction to offset the directional risk</span></td><td class="txt"><span class="l-zh">买 1 张，同时卖出约 56 股</span><span class="l-en">Buy 1 contract and sell about 56 shares</span></td></tr>
+      <tr><td><span class="l-zh">④ 实值概率（近似）</span><span class="l-en">④ Probability of finishing in the money (approximate)</span></td><td class="txt"><span class="l-zh">到期落在实值的可能性</span><span class="l-en">How likely it is to finish in the money</span></td><td class="txt"><span class="l-zh">按 delta 读约 56%；模型算出的实值概率是 50.3%</span><span class="l-en">Read from delta, about 56%; the model's probability of finishing in the money is 50.3%</span></td></tr>
     </tbody>
   </table>
 
-  <h3>① 价格变化速度</h3>
-  <p>讲义的例子：delta 50 的期权，标的涨 1.20，期权涨 .60；标的跌 1.70，期权跌 .85。都是标的变动的一半。</p>
-  <p>TSLA 这张 350 call，4/14 标的涨 11.96，期权涨 7.15，比例 0.598。这一天开始时的 delta 是 0.557（4/13 收盘），结束时是 0.651（4/14 收盘），0.598 落在两者之间：TSLA 这一天往上走，delta 也跟着往上变。</p>
+  <h3><span class="l-zh">① 价格变化速度</span><span class="l-en">① Rate of price change</span></h3>
+  <p><span class="l-zh">讲义的例子：delta 50 的期权，标的涨 1.20，期权涨 .60；标的跌 1.70，期权跌 .85。都是标的变动的一半。</span><span class="l-en">The example in the lecture notes: for a delta 50 option, the underlying rises 1.20 and the option rises .60; the underlying falls 1.70 and the option falls .85. Both are half the underlying's move.</span></p>
+  <p><span class="l-zh">TSLA 这张 350 call，4/14 标的涨 11.96，期权涨 7.15，比例 0.598。这一天开始时的 delta 是 0.557（4/13 收盘），结束时是 0.651（4/14 收盘），0.598 落在两者之间：TSLA 这一天往上走，delta 也跟着往上变。</span><span class="l-en">For this TSLA 350 call, on 4/14 the underlying rose 11.96 and the option rose 7.15, a ratio of 0.598. Delta was 0.557 at the start of the day (4/13 close) and 0.651 at the end (4/14 close), and 0.598 falls between them: TSLA moved up that day, and delta moved up with it.</span></p>
 
-  <h3>② 等价标的头寸</h3>
-  <p>按每股算，期权随标的每动 1 美元动 0.557 美元，赚赔就像持有 0.557 股。一张合约是 100 股的份额，所以 1 张 350 call 的方向风险相当于 55.7 股 TSLA。讲义的说法：delta 50 的期权，方向风险相当于 50 股股票；如果是<span class="sym" data-say="futures。约定将来某天按今天谈好的价格买卖标的的合约。讲义的例子多是期货期权：一张期权对应一张期货，不是 100 股。">期货</span>期权，一张期权对应一张期货，就说成半张期货。</p>
-  <p>按 352.36 算，55.74 股 TSLA 市值约 19,641 美元，买这张 call 按卖一价 21.10 只付 2,110 美元。付出的钱约是这些股票市值的十分之一，方向上的风险却差不多，这就是 1.1 说的杠杆。</p>
+  <h3><span class="l-zh">② 等价标的头寸</span><span class="l-en">② Equivalent underlying position</span></h3>
+  <p><span class="l-zh">按每股算，期权随标的每动 1 美元动 0.557 美元，赚赔就像持有 0.557 股。一张合约是 100 股的份额，所以 1 张 350 call 的方向风险相当于 55.7 股 TSLA。讲义的说法：delta 50 的期权，方向风险相当于 50 股股票；如果是<span class="sym" data-say="futures。约定将来某天按今天谈好的价格买卖标的的合约。讲义的例子多是期货期权：一张期权对应一张期货，不是 100 股。">期货</span>期权，一张期权对应一张期货，就说成半张期货。</span><span class="l-en">Per share, the option moves 0.557 dollars for every 1-dollar move in the underlying, so it gains and loses as if you held 0.557 shares. One contract covers 100 shares, so the directional risk of one 350 call is equivalent to 55.7 shares of TSLA. In the lecture notes' words: a delta 50 option carries the directional risk of 50 shares of stock; for an option on <span class="sym" data-say="Futures: a contract to buy or sell the underlying on a future date at a price agreed today. Most examples in the lecture notes are options on futures: one option corresponds to one futures contract, not 100 shares.">futures</span>, where one option corresponds to one futures contract, it is half a futures contract.</span></p>
+  <p><span class="l-zh">按 352.36 算，55.74 股 TSLA 市值约 19,641 美元，买这张 call 按卖一价 21.10 只付 2,110 美元。付出的钱约是这些股票市值的十分之一，方向上的风险却差不多，这就是 1.1 说的杠杆。</span><span class="l-en">At 352.36, 55.74 shares of TSLA are worth about 19,641 dollars, while buying this call at the ask of 21.10 costs only 2,110 dollars. You pay about a tenth of the market value of those shares for about the same directional risk; this is the leverage described in 1.1.</span></p>
 
-  <h3>③ 对冲比率</h3>
-  <p><span class="sym" data-say="hedge。做一笔方向相反的交易，让原来那笔交易的赚赔被抵消掉。">对冲</span>是做一笔反向的交易，让原来那笔的赚赔被抵消。1 张 call 像 55.7 股，卖出约 56 股就把方向风险抵掉了。手里没有股票也能卖出，叫<span class="sym" data-say="short sale。先向券商借股票卖掉，以后再买回来还上。股价涨了，买回来花的钱更多，所以亏钱。">卖空</span>：先借股票卖掉，以后再买回来还。股价涨了，买回来要花更多钱，所以卖出的股票在 TSLA 涨时亏钱、跌时赚钱，和 call 正好相反。</p>
-  <p>讲义的例子：delta 25 的期权，每买 1 张，要卖出 0.25 份标的，四张期权对一份标的（讲义写 4:1）。股票期权的一份标的是 100 股，所以是每买 1 张卖出 25 股，四张期权对 100 股。</p>
-  <p>4/14 TSLA 涨了 11.96：这张 call 赚 715 美元，卖出的 56 股亏 669.76 美元，合计 +45.24。两边差不多抵消。第五节把 25 个交易日逐天走一遍。</p>
-  <p>三种读法说的是同一个数。期权跟着标的动的比例（①），就是它相当于多少股（②），也就是抵消它要反向做多少股（③）。讲义列的第一种定义就是对冲比率。</p>
+  <h3><span class="l-zh">③ 对冲比率</span><span class="l-en">③ Hedge ratio</span></h3>
+  <p><span class="l-zh"><span class="sym" data-say="hedge。做一笔方向相反的交易，让原来那笔交易的赚赔被抵消掉。">对冲</span>是做一笔反向的交易，让原来那笔的赚赔被抵消。1 张 call 像 55.7 股，卖出约 56 股就把方向风险抵掉了。手里没有股票也能卖出，叫<span class="sym" data-say="short sale。先向券商借股票卖掉，以后再买回来还上。股价涨了，买回来花的钱更多，所以亏钱。">卖空</span>：先借股票卖掉，以后再买回来还。股价涨了，买回来要花更多钱，所以卖出的股票在 TSLA 涨时亏钱、跌时赚钱，和 call 正好相反。</span><span class="l-en">A <span class="sym" data-say="Hedge: a trade in the opposite direction so that the gains and losses of the original trade are offset.">hedge</span> is an opposite trade that offsets the gains and losses of the original one. One call is like 55.7 shares, so selling about 56 shares offsets its directional risk. You can sell shares you do not own; that is a <span class="sym" data-say="Short sale: borrow shares from the broker and sell them, then buy them back later to return. If the price rises, buying back costs more, so you lose money.">short sale</span>: borrow the shares and sell them, then buy them back later to return them. If the price rises, buying back costs more, so the shares sold lose money when TSLA rises and make money when it falls, the exact opposite of the call.</span></p>
+  <p><span class="l-zh">讲义的例子：delta 25 的期权，每买 1 张，要卖出 0.25 份标的，四张期权对一份标的（讲义写 4:1）。股票期权的一份标的是 100 股，所以是每买 1 张卖出 25 股，四张期权对 100 股。</span><span class="l-en">The example in the lecture notes: for a delta 25 option, each contract bought requires selling 0.25 units of the underlying, four options per unit (the notes write 4:1). For stock options one unit of the underlying is 100 shares, so each contract bought means selling 25 shares, four options per 100 shares.</span></p>
+  <p><span class="l-zh">4/14 TSLA 涨了 11.96：这张 call 赚 715 美元，卖出的 56 股亏 669.76 美元，合计 +45.24。两边差不多抵消。第五节把 25 个交易日逐天走一遍。</span><span class="l-en">On 4/14 TSLA rose 11.96: this call made 715 dollars and the 56 shares sold lost 669.76 dollars, for a total of +45.24. The two sides roughly offset. Section 5 goes through all 25 trading days one by one.</span></p>
+  <p><span class="l-zh">三种读法说的是同一个数。期权跟着标的动的比例（①），就是它相当于多少股（②），也就是抵消它要反向做多少股（③）。讲义列的第一种定义就是对冲比率。</span><span class="l-en">The three readings describe the same number. The ratio by which the option follows the underlying (①) is how many shares it is equivalent to (②), which is how many shares you trade in the opposite direction to offset it (③). The first definition listed in the lecture notes is the hedge ratio.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>正负号</h2>
-  <p class="sub">delta 的正负说的是方向：标的涨时这个头寸赚钱，delta 为正；标的涨时亏钱，delta 为负。</p>
+  <h2><span class="l-zh"><span class="n">二</span>正负号</span><span class="l-en"><span class="n">2</span>Signs</span></h2>
+  <p class="sub"><span class="l-zh">delta 的正负说的是方向：标的涨时这个头寸赚钱，delta 为正；标的涨时亏钱，delta 为负。</span><span class="l-en">The sign of delta gives the direction: if the position makes money when the underlying rises, delta is positive; if it loses money when the underlying rises, delta is negative.</span></p>
   <table class="nwh">
-    <thead><tr><th>头寸</th><th>TSLA 涨时</th><th>delta</th><th>每张折合</th></tr></thead>
+    <thead><tr><th><span class="l-zh">头寸</span><span class="l-en">Position</span></th><th><span class="l-zh">TSLA 涨时</span><span class="l-en">TSLA up</span></th><th>delta</th><th><span class="l-zh">每张折合</span><span class="l-en">Per contract</span></th></tr></thead>
     <tbody class="nw">
-      <tr><td>买 350 call</td><td>赚</td><td class="pos">+0.5574</td><td>+55.7 股</td></tr>
-      <tr><td>卖 350 call</td><td>亏</td><td class="neg">−0.5574</td><td>−55.7 股</td></tr>
-      <tr><td>买 350 put</td><td>亏</td><td class="neg">−0.4426</td><td>−44.3 股</td></tr>
-      <tr><td>卖 350 put</td><td>赚</td><td class="pos">+0.4426</td><td>+44.3 股</td></tr>
-      <tr><td>买 100 股 TSLA</td><td>赚</td><td class="pos">每股 +1</td><td>+100 股</td></tr>
+      <tr><td><span class="l-zh">买 350 call</span><span class="l-en">Long 350 call</span></td><td><span class="l-zh">赚</span><span class="l-en">gains</span></td><td class="pos">+0.5574</td><td><span class="l-zh">+55.7 股</span><span class="l-en">+55.7 shares</span></td></tr>
+      <tr><td><span class="l-zh">卖 350 call</span><span class="l-en">Short 350 call</span></td><td><span class="l-zh">亏</span><span class="l-en">loses</span></td><td class="neg">−0.5574</td><td><span class="l-zh">−55.7 股</span><span class="l-en">−55.7 shares</span></td></tr>
+      <tr><td><span class="l-zh">买 350 put</span><span class="l-en">Long 350 put</span></td><td><span class="l-zh">亏</span><span class="l-en">loses</span></td><td class="neg">−0.4426</td><td><span class="l-zh">−44.3 股</span><span class="l-en">−44.3 shares</span></td></tr>
+      <tr><td><span class="l-zh">卖 350 put</span><span class="l-en">Short 350 put</span></td><td><span class="l-zh">赚</span><span class="l-en">gains</span></td><td class="pos">+0.4426</td><td><span class="l-zh">+44.3 股</span><span class="l-en">+44.3 shares</span></td></tr>
+      <tr><td><span class="l-zh">买 100 股 TSLA</span><span class="l-en">Long 100 TSLA</span></td><td><span class="l-zh">赚</span><span class="l-en">gains</span></td><td class="pos"><span class="l-zh">每股 +1</span><span class="l-en">+1/share</span></td><td><span class="l-zh">+100 股</span><span class="l-en">+100 shares</span></td></tr>
     </tbody>
   </table>
-  <p>call 是买入的权利，TSLA 越高越值钱，所以 call 的 delta 在 0 到 1 之间。put 是卖出的权利，TSLA 越高越不值钱，所以 put 的 delta 在 −1 到 0 之间。卖出一个期权，赚赔正好是买方的反面，符号跟着反过来。讲义的说法：买 call 和卖 put 是看涨的头寸，卖 call 和买 put 是看跌的头寸。</p>
-  <p>同一行权价、同一到期日的 call 和 put，delta 正好差 1：350 call 是 0.5574，350 put 是 −0.4426，0.5574 − (−0.4426) = 1。4/13 这条链上 300 到 470 每一档都是这样。原因是买 1 张 call、同时卖 1 张同样的 put，合起来到期时每股的价值是股价减 350：股价每动 1 美元，它也动 1 美元，和持有 100 股一样（节点 5.1 讲这类<span class="sym" data-say="synthetic position。用几个期权拼出和另一种头寸一样的到期结果，例如买 call、卖 put 合成持有股票。5.1 讲。">合成头寸</span>）；股票的 delta 每股是 1，所以 call 的 delta 减去 put 的 delta 正好是 1。讲义的风险表也是这样：delta 87 对 −13，73 对 −27，54 对 −46。</p>
+  <p><span class="l-zh">call 是买入的权利，TSLA 越高越值钱，所以 call 的 delta 在 0 到 1 之间。put 是卖出的权利，TSLA 越高越不值钱，所以 put 的 delta 在 −1 到 0 之间。卖出一个期权，赚赔正好是买方的反面，符号跟着反过来。讲义的说法：买 call 和卖 put 是看涨的头寸，卖 call 和买 put 是看跌的头寸。</span><span class="l-en">A call is the right to buy, worth more the higher TSLA goes, so a call's delta is between 0 and 1. A put is the right to sell, worth less the higher TSLA goes, so a put's delta is between −1 and 0. Selling an option gives exactly the opposite gains and losses of the buyer, so the sign flips too. In the lecture notes' words: long calls and short puts are bullish positions; short calls and long puts are bearish positions.</span></p>
+  <p><span class="l-zh">同一行权价、同一到期日的 call 和 put，delta 正好差 1：350 call 是 0.5574，350 put 是 −0.4426，0.5574 − (−0.4426) = 1。4/13 这条链上 300 到 470 每一档都是这样。原因是买 1 张 call、同时卖 1 张同样的 put，合起来到期时每股的价值是股价减 350：股价每动 1 美元，它也动 1 美元，和持有 100 股一样（节点 5.1 讲这类<span class="sym" data-say="synthetic position。用几个期权拼出和另一种头寸一样的到期结果，例如买 call、卖 put 合成持有股票。5.1 讲。">合成头寸</span>）；股票的 delta 每股是 1，所以 call 的 delta 减去 put 的 delta 正好是 1。讲义的风险表也是这样：delta 87 对 −13，73 对 −27，54 对 −46。</span><span class="l-en">A call and a put with the same strike and expiration have deltas exactly 1 apart: the 350 call is 0.5574, the 350 put is −0.4426, and 0.5574 − (−0.4426) = 1. Every strike from 300 to 470 on the 4/13 chain works this way. The reason: buying 1 call and selling 1 identical put together are worth the stock price minus 350 per share at expiration, so they move 1 dollar for every 1-dollar move in the stock, the same as holding 100 shares (node 5.1 covers <span class="sym" data-say="Synthetic position: several options combined to give the same expiration result as another position, for example a long call and a short put make a synthetic long stock. Covered in 5.1.">synthetic positions</span> like this); stock has a delta of 1 per share, so the call's delta minus the put's delta is exactly 1. The risk tables in the lecture notes show the same: delta 87 against −13, 73 against −27, 54 against −46.</span></p>
 
-  <h3>任何头寸换成股数</h3>
+  <h3><span class="l-zh">任何头寸换成股数</span><span class="l-en">Converting any position into shares</span></h3>
   <div class="formula">
-    <div class="math">相当于的股数 ＝ 张数 × 100 × Δ × (买 +1，卖 −1)</div>
-    <div class="gloss">Δ 带着自己的正负号：call 为正，put 为负。结果为正是<span class="sym" data-say="long。标的涨时赚钱的方向，像持有股票。">多头</span>，为负是<span class="sym" data-say="short。标的跌时赚钱的方向，像卖空股票。">空头</span>。</div>
+    <div class="math"><span class="l-zh">相当于的股数 ＝ 张数 × 100 × Δ × (买 +1，卖 −1)</span><span class="l-en">Equivalent shares = contracts × 100 × Δ × (long +1, short −1)</span></div>
+    <div class="gloss"><span class="l-zh">Δ 带着自己的正负号：call 为正，put 为负。结果为正是<span class="sym" data-say="long。标的涨时赚钱的方向，像持有股票。">多头</span>，为负是<span class="sym" data-say="short。标的跌时赚钱的方向，像卖空股票。">空头</span>。</span><span class="l-en">Δ carries its own sign: positive for calls, negative for puts. A positive result is <span class="sym" data-say="Long: the direction that makes money when the underlying rises, like holding stock.">long</span>, a negative one is <span class="sym" data-say="Short: the direction that makes money when the underlying falls, like a short sale of stock.">short</span>.</span></div>
   </div>
   <div class="formula">
-    <div class="math">对冲要做的股数 ＝ −相当于的股数</div>
-    <div class="gloss">相当于多头多少股，就卖出多少股；相当于空头多少股，就买入多少股。</div>
+    <div class="math"><span class="l-zh">对冲要做的股数 ＝ −相当于的股数</span><span class="l-en">Shares to trade for the hedge = −equivalent shares</span></div>
+    <div class="gloss"><span class="l-zh">相当于多头多少股，就卖出多少股；相当于空头多少股，就买入多少股。</span><span class="l-en">If the position is long a number of shares, sell that many; if it is short, buy that many.</span></div>
   </div>
   <div class="panel">
     <div class="conv">
-      <div class="seg" id="cvSide"><button data-v="1" aria-pressed="true">买</button><button data-v="-1" aria-pressed="false">卖</button></div>
+      <div class="seg" id="cvSide"><button data-v="1" aria-pressed="true"><span class="l-zh">买</span><span class="l-en">Long</span></button><button data-v="-1" aria-pressed="false"><span class="l-zh">卖</span><span class="l-en">Short</span></button></div>
       <div class="seg" id="cvType"><button data-v="c" aria-pressed="true">call</button><button data-v="p" aria-pressed="false">put</button></div>
-      <label>行权价 <select id="cvK" aria-label="行权价"></select></label>
-      <label>张数 <input type="number" id="cvN" value="10" min="1" max="1000" step="1" aria-label="张数"></label>
+      <label><span class="l-zh">行权价 </span><span class="l-en">Strike </span><select id="cvK" aria-label="行权价" data-en-aria-label="Strike"></select></label>
+      <label><span class="l-zh">张数 </span><span class="l-en">Contracts </span><input type="number" id="cvN" value="10" min="1" max="1000" step="1" aria-label="张数" data-en-aria-label="Contracts"></label>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">每股 delta（4/13 收盘）</div><div class="d" id="cvD"></div><div class="d2" id="cvDb"></div></div>
-      <div class="stat"><div class="k">相当于持有</div><div class="d" id="cvSh" style="color:var(--control)"></div><div class="d2" id="cvShb"></div></div>
-      <div class="stat"><div class="k">对冲要做</div><div class="d" id="cvH" style="color:var(--result)"></div><div class="d2" id="cvHb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">每股 delta（4/13 收盘）</span><span class="l-en">Delta per share (4/13 close)</span></div><div class="d" id="cvD"></div><div class="d2" id="cvDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">相当于持有</span><span class="l-en">Equivalent to holding</span></div><div class="d" id="cvSh" style="color:var(--control)"></div><div class="d2" id="cvShb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">对冲要做</span><span class="l-en">Hedge trade</span></div><div class="d" id="cvH" style="color:var(--result)"></div><div class="d2" id="cvHb"></div></div>
     </div>
     <p class="calc" id="cvCalc"></p>
   </div>
-  <p class="tiny">几条腿的仓位，各腿的股数直接相加，2.4 讲组合的希腊字母。</p>
+  <p class="tiny"><span class="l-zh">几条腿的仓位，各腿的股数直接相加，2.4 讲组合的希腊字母。</span><span class="l-en">For a multi-leg position, add up the shares of each leg; 2.4 covers the Greeks of a portfolio.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>delta 为什么会自己变</h2>
-  <p class="sub">同一天、同一个到期日，行权价不同，delta 就不同；同一个行权价，过几天 delta 也不同。</p>
-  <p>下图是 4/13 收盘这一条期权链上每个行权价的 delta。实值、虚值、平值的说法见第一节。</p>
+  <h2><span class="l-zh"><span class="n">三</span>delta 为什么会自己变</span><span class="l-en"><span class="n">3</span>Why delta changes on its own</span></h2>
+  <p class="sub"><span class="l-zh">同一天、同一个到期日，行权价不同，delta 就不同；同一个行权价，过几天 delta 也不同。</span><span class="l-en">On the same day and the same expiration, different strikes have different deltas; and the same strike has a different delta a few days later.</span></p>
+  <p><span class="l-zh">下图是 4/13 收盘这一条期权链上每个行权价的 delta。实值、虚值、平值的说法见第一节。</span><span class="l-en">The chart below shows the delta at every strike on the 4/13 closing chain. In the money, out of the money and at the money are defined in section 1.</span></p>
   <div class="panel">
-    <svg id="chain" viewBox="0 0 720 340" role="img" aria-label="4/13 收盘 5/15 到期整条期权链的 call delta 与 put delta"></svg>
+    <svg id="chain" viewBox="0 0 720 340" role="img" aria-label="4/13 收盘 5/15 到期整条期权链的 call delta 与 put delta" data-en-aria-label="Call delta and put delta across the whole 4/13 closing chain for the 5/15 expiration"></svg>
     <div class="legend">
       <span><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>call delta</span>
       <span><i style="background:var(--result);height:3px;vertical-align:.25rem"></i>put delta</span>
-      <span>竖虚线：4/13 收盘 352.36</span>
+      <span><span class="l-zh">竖虚线：4/13 收盘 352.36</span><span class="l-en">vertical dashed line: 4/13 close 352.36</span></span>
     </div>
   </div>
-  <p><b>越实值越靠近 1。</b>300 call 深度实值，delta 0.8825。TSLA 要比现在低 14.9% 它才会作废。按 1.2 的尺子，300 在分布中心下方 1.20 个标准差，到期落到它下面的可能约 11.5%。这把尺子是心算用的近似，第六节按模型逐档算出的是 15.7%。这张 call 大概率会被行权，行权就是花 300 美元买一股，所以它的价格基本跟着股价一美元对一美元地动。</p>
-  <p><b>越虚值越靠近 0。</b>450 call 深度虚值，delta 0.0419。TSLA 要涨 27.7% 它才有用，450 在中心上方 1.76 个标准差，到期越过它的可能约 3.9%。今天 TSLA 多涨 1 美元，离 450 还是很远，这张期权每股只多值约 4 美分。</p>
-  <p><b>平值附近变得最快。</b>行权价靠近股价时，TSLA 每动一点，到期落在实值还是虚值的前景变化最大，曲线在这里最陡。call delta 在行权价约 357 处穿过 0.5。讲义说 delta 50 的期权就是平值，平值以远期价为准（1.1）；这里远期价是 353.69，差 3 美元左右，来自对数正态分布上下不对称（1.2），心算时当成同一个价就行。</p>
-  <p>put 的曲线是 call 的曲线整体往下挪 1（第二节）：深度实值的 put 在右边，delta 接近 −1。</p>
+  <p><span class="l-zh"><b>越实值越靠近 1。</b>300 call 深度实值，delta 0.8825。TSLA 要比现在低 14.9% 它才会作废。按 1.2 的尺子，300 在分布中心下方 1.20 个标准差，到期落到它下面的可能约 11.5%。这把尺子是心算用的近似，第六节按模型逐档算出的是 15.7%。这张 call 大概率会被行权，行权就是花 300 美元买一股，所以它的价格基本跟着股价一美元对一美元地动。</span><span class="l-en"><b>The deeper in the money, the closer to 1.</b> The 300 call is deep in the money, with delta 0.8825. TSLA would have to be 14.9% lower than now for it to expire worthless. By the ruler of 1.2, 300 is 1.20 standard deviations below the center of the distribution, and the chance of finishing below it is about 11.5%. That ruler is an approximation for mental math; computed strike by strike with the model in section 6, it is 15.7%. This call will most likely be exercised, and exercising means paying 300 dollars for a share, so its price moves roughly dollar for dollar with the stock.</span></p>
+  <p><span class="l-zh"><b>越虚值越靠近 0。</b>450 call 深度虚值，delta 0.0419。TSLA 要涨 27.7% 它才有用，450 在中心上方 1.76 个标准差，到期越过它的可能约 3.9%。今天 TSLA 多涨 1 美元，离 450 还是很远，这张期权每股只多值约 4 美分。</span><span class="l-en"><b>The further out of the money, the closer to 0.</b> The 450 call is deep out of the money, with delta 0.0419. TSLA would have to rise 27.7% for it to be useful; 450 is 1.76 standard deviations above the center, and the chance of finishing above it is about 3.9%. If TSLA rises another dollar today it is still far from 450, and the option gains only about 4 cents per share.</span></p>
+  <p><span class="l-zh"><b>平值附近变得最快。</b>行权价靠近股价时，TSLA 每动一点，到期落在实值还是虚值的前景变化最大，曲线在这里最陡。call delta 在行权价约 357 处穿过 0.5。讲义说 delta 50 的期权就是平值，平值以远期价为准（1.1）；这里远期价是 353.69，差 3 美元左右，来自对数正态分布上下不对称（1.2），心算时当成同一个价就行。</span><span class="l-en"><b>It changes fastest near the money.</b> When the strike is close to the stock price, every small move in TSLA changes the outlook of finishing in or out of the money the most, and the curve is steepest here. The call delta crosses 0.5 at a strike of about 357. The lecture notes say a delta 50 option is at the money, with the money measured against the forward price (1.1); here the forward price is 353.69, about 3 dollars apart, a gap that comes from the up-down asymmetry of the lognormal distribution (1.2). For mental math, treat them as the same price.</span></p>
+  <p><span class="l-zh">put 的曲线是 call 的曲线整体往下挪 1（第二节）：深度实值的 put 在右边，delta 接近 −1。</span><span class="l-en">The put curve is the call curve shifted down by 1 (section 2): deep in-the-money puts are on the right, with delta close to −1.</span></p>
 
-  <h3>离到期越近，曲线越陡</h3>
-  <p>「远」和「近」要按标准差个数量（1.2）。离到期越近，一个标准差越窄，同样的距离折成标准差个数就越多，delta 就被推向 0 或 1。下图是 4/13 到 5/15 每天收盘整条链的 call delta。横轴换成行权价比当天股价高出多少，这样每天的曲线中心都对在 0。</p>
+  <h3><span class="l-zh">离到期越近，曲线越陡</span><span class="l-en">The closer to expiration, the steeper the curve</span></h3>
+  <p><span class="l-zh">「远」和「近」要按标准差个数量（1.2）。离到期越近，一个标准差越窄，同样的距离折成标准差个数就越多，delta 就被推向 0 或 1。下图是 4/13 到 5/15 每天收盘整条链的 call delta。横轴换成行权价比当天股价高出多少，这样每天的曲线中心都对在 0。</span><span class="l-en">"Far" and "near" have to be measured in standard deviations (1.2). The closer to expiration, the narrower one standard deviation, the more standard deviations the same distance converts into, and the further delta is pushed toward 0 or 1. The chart below shows the call delta of the whole chain at each close from 4/13 to 5/15. The horizontal axis is how far the strike is above that day's stock price, so every day's curve is centered on 0.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="tgPlay">重播</button></div>
-    <svg id="tight" viewBox="0 0 720 330" role="img" aria-label="4/13 到 5/15 每天整条链的 call delta，横轴是行权价比当天股价高出的百分比"></svg>
+    <div class="bar"><button class="btn ghost" id="tgPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <svg id="tight" viewBox="0 0 720 330" role="img" aria-label="4/13 到 5/15 每天整条链的 call delta，横轴是行权价比当天股价高出的百分比" data-en-aria-label="Call delta of the whole chain each day from 4/13 to 5/15, with the strike's percentage above that day's stock price on the horizontal axis"></svg>
     <div class="legend">
-      <span><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>当天收盘的 call delta</span>
-      <span><i style="background:var(--ink-faint);height:1px;vertical-align:.25rem"></i>之前每天的曲线</span>
+      <span><span class="l-zh"><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>当天收盘的 call delta</span><span class="l-en"><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>call delta at that day's close</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint);height:1px;vertical-align:.25rem"></i>之前每天的曲线</span><span class="l-en"><i style="background:var(--ink-faint);height:1px;vertical-align:.25rem"></i>curves of earlier days</span></span>
       <span><i style="background:var(--ink);border-radius:50%"></i>350 call</span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="tgD"></div><div class="d2" id="tgDb"></div></div>
-      <div class="stat"><div class="k">行权价高出股价 10%</div><div class="d" id="tgU"></div><div class="d2">call delta</div></div>
-      <div class="stat"><div class="k">行权价低于股价 10%</div><div class="d" id="tgL"></div><div class="d2">call delta</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="tgD"></div><div class="d2" id="tgDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">行权价高出股价 10%</span><span class="l-en">Strike 10% above the stock price</span></div><div class="d" id="tgU"></div><div class="d2">call delta</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">行权价低于股价 10%</span><span class="l-en">Strike 10% below the stock price</span></div><div class="d" id="tgL"></div><div class="d2">call delta</div></div>
       <div class="stat"><div class="k">350 call</div><div class="d" id="tgK" style="color:var(--control)"></div><div class="d2" id="tgKb"></div></div>
     </div>
   </div>
-  <p>行权价高出股价 10% 的 call，4/13 离到期 32 天时 delta 0.267；4/29 离到期 16 天，0.166；5/7 离到期 8 天，0.093；5/14 只剩 1 天，0.014。低于股价 10% 的 call 反过来，从 0.796 升到 0.994。到期那天曲线变成台阶：行权价在股价以下的全部是 1，以上的全部是 0。</p>
-  <p>350 那个点同时在往左移：TSLA 从 352 涨到 445，350 从平值变成深度实值。delta 自己会变，就是这两件事叠在一起：标的价格变了，离到期的时间也少了。隐含波动率变了也会让 delta 变，节点 6 讲。</p>
+  <p><span class="l-zh">行权价高出股价 10% 的 call，4/13 离到期 32 天时 delta 0.267；4/29 离到期 16 天，0.166；5/7 离到期 8 天，0.093；5/14 只剩 1 天，0.014。低于股价 10% 的 call 反过来，从 0.796 升到 0.994。到期那天曲线变成台阶：行权价在股价以下的全部是 1，以上的全部是 0。</span><span class="l-en">The call with a strike 10% above the stock price had delta 0.267 on 4/13 with 32 days to expiration; 0.166 on 4/29 with 16 days; 0.093 on 5/7 with 8 days; 0.014 on 5/14 with 1 day left. The call 10% below the stock price goes the other way, from 0.796 to 0.994. On expiration day the curve becomes a step: every strike below the stock price is 1, every strike above is 0.</span></p>
+  <p><span class="l-zh">350 那个点同时在往左移：TSLA 从 352 涨到 445，350 从平值变成深度实值。delta 自己会变，就是这两件事叠在一起：标的价格变了，离到期的时间也少了。隐含波动率变了也会让 delta 变，节点 6 讲。</span><span class="l-en">At the same time the 350 point moves left: TSLA rose from 352 to 445, and 350 went from at the money to deep in the money. Delta changes on its own because these two things combine: the underlying price changed, and the time to expiration shrank. A change in implied volatility also changes delta; node 6 covers that.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>逐天回放：0.557 和 0.734</h2>
-  <p class="sub">入场 delta 只管入场那一刻。之后 TSLA 每走一天，delta 就换一个值。</p>
-  <p>1.1 算过：4/13 到 5/15，TSLA 涨了 69.96，350 call 的中间价从 21.05 涨到 72.42，涨了 51.37，两者之比 0.734，叫<span class="sym" data-say="期权的涨跌 ÷ 标的的涨跌，1.1 的叫法：整段持有下来，期权跟上了标的涨幅的多少。">捕获比</span>。按入场 delta 算，期权只该涨 0.5574 × 69.96 = 39.00，少了 12.37。</p>
-  <p>改成逐天算：每一天用前一天收盘的 delta，乘当天 TSLA 的涨跌，得到这一天期权大约该涨多少，再把 24 个交易日加起来。</p>
+  <h2><span class="l-zh"><span class="n">四</span>逐天回放：0.557 和 0.734</span><span class="l-en"><span class="n">4</span>Day-by-day replay: 0.557 and 0.734</span></h2>
+  <p class="sub"><span class="l-zh">入场 delta 只管入场那一刻。之后 TSLA 每走一天，delta 就换一个值。</span><span class="l-en">The entry delta applies only at the moment of entry. Every day TSLA moves after that, delta takes a new value.</span></p>
+  <p><span class="l-zh">1.1 算过：4/13 到 5/15，TSLA 涨了 69.96，350 call 的中间价从 21.05 涨到 72.42，涨了 51.37，两者之比 0.734，叫<span class="sym" data-say="期权的涨跌 ÷ 标的的涨跌，1.1 的叫法：整段持有下来，期权跟上了标的涨幅的多少。">捕获比</span>。按入场 delta 算，期权只该涨 0.5574 × 69.96 = 39.00，少了 12.37。</span><span class="l-en">From 1.1: from 4/13 to 5/15, TSLA rose 69.96 and the 350 call's mid rose from 21.05 to 72.42, up 51.37, a ratio of 0.734, called the <span class="sym" data-say="Option's change ÷ underlying's change, the term from 1.1: over the whole holding period, how much of the underlying's gain the option kept up with.">capture ratio</span>. At the entry delta, the option should have risen only 0.5574 × 69.96 = 39.00, 12.37 short.</span></p>
+  <p><span class="l-zh">改成逐天算：每一天用前一天收盘的 delta，乘当天 TSLA 的涨跌，得到这一天期权大约该涨多少，再把 24 个交易日加起来。</span><span class="l-en">Compute it day by day instead: each day, multiply the previous close's delta by TSLA's change that day to get roughly how much the option should rise that day, then add up the 24 trading days.</span></p>
   <div class="formula">
-    <div class="math">期权的涨跌 ≈ <span class="sym" data-say="读作「西格玛」，这里是大写。求和：每一天算一次，全部加起来。">Σ</span> Δ<sub>前一天</sub> × 当天标的的涨跌</div>
-    <div class="gloss">每天用前一天收盘的 delta 乘当天的涨跌，24 天全部加起来</div>
+    <div class="math"><span class="l-zh">期权的涨跌 ≈ <span class="sym" data-say="读作「西格玛」，这里是大写。求和：每一天算一次，全部加起来。">Σ</span> Δ<sub>前一天</sub> × 当天标的的涨跌</span><span class="l-en">Change in option ≈ <span class="sym" data-say="Capital sigma: summation. Compute once for each day and add them all up.">Σ</span> Δ<sub>previous day</sub> × underlying's change that day</span></div>
+    <div class="gloss"><span class="l-zh">每天用前一天收盘的 delta 乘当天的涨跌，24 天全部加起来</span><span class="l-en">Each day, multiply the previous close's delta by that day's change, and add up all 24 days</span></div>
   </div>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="rpPlay">逐天播放</button></div>
-    <svg id="rep" viewBox="0 0 720 430" role="img" aria-label="TSLA 与 350 call 从入场起的累计涨跌，以及每天收盘的 delta"></svg>
+    <div class="bar"><button class="btn ghost" id="rpPlay"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button></div>
+    <svg id="rep" viewBox="0 0 720 430" role="img" aria-label="TSLA 与 350 call 从入场起的累计涨跌，以及每天收盘的 delta" data-en-aria-label="Cumulative changes of TSLA and the 350 call since entry, and delta at each close"></svg>
     <div class="legend">
-      <span><i style="background:var(--ink);height:2px;vertical-align:.25rem"></i>TSLA 累计涨跌</span>
-      <span><i style="background:var(--control);height:4px;vertical-align:.2rem"></i>350 call 累计涨跌（实际）</span>
-      <span><i style="background:var(--result);height:2px;vertical-align:.25rem"></i>逐天 delta × 涨跌，累加</span>
-      <span><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>虚线：入场 delta 0.557 × TSLA 累计涨跌</span>
+      <span><span class="l-zh"><i style="background:var(--ink);height:2px;vertical-align:.25rem"></i>TSLA 累计涨跌</span><span class="l-en"><i style="background:var(--ink);height:2px;vertical-align:.25rem"></i>TSLA cumulative change</span></span>
+      <span><span class="l-zh"><i style="background:var(--control);height:4px;vertical-align:.2rem"></i>350 call 累计涨跌（实际）</span><span class="l-en"><i style="background:var(--control);height:4px;vertical-align:.2rem"></i>350 call cumulative change (actual)</span></span>
+      <span><span class="l-zh"><i style="background:var(--result);height:2px;vertical-align:.25rem"></i>逐天 delta × 涨跌，累加</span><span class="l-en"><i style="background:var(--result);height:2px;vertical-align:.25rem"></i>daily delta × change, accumulated</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>虚线：入场 delta 0.557 × TSLA 累计涨跌</span><span class="l-en"><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>dashed: entry delta 0.557 × TSLA cumulative change</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
-      <div class="stat"><div class="k">TSLA 当天</div><div class="d" id="rpU"></div><div class="d2" id="rpUb"></div></div>
-      <div class="stat"><div class="k">350 call 当天</div><div class="d" id="rpC" style="color:var(--control)"></div><div class="d2" id="rpCb"></div></div>
-      <div class="stat"><div class="k">累计：实际 / 逐天累加</div><div class="d" id="rpA"></div><div class="d2" id="rpAb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 当天</span><span class="l-en">TSLA that day</span></div><div class="d" id="rpU"></div><div class="d2" id="rpUb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">350 call 当天</span><span class="l-en">350 call that day</span></div><div class="d" id="rpC" style="color:var(--control)"></div><div class="d2" id="rpCb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">累计：实际 / 逐天累加</span><span class="l-en">Cumulative: actual / daily sum</span></div><div class="d" id="rpA"></div><div class="d2" id="rpAb"></div></div>
     </div>
     <div class="say plain" id="rpSay"></div>
   </div>
 
-  <h3>捕获比是按涨跌加权的 delta</h3>
-  <p>把上面的式子两边都除以 TSLA 全程的涨跌 69.96，左边就是捕获比，右边是每天的 delta 乘一个权重再相加，权重是这一天的涨跌占全程的多少。所以 0.734 近似是这 24 天 delta 的一种平均，但不是简单平均，是按每天的涨跌加权，涨跌带着正负号：涨的日子权重为正，跌的日子权重为负。严格按这个算是 52.37 ÷ 69.96 = 0.749，再扣掉下面说的 1.00，就是 51.37 ÷ 69.96 = 0.734。</p>
-  <p>24 天里每天开始时的 delta，简单平均是 0.857，比 0.749 高，原因在涨跌的时机。涨得最多的 4/15（+27.61）权重最大，那天开始时的 delta 只有 0.651。最后一天 5/15 跌了 21.04，那时 delta 已经是 1.000，这一天权重为负，高 delta 的这一份被整份减掉：期权几乎一美元对一美元地跟着跌了 20.98。只算前 23 天，加权平均是 0.807；加上 5/15，降到 0.749。低 delta 的时候在涨，高 delta 的时候在跌，加权平均就低于简单平均。</p>
-  <p>逐天累加比实际多 1.00，这是一正一负两笔账相抵后剩下的。第一笔：每天用的是前一天的 delta，当天 delta 跟着变的那一截没算进去。大涨的日子 delta 变大，期权会多涨；大跌的日子 delta 变小，期权会少跌，两种都让期权比按 delta 算的多赚。这是 <span class="sym" data-say="gamma。delta 的变化速度：标的动 1 美元，delta 变多少。2.2 讲。">gamma</span> 的作用，按每天收盘报价里的 gamma 算，24 天合计 +6.04。第二笔：就算 TSLA 不动，期权也一天天变便宜，这是 <span class="sym" data-say="theta。时间价值的流失速度：标的不动，期权每过一天变便宜多少。2.2 讲。">theta</span>，按每天收盘报价里的 theta 算，合计 −7.15。两笔相抵是 −1.11，和 −1.00 只差 0.11，剩下的来自隐含波动率的起落等（2.3）。2.2 的逐日账本把这两笔一天天记出来，并讲它们为什么总是一起出现。</p>
-  <p>时间价值在 TSLA 动得少的日子最看得出来。4/27 是周一，TSLA 涨 2.92，按前一天的 delta 0.794 期权该涨 2.32，实际只涨了 1.47，少了 0.85。从周五收盘到周一收盘隔了三个日历日，报价快照里的 theta 是每天 −0.27，三天 −0.82；这一天 350 call 的隐含波动率几乎没变（43.3% 到 43.5%）。</p>
-  <p>回到 0.557 和 0.734：捕获比比入场 delta 大，这一次对买方有利。TSLA 往上走，delta 跟着变大，越涨赚得越快。如果 TSLA 一路跌，delta 会往 0 缩，期权跌得越来越慢，价格带来的亏损会小于 0.557 × 跌幅。两个方向上 delta 的变化都对期权买方有利，代价是每天流失的时间价值。</p>
+  <h3><span class="l-zh">捕获比是按涨跌加权的 delta</span><span class="l-en">The capture ratio is a delta weighted by the moves</span></h3>
+  <p><span class="l-zh">把上面的式子两边都除以 TSLA 全程的涨跌 69.96，左边就是捕获比，右边是每天的 delta 乘一个权重再相加，权重是这一天的涨跌占全程的多少。所以 0.734 近似是这 24 天 delta 的一种平均，但不是简单平均，是按每天的涨跌加权，涨跌带着正负号：涨的日子权重为正，跌的日子权重为负。严格按这个算是 52.37 ÷ 69.96 = 0.749，再扣掉下面说的 1.00，就是 51.37 ÷ 69.96 = 0.734。</span><span class="l-en">Divide both sides of the formula above by TSLA's total change of 69.96: the left side becomes the capture ratio, and the right side is each day's delta times a weight, added up, where the weight is that day's share of the total change. So 0.734 is roughly an average of the 24 days' deltas, but not a simple average: it is weighted by each day's move, with sign. Up days have positive weights and down days negative weights. Computed strictly this way it is 52.37 ÷ 69.96 = 0.749; subtracting the 1.00 discussed below gives 51.37 ÷ 69.96 = 0.734.</span></p>
+  <p><span class="l-zh">24 天里每天开始时的 delta，简单平均是 0.857，比 0.749 高，原因在涨跌的时机。涨得最多的 4/15（+27.61）权重最大，那天开始时的 delta 只有 0.651。最后一天 5/15 跌了 21.04，那时 delta 已经是 1.000，这一天权重为负，高 delta 的这一份被整份减掉：期权几乎一美元对一美元地跟着跌了 20.98。只算前 23 天，加权平均是 0.807；加上 5/15，降到 0.749。低 delta 的时候在涨，高 delta 的时候在跌，加权平均就低于简单平均。</span><span class="l-en">The simple average of the delta at the start of each of the 24 days is 0.857, higher than 0.749, because of when the moves happened. The biggest rise, on 4/15 (+27.61), has the largest weight, and delta at the start of that day was only 0.651. On the last day, 5/15, TSLA fell 21.04 when delta was already 1.000; that day has a negative weight, so a full share at high delta is subtracted: the option fell almost dollar for dollar, by 20.98. Over the first 23 days the weighted average is 0.807; adding 5/15 brings it down to 0.749. It rose while delta was low and fell while delta was high, so the weighted average is below the simple average.</span></p>
+  <p><span class="l-zh">逐天累加比实际多 1.00，这是一正一负两笔账相抵后剩下的。第一笔：每天用的是前一天的 delta，当天 delta 跟着变的那一截没算进去。大涨的日子 delta 变大，期权会多涨；大跌的日子 delta 变小，期权会少跌，两种都让期权比按 delta 算的多赚。这是 <span class="sym" data-say="gamma。delta 的变化速度：标的动 1 美元，delta 变多少。2.2 讲。">gamma</span> 的作用，按每天收盘报价里的 gamma 算，24 天合计 +6.04。第二笔：就算 TSLA 不动，期权也一天天变便宜，这是 <span class="sym" data-say="theta。时间价值的流失速度：标的不动，期权每过一天变便宜多少。2.2 讲。">theta</span>，按每天收盘报价里的 theta 算，合计 −7.15。两笔相抵是 −1.11，和 −1.00 只差 0.11，剩下的来自隐含波动率的起落等（2.3）。2.2 的逐日账本把这两笔一天天记出来，并讲它们为什么总是一起出现。</span><span class="l-en">The daily sum is 1.00 more than the actual result; this is what is left after two entries, one positive and one negative, offset each other. The first: each day uses the previous day's delta, which leaves out the part of the change in delta during the day. On big up days delta grows and the option gains more; on big down days delta shrinks and the option loses less. Both make the option earn more than the delta calculation says. This is the effect of <span class="sym" data-say="Gamma: the rate at which delta changes: when the underlying moves 1 dollar, how much delta changes. Covered in 2.2.">gamma</span>; computed from the gamma in each day's closing quotes, it totals +6.04 over the 24 days. The second: even if TSLA does not move, the option gets cheaper day by day; this is <span class="sym" data-say="Theta: the rate at which time value decays: with the underlying unchanged, how much cheaper the option gets each day. Covered in 2.2.">theta</span>, and computed from the theta in each day's closing quotes it totals −7.15. Together they come to −1.11, only 0.11 away from −1.00; the rest comes from things like the rise and fall of implied volatility (2.3). The daily ledger in 2.2 records these two entries day by day and explains why they always appear together.</span></p>
+  <p><span class="l-zh">时间价值在 TSLA 动得少的日子最看得出来。4/27 是周一，TSLA 涨 2.92，按前一天的 delta 0.794 期权该涨 2.32，实际只涨了 1.47，少了 0.85。从周五收盘到周一收盘隔了三个日历日，报价快照里的 theta 是每天 −0.27，三天 −0.82；这一天 350 call 的隐含波动率几乎没变（43.3% 到 43.5%）。</span><span class="l-en">Time value shows most on days when TSLA moves little. 4/27 was a Monday; TSLA rose 2.92, and at the previous day's delta of 0.794 the option should have risen 2.32, but it rose only 1.47, 0.85 short. Friday's close to Monday's close spans three calendar days; the theta in the quote snapshot was −0.27 per day, −0.82 over three days, and the 350 call's implied volatility barely changed that day (43.3% to 43.5%).</span></p>
+  <p><span class="l-zh">回到 0.557 和 0.734：捕获比比入场 delta 大，这一次对买方有利。TSLA 往上走，delta 跟着变大，越涨赚得越快。如果 TSLA 一路跌，delta 会往 0 缩，期权跌得越来越慢，价格带来的亏损会小于 0.557 × 跌幅。两个方向上 delta 的变化都对期权买方有利，代价是每天流失的时间价值。</span><span class="l-en">Back to 0.557 and 0.734: the capture ratio was larger than the entry delta, which favored the buyer this time. As TSLA rose, delta grew, so the more it rose the faster the option gained. If TSLA had fallen all the way, delta would have shrunk toward 0, the option would have fallen more and more slowly, and the loss from price would have been less than 0.557 × the fall. In both directions the change in delta favors the option buyer; the cost is the time value lost every day.</span></p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>对冲：买 1 张 call，卖 56 股</h2>
-  <p class="sub">4/13 收盘买 1 张 350 call，同时卖出 56 股 TSLA，之后一直不动，看合计的盈亏。</p>
+  <h2><span class="l-zh"><span class="n">五</span>对冲：买 1 张 call，卖 56 股</span><span class="l-en"><span class="n">5</span>Hedging: buy 1 call, sell 56 shares</span></h2>
+  <p class="sub"><span class="l-zh">4/13 收盘买 1 张 350 call，同时卖出 56 股 TSLA，之后一直不动，看合计的盈亏。</span><span class="l-en">At the 4/13 close, buy 1 350 call and sell 56 shares of TSLA at the same time, then leave it alone and look at the combined P&amp;L.</span></p>
   <div class="formula">
-    <div class="math">对冲的股数 ＝ −(1 张 × 100 × 0.5574) ＝ −55.74 ≈ −56</div>
-    <div class="gloss">卖出 56 股。股票按整股买卖，55.74 取整</div>
+    <div class="math"><span class="l-zh">对冲的股数 ＝ −(1 张 × 100 × 0.5574) ＝ −55.74 ≈ −56</span><span class="l-en">Shares for the hedge = −(1 contract × 100 × 0.5574) = −55.74 ≈ −56</span></div>
+    <div class="gloss"><span class="l-zh">卖出 56 股。股票按整股买卖，55.74 取整</span><span class="l-en">Sell 56 shares. Stock trades in whole shares, so 55.74 is rounded</span></div>
   </div>
-  <p>卖出的 56 股是卖空（第一节）：TSLA 涨时亏钱、跌时赚钱，和 call 正好相反。</p>
+  <p><span class="l-zh">卖出的 56 股是卖空（第一节）：TSLA 涨时亏钱、跌时赚钱，和 call 正好相反。</span><span class="l-en">The 56 shares sold are a short sale (section 1): they lose money when TSLA rises and make money when it falls, the exact opposite of the call.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="hdPlay">逐天播放</button></div>
-    <svg id="hed" viewBox="0 0 720 430" role="img" aria-label="单买 call、卖出 56 股、两者合计的逐日盈亏，以及合计相当于多少股"></svg>
+    <div class="bar"><button class="btn ghost" id="hdPlay"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button></div>
+    <svg id="hed" viewBox="0 0 720 430" role="img" aria-label="单买 call、卖出 56 股、两者合计的逐日盈亏，以及合计相当于多少股" data-en-aria-label="Daily P&amp;L of the call alone, the 56 shares sold and the two combined, and how many shares the combination is equivalent to"></svg>
     <div class="legend">
-      <span><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>单买 1 张 call</span>
-      <span><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>卖出的 56 股</span>
-      <span><i style="background:var(--result);height:4px;vertical-align:.2rem"></i>两者合计</span>
-      <span>下图：合计相当于多少股</span>
+      <span><span class="l-zh"><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>单买 1 张 call</span><span class="l-en"><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>1 call alone</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>卖出的 56 股</span><span class="l-en"><i style="background:var(--ink-faint);height:2px;vertical-align:.25rem"></i>the 56 shares sold</span></span>
+      <span><span class="l-zh"><i style="background:var(--result);height:4px;vertical-align:.2rem"></i>两者合计</span><span class="l-en"><i style="background:var(--result);height:4px;vertical-align:.2rem"></i>the two combined</span></span>
+      <span><span class="l-zh">下图：合计相当于多少股</span><span class="l-en">lower chart: how many shares the combination is equivalent to</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="hdD"></div><div class="d2" id="hdDb"></div></div>
-      <div class="stat"><div class="k">call 盈亏</div><div class="d" id="hdC" style="color:var(--control)"></div><div class="d2">美元，一张</div></div>
-      <div class="stat"><div class="k">56 股盈亏</div><div class="d" id="hdS"></div><div class="d2">美元</div></div>
-      <div class="stat"><div class="k">合计</div><div class="d" id="hdT" style="color:var(--result)"></div><div class="d2" id="hdTb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="hdD"></div><div class="d2" id="hdDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">call 盈亏</span><span class="l-en">Call P&amp;L</span></div><div class="d" id="hdC" style="color:var(--control)"></div><div class="d2"><span class="l-zh">美元，一张</span><span class="l-en">dollars, one contract</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">56 股盈亏</span><span class="l-en">P&amp;L of 56 shares</span></div><div class="d" id="hdS"></div><div class="d2"><span class="l-zh">美元</span><span class="l-en">dollars</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">合计</span><span class="l-en">Combined</span></div><div class="d" id="hdT" style="color:var(--result)"></div><div class="d2" id="hdTb"></div></div>
     </div>
     <div class="say plain" id="hdSay"></div>
   </div>
-  <p class="tiny">按每天收盘的买卖中间价算；不计买卖价差、借股票的费用和利息。</p>
-  <p>头几天对冲很管用。4/14 call 赚 715，股票亏 669.76，合计 +45.24。前 5 个交易日，单买 call 每天盈亏的<span class="sym" data-say="这里用均方根：把每天的盈亏平方、求平均、再开平方根。和 1.2 的零均值标准差是同一种算法。">典型幅度</span>是 1,166 美元，对冲后只有 342 美元。</p>
-  <p>越往后越不管用。卖出的一直是 56 股，call 的 delta 却从 0.557 升到了 1.000。到 5/11，这张 call 已经相当于 100 股，减去卖出的 56 股，整个仓位相当于多头 44 股，TSLA 的涨跌又直接落到合计的盈亏上。最后 5 个交易日，单买 call 每天的典型幅度是 1,406 美元，对冲后是 620 美元：对冲后剩下的幅度，从前 5 天的约三成升到了四成多。</p>
-  <p>合计到 4/29 是 −506.96。这段先赚后亏：4/17 合计还是 +751.52，之后 TSLA 从 400.94 回落到 373.02，这时仓位相当于多头约 20 到 31 股，跟着亏；期权还在一天天流失时间价值（2.2），350 call 的隐含波动率也从入场时的 46.3% 降到了 40.5%（2.3）。4/29 之后 TSLA 又涨了 49.30，这时仓位已经相当于多头 21 到 44 股，这一段合计赚了 1,726.20。全程合计 +1,219.24。</p>
-  <p>要让仓位一直保持对冲，股数就要跟着 delta 调：4/14 delta 升到 0.651，就再多卖 9 股。这叫<span class="sym" data-say="dynamic hedging。随 delta 的变化调整对冲的股数，让仓位一直接近没有方向风险。4.1 讲。">动态对冲</span>，节点 4.1 用讲义的十周例子逐周做一遍。</p>
+  <p class="tiny"><span class="l-zh">按每天收盘的买卖中间价算；不计买卖价差、借股票的费用和利息。</span><span class="l-en">Computed from each day's closing bid-ask mid; excludes the bid-ask spread, stock borrow fees and interest.</span></p>
+  <p><span class="l-zh">头几天对冲很管用。4/14 call 赚 715，股票亏 669.76，合计 +45.24。前 5 个交易日，单买 call 每天盈亏的<span class="sym" data-say="这里用均方根：把每天的盈亏平方、求平均、再开平方根。和 1.2 的零均值标准差是同一种算法。">典型幅度</span>是 1,166 美元，对冲后只有 342 美元。</span><span class="l-en">In the first few days the hedge works well. On 4/14 the call made 715 and the stock lost 669.76, for a combined +45.24. Over the first 5 trading days, the <span class="sym" data-say="Root mean square here: square each day's P&amp;L, take the average, then the square root. The same calculation as the zero-mean standard deviation in 1.2.">typical size</span> of the daily P&amp;L was 1,166 dollars for the call alone and only 342 dollars after hedging.</span></p>
+  <p><span class="l-zh">越往后越不管用。卖出的一直是 56 股，call 的 delta 却从 0.557 升到了 1.000。到 5/11，这张 call 已经相当于 100 股，减去卖出的 56 股，整个仓位相当于多头 44 股，TSLA 的涨跌又直接落到合计的盈亏上。最后 5 个交易日，单买 call 每天的典型幅度是 1,406 美元，对冲后是 620 美元：对冲后剩下的幅度，从前 5 天的约三成升到了四成多。</span><span class="l-en">Later it works less and less. The shares sold stay at 56, but the call's delta rose from 0.557 to 1.000. By 5/11 the call is already equivalent to 100 shares; minus the 56 sold, the whole position is equivalent to 44 shares long, and TSLA's moves feed straight into the combined P&amp;L again. Over the last 5 trading days the daily typical size was 1,406 dollars for the call alone and 620 dollars after hedging: what remains after hedging grew from about 30% in the first 5 days to over 40%.</span></p>
+  <p><span class="l-zh">合计到 4/29 是 −506.96。这段先赚后亏：4/17 合计还是 +751.52，之后 TSLA 从 400.94 回落到 373.02，这时仓位相当于多头约 20 到 31 股，跟着亏；期权还在一天天流失时间价值（2.2），350 call 的隐含波动率也从入场时的 46.3% 降到了 40.5%（2.3）。4/29 之后 TSLA 又涨了 49.30，这时仓位已经相当于多头 21 到 44 股，这一段合计赚了 1,726.20。全程合计 +1,219.24。</span><span class="l-en">The combined total at 4/29 was −506.96. This stretch first gained, then lost: on 4/17 the total was still +751.52, then TSLA fell back from 400.94 to 373.02 while the position was equivalent to about 20 to 31 shares long, so it lost along with it; the option was also losing time value day by day (2.2), and the 350 call's implied volatility fell from 46.3% at entry to 40.5% (2.3). After 4/29 TSLA rose another 49.30, and by then the position was equivalent to 21 to 44 shares long; this stretch made a combined 1,726.20. The total for the whole period was +1,219.24.</span></p>
+  <p><span class="l-zh">要让仓位一直保持对冲，股数就要跟着 delta 调：4/14 delta 升到 0.651，就再多卖 9 股。这叫<span class="sym" data-say="dynamic hedging。随 delta 的变化调整对冲的股数，让仓位一直接近没有方向风险。4.1 讲。">动态对冲</span>，节点 4.1 用讲义的十周例子逐周做一遍。</span><span class="l-en">To keep the position hedged all the time, the share count has to follow delta: when delta rises to 0.651 on 4/14, sell 9 more shares. This is called <span class="sym" data-say="Dynamic hedging: adjusting the number of hedge shares as delta changes, so that the position stays close to having no directional risk. Covered in 4.1.">dynamic hedging</span>; node 4.1 works through the ten-week example from the lecture notes week by week.</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>第四种读法：到期实值概率</h2>
-  <p class="sub">讲义说 delta 约等于期权到期落在实值的概率：delta 10 大约是 10% 的机会，delta 50 是 50%，delta 90 是 90%。这是粗略近似。</p>
+  <h2><span class="l-zh"><span class="n">六</span>第四种读法：到期实值概率</span><span class="l-en"><span class="n">6</span>The fourth reading: probability of finishing in the money</span></h2>
+  <p class="sub"><span class="l-zh">讲义说 delta 约等于期权到期落在实值的概率：delta 10 大约是 10% 的机会，delta 50 是 50%，delta 90 是 90%。这是粗略近似。</span><span class="l-en">The lecture notes say delta is roughly the probability that the option finishes in the money: delta 10 is about a 10% chance, delta 50 is 50%, delta 90 is 90%. This is a rough approximation.</span></p>
 
-  <h3>概率只说多常见，不说赚多少</h3>
+  <h3><span class="l-zh">概率只说多常见，不说赚多少</span><span class="l-en">A probability says how often, not how much</span></h3>
   <div class="story">
-    <p>讲义的例子：一张 delta 10 的期权，到期实值的概率约 10%。以 1.00 卖出它，十次里九次到期作废，每次赚 1.00，共 +9.00；一次到期实值，亏 20.00。十次合计 −11.00。</p>
-    <p>赢的次数多，不等于赚钱。概率要和每种结果的大小一起看。</p>
+    <p><span class="l-zh">讲义的例子：一张 delta 10 的期权，到期实值的概率约 10%。以 1.00 卖出它，十次里九次到期作废，每次赚 1.00，共 +9.00；一次到期实值，亏 20.00。十次合计 −11.00。</span><span class="l-en">The example in the lecture notes: an option with delta 10 has about a 10% probability of finishing in the money. Sell it for 1.00: nine times out of ten it expires worthless and you make 1.00 each time, +9.00 in total; once it finishes in the money and you lose 20.00. The ten times together come to −11.00.</span></p>
+    <p><span class="l-zh">赢的次数多，不等于赚钱。概率要和每种结果的大小一起看。</span><span class="l-en">Winning more often does not mean making money. A probability has to be looked at together with the size of each outcome.</span></p>
   </div>
 
-  <h3>和模型里的概率比</h3>
-  <p>Black-Scholes 模型里，call 的 delta 有一个公式，写作 <span class="sym" data-say="Black-Scholes 模型里 call 的 delta。d1 是由股价、行权价、波动率、时间、利率算出来的一个数，N(·) 是钟形从最左边累加到这个数的面积。">N(d1)</span>；到期落在实值的概率是另一个公式，写作 <span class="sym" data-say="Black-Scholes 模型里 call 到期落在实值的概率。d2 = d1 − σ√t，比 d1 小一个标准差的宽度，所以 N(d2) 总比 N(d1) 小。">N(d2)</span>，两者差在 d2 比 d1 小了 <span class="sym" data-say="波动率乘以到期时间的平方根：到期前一个标准差有多宽，按比例计（1.2）。350 call 是 0.137。">σ√t</span>。报价快照里的 delta，和把每一档自己的隐含波动率代进 N(d1) 算出来的，在行权价 320 到 400 之间差不到 0.001，两头最多差 0.012。下图把 4/13 这条链的 delta 和模型的实值概率画在一起。</p>
+  <h3><span class="l-zh">和模型里的概率比</span><span class="l-en">Compared with the model's probability</span></h3>
+  <p><span class="l-zh">Black-Scholes 模型里，call 的 delta 有一个公式，写作 <span class="sym" data-say="Black-Scholes 模型里 call 的 delta。d1 是由股价、行权价、波动率、时间、利率算出来的一个数，N(·) 是钟形从最左边累加到这个数的面积。">N(d1)</span>；到期落在实值的概率是另一个公式，写作 <span class="sym" data-say="Black-Scholes 模型里 call 到期落在实值的概率。d2 = d1 − σ√t，比 d1 小一个标准差的宽度，所以 N(d2) 总比 N(d1) 小。">N(d2)</span>，两者差在 d2 比 d1 小了 <span class="sym" data-say="波动率乘以到期时间的平方根：到期前一个标准差有多宽，按比例计（1.2）。350 call 是 0.137。">σ√t</span>。报价快照里的 delta，和把每一档自己的隐含波动率代进 N(d1) 算出来的，在行权价 320 到 400 之间差不到 0.001，两头最多差 0.012。下图把 4/13 这条链的 delta 和模型的实值概率画在一起。</span><span class="l-en">In the Black-Scholes model, a call's delta has a formula written <span class="sym" data-say="The delta of a call in the Black-Scholes model. d1 is a number computed from the stock price, strike, volatility, time and interest rate; N(·) is the area under the bell curve accumulated from the far left up to that number.">N(d1)</span>; the probability of finishing in the money is another formula, written <span class="sym" data-say="The probability that a call finishes in the money in the Black-Scholes model. d2 = d1 − σ√t, one standard deviation width smaller than d1, so N(d2) is always smaller than N(d1).">N(d2)</span>, and the two differ in that d2 is smaller than d1 by <span class="sym" data-say="Volatility times the square root of time to expiration: how wide one standard deviation is before expiration, as a proportion (1.2). For the 350 call it is 0.137.">σ√t</span>. The delta in the quote snapshot and the value from N(d1) with each strike's own implied volatility differ by less than 0.001 for strikes from 320 to 400, and by at most 0.012 at the ends. The chart below plots the deltas of the 4/13 chain together with the model's probabilities of finishing in the money.</span></p>
   <div class="panel">
-    <svg id="prob" viewBox="0 0 720 320" role="img" aria-label="4/13 收盘整条链的 call delta、模型算的到期实值概率，以及 5/15 的实际结果"></svg>
+    <svg id="prob" viewBox="0 0 720 320" role="img" aria-label="4/13 收盘整条链的 call delta、模型算的到期实值概率，以及 5/15 的实际结果" data-en-aria-label="Call delta across the whole 4/13 closing chain, the model's probability of finishing in the money, and the actual result on 5/15"></svg>
     <div class="legend">
       <span><i style="background:var(--control);height:3px;vertical-align:.25rem"></i>call delta</span>
-      <span><i style="background:var(--result);height:3px;vertical-align:.25rem"></i>模型的实值概率 N(d2)</span>
-      <span><i style="background:var(--good);height:2px;vertical-align:.25rem"></i>5/15 的实际结果：实值为 1，作废为 0</span>
+      <span><span class="l-zh"><i style="background:var(--result);height:3px;vertical-align:.25rem"></i>模型的实值概率 N(d2)</span><span class="l-en"><i style="background:var(--result);height:3px;vertical-align:.25rem"></i>model's probability of finishing in the money N(d2)</span></span>
+      <span><span class="l-zh"><i style="background:var(--good);height:2px;vertical-align:.25rem"></i>5/15 的实际结果：实值为 1，作废为 0</span><span class="l-en"><i style="background:var(--good);height:2px;vertical-align:.25rem"></i>actual result on 5/15: 1 if in the money, 0 if worthless</span></span>
     </div>
   </div>
-  <p>300 到 460 每一档都是 delta 比实值概率高：350 call 是 0.5574 对 0.5032，400 call 是 0.1954 对 0.1609，300 call 是 0.8825 对 0.8435。最右边 465、470 两档例外：上一段说的两头报价里的 delta 比 N(d1) 低约 0.01，到这两档就比概率还低一点，465 是 0.0244 对 0.0258。模型里 N(d1) 每一档都比 N(d2) 大。put 正好反过来：350 put 的 delta 是 −0.4426，它到期实值的概率是 0.4968，delta 的绝对值比概率小。</p>
+  <p><span class="l-zh">300 到 460 每一档都是 delta 比实值概率高：350 call 是 0.5574 对 0.5032，400 call 是 0.1954 对 0.1609，300 call 是 0.8825 对 0.8435。最右边 465、470 两档例外：上一段说的两头报价里的 delta 比 N(d1) 低约 0.01，到这两档就比概率还低一点，465 是 0.0244 对 0.0258。模型里 N(d1) 每一档都比 N(d2) 大。put 正好反过来：350 put 的 delta 是 −0.4426，它到期实值的概率是 0.4968，delta 的绝对值比概率小。</span><span class="l-en">At every strike from 300 to 460, delta is higher than the probability of finishing in the money: 0.5574 against 0.5032 for the 350 call, 0.1954 against 0.1609 for the 400 call, 0.8825 against 0.8435 for the 300 call. The two strikes on the far right, 465 and 470, are exceptions: as the previous paragraph said, the quoted deltas at the ends are about 0.01 below N(d1), and at these two strikes that puts them slightly below the probability; for 465 it is 0.0244 against 0.0258. In the model, N(d1) is larger than N(d2) at every strike. Puts are the other way around: the 350 put has delta −0.4426 and a probability of finishing in the money of 0.4968, so the absolute value of delta is smaller than the probability.</span></p>
 
-  <h3>为什么 delta 比概率大</h3>
-  <p>1.2 的模型里涨跌按比例算。今天 TSLA 如果高 1 美元，到期时每一种可能的价格都会跟着高一点，高多少按比例：原本到期落在 400 的，会高 400 ÷ 352.36 ≈ 1.135 美元；落在 300 的，只高 0.85 美元。</p>
-  <p>call 只在到期落在 350 以上时有钱拿。按模型，落在 350 以上的那些价格平均是 391.98，每个都会高出约 391.98 ÷ 352.36 ≈ 1.112 美元。所以今天 TSLA 多 1 美元，期权到期能拿到的钱平均多出：</p>
+  <h3><span class="l-zh">为什么 delta 比概率大</span><span class="l-en">Why delta is larger than the probability</span></h3>
+  <p><span class="l-zh">1.2 的模型里涨跌按比例算。今天 TSLA 如果高 1 美元，到期时每一种可能的价格都会跟着高一点，高多少按比例：原本到期落在 400 的，会高 400 ÷ 352.36 ≈ 1.135 美元；落在 300 的，只高 0.85 美元。</span><span class="l-en">In the model of 1.2, changes are proportional. If TSLA is 1 dollar higher today, every possible price at expiration is a little higher too, in proportion: a path that would have ended at 400 ends 400 ÷ 352.36 ≈ 1.135 dollars higher; one that would have ended at 300, only 0.85 dollars higher.</span></p>
+  <p><span class="l-zh">call 只在到期落在 350 以上时有钱拿。按模型，落在 350 以上的那些价格平均是 391.98，每个都会高出约 391.98 ÷ 352.36 ≈ 1.112 美元。所以今天 TSLA 多 1 美元，期权到期能拿到的钱平均多出：</span><span class="l-en">A call pays only if it finishes above 350. In the model, the prices above 350 average 391.98, and each would be about 391.98 ÷ 352.36 ≈ 1.112 dollars higher. So for each extra dollar in TSLA today, the money the option collects at expiration rises on average by:</span></p>
   <div class="formula">
-    <div class="math">Δ ≈ 实值概率 × 实值终点的平均 ÷ 今天的股价</div>
-    <div class="gloss">0.503 × 391.98 ÷ 352.36 ≈ 0.560，再按 4.3% 的利率折回今天是 0.558</div>
+    <div class="math"><span class="l-zh">Δ ≈ 实值概率 × 实值终点的平均 ÷ 今天的股价</span><span class="l-en">Δ ≈ probability of finishing ITM × average ITM end price ÷ today's stock price</span></div>
+    <div class="gloss"><span class="l-zh">0.503 × 391.98 ÷ 352.36 ≈ 0.560，再按 4.3% 的利率折回今天是 0.558</span><span class="l-en">0.503 × 391.98 ÷ 352.36 ≈ 0.560, discounted to today at a 4.3% rate gives 0.558</span></div>
   </div>
-  <p>delta 比概率大出的倍数 1.112，来自实值那一侧的价格比今天高。下面按同一个模型抽 1 万个 5/15 的收盘价：平均值放在远期价 353.69（1.1），宽度用隐含波动率 46.3%（1.2），涨跌按比例。</p>
+  <p><span class="l-zh">delta 比概率大出的倍数 1.112，来自实值那一侧的价格比今天高。下面按同一个模型抽 1 万个 5/15 的收盘价：平均值放在远期价 353.69（1.1），宽度用隐含波动率 46.3%（1.2），涨跌按比例。</span><span class="l-en">The factor 1.112 by which delta exceeds the probability comes from the prices on the in-the-money side being above today's price. Below, the same model draws 10,000 closing prices for 5/15: the mean is placed at the forward price 353.69 (1.1), the width uses the implied volatility of 46.3% (1.2), and changes are proportional.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="ptPlay">再落一遍</button></div>
-    <div class="stage"><canvas id="pt" width="264" height="170" aria-label="按模型抽出的 1 万个 5/15 收盘价堆成的分布，落在 350 以上的标出颜色"></canvas></div>
+    <div class="bar"><button class="btn ghost" id="ptPlay"><span class="l-zh">再落一遍</span><span class="l-en">Drop again</span></button></div>
+    <div class="stage"><canvas id="pt" width="264" height="170" aria-label="按模型抽出的 1 万个 5/15 收盘价堆成的分布，落在 350 以上的标出颜色" data-en-aria-label="Distribution of 10,000 model-drawn closing prices for 5/15, with those above 350 colored"></canvas></div>
     <div class="legend">
-      <span><i style="background:var(--control)"></i>落在 350 以上：call 到期实值</span>
-      <span><i style="background:var(--ink-faint)"></i>落在 350 以下</span>
-      <span>点线：行权价 350；横轴 190 到 560，刻度每 50 美元</span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>落在 350 以上：call 到期实值</span><span class="l-en"><i style="background:var(--control)"></i>above 350: the call finishes in the money</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint)"></i>落在 350 以下</span><span class="l-en"><i style="background:var(--ink-faint)"></i>below 350</span></span>
+      <span><span class="l-zh">点线：行权价 350；横轴 190 到 560，刻度每 50 美元</span><span class="l-en">dotted line: strike 350; horizontal axis 190 to 560, ticks every 50 dollars</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已落下</div><div class="d" id="ptN"></div><div class="d2">共 10,000 颗</div></div>
-      <div class="stat"><div class="k">落在 350 以上</div><div class="d" id="ptP" style="color:var(--control)"></div><div class="d2">模型精确值 50.3%</div></div>
-      <div class="stat"><div class="k">这些终点的平均</div><div class="d" id="ptM"></div><div class="d2" id="ptMb"></div></div>
-      <div class="stat"><div class="k">由此估出的 delta</div><div class="d" id="ptD" style="color:var(--result)"></div><div class="d2">模型的 N(d1) 0.558</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已落下</span><span class="l-en">Dropped</span></div><div class="d" id="ptN"></div><div class="d2"><span class="l-zh">共 10,000 颗</span><span class="l-en">10,000 in total</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">落在 350 以上</span><span class="l-en">Above 350</span></div><div class="d" id="ptP" style="color:var(--control)"></div><div class="d2"><span class="l-zh">模型精确值 50.3%</span><span class="l-en">model exact value 50.3%</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这些终点的平均</span><span class="l-en">Average of these end prices</span></div><div class="d" id="ptM"></div><div class="d2" id="ptMb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">由此估出的 delta</span><span class="l-en">Delta estimated from this</span></div><div class="d" id="ptD" style="color:var(--result)"></div><div class="d2"><span class="l-zh">模型的 N(d1) 0.558</span><span class="l-en">model's N(d1) 0.558</span></div></div>
     </div>
     <div class="say plain" id="ptSay"></div>
   </div>
-  <p>这里放在远期价上的是平均值，不是<span class="sym" data-say="median。把所有结果从低到高排开，正中间的那个：一半比它低，一半比它高。">中位数</span>。1.2 的尺子把中位数放在远期价，是心算用的近似；模型要求平均值等于远期价（1.1），涨跌按比例时分布右边拖得长，中位数就略低，约 350.4。所以按 1.2 的尺子，350 以上约 53%；按模型是 50.3%，1 万颗里落在 350 以上的也不到一半。第三节 300 那一档同样：按尺子，300 以下约 11.5%；按模型，再用 300 这一档自己的隐含波动率 51.3%，是 15.7%。</p>
+  <p><span class="l-zh">这里放在远期价上的是平均值，不是<span class="sym" data-say="median。把所有结果从低到高排开，正中间的那个：一半比它低，一半比它高。">中位数</span>。1.2 的尺子把中位数放在远期价，是心算用的近似；模型要求平均值等于远期价（1.1），涨跌按比例时分布右边拖得长，中位数就略低，约 350.4。所以按 1.2 的尺子，350 以上约 53%；按模型是 50.3%，1 万颗里落在 350 以上的也不到一半。第三节 300 那一档同样：按尺子，300 以下约 11.5%；按模型，再用 300 这一档自己的隐含波动率 51.3%，是 15.7%。</span><span class="l-en">What sits at the forward price here is the mean, not the <span class="sym" data-say="Median: line up all outcomes from low to high and take the one in the middle: half are below it, half above.">median</span>. The ruler of 1.2 puts the median at the forward price as an approximation for mental math; the model requires the mean to equal the forward price (1.1), and with proportional changes the distribution has a long right tail, so the median is slightly lower, about 350.4. So by the ruler of 1.2, about 53% ends above 350; by the model it is 50.3%, and fewer than half of the 10,000 balls land above 350. The 300 strike in section 3 is the same: by the ruler, about 11.5% ends below 300; by the model, using the 300 strike's own implied volatility of 51.3%, it is 15.7%.</span></p>
 
-  <h3>近似在什么时候差得多</h3>
-  <p>delta 和概率之间的差距随 σ√t 变大。32 天的 350 call 只差 0.05。换成行权价等于今天股价 352.36 的两年期 call（模型值，同样用 46.3%），σ√t 是 0.655，delta 0.677，到期实值的概率只有 0.422。</p>
-  <p>还有两点。第一，模型的概率把平均值放在远期价，是市场这样定价时隐含的概率，不是对 TSLA 会涨还是会跌的预测。第二，一次结果只能是 0 或 1，验证不了一个概率：5/15 TSLA 收在 422.32，300 到 420 的 call 全部到期实值，其中 420 call 入场时的 delta 只有 0.111，模型的实值概率 0.090。概率准不准，要看很多次才知道。</p>
+  <h3><span class="l-zh">近似在什么时候差得多</span><span class="l-en">When the approximation is far off</span></h3>
+  <p><span class="l-zh">delta 和概率之间的差距随 σ√t 变大。32 天的 350 call 只差 0.05。换成行权价等于今天股价 352.36 的两年期 call（模型值，同样用 46.3%），σ√t 是 0.655，delta 0.677，到期实值的概率只有 0.422。</span><span class="l-en">The gap between delta and the probability grows with σ√t. For the 32-day 350 call it is only 0.05. For a two-year call with the strike at today's stock price of 352.36 (model values, again at 46.3%), σ√t is 0.655, delta is 0.677, and the probability of finishing in the money is only 0.422.</span></p>
+  <p><span class="l-zh">还有两点。第一，模型的概率把平均值放在远期价，是市场这样定价时隐含的概率，不是对 TSLA 会涨还是会跌的预测。第二，一次结果只能是 0 或 1，验证不了一个概率：5/15 TSLA 收在 422.32，300 到 420 的 call 全部到期实值，其中 420 call 入场时的 delta 只有 0.111，模型的实值概率 0.090。概率准不准，要看很多次才知道。</span><span class="l-en">Two more points. First, the model's probability puts the mean at the forward price; it is the probability implied by the market's pricing, not a forecast of whether TSLA will rise or fall. Second, a single outcome can only be 0 or 1 and cannot verify a probability: on 5/15 TSLA closed at 422.32, and every call from 300 to 420 finished in the money, including the 420 call, whose delta at entry was only 0.111 and whose model probability of finishing in the money was 0.090. Whether a probability is accurate can only be seen over many trials.</span></p>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">七</span>费曼检验</span><span class="l-en"><span class="n">7</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 
 </section>
 
 <section id="gloss" style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">Δ, delta</div><div class="t">期权价格对标的价格的敏感度：标的动 1 美元，期权每股动多少美元。call 在 0 到 1 之间，put 在 −1 到 0 之间。</div></div>
-      <div class="gl"><div class="s">整数写法</div><div class="t">讲义把 delta 乘 100 写成整数：50 就是 0.50。正好等于一张合约相当于多少股。</div></div>
-      <div class="gl"><div class="s">斜率、切线</div><div class="t">曲线在某一点往右走 1、往上升多少叫斜率；只在这一点碰到曲线的直线叫切线。delta 是期权价值曲线的斜率。</div></div>
-      <div class="gl"><div class="s">等价标的头寸</div><div class="t">期权的方向风险相当于持有多少股：张数 × 100 × Δ，买为正、卖为负。</div></div>
-      <div class="gl"><div class="s">对冲、对冲比率</div><div class="t">做一笔反向交易抵消原来的方向风险。每股期权要反向做的标的数量就是 delta。</div></div>
-      <div class="gl"><div class="s">卖空</div><div class="t">先借股票卖掉，以后再买回来还。股价涨时亏钱，跌时赚钱。</div></div>
-      <div class="gl"><div class="s">多头、空头</div><div class="t">多头是标的涨时赚钱的方向，像持有股票；空头是标的跌时赚钱的方向，像卖空股票。</div></div>
-      <div class="gl"><div class="s">期货</div><div class="t">约定将来某天按今天谈好的价格买卖标的的合约。讲义的例子多是期货期权，一张期权对应一张期货，不是 100 股。</div></div>
-      <div class="gl"><div class="s">行权</div><div class="t">期权的买方使用权利：call 按行权价买入标的，put 按行权价卖出标的。</div></div>
-      <div class="gl"><div class="s">实值、虚值、平值</div><div class="t">call 的行权价低于股价是实值，高于股价是虚值，差不多是平值；put 反过来。平值实务上以远期价为准（1.1）。</div></div>
-      <div class="gl"><div class="s">期权链</div><div class="t">同一个标的、同一个到期日，各个行权价的 call 和 put 排成的一张表。</div></div>
-      <div class="gl"><div class="s">买一价、卖一价、中间价</div><div class="t">买一价是市场上最高的买入报价，卖一价是最低的卖出报价，中间价是两者的平均（1.1）。马上买入要按卖一价付钱。</div></div>
-      <div class="gl"><div class="s">捕获比</div><div class="t">一段时间里期权的涨跌 ÷ 标的的涨跌（1.1）。它近似是这段时间 delta 按每天涨跌加权的平均，涨跌带正负号：涨的日子权重为正，跌的日子为负。</div></div>
-      <div class="gl"><div class="s">Σ</div><div class="t">读作「西格玛」（大写），求和：每一项算一次，全部加起来。</div></div>
-      <div class="gl"><div class="s">S、F</div><div class="t">标的今天的价格、远期价（1.1）。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%，每个行权价各有一个。</div></div>
-      <div class="gl"><div class="s">标准差、对数正态</div><div class="t">1.2 的两个词：标准差量到期价格离中心多远；对数正态是涨跌按比例算时到期价格的分布，左边不会低于 0，右边拖得长。</div></div>
-      <div class="gl"><div class="s">中位数</div><div class="t">所有结果从低到高排开，正中间的那个。对数正态分布的中位数比平均值低。</div></div>
-      <div class="gl"><div class="s">Black-Scholes</div><div class="t">给期权定价的公式，用股价、行权价、波动率、离到期的时间和利率算出期权价值、delta 与实值概率。本页只用它的结果。</div></div>
-      <div class="gl"><div class="s">σ√t</div><div class="t">年化波动率乘到期时间的平方根：到期前一个标准差的宽度，按比例计（1.2）。</div></div>
-      <div class="gl"><div class="s">N(d1), N(d2)</div><div class="t">Black-Scholes 模型里 call 的 delta 和到期实值的概率。d2 比 d1 小 σ√t，所以 call 的 delta 比实值概率大。</div></div>
-      <div class="gl"><div class="s">希腊字母</div><div class="t">delta、gamma、theta、vega、rho，各自说明期权价格对一样东西的敏感度。</div></div>
-      <div class="gl"><div class="s">gamma</div><div class="t">delta 的变化速度，2.2 讲。</div></div>
-      <div class="gl"><div class="s">theta</div><div class="t">时间价值的流失速度：标的不动，期权每过一天变便宜多少，2.2 讲。</div></div>
-      <div class="gl"><div class="s">模型值</div><div class="t">用 Black-Scholes 公式算的数，不是市场报价。</div></div>
-      <div class="gl"><div class="s">典型幅度</div><div class="t">这里用均方根：每天的数平方、求平均、再开平方根。和 1.2 的零均值标准差是同一种算法。</div></div>
-      <div class="gl"><div class="s">动态对冲</div><div class="t">随 delta 的变化调整对冲的股数，让仓位一直接近没有方向风险，4.1 讲。</div></div>
-      <div class="gl"><div class="s">合成头寸</div><div class="t">用几个期权拼出和另一种头寸一样的到期结果，例如买 call、卖 put 合成持有股票，5.1 讲。</div></div>
+      <div class="gl"><div class="s">Δ, delta</div><div class="t"><span class="l-zh">期权价格对标的价格的敏感度：标的动 1 美元，期权每股动多少美元。call 在 0 到 1 之间，put 在 −1 到 0 之间。</span><span class="l-en">How sensitive the option price is to the underlying price: when the underlying moves 1 dollar, how many dollars per share the option moves. Between 0 and 1 for calls, between −1 and 0 for puts.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">整数写法</span><span class="l-en">whole number format</span></div><div class="t"><span class="l-zh">讲义把 delta 乘 100 写成整数：50 就是 0.50。正好等于一张合约相当于多少股。</span><span class="l-en">The lecture notes write delta times 100 as a whole number: 50 means 0.50. It equals how many shares one contract is equivalent to.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">斜率、切线</span><span class="l-en">slope, tangent</span></div><div class="t"><span class="l-zh">曲线在某一点往右走 1、往上升多少叫斜率；只在这一点碰到曲线的直线叫切线。delta 是期权价值曲线的斜率。</span><span class="l-en">How much a curve rises when you move 1 to the right at a point is the slope; the straight line that touches the curve only at that point is the tangent. Delta is the slope of the option value curve.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">等价标的头寸</span><span class="l-en">equivalent underlying position</span></div><div class="t"><span class="l-zh">期权的方向风险相当于持有多少股：张数 × 100 × Δ，买为正、卖为负。</span><span class="l-en">How many shares the option's directional risk is equivalent to: contracts × 100 × Δ, positive for long, negative for short.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">对冲、对冲比率</span><span class="l-en">hedge, hedge ratio</span></div><div class="t"><span class="l-zh">做一笔反向交易抵消原来的方向风险。每股期权要反向做的标的数量就是 delta。</span><span class="l-en">An opposite trade that offsets the original directional risk. The amount of underlying to trade in the opposite direction per share of option is delta.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">卖空</span><span class="l-en">short sale</span></div><div class="t"><span class="l-zh">先借股票卖掉，以后再买回来还。股价涨时亏钱，跌时赚钱。</span><span class="l-en">Borrow shares and sell them, then buy them back later to return. Loses money when the price rises, makes money when it falls.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">多头、空头</span><span class="l-en">long, short</span></div><div class="t"><span class="l-zh">多头是标的涨时赚钱的方向，像持有股票；空头是标的跌时赚钱的方向，像卖空股票。</span><span class="l-en">Long is the direction that makes money when the underlying rises, like holding stock; short is the direction that makes money when it falls, like a short sale.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期货</span><span class="l-en">futures</span></div><div class="t"><span class="l-zh">约定将来某天按今天谈好的价格买卖标的的合约。讲义的例子多是期货期权，一张期权对应一张期货，不是 100 股。</span><span class="l-en">A contract to buy or sell the underlying on a future date at a price agreed today. Most examples in the lecture notes are options on futures, where one option corresponds to one futures contract, not 100 shares.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">行权</span><span class="l-en">exercise</span></div><div class="t"><span class="l-zh">期权的买方使用权利：call 按行权价买入标的，put 按行权价卖出标的。</span><span class="l-en">The option buyer uses the right: a call buys the underlying at the strike, a put sells the underlying at the strike.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">实值、虚值、平值</span><span class="l-en">in / out of / at the money</span></div><div class="t"><span class="l-zh">call 的行权价低于股价是实值，高于股价是虚值，差不多是平值；put 反过来。平值实务上以远期价为准（1.1）。</span><span class="l-en">A call with the strike below the stock price is in the money, above it out of the money, and about equal at the money; for puts it is the other way around. In practice at the money is measured against the forward price (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期权链</span><span class="l-en">option chain</span></div><div class="t"><span class="l-zh">同一个标的、同一个到期日，各个行权价的 call 和 put 排成的一张表。</span><span class="l-en">A table of the calls and puts at every strike for the same underlying and the same expiration.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">买一价、卖一价、中间价</span><span class="l-en">bid, ask, mid</span></div><div class="t"><span class="l-zh">买一价是市场上最高的买入报价，卖一价是最低的卖出报价，中间价是两者的平均（1.1）。马上买入要按卖一价付钱。</span><span class="l-en">The bid is the highest buy quote in the market, the ask is the lowest sell quote, and the mid is their average (1.1). Buying immediately means paying the ask.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">捕获比</span><span class="l-en">capture ratio</span></div><div class="t"><span class="l-zh">一段时间里期权的涨跌 ÷ 标的的涨跌（1.1）。它近似是这段时间 delta 按每天涨跌加权的平均，涨跌带正负号：涨的日子权重为正，跌的日子为负。</span><span class="l-en">The option's change ÷ the underlying's change over a period (1.1). It is roughly the average delta over the period, weighted by each day's move with sign: up days have positive weights, down days negative.</span></div></div>
+      <div class="gl"><div class="s">Σ</div><div class="t"><span class="l-zh">读作「西格玛」（大写），求和：每一项算一次，全部加起来。</span><span class="l-en">Capital sigma: summation. Compute each term once and add them all up.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">S、F</span><span class="l-en">S, F</span></div><div class="t"><span class="l-zh">标的今天的价格、远期价（1.1）。</span><span class="l-en">The underlying's price today, and the forward price (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率</span><span class="l-en">implied volatility</span></div><div class="t"><span class="l-zh">从期权的市场价格反推出来的波动率（1.2）。350 call 入场时是 46.3%，每个行权价各有一个。</span><span class="l-en">The volatility backed out from an option's market price (1.2). It was 46.3% for the 350 call at entry; each strike has its own.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">标准差、对数正态</span><span class="l-en">standard deviation, lognormal</span></div><div class="t"><span class="l-zh">1.2 的两个词：标准差量到期价格离中心多远；对数正态是涨跌按比例算时到期价格的分布，左边不会低于 0，右边拖得长。</span><span class="l-en">Two terms from 1.2: the standard deviation measures how far the price at expiration is from the center; the lognormal is the distribution of the price at expiration when changes are proportional, never below 0 on the left, with a long tail on the right.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">中位数</span><span class="l-en">median</span></div><div class="t"><span class="l-zh">所有结果从低到高排开，正中间的那个。对数正态分布的中位数比平均值低。</span><span class="l-en">Line up all outcomes from low to high and take the one in the middle. The median of a lognormal distribution is below its mean.</span></div></div>
+      <div class="gl"><div class="s">Black-Scholes</div><div class="t"><span class="l-zh">给期权定价的公式，用股价、行权价、波动率、离到期的时间和利率算出期权价值、delta 与实值概率。本页只用它的结果。</span><span class="l-en">A formula for pricing options that computes an option's value, delta and probability of finishing in the money from the stock price, strike, volatility, time to expiration and interest rate. This page uses only its results.</span></div></div>
+      <div class="gl"><div class="s">σ√t</div><div class="t"><span class="l-zh">年化波动率乘到期时间的平方根：到期前一个标准差的宽度，按比例计（1.2）。</span><span class="l-en">Annualized volatility times the square root of time to expiration: the width of one standard deviation before expiration, as a proportion (1.2).</span></div></div>
+      <div class="gl"><div class="s">N(d1), N(d2)</div><div class="t"><span class="l-zh">Black-Scholes 模型里 call 的 delta 和到期实值的概率。d2 比 d1 小 σ√t，所以 call 的 delta 比实值概率大。</span><span class="l-en">A call's delta and its probability of finishing in the money in the Black-Scholes model. d2 is smaller than d1 by σ√t, so a call's delta is larger than its probability of finishing in the money.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">希腊字母</span><span class="l-en">Greeks</span></div><div class="t"><span class="l-zh">delta、gamma、theta、vega、rho，各自说明期权价格对一样东西的敏感度。</span><span class="l-en">Delta, gamma, theta, vega, rho: each says how sensitive the option price is to one thing.</span></div></div>
+      <div class="gl"><div class="s">gamma</div><div class="t"><span class="l-zh">delta 的变化速度，2.2 讲。</span><span class="l-en">The rate at which delta changes; covered in 2.2.</span></div></div>
+      <div class="gl"><div class="s">theta</div><div class="t"><span class="l-zh">时间价值的流失速度：标的不动，期权每过一天变便宜多少，2.2 讲。</span><span class="l-en">The rate at which time value decays: with the underlying unchanged, how much cheaper the option gets each day; covered in 2.2.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">模型值</span><span class="l-en">model value</span></div><div class="t"><span class="l-zh">用 Black-Scholes 公式算的数，不是市场报价。</span><span class="l-en">A number computed with the Black-Scholes formula, not a market quote.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">典型幅度</span><span class="l-en">typical size</span></div><div class="t"><span class="l-zh">这里用均方根：每天的数平方、求平均、再开平方根。和 1.2 的零均值标准差是同一种算法。</span><span class="l-en">Root mean square here: square each day's number, take the average, then the square root. The same calculation as the zero-mean standard deviation in 1.2.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">动态对冲</span><span class="l-en">dynamic hedging</span></div><div class="t"><span class="l-zh">随 delta 的变化调整对冲的股数，让仓位一直接近没有方向风险，4.1 讲。</span><span class="l-en">Adjusting the number of hedge shares as delta changes, so the position stays close to having no directional risk; covered in 4.1.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">合成头寸</span><span class="l-en">synthetic position</span></div><div class="t"><span class="l-zh">用几个期权拼出和另一种头寸一样的到期结果，例如买 call、卖 put 合成持有股票，5.1 讲。</span><span class="l-en">Several options combined to give the same expiration result as another position, for example a long call and a short put make a synthetic long stock; covered in 5.1.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节有两个，并列，都以 delta 为前置：<a href="station-2-2-gamma-theta.html"><b>2.2 gamma 与 theta</b></a>，delta 自己变化的速度，以及为什么买 gamma 就要付 theta；<a href="station-2-3-vega-rho.html"><b>2.3 vega 与 rho</b></a>，隐含波动率和利率变动时，期权的价值怎么变。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节有两个，并列，都以 delta 为前置：<a href="station-2-2-gamma-theta.html"><b>2.2 gamma 与 theta</b></a>，delta 自己变化的速度，以及为什么买 gamma 就要付 theta；<a href="station-2-3-vega-rho.html"><b>2.3 vega 与 rho</b></a>，隐含波动率和利率变动时，期权的价值怎么变。</span><span class="l-en">There are two next nodes, side by side, both with delta as the prerequisite: <a href="station-2-2-gamma-theta.html"><b>2.2 Gamma and theta</b></a>, the rate at which delta itself changes, and why buying gamma means paying theta; <a href="station-2-3-vega-rho.html"><b>2.3 Vega and rho</b></a>, how an option's value changes when implied volatility and interest rates move.</span></p>
+  <p><span class="l-zh"><a href="./">← 回到课程路线图</a></span><span class="l-en"><a href="./">← Back to the course roadmap</a></span></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
@@ -646,10 +648,10 @@ function drawTan(){
   let g=`<defs><clipPath id="tnClip"><rect x="${L}" y="${T}" width="${R-L}" height="${B-T}"/></clipPath></defs>`;
   [0,20,40,60,80,100].forEach(v=>{ g+=hl(L,R,Y(v),'var(--rule)',v?.8:1.2); g+=lab(L-8,Y(v)+4,v,'var(--ink-faint)','end'); });
   [300,350,400,450].forEach(s=>{ g+=vl(X(s),B,B+5,'var(--ink-faint)',1); g+=lab(X(s),B+19,s,'var(--ink-faint)','middle'); });
-  g+=lab((L+R)/2,H-6,'TSLA 价格','var(--ink-soft)','middle',11.5);
-  g+=vlab(nw?11:14,(T+B)/2,'350 call 每股价值');
+  g+=lab((L+R)/2,H-6,window.L('TSLA 价格','TSLA price'),'var(--ink-soft)','middle',11.5);
+  g+=vlab(nw?11:14,(T+B)/2,window.L('350 call 每股价值','350 call value per share'));
   g+=`<polyline points="${X(x0)},${Y(0)} ${X(350)},${Y(0)} ${X(x1)},${Y(x1-350)}" fill="none" stroke="var(--ink-faint)" stroke-width="1.6" stroke-dasharray="5 4"/>`;
-  g+=lab(X(406),Y(36),'到期那天的价值','var(--ink-faint)','start');
+  g+=lab(X(406),Y(36),window.L('到期那天的价值','value on expiration day'),'var(--ink-faint)','start');
   const cv=[]; for(let s=x0;s<=x1;s+=1) cv.push([X(s),Y(bs(s,K0,T0,RATE,IV).c)]);
   g+=pl(cv,'stroke="var(--ink)" stroke-width="2.4"');
   const o=bs(S,K0,T0,RATE,IV), a=S-45, b=S+45;
@@ -664,8 +666,8 @@ function drawTan(){
   const o2=bs(S+20,K0,T0,RATE,IV);
   $('vS').textContent=f2(S);
   $('tnV').textContent=f2(o.c);
-  $('tnD').textContent=f3(o.d); $('tnDb').textContent=`TSLA 涨 1 美元，期权约涨 ${f3(o.d)}`;
-  $('tnJ').textContent=sgn(o2.c-o.c); $('tnJb').textContent=`切线预测 ${sgn(20*o.d)}，曲线多出 ${f2(o2.c-o.c-20*o.d)}`;
+  $('tnD').textContent=f3(o.d); $('tnDb').textContent=window.L(`TSLA 涨 1 美元，期权约涨 ${f3(o.d)}`,`TSLA up 1 dollar, option up about ${f3(o.d)}`);
+  $('tnJ').textContent=sgn(o2.c-o.c); $('tnJb').textContent=window.L(`切线预测 ${sgn(20*o.d)}，曲线多出 ${f2(o2.c-o.c-20*o.d)}`,`tangent predicts ${sgn(20*o.d)}, the curve adds ${f2(o2.c-o.c-20*o.d)} more`);
 }
 $('iS').addEventListener('input',drawTan);
 
@@ -681,12 +683,12 @@ const cv={side:1,type:'c',k:350};
 function renderConv(){
   const row=CH.find(r=>r.k===cv.k), d= cv.type==='c'?row.cd:row.pd;
   const n=Math.max(0,Math.round(+$('cvN').value||0)), sh=n*100*d*cv.side;
-  const nm=`${cv.side>0?'买':'卖'} ${n} 张 ${cv.k} ${cv.type==='c'?'call':'put'}`;
-  $('cvD').textContent=sgn(d,4); $('cvDb').textContent=`${cv.k} ${cv.type==='c'?'call':'put'}，${cv.type==='c'?'call 为正':'put 为负'}`;
-  $('cvSh').textContent=sgn(sh,1)+' 股'; $('cvShb').textContent= sh>0?'多头：TSLA 涨时赚':(sh<0?'空头：TSLA 跌时赚':'没有方向风险');
-  $('cvH').textContent= sh>0?`卖出 ${Math.round(sh)} 股`:(sh<0?`买入 ${Math.round(-sh)} 股`:'不用做');
-  $('cvHb').textContent='取整到股';
-  $('cvCalc').textContent=`${nm}：${n} × 100 × ${fm(d,4)} × (${cv.side>0?'+1':'−1'}) = ${sgn(sh,1)} 股`;
+  const nm=window.L(`${cv.side>0?'买':'卖'} ${n} 张 ${cv.k} ${cv.type==='c'?'call':'put'}`,`${cv.side>0?'Long':'Short'} ${n} × ${cv.k} ${cv.type==='c'?'call':'put'}`);
+  $('cvD').textContent=sgn(d,4); $('cvDb').textContent=window.L(`${cv.k} ${cv.type==='c'?'call':'put'}，${cv.type==='c'?'call 为正':'put 为负'}`,`${cv.k} ${cv.type==='c'?'call':'put'}, ${cv.type==='c'?'positive for calls':'negative for puts'}`);
+  $('cvSh').textContent=sgn(sh,1)+window.L(' 股',' shares'); $('cvShb').textContent= sh>0?window.L('多头：TSLA 涨时赚','Long: gains when TSLA rises'):(sh<0?window.L('空头：TSLA 跌时赚','Short: gains when TSLA falls'):window.L('没有方向风险','No directional risk'));
+  $('cvH').textContent= sh>0?window.L(`卖出 ${Math.round(sh)} 股`,`Sell ${Math.round(sh)} shares`):(sh<0?window.L(`买入 ${Math.round(-sh)} 股`,`Buy ${Math.round(-sh)} shares`):window.L('不用做','Nothing to do'));
+  $('cvHb').textContent=window.L('取整到股','rounded to whole shares');
+  $('cvCalc').textContent=window.L(`${nm}：${n} × 100 × ${fm(d,4)} × (${cv.side>0?'+1':'−1'}) = ${sgn(sh,1)} 股`,`${nm}: ${n} × 100 × ${fm(d,4)} × (${cv.side>0?'+1':'−1'}) = ${sgn(sh,1)} shares`);
 }
 
 /* ══════════ 三 · 4/13 整条链 ══════════ */
@@ -697,10 +699,10 @@ function drawChain(){
   let g='';
   [-1,-0.5,0,0.5,1].forEach(v=>{ g+=hl(L,R,Y(v),'var(--rule)',v===0?1.4:.8); g+=lab(L-8,Y(v)+4,v===0?'0':(v>0?'+':'−')+Math.abs(v),'var(--ink-faint)','end'); });
   [300,350,400,450].forEach(k=>{ g+=vl(X(k),B,B+5,'var(--ink-faint)',1); g+=lab(X(k),B+19,k,'var(--ink-faint)','middle'); });
-  g+=lab((L+R)/2,H-6,'行权价','var(--ink-soft)','middle',11.5);
+  g+=lab((L+R)/2,H-6,window.L('行权价','strike'),'var(--ink-soft)','middle',11.5);
   g+=vl(X(S0),T,B,'var(--ink-faint)',1.2,'4 4');
-  g+=lab(L+4,T-10,nw?'← call 实值':'← call 实值，put 虚值','var(--ink-soft)','start',11);
-  g+=lab(R-4,T-10,nw?'call 虚值 →':'call 虚值，put 实值 →','var(--ink-soft)','end',11);
+  g+=lab(L+4,T-10,nw?window.L('← call 实值','← call ITM'):window.L('← call 实值，put 虚值','← call ITM, put OTM'),'var(--ink-soft)','start',11);
+  g+=lab(R-4,T-10,nw?window.L('call 虚值 →','call OTM →'):window.L('call 虚值，put 实值 →','call OTM, put ITM →'),'var(--ink-soft)','end',11);
   g+=pl(CH.map(r=>[X(r.k),Y(r.cd)]),'stroke="var(--control)" stroke-width="2.6"');
   g+=pl(CH.map(r=>[X(r.k),Y(r.pd)]),'stroke="var(--result)" stroke-width="2.6"');
   const at=k=>CH.find(r=>r.k===k);
@@ -711,7 +713,7 @@ function drawChain(){
   g+=dot(X(350),Y(r.pd),4,'var(--result)'); g+=lab(X(350)-14,Y(r.pd)+22,fm(r.pd,4),'var(--result)','end',11.5,600);
   g+=vl(X(350)-10,Y(r.cd),Y(r.pd),'var(--ink-soft)',1.2);
   g+=hl(X(350)-14,X(350)-6,Y(r.cd),'var(--ink-soft)',1.2); g+=hl(X(350)-14,X(350)-6,Y(r.pd),'var(--ink-soft)',1.2);
-  g+=lab(X(350)-16,(Y(r.cd)+Y(r.pd))/2+4,'相差 1','var(--ink-soft)','end',11);
+  g+=lab(X(350)-16,(Y(r.cd)+Y(r.pd))/2+4,window.L('相差 1','1 apart'),'var(--ink-soft)','end',11);
   $('chain').innerHTML=g;
 }
 
@@ -735,11 +737,11 @@ const TG=(()=>{
     let g='';
     [0,.25,.5,.75,1].forEach(v=>{ g+=hl(L,R,Y(v),'var(--rule)',v===0?1.2:.8); g+=lab(L-8,Y(v)+4,v===0?'0':v===1?'1':v.toFixed(2),'var(--ink-faint)','end'); });
     [-20,-10,0,10,20].forEach(x=>{ g+=vl(X(x),B,B+5,'var(--ink-faint)',1); g+=lab(X(x),B+19,x===0?'0':(x>0?'+':'−')+Math.abs(x)+'%','var(--ink-faint)','middle'); });
-    g+=lab((L+R)/2,H-6,'行权价比当天股价高出多少','var(--ink-soft)','middle',11.5);
+    g+=lab((L+R)/2,H-6,window.L('行权价比当天股价高出多少','strike above that day\'s stock price'),'var(--ink-soft)','middle',11.5);
     g+=vl(X(0),T,B,'var(--ink-faint)',1.2,'4 4');
-    g+=lab(X(0)+6,T-10,'当天股价','var(--ink-faint)','start');
-    g+=lab(L+6,B-10,'← call 实值','var(--ink-soft)','start',11);
-    g+=lab(R-6,T+14,'call 虚值 →','var(--ink-soft)','end',11);
+    g+=lab(X(0)+6,T-10,window.L('当天股价','that day\'s price'),'var(--ink-faint)','start');
+    g+=lab(L+6,B-10,window.L('← call 实值','← call ITM'),'var(--ink-soft)','start',11);
+    g+=lab(R-6,T+14,window.L('call 虚值 →','call OTM →'),'var(--ink-soft)','end',11);
     const i=Math.floor(s.p), f=s.p-i, j=Math.min(NDAY,i+1);
     for(let d=0; d<i; d++) g+=pl(RS[d].map((v,k)=>[X(GX[k]),Y(v)]),'stroke="var(--ink-faint)" stroke-width="1" stroke-opacity=".45"');
     const cur=RS[i].map((v,k)=>v*(1-f)+RS[j][k]*f);
@@ -748,10 +750,10 @@ const TG=(()=>{
     g+=dot(X(x350),Y(d350),5,'var(--ink)');
     g+=lab(X(x350)+(x350<-18?8:-8),Y(d350)+(d350>.9?18:-10),'350','var(--ink)',x350<-18?'start':'end',11.5,600);
     $('tight').innerHTML=g;
-    $('tgD').textContent=md(DAYS[i]); $('tgDb').textContent=`离到期 ${calLeft(i)} 天`;
+    $('tgD').textContent=md(DAYS[i]); $('tgDb').textContent=window.L(`离到期 ${calLeft(i)} 天`,`${calLeft(i)} days to expiration`);
     $('tgU').textContent=f3(RS[i][70]); $('tgL').textContent=f3(RS[i][30]);
     $('tgK').textContent=f3(DL[i]);
-    const pc=(350/U[i]-1)*100; $('tgKb').textContent=`350 在当天股价${pc>=0?'上方':'下方'} ${Math.abs(pc).toFixed(1)}%`;
+    const pc=(350/U[i]-1)*100; $('tgKb').textContent=window.L(`350 在当天股价${pc>=0?'上方':'下方'} ${Math.abs(pc).toFixed(1)}%`,`350 is ${Math.abs(pc).toFixed(1)}% ${pc>=0?'above':'below'} that day's stock price`);
   }
   function start(){
     s.playing=false; s.p=0;
@@ -773,9 +775,9 @@ const REP=(()=>{
     vb($('rep'),W,H);
     const X=i=>L+i/NDAY*(R-L), Y=v=>B1-v/100*(B1-T), Y2=v=>B2-(v-0.4)/0.6*(B2-T2);
     let g='';
-    g+=lab(L,T-14,'从 4/13 收盘起的累计涨跌，美元每股','var(--ink-soft)','start',11.5);
+    g+=lab(L,T-14,window.L('从 4/13 收盘起的累计涨跌，美元每股','cumulative change since the 4/13 close, dollars per share'),'var(--ink-soft)','start',11.5);
     [0,25,50,75,100].forEach(v=>{ g+=hl(L,R,Y(v),'var(--rule)',v?.8:1.2); g+=lab(L-8,Y(v)+4,v,'var(--ink-faint)','end'); });
-    g+=lab(L,T2-14,'每天收盘的 delta','var(--ink-soft)','start',11.5);
+    g+=lab(L,T2-14,window.L('每天收盘的 delta','delta at each close'),'var(--ink-soft)','start',11.5);
     [.5,.75,1].forEach(v=>{ g+=hl(L,R,Y2(v)); g+=lab(L-8,Y2(v)+4,v===1?'1.00':v.toFixed(2),'var(--ink-faint)','end'); });
     g+=hl(L,R,Y2(DL[0]),'var(--ink-faint)',1,'4 4');
     g+=lab(R+6,Y2(DL[0])+4,'0.557','var(--ink-faint)','start',10.5);
@@ -799,16 +801,16 @@ const REP=(()=>{
     }
     $('rep').innerHTML=g;
     const i=Math.floor(p);
-    $('rpD').textContent=md(DAYS[i]); $('rpDb').textContent= i?`第 ${i} 个交易日`:'入场';
-    $('rpU').textContent= i?sgn(U[i]-U[i-1]):'0'; $('rpUb').textContent=`收盘 ${f2(U[i])}`;
+    $('rpD').textContent=md(DAYS[i]); $('rpDb').textContent= i?window.L(`第 ${i} 个交易日`,`Trading day ${i}`):window.L('入场','entry');
+    $('rpU').textContent= i?sgn(U[i]-U[i-1]):'0'; $('rpUb').textContent=window.L(`收盘 ${f2(U[i])}`,`close ${f2(U[i])}`);
     $('rpC').textContent= i?sgn(C[i]-C[i-1]):'0';
-    $('rpCb').textContent= i?`按前一天 delta ${f3(DL[i-1])} 算 ${sgn(DL[i-1]*(U[i]-U[i-1]))}`:'中间价 21.05，delta 0.557';
-    $('rpA').textContent=`${sgn(cumC[i])} / ${sgn(cumP[i])}`; $('rpAb').textContent=`按入场 delta ${sgn(cumE[i])}`;
+    $('rpCb').textContent= i?window.L(`按前一天 delta ${f3(DL[i-1])} 算 ${sgn(DL[i-1]*(U[i]-U[i-1]))}`,`at the previous day's delta ${f3(DL[i-1])}: ${sgn(DL[i-1]*(U[i]-U[i-1]))}`):window.L('中间价 21.05，delta 0.557','mid 21.05, delta 0.557');
+    $('rpA').textContent=`${sgn(cumC[i])} / ${sgn(cumP[i])}`; $('rpAb').textContent=window.L(`按入场 delta ${sgn(cumE[i])}`,`at entry delta ${sgn(cumE[i])}`);
     const say=$('rpSay');
     if(p<NDAY){ say.textContent=''; return; }
     const i29=DAYS.indexOf('2026-04-29');
-    say.textContent=`24 天逐天累加是 ${sgn(cumP[NDAY])}，实际 ${sgn(cumC[NDAY])}，只差 ${f2(cumP[NDAY]-cumC[NDAY])}。按入场 delta 算的 ${sgn(cumE[NDAY])} 少了 ${f2(cumC[NDAY]-cumE[NDAY])}。`+
-      `delta 从 0.557 升到 5/14 的 ${f3(DL[NDAY-1])}：4/29 之后 TSLA 涨了 ${f2(U[NDAY]-U[i29])}，占全程 ${f2(cumS[NDAY])} 的 ${Math.round((U[NDAY]-U[i29])/cumS[NDAY]*100)}%，那段时间 delta 在 ${f2(DL[i29])} 到 1.00 之间。`;
+    say.textContent=window.L(`24 天逐天累加是 ${sgn(cumP[NDAY])}，实际 ${sgn(cumC[NDAY])}，只差 ${f2(cumP[NDAY]-cumC[NDAY])}。按入场 delta 算的 ${sgn(cumE[NDAY])} 少了 ${f2(cumC[NDAY]-cumE[NDAY])}。`,`The 24-day daily sum is ${sgn(cumP[NDAY])} against an actual ${sgn(cumC[NDAY])}, only ${f2(cumP[NDAY]-cumC[NDAY])} apart. The entry-delta estimate of ${sgn(cumE[NDAY])} falls ${f2(cumC[NDAY]-cumE[NDAY])} short.`)+
+      window.L(`delta 从 0.557 升到 5/14 的 ${f3(DL[NDAY-1])}：4/29 之后 TSLA 涨了 ${f2(U[NDAY]-U[i29])}，占全程 ${f2(cumS[NDAY])} 的 ${Math.round((U[NDAY]-U[i29])/cumS[NDAY]*100)}%，那段时间 delta 在 ${f2(DL[i29])} 到 1.00 之间。`,`Delta rose from 0.557 to ${f3(DL[NDAY-1])} on 5/14: after 4/29 TSLA rose ${f2(U[NDAY]-U[i29])}, ${Math.round((U[NDAY]-U[i29])/cumS[NDAY]*100)}% of the total ${f2(cumS[NDAY])}, while delta was between ${f2(DL[i29])} and 1.00.`);
   }
   function start(){
     s.playing=false; s.p=0;
@@ -829,9 +831,9 @@ const HED=(()=>{
     const lo=-6000, hi=8000;
     const X=i=>L+i/NDAY*(R-L), Y=v=>B1-(v-lo)/(hi-lo)*(B1-T), Y2=v=>B2-v/50*(B2-T2);
     let g='';
-    g+=lab(L,T-14,'从 4/13 收盘起的盈亏，美元','var(--ink-soft)','start',11.5);
+    g+=lab(L,T-14,window.L('从 4/13 收盘起的盈亏，美元','P&amp;L since the 4/13 close, dollars'),'var(--ink-soft)','start',11.5);
     for(let v=lo;v<=hi;v+=2000){ g+=hl(L,R,Y(v),'var(--rule)',v?.8:1.4); g+=lab(L-8,Y(v)+4,v?fm(v/1000,0)+',000':'0','var(--ink-faint)','end'); }
-    g+=lab(L,T2-14,'合计相当于多少股','var(--ink-soft)','start',11.5);
+    g+=lab(L,T2-14,window.L('合计相当于多少股','combined equivalent shares'),'var(--ink-soft)','start',11.5);
     [0,25,50].forEach(v=>{ g+=hl(L,R,Y2(v),'var(--rule)',v?.8:1.2); g+=lab(L-8,Y2(v)+4,v,'var(--ink-faint)','end'); });
     XT.forEach(i=>{ g+=vl(X(i),B2,B2+5,'var(--ink-faint)',1); g+=lab(X(i),B2+19,md(DAYS[i]),'var(--ink-faint)','middle'); });
     const p=s.p, bw=(R-L)/NDAY*.56;
@@ -847,18 +849,18 @@ const HED=(()=>{
       g+=lab(R+6,Y(nk[n])+4,usd(nk[n]),'var(--control)','start',11,600);
       g+=lab(R+6,Y(tt[n])+4,usd(tt[n]),'var(--result)','start',11,600);
       g+=lab(R+6,Y(st[n])+4,usd(st[n]),'var(--ink-faint)','start',11);
-      g+=lab(R+6,Y2(nd[n])+4,sgn(nd[n],0)+' 股','var(--result)','start',10.5);
+      g+=lab(R+6,Y2(nd[n])+4,sgn(nd[n],0)+window.L(' 股',' shares'),'var(--result)','start',10.5);
     }
     $('hed').innerHTML=g;
     const i=Math.floor(p);
-    $('hdD').textContent=md(DAYS[i]); $('hdDb').textContent=`TSLA ${f2(U[i])}，delta ${f3(DL[i])}`;
+    $('hdD').textContent=md(DAYS[i]); $('hdDb').textContent=window.L(`TSLA ${f2(U[i])}，delta ${f3(DL[i])}`,`TSLA ${f2(U[i])}, delta ${f3(DL[i])}`);
     $('hdC').textContent=usd(nk[i],2); $('hdS').textContent=usd(st[i],2);
-    $('hdT').textContent=usd(tt[i],2); $('hdTb').textContent=`相当于 ${sgn(nd[i],1)} 股`;
+    $('hdT').textContent=usd(tt[i],2); $('hdTb').textContent=window.L(`相当于 ${sgn(nd[i],1)} 股`,`equivalent to ${sgn(nd[i],1)} shares`);
     const say=$('hdSay');
     if(p<NDAY){ say.textContent=''; return; }
     const rms=a_=>Math.sqrt(a_.reduce((q,x)=>q+x*x,0)/a_.length);
     const dn=nk.slice(1).map((v,k)=>v-nk[k]), dh=tt.slice(1).map((v,k)=>v-tt[k]);
-    say.textContent=`单买 call 全程 ${usd(nk[NDAY])}，合计 ${usd(tt[NDAY],2)}。每天盈亏的典型幅度：单买 call ${Math.round(rms(dn)).toLocaleString('en-US')} 美元，对冲后 ${Math.round(rms(dh))} 美元。入场时合计相当于 ${sgn(nd[0],1)} 股，5/11 之后是 ${sgn(nd[20],1)} 股：股数没动，delta 变了。`;
+    say.textContent=window.L(`单买 call 全程 ${usd(nk[NDAY])}，合计 ${usd(tt[NDAY],2)}。每天盈亏的典型幅度：单买 call ${Math.round(rms(dn)).toLocaleString('en-US')} 美元，对冲后 ${Math.round(rms(dh))} 美元。入场时合计相当于 ${sgn(nd[0],1)} 股，5/11 之后是 ${sgn(nd[20],1)} 股：股数没动，delta 变了。`,`Call alone over the whole period ${usd(nk[NDAY])}, combined ${usd(tt[NDAY],2)}. Typical size of the daily P&L: ${Math.round(rms(dn)).toLocaleString('en-US')} dollars for the call alone, ${Math.round(rms(dh))} dollars after hedging. At entry the combination was equivalent to ${sgn(nd[0],1)} shares, and after 5/11 to ${sgn(nd[20],1)} shares: the share count did not move, delta did.`);
   }
   function start(){
     s.playing=false; s.p=0;
@@ -877,9 +879,9 @@ function drawProb(){
   let g='';
   [0,.25,.5,.75,1].forEach(v=>{ g+=hl(L,R,Y(v),'var(--rule)',v===0?1.2:.8); g+=lab(L-8,Y(v)+4,v===0?'0':v===1?'1':v.toFixed(2),'var(--ink-faint)','end'); });
   [300,350,400,450].forEach(k=>{ g+=vl(X(k),B,B+5,'var(--ink-faint)',1); g+=lab(X(k),B+19,k,'var(--ink-faint)','middle'); });
-  g+=lab((L+R)/2,H-6,'行权价','var(--ink-soft)','middle',11.5);
+  g+=lab((L+R)/2,H-6,window.L('行权价','strike'),'var(--ink-soft)','middle',11.5);
   g+=`<polyline points="${X(x0)},${Y(1)} ${X(SETTLE)},${Y(1)} ${X(SETTLE)},${Y(0)} ${X(x1)},${Y(0)}" fill="none" stroke="var(--good)" stroke-width="2" stroke-opacity=".8"/>`;
-  g+=lab(X(SETTLE)+6,Y(1)+16,'5/15 收盘 '+SETTLE,'var(--good)','start',11);
+  g+=lab(X(SETTLE)+6,Y(1)+16,window.L('5/15 收盘 ','5/15 close ')+SETTLE,'var(--good)','start',11);
   g+=pl(CH.map(r=>[X(r.k),Y(r.n2)]),'stroke="var(--result)" stroke-width="2.4"');
   g+=pl(CH.map(r=>[X(r.k),Y(r.cd)]),'stroke="var(--control)" stroke-width="2.6"');
   const r=CH.find(q=>q.k===350);
@@ -887,8 +889,8 @@ function drawProb(){
   g+=dot(X(350),Y(r.n2),4,'var(--result)'); g+=lab(X(350)-8,Y(r.n2)+16,r.n2.toFixed(4),'var(--result)','end',11.5,600);
   const q=CH.find(q_=>q_.k===420);
   g+=dot(X(420),Y(q.cd),3.5,'var(--control)'); g+=dot(X(420),Y(q.n2),3.5,'var(--result)');
-  g+=lab(X(SETTLE)+6,Y(q.cd)-22,'420 call：'+q.cd.toFixed(4),'var(--control)','start',11);
-  g+=lab(X(SETTLE)+6,Y(q.cd)-8,'实值概率 '+q.n2.toFixed(4),'var(--result)','start',11);
+  g+=lab(X(SETTLE)+6,Y(q.cd)-22,window.L('420 call：','420 call: ')+q.cd.toFixed(4),'var(--control)','start',11);
+  g+=lab(X(SETTLE)+6,Y(q.cd)-8,window.L('实值概率 ','probability ITM ')+q.n2.toFixed(4),'var(--result)','start',11);
   $('prob').innerHTML=g;
 }
 
@@ -924,13 +926,13 @@ const PT=(()=>{
     for(let x=X0;x<=X1;x++){ const n=s.cnt[x]; if(!n) continue; c.fillStyle=above(x)?C_.ctl:C_.faint; c.fillRect(x,BASE+1-n,1,n); }
     s.fall.forEach(b=>{ c.fillStyle=END[b.i]>K0?C_.ctl:C_.faint; c.fillRect(COL[b.i],Math.round(b.y),1,2); });
     const sh=s.landed?s.itm/s.landed:0, avg=s.itm?s.sum/s.itm:0, est=sh*avg/S0/ER;
-    $('ptN').textContent=s.landed.toLocaleString('en-US')+' 颗';
+    $('ptN').textContent=s.landed.toLocaleString('en-US')+window.L(' 颗',' balls');
     $('ptP').textContent=s.landed?(sh*100).toFixed(1)+'%':'0';
-    $('ptM').textContent=s.itm?f2(avg):'0'; $('ptMb').textContent=s.itm?`是今天 352.36 的 ${f3(avg/S0)} 倍`:'';
+    $('ptM').textContent=s.itm?f2(avg):'0'; $('ptMb').textContent=s.itm?window.L(`是今天 352.36 的 ${f3(avg/S0)} 倍`,`${f3(avg/S0)} times today's 352.36`):'';
     $('ptD').textContent=s.itm?f3(est):'0';
     const say=$('ptSay');
     if(!done()){ say.textContent=''; return; }
-    say.textContent=`1 万颗里 ${s.itm.toLocaleString('en-US')} 颗落在 350 以上，占 ${(sh*100).toFixed(1)}%，模型的精确值是 50.3%。它们平均落在 ${f2(avg)}，是今天股价的 ${f3(avg/S0)} 倍。${(sh*100).toFixed(1)}% × ${f3(avg/S0)} 再折回今天，得到 ${f3(est)}，模型的 delta 是 0.558。差的那一点是抽样误差，颗数越多越接近精确值。`;
+    say.textContent=window.L(`1 万颗里 ${s.itm.toLocaleString('en-US')} 颗落在 350 以上，占 ${(sh*100).toFixed(1)}%，模型的精确值是 50.3%。它们平均落在 ${f2(avg)}，是今天股价的 ${f3(avg/S0)} 倍。${(sh*100).toFixed(1)}% × ${f3(avg/S0)} 再折回今天，得到 ${f3(est)}，模型的 delta 是 0.558。差的那一点是抽样误差，颗数越多越接近精确值。`,`Of 10,000 balls, ${s.itm.toLocaleString('en-US')} landed above 350, ${(sh*100).toFixed(1)}%; the model's exact value is 50.3%. They average ${f2(avg)}, ${f3(avg/S0)} times today's stock price. ${(sh*100).toFixed(1)}% × ${f3(avg/S0)}, discounted to today, gives ${f3(est)}; the model's delta is 0.558. The small difference is sampling error; the more balls, the closer to the exact value.`);
   }
   function start(){
     if(s) s.playing=false;
@@ -945,52 +947,52 @@ const PT=(()=>{
 
 /* ══════════ 七 · 费曼检验 ══════════ */
 const QS=[
- {q:`不用「斜率」「导数」这两个词，向没学过期权的人讲清楚「这张 350 call 的 delta 是 0.557」。至少讲出两种读法。`,
-  a:['TSLA 涨 1 美元，这张期权每股大约涨 0.557 美元；跌 1 美元，大约跌 0.557 美元。',
-     '一张合约是 100 股的份额，所以持有 1 张，赚赔大约像持有 55.7 股 TSLA。',
-     '想让它不受 TSLA 小幅涨跌的影响，就同时卖出约 56 股。',
-     '这只对小幅变动成立。TSLA 动多了，这个数自己会变。'],
-  s:'「期权会涨 55.7%」：delta 说的是美元对美元的比例，不是百分比涨幅。'},
- {q:`卖 put 为什么是正 delta？卖 call 和买 put 都是负 delta，它们在什么行情下赚钱？`,
-  a:['put 是卖出的权利，TSLA 越高它越不值钱，所以 put 本身的 delta 为负，350 put 是 −0.443。',
-     '卖出它，赚赔是买方的反面：TSLA 涨时 put 变便宜，卖方赚钱，所以卖 put 的 delta 为正。',
-     '卖 call 和买 put 都在 TSLA 跌时赚钱，所以都是负 delta。',
-     '同一行权价的 call 和 put，delta 正好差 1：0.557 − (−0.443) = 1。'],
-  s:'「put 就是负的」：只说了买 put。卖出会把符号再翻一次。'},
- {q:`为什么深度实值 call 的 delta 接近 1、深度虚值接近 0？用「到期会不会被行权」来讲，不要用公式。`,
-  a:['深度实值：TSLA 要大跌才会让它作废，这种事不常发生，它大概率会被行权。',
-     '行权就是用行权价买一股，它的价值约等于股价减行权价，股价动 1 美元它也动约 1 美元。',
-     '深度虚值：TSLA 要大涨它才有用，今天多涨 1 美元离那里还是很远，期权价值几乎不动。',
-     '远近要按标准差个数量（1.2）：离到期越近，一个标准差越窄，同样的距离显得越远，所以临近到期时 delta 更靠近 0 或 1。'],
-  s:'「因为实值期权贵」：价格高低不决定 delta，决定 delta 的是标的这一点变动能不能改变到期的结果。'},
- {q:`入场 delta 0.557，全程捕获比 0.734。为什么不相等？如果这 24 天 TSLA 是一路跌的，期权跟着跌的比例会比 0.557 大还是小？`,
-  a:['0.557 只是入场那一刻的斜率。TSLA 一路涨，350 call 变成深度实值，delta 升到 1.000。',
-     '每天用前一天的 delta 乘当天的涨跌，24 天加起来 52.37，实际涨 51.37：捕获比近似是一路上 delta 按每天涨跌加权的平均。差的 1.00 是 gamma 多赚的与 theta 流失的相抵后剩下的。',
-     '如果一路跌，delta 会往 0 缩，后面的跌幅只被期权跟上一小部分，价格带来的那部分亏损比 0.557 × 跌幅小。',
-     '对买方来说，delta 的变化两个方向都有利：涨时越涨越快，跌时越跌越慢。'],
-  s:'「报价给的 delta 算错了」：入场那一刻它是对的，只是它会变。'},
- {q:`这 24 天每天开始时的 delta，简单平均是 0.857，比捕获比 0.734 高。为什么？`,
-  a:['捕获比近似是按每天涨跌加权的平均，涨跌带着正负号：涨的日子权重为正，跌的日子权重为负。',
-     '涨得最多的 4/15（+27.61）发生在 delta 0.651 的时候，被期权跟上得少。',
-     '最后一天 5/15 跌了 21.04，这时 delta 已经是 1.000，这一天权重为负，高 delta 的这一份被整份减掉。',
-     '低 delta 时涨、高 delta 时跌，加权平均就被拉低了。'],
-  s:'「动得多的日子分量重」：只说对了一半。跌的日子权重是负的，不然 5/15 会把平均往上拉，而不是往下拉。'},
- {q:`买 1 张 350 call、卖出 56 股，这个仓位对冲掉了什么，没对冲掉什么？为什么到了 5/11 它像是持有 44 股？`,
-  a:['对冲掉的是入场那一刻的方向风险：TSLA 小幅涨跌时，两边的盈亏大致抵消。',
-     'delta 会变，卖出的股数不变。TSLA 涨上去之后 call 的 delta 升到约 1，相当于 100 股，减去卖出的 56 股，剩下 44 股的多头。',
-     '没对冲掉的还有时间价值的流失和隐含波动率的下降：TSLA 回落、横着走的那几天，组合在亏（2.2、2.3）。',
-     '想一直保持对冲，就要随 delta 调整股数，这是 4.1 的动态对冲。'],
-  s:'「对冲之后就不会亏钱了」：4/29 这个组合合计亏了 506.96。'},
- {q:`4/13 这条链上 420 call 的 delta 是 0.111，5/15 它到期实值了。能不能说 delta 低估了它到期实值的概率？delta 和实值概率为什么不一样？`,
-  a:['一次结果只能是 0 或 1。一件约一成可能的事发生了一次，不说明概率算错了，要看很多次。',
-     '按模型，420 call 到期实值的概率是 0.090，比 delta 0.111 还低。',
-     'delta 比实值概率大，是因为涨跌按比例算：今天多 1 美元，到期落在高处的那些价格会多出不止 1 美元。',
-     '模型的概率把平均值放在远期价，是市场定价时隐含的，不是对方向的预测。'],
-  s:'「delta 就是概率」：只在很粗的意义上成立，长期期权差得很多。'}
+ {q:window.L(`不用「斜率」「导数」这两个词，向没学过期权的人讲清楚「这张 350 call 的 delta 是 0.557」。至少讲出两种读法。`,`Without the words "slope" or "derivative", explain "this 350 call has a delta of 0.557" to someone who has never studied options. Give at least two readings.`),
+  a:[window.L('TSLA 涨 1 美元，这张期权每股大约涨 0.557 美元；跌 1 美元，大约跌 0.557 美元。','If TSLA rises 1 dollar, this option rises about 0.557 dollars per share; if it falls 1 dollar, the option falls about 0.557 dollars.'),
+     window.L('一张合约是 100 股的份额，所以持有 1 张，赚赔大约像持有 55.7 股 TSLA。','One contract covers 100 shares, so holding 1 contract gains and loses roughly like holding 55.7 shares of TSLA.'),
+     window.L('想让它不受 TSLA 小幅涨跌的影响，就同时卖出约 56 股。','To make it unaffected by small moves in TSLA, sell about 56 shares at the same time.'),
+     window.L('这只对小幅变动成立。TSLA 动多了，这个数自己会变。','This only holds for small moves. When TSLA moves a lot, the number itself changes.')],
+  s:window.L('「期权会涨 55.7%」：delta 说的是美元对美元的比例，不是百分比涨幅。','"The option will rise 55.7%": delta is a dollar-for-dollar ratio, not a percentage gain.')},
+ {q:window.L(`卖 put 为什么是正 delta？卖 call 和买 put 都是负 delta，它们在什么行情下赚钱？`,`Why does a short put have positive delta? A short call and a long put both have negative delta; in what market do they make money?`),
+  a:[window.L('put 是卖出的权利，TSLA 越高它越不值钱，所以 put 本身的 delta 为负，350 put 是 −0.443。','A put is the right to sell, worth less the higher TSLA goes, so the put itself has negative delta; the 350 put is −0.443.'),
+     window.L('卖出它，赚赔是买方的反面：TSLA 涨时 put 变便宜，卖方赚钱，所以卖 put 的 delta 为正。','Selling it gives the opposite of the buyer\'s gains and losses: when TSLA rises the put gets cheaper and the seller makes money, so a short put has positive delta.'),
+     window.L('卖 call 和买 put 都在 TSLA 跌时赚钱，所以都是负 delta。','A short call and a long put both make money when TSLA falls, so both have negative delta.'),
+     window.L('同一行权价的 call 和 put，delta 正好差 1：0.557 − (−0.443) = 1。','A call and a put at the same strike have deltas exactly 1 apart: 0.557 − (−0.443) = 1.')],
+  s:window.L('「put 就是负的」：只说了买 put。卖出会把符号再翻一次。','"Puts are negative": that only covers long puts. Selling flips the sign again.')},
+ {q:window.L(`为什么深度实值 call 的 delta 接近 1、深度虚值接近 0？用「到期会不会被行权」来讲，不要用公式。`,`Why is a deep in-the-money call's delta close to 1 and a deep out-of-the-money call's close to 0? Explain it in terms of "will it be exercised at expiration", without formulas.`),
+  a:[window.L('深度实值：TSLA 要大跌才会让它作废，这种事不常发生，它大概率会被行权。','Deep in the money: TSLA would have to fall sharply for it to expire worthless, which does not happen often, so it will most likely be exercised.'),
+     window.L('行权就是用行权价买一股，它的价值约等于股价减行权价，股价动 1 美元它也动约 1 美元。','Exercising means buying a share at the strike, so its value is about the stock price minus the strike; when the stock moves 1 dollar it moves about 1 dollar too.'),
+     window.L('深度虚值：TSLA 要大涨它才有用，今天多涨 1 美元离那里还是很远，期权价值几乎不动。','Deep out of the money: TSLA would have to rise sharply for it to be useful; another dollar today still leaves it far away, so the option\'s value barely moves.'),
+     window.L('远近要按标准差个数量（1.2）：离到期越近，一个标准差越窄，同样的距离显得越远，所以临近到期时 delta 更靠近 0 或 1。','Distance has to be measured in standard deviations (1.2): the closer to expiration, the narrower one standard deviation and the further the same distance looks, so near expiration delta is closer to 0 or 1.')],
+  s:window.L('「因为实值期权贵」：价格高低不决定 delta，决定 delta 的是标的这一点变动能不能改变到期的结果。','"Because in-the-money options are expensive": price level does not determine delta; what determines it is whether this small move in the underlying can change the result at expiration.')},
+ {q:window.L(`入场 delta 0.557，全程捕获比 0.734。为什么不相等？如果这 24 天 TSLA 是一路跌的，期权跟着跌的比例会比 0.557 大还是小？`,`Entry delta 0.557, capture ratio over the whole period 0.734. Why are they different? If TSLA had fallen all the way over these 24 days, would the option fall by a larger or smaller ratio than 0.557?`),
+  a:[window.L('0.557 只是入场那一刻的斜率。TSLA 一路涨，350 call 变成深度实值，delta 升到 1.000。','0.557 is only the slope at the moment of entry. TSLA kept rising, the 350 call became deep in the money, and delta rose to 1.000.'),
+     window.L('每天用前一天的 delta 乘当天的涨跌，24 天加起来 52.37，实际涨 51.37：捕获比近似是一路上 delta 按每天涨跌加权的平均。差的 1.00 是 gamma 多赚的与 theta 流失的相抵后剩下的。','Multiplying each day\'s change by the previous day\'s delta and adding up the 24 days gives 52.37, against an actual rise of 51.37: the capture ratio is roughly the average delta along the way, weighted by each day\'s move. The 1.00 difference is what is left after gamma\'s extra gains and theta\'s decay offset each other.'),
+     window.L('如果一路跌，delta 会往 0 缩，后面的跌幅只被期权跟上一小部分，价格带来的那部分亏损比 0.557 × 跌幅小。','If it fell all the way, delta would shrink toward 0, the option would follow only a small part of the later falls, and the loss from price would be less than 0.557 × the fall.'),
+     window.L('对买方来说，delta 的变化两个方向都有利：涨时越涨越快，跌时越跌越慢。','For the buyer, the change in delta is favorable in both directions: on the way up it gains faster and faster, on the way down it loses more and more slowly.')],
+  s:window.L('「报价给的 delta 算错了」：入场那一刻它是对的，只是它会变。','"The quoted delta was wrong": it was right at the moment of entry; it just changes.')},
+ {q:window.L(`这 24 天每天开始时的 delta，简单平均是 0.857，比捕获比 0.734 高。为什么？`,`The simple average of the delta at the start of each of these 24 days is 0.857, higher than the capture ratio of 0.734. Why?`),
+  a:[window.L('捕获比近似是按每天涨跌加权的平均，涨跌带着正负号：涨的日子权重为正，跌的日子权重为负。','The capture ratio is roughly an average weighted by each day\'s move, with sign: up days have positive weights and down days negative weights.'),
+     window.L('涨得最多的 4/15（+27.61）发生在 delta 0.651 的时候，被期权跟上得少。','The biggest rise, on 4/15 (+27.61), happened when delta was 0.651, so the option followed less of it.'),
+     window.L('最后一天 5/15 跌了 21.04，这时 delta 已经是 1.000，这一天权重为负，高 delta 的这一份被整份减掉。','On the last day, 5/15, TSLA fell 21.04 when delta was already 1.000; that day\'s weight is negative, so a full share at high delta is subtracted.'),
+     window.L('低 delta 时涨、高 delta 时跌，加权平均就被拉低了。','It rose while delta was low and fell while delta was high, which pulls the weighted average down.')],
+  s:window.L('「动得多的日子分量重」：只说对了一半。跌的日子权重是负的，不然 5/15 会把平均往上拉，而不是往下拉。','"Days with bigger moves count more": only half right. Down days have negative weights; otherwise 5/15 would pull the average up, not down.')},
+ {q:window.L(`买 1 张 350 call、卖出 56 股，这个仓位对冲掉了什么，没对冲掉什么？为什么到了 5/11 它像是持有 44 股？`,`Buy 1 350 call and sell 56 shares: what does this position hedge, and what does it leave unhedged? Why does it look like holding 44 shares by 5/11?`),
+  a:[window.L('对冲掉的是入场那一刻的方向风险：TSLA 小幅涨跌时，两边的盈亏大致抵消。','It hedges the directional risk at the moment of entry: for small moves in TSLA, the two sides\' gains and losses roughly offset.'),
+     window.L('delta 会变，卖出的股数不变。TSLA 涨上去之后 call 的 delta 升到约 1，相当于 100 股，减去卖出的 56 股，剩下 44 股的多头。','Delta changes, but the shares sold do not. After TSLA rose, the call\'s delta went up to about 1, equivalent to 100 shares; minus the 56 sold, 44 shares long remain.'),
+     window.L('没对冲掉的还有时间价值的流失和隐含波动率的下降：TSLA 回落、横着走的那几天，组合在亏（2.2、2.3）。','What it does not hedge includes the decay of time value and the fall in implied volatility: on the days TSLA fell back or moved sideways, the combination lost money (2.2, 2.3).'),
+     window.L('想一直保持对冲，就要随 delta 调整股数，这是 4.1 的动态对冲。','To stay hedged, the share count has to be adjusted as delta changes; that is the dynamic hedging of 4.1.')],
+  s:window.L('「对冲之后就不会亏钱了」：4/29 这个组合合计亏了 506.96。','"Once hedged it cannot lose money": on 4/29 this combination had lost a total of 506.96.')},
+ {q:window.L(`4/13 这条链上 420 call 的 delta 是 0.111，5/15 它到期实值了。能不能说 delta 低估了它到期实值的概率？delta 和实值概率为什么不一样？`,`On the 4/13 chain the 420 call had a delta of 0.111, and on 5/15 it finished in the money. Can you say delta underestimated its probability of finishing in the money? Why do delta and the probability of finishing in the money differ?`),
+  a:[window.L('一次结果只能是 0 或 1。一件约一成可能的事发生了一次，不说明概率算错了，要看很多次。','A single outcome can only be 0 or 1. Something with roughly a one-in-ten chance happening once does not show the probability was wrong; that takes many trials.'),
+     window.L('按模型，420 call 到期实值的概率是 0.090，比 delta 0.111 还低。','By the model, the 420 call\'s probability of finishing in the money was 0.090, even lower than its delta of 0.111.'),
+     window.L('delta 比实值概率大，是因为涨跌按比例算：今天多 1 美元，到期落在高处的那些价格会多出不止 1 美元。','Delta is larger than the probability of finishing in the money because changes are proportional: one more dollar today makes the high end prices at expiration more than one dollar higher.'),
+     window.L('模型的概率把平均值放在远期价，是市场定价时隐含的，不是对方向的预测。','The model\'s probability puts the mean at the forward price; it is implied by the market\'s pricing, not a forecast of direction.')],
+  s:window.L('「delta 就是概率」：只在很粗的意义上成立，长期期权差得很多。','"Delta is the probability": true only in a very rough sense, and far off for long-dated options.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>window.L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1004,7 +1006,21 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`
+    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-2-1-q'+i); if(v) t.value=v; }catch(e){}
@@ -1013,8 +1029,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? window.L('对照参考答案','Compare with the reference answer') : window.L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? window.L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 
@@ -1051,6 +1067,7 @@ let rsz=0; addEventListener('resize',()=>{ clearTimeout(rsz); rsz=setTimeout(dra
 /* 滚到眼前才开始播放 */
 onView($('tight'),TG.start); onView($('rep'),REP.start); onView($('hed'),HED.start); onView(PT.cv,PT.start);
 </script>
+<script>/* 英文模式：属性文字换成英文 */if(window.LANG==='en')document.querySelectorAll('[data-en-aria-label],[data-en-placeholder],[data-en-title],[data-en-alt]').forEach(function(e){['aria-label','placeholder','title','alt'].forEach(function(a){var v=e.getAttribute('data-en-'+a);if(v!=null)e.setAttribute(a,v);});});</script>
 <script src="course-nav.js"></script>
 </body>
 </html>

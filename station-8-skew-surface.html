@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="lang.js"></script>
 <title>skew 与波动率曲面</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%208C9%2021%2013%2024%2017%2024S24%2019%2027%2013'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -196,400 +197,405 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 微笑</a><a href="#s1">一 三个数</a><a href="#s2">二 逐日变化</a><a href="#s3">三 乘性</a>
-  <a href="#s4">四 曲面</a><a href="#s5">五 真实 delta</a><a href="#s6">六 隐含分布</a><a href="#s7">七 怎么交易</a><a href="#s8">八 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 微笑</span><span class="l-en">0 Smile</span></a><a href="#s1"><span class="l-zh">一 三个数</span><span class="l-en">1 Three numbers</span></a><a href="#s2"><span class="l-zh">二 逐日变化</span><span class="l-en">2 Day by day</span></a><a href="#s3"><span class="l-zh">三 乘性</span><span class="l-en">3 Multiplicative</span></a>
+  <a href="#s4"><span class="l-zh">四 曲面</span><span class="l-en">4 Surface</span></a><a href="#s5"><span class="l-zh">五 真实 delta</span><span class="l-en">5 True delta</span></a><a href="#s6"><span class="l-zh">六 隐含分布</span><span class="l-en">6 Implied distribution</span></a><a href="#s7"><span class="l-zh">七 怎么交易</span><span class="l-en">7 How to trade it</span></a><a href="#s8"><span class="l-zh">八 费曼检验</span><span class="l-en">8 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 8</p>
-  <h1>skew 与波动率曲面</h1>
-  <p class="lede">节点 7 讲了 Black-Scholes 的几条假设在真实市场里怎么不成立。市场的补法是每个行权价、每个到期日各报一个隐含波动率，这张表就是波动率曲面。这一节把它读懂：一条曲线用三个数描述，整张曲面有两个维度，再从它推出真实的对冲比率和市场心里的到期分布。案例还是 2026-04-13 收盘的 TSLA 期权链。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 8</span><span class="l-en">FIN 580 review · Node 8</span></p>
+  <h1><span class="l-zh">skew 与波动率曲面</span><span class="l-en">Skew and the volatility surface</span></h1>
+  <p class="lede"><span class="l-zh">节点 7 讲了 Black-Scholes 的几条假设在真实市场里怎么不成立。市场的补法是每个行权价、每个到期日各报一个隐含波动率，这张表就是波动率曲面。这一节把它读懂：一条曲线用三个数描述，整张曲面有两个维度，再从它推出真实的对冲比率和市场心里的到期分布。案例还是 2026-04-13 收盘的 TSLA 期权链。</span><span class="l-en">Node 7 showed where the Black-Scholes assumptions fail in real markets. The market's fix is to quote a separate implied volatility for every strike and every expiration; that table is the volatility surface. This node reads it: one curve is described by three numbers, the whole surface has two dimensions, and from it we derive the true hedge ratio and the distribution at expiration the market has in mind. The case is again the TSLA option chain at the 2026-04-13 close.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>一个行权价一个 σ</h2>
-  <p class="sub">1.2 给 350 call 定价时，所有行权价都用同一个 σ = 46.3%。同一天、同一个到期日，市场给每个行权价的报价反推出来的 σ 并不一样。</p>
-  <p>1.2 第六节末尾提过一句：这天 5/15 到期的 300 是 51%，400 是 45%。把这个到期日全部 104 档可用的行权价都画出来：</p>
+  <h2><span class="l-zh"><span class="n">〇</span>一个行权价一个 σ</span><span class="l-en"><span class="n">0</span>One σ per strike</span></h2>
+  <p class="sub"><span class="l-zh">1.2 给 350 call 定价时，所有行权价都用同一个 σ = 46.3%。同一天、同一个到期日，市场给每个行权价的报价反推出来的 σ 并不一样。</span><span class="l-en">When 1.2 priced the 350 call, every strike used the same σ = 46.3%. On the same day and for the same expiration, the σ backed out of the market's quote at each strike is not the same.</span></p>
+  <p><span class="l-zh">1.2 第六节末尾提过一句：这天 5/15 到期的 300 是 51%，400 是 45%。把这个到期日全部 104 档可用的行权价都画出来：</span><span class="l-en">Section 6 of 1.2 mentioned in passing that on this day the 5/15 300 was at 51% and the 400 at 45%. Here are all 104 usable strikes of that expiration:</span></p>
   <div class="panel">
-    <svg id="s0c" viewBox="0 0 640 330" role="img" aria-label="4/13 收盘，5/15 到期各行权价的隐含波动率"></svg>
+    <svg id="s0c" viewBox="0 0 640 330" role="img" aria-label="4/13 收盘，5/15 到期各行权价的隐含波动率" data-en-aria-label="Implied volatility by strike, 5/15 expiration, 4/13 close"></svg>
     <div class="legend">
-      <span><i class="dot" style="background:var(--control)"></i>每个行权价的隐含波动率（虚值那一张）</span>
-      <span><i class="ln" style="background:var(--ink-faint);width:2px;height:.8rem;vertical-align:-.1rem"></i>竖线：买价到卖价各自反推的范围</span>
-      <span><i class="dash" style="border-color:var(--result)"></i>平滑隐含波动率曲线</span>
-      <span><i class="dash" style="border-color:var(--ink-soft)"></i>1.2 用的 46.3%</span>
+      <span><i class="dot" style="background:var(--control)"></i><span class="l-zh">每个行权价的隐含波动率（虚值那一张）</span><span class="l-en">Implied volatility at each strike (the OTM option)</span></span>
+      <span><i class="ln" style="background:var(--ink-faint);width:2px;height:.8rem;vertical-align:-.1rem"></i><span class="l-zh">竖线：买价到卖价各自反推的范围</span><span class="l-en">Vertical lines: range backed out from the bid and from the ask</span></span>
+      <span><i class="dash" style="border-color:var(--result)"></i><span class="l-zh">平滑隐含波动率曲线</span><span class="l-en">Smoothed implied volatility curve</span></span>
+      <span><i class="dash" style="border-color:var(--ink-soft)"></i><span class="l-zh">1.2 用的 46.3%</span><span class="l-en">46.3% used in 1.2</span></span>
     </div>
   </div>
-  <p>两头高，中间低，左边升得比右边快：200 的 put 是 86.5%，比平值高出 40 多个点；500 的 call 是 53.5%。最低的一档是 385，44.96%，在现价右边。</p>
+  <p><span class="l-zh">两头高，中间低，左边升得比右边快：200 的 put 是 86.5%，比平值高出 40 多个点；500 的 call 是 53.5%。最低的一档是 385，44.96%，在现价右边。</span><span class="l-en">High at both ends, low in the middle, and rising faster on the left than on the right: the 200 put is at 86.5%, more than 40 points above at-the-money; the 500 call is at 53.5%. The lowest strike is 385, at 44.96%, to the right of the current price.</span></p>
 
-  <h3>取哪一张的报价</h3>
-  <p>每个行权价都有一张 call 和一张 put。5.2 讲过 parity 把同一行权价的 call 和 put 绑在一起：call 的价格定了，put 的价格也就定了。Black-Scholes 用同一个 σ 算出的 call 和 put 正好满足 parity，所以由 parity 可以推出，两张反推出的隐含波动率应该一样。这天 320 到 380 之间逐档看，两者只差 0.16 到 0.34 个点。</p>
-  <p>实值那一张的价格大部分是内在价值，时间价值只剩一点零头，报价差几分钱，反推出来的 σ 就差很多：5 行权价的 call 反推出 1000%。所以每个行权价取虚值那一张：比远期价 353.69 低的用 put，高的用 call。</p>
-  <p>虚线是报价快照自带的平滑曲线。300 到 450 之间它和报价相差不到 0.3 个点；往左它停在 61.4% 不再升，而报价一路升到 200 的 86.5%、150 的 112.6%。看两翼要用原始报价。</p>
+  <h3><span class="l-zh">取哪一张的报价</span><span class="l-en">Which option's quote to use</span></h3>
+  <p><span class="l-zh">每个行权价都有一张 call 和一张 put。5.2 讲过 parity 把同一行权价的 call 和 put 绑在一起：call 的价格定了，put 的价格也就定了。Black-Scholes 用同一个 σ 算出的 call 和 put 正好满足 parity，所以由 parity 可以推出，两张反推出的隐含波动率应该一样。这天 320 到 380 之间逐档看，两者只差 0.16 到 0.34 个点。</span><span class="l-en">Every strike has a call and a put. 5.2 showed that parity ties the call and put at the same strike together: once the call's price is set, so is the put's. Black-Scholes call and put prices computed with the same σ satisfy parity exactly, so parity implies that the two backed-out implied volatilities should be equal. Strike by strike between 320 and 380 on this day, they differ by only 0.16 to 0.34 points.</span></p>
+  <p><span class="l-zh">实值那一张的价格大部分是内在价值，时间价值只剩一点零头，报价差几分钱，反推出来的 σ 就差很多：5 行权价的 call 反推出 1000%。所以每个行权价取虚值那一张：比远期价 353.69 低的用 put，高的用 call。</span><span class="l-en">Most of an in-the-money option's price is intrinsic value, with only a sliver of time value left, so a few cents of quote difference moves the backed-out σ a lot: the 5-strike call backs out to 1000%. So each strike uses the out-of-the-money option: puts below the forward price of 353.69, calls above it.</span></p>
+  <p><span class="l-zh">虚线是报价快照自带的平滑曲线。300 到 450 之间它和报价相差不到 0.3 个点；往左它停在 61.4% 不再升，而报价一路升到 200 的 86.5%、150 的 112.6%。看两翼要用原始报价。</span><span class="l-en">The dashed line is the smoothed curve that comes with the quote snapshot. Between 300 and 450 it is within 0.3 points of the quotes; to the left it stops rising at 61.4%, while the quotes keep climbing to 86.5% at 200 and 112.6% at 150. To read the wings, use the raw quotes.</span></p>
 
-  <h3>三种形状</h3>
-  <p>同一到期日、不同行权价的隐含波动率不一样，这件事叫 <span class="sym" data-say="volatility skew，波动率偏斜。讲义的定义：同一到期日、不同行权价的期权以不同的隐含波动率交易。">skew</span>（偏斜）。两头都翘起来的形状叫微笑。讲义按哪一头被抬高分成三种：</p>
+  <h3><span class="l-zh">三种形状</span><span class="l-en">Three shapes</span></h3>
+  <p><span class="l-zh">同一到期日、不同行权价的隐含波动率不一样，这件事叫 <span class="sym" data-say="volatility skew，波动率偏斜。讲义的定义：同一到期日、不同行权价的期权以不同的隐含波动率交易。">skew</span>（偏斜）。两头都翘起来的形状叫微笑。讲义按哪一头被抬高分成三种：</span><span class="l-en">When implied volatility differs across strikes for the same expiration, that is called <span class="sym" data-say="Volatility skew. The lecture's definition: options with the same expiration and different strikes trade at different implied volatilities.">skew</span>. A shape that turns up at both ends is called a smile. The lecture notes sort skews into three kinds by which end is raised:</span></p>
   <div class="tw"><table>
-    <thead><tr><th>名称</th><th class="txt">形状</th><th class="txt">讲义给的来由</th></tr></thead>
+    <thead><tr><th><span class="l-zh">名称</span><span class="l-en">Name</span></th><th class="txt"><span class="l-zh">形状</span><span class="l-en">Shape</span></th><th class="txt"><span class="l-zh">讲义给的来由</span><span class="l-en">Origin given in the lecture notes</span></th></tr></thead>
     <tbody>
-      <tr><td>investment skew（投资型）</td><td class="txt">低行权价被抬高</td><td class="txt">持股的人买低行权价的 put 保护自己，把低行权价抬高；同时卖高行权价的 call 收租金，把高行权价压低。两头一推一压，低行权价相对更贵。</td></tr>
-      <tr><td>demand skew（需求型）</td><td class="txt">高行权价被抬高</td><td class="txt">讲义只给了名字和图。</td></tr>
-      <tr><td>balanced skew（平衡型）</td><td class="txt">两头一起被抬高</td><td class="txt">讲义只给了名字和图。</td></tr>
+      <tr><td><span class="l-zh">investment skew（投资型）</span><span class="l-en">investment skew</span></td><td class="txt"><span class="l-zh">低行权价被抬高</span><span class="l-en">Low strikes raised</span></td><td class="txt"><span class="l-zh">持股的人买低行权价的 put 保护自己，把低行权价抬高；同时卖高行权价的 call 收租金，把高行权价压低。两头一推一压，低行权价相对更贵。</span><span class="l-en">Shareholders buy low-strike puts to protect themselves, which raises low strikes; at the same time they sell high-strike calls for rent, which pushes high strikes down. With one end pushed up and the other pushed down, low strikes are relatively more expensive.</span></td></tr>
+      <tr><td><span class="l-zh">demand skew（需求型）</span><span class="l-en">demand skew</span></td><td class="txt"><span class="l-zh">高行权价被抬高</span><span class="l-en">High strikes raised</span></td><td class="txt"><span class="l-zh">讲义只给了名字和图。</span><span class="l-en">The lecture notes give only the name and a chart.</span></td></tr>
+      <tr><td><span class="l-zh">balanced skew（平衡型）</span><span class="l-en">balanced skew</span></td><td class="txt"><span class="l-zh">两头一起被抬高</span><span class="l-en">Both ends raised</span></td><td class="txt"><span class="l-zh">讲义只给了名字和图。</span><span class="l-en">The lecture notes give only the name and a chart.</span></td></tr>
     </tbody>
   </table></div>
-  <p>TSLA 这天两头都翘，左头翘得更多，是投资型叠在一个微笑上。节点 7 讲过两件事：真实的日涨跌两头比钟形长；下跌的时候波动更大。前一件让两翼一起抬高，后一件让左边抬得更多。</p>
-  <p class="tiny">数据：2026-04-13 16:00 的报价快照。隐含波动率取虚值一侧（行权价低于远期价用 put 的隐含波动率，高于远期价用 call 的隐含波动率），只用买价不低于 0.05、买卖两边反推的隐含波动率相差不到 15 个点的报价。远期价 F = 352.36 × (1 + 4.3% × 32/365) = 353.69。</p>
+  <p><span class="l-zh">TSLA 这天两头都翘，左头翘得更多，是投资型叠在一个微笑上。节点 7 讲过两件事：真实的日涨跌两头比钟形长；下跌的时候波动更大。前一件让两翼一起抬高，后一件让左边抬得更多。</span><span class="l-en">On this day TSLA turns up at both ends, more on the left: an investment skew laid on top of a smile. Node 7 covered two facts: real daily moves have longer tails than the bell shape, and volatility is higher when prices fall. The first raises both wings; the second raises the left side more.</span></p>
+  <p class="tiny"><span class="l-zh">数据：2026-04-13 16:00 的报价快照。隐含波动率取虚值一侧（行权价低于远期价用 put 的隐含波动率，高于远期价用 call 的隐含波动率），只用买价不低于 0.05、买卖两边反推的隐含波动率相差不到 15 个点的报价。远期价 F = 352.36 × (1 + 4.3% × 32/365) = 353.69。</span><span class="l-en">Data: quote snapshot at 16:00 on 2026-04-13. Implied volatility comes from the OTM side (put implied volatility for strikes below the forward price, call implied volatility above it), using only quotes with a bid of at least 0.05 and with the implied volatilities from bid and ask less than 15 points apart. Forward price F = 352.36 × (1 + 4.3% × 32/365) = 353.69.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>三个数</h2>
-  <p class="sub">一条曲线几十个点，交易员用三个数记住它：高度、倾斜、弯曲。</p>
-  <p>横轴先换成 1.2 第六节的 z：行权价离中心几个标准差。</p>
+  <h2><span class="l-zh"><span class="n">一</span>三个数</span><span class="l-en"><span class="n">1</span>Three numbers</span></h2>
+  <p class="sub"><span class="l-zh">一条曲线几十个点，交易员用三个数记住它：高度、倾斜、弯曲。</span><span class="l-en">A curve has dozens of points; traders remember it with three numbers: height, tilt and bend.</span></p>
+  <p><span class="l-zh">横轴先换成 1.2 第六节的 z：行权价离中心几个标准差。</span><span class="l-en">First, change the horizontal axis to the z from section 6 of 1.2: how many standard deviations the strike is from the center.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="离中心几个标准差。负数在中心左边（低行权价），正数在右边。">z</span> ＝ ln(<span class="sym" data-say="行权价。">X</span> ÷ <span class="sym" data-say="远期价，分布的中心（1.1）。这里是 353.69。">F</span>) ÷ (<span class="sym" data-say="平值隐含波动率：把各行权价的隐含波动率在远期价处插值。4/13 的 5/15 到期是 46.07%。">σ平</span> × <span class="sym" data-say="到期时间（以年计）的平方根。32 天是 √(32/365) ≈ 0.296。">√t</span>)</div>
-    <div class="gloss">行权价比远期价高出的比例，除以一个标准差的宽度</div>
-    <div class="note">σ平 取远期价 353.69 处的隐含波动率 46.07%。1.2 用的 46.3% 是 350 call 自己的，它比远期价低 3.69。</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="离中心几个标准差。负数在中心左边（低行权价），正数在右边。">z</span> ＝ ln(<span class="sym" data-say="行权价。">X</span> ÷ <span class="sym" data-say="远期价，分布的中心（1.1）。这里是 353.69。">F</span>) ÷ (<span class="sym" data-say="平值隐含波动率：把各行权价的隐含波动率在远期价处插值。4/13 的 5/15 到期是 46.07%。">σ平</span> × <span class="sym" data-say="到期时间（以年计）的平方根。32 天是 √(32/365) ≈ 0.296。">√t</span></span><span class="l-en"><span class="sym" data-say="How many standard deviations from the center. Negative is left of center (low strikes), positive is right.">z</span> = ln(<span class="sym" data-say="Strike.">X</span> ÷ <span class="sym" data-say="Forward price, the center of the distribution (1.1). Here 353.69.">F</span>) ÷ (<span class="sym" data-say="At-the-money implied volatility: the strikes' implied volatilities interpolated at the forward price. For the 5/15 expiration on 4/13 it is 46.07%.">σ<sub>ATM</sub></span> × <span class="sym" data-say="Square root of time to expiration in years. 32 days is √(32/365) ≈ 0.296.">√t</span></span>)</div>
+    <div class="gloss"><span class="l-zh">行权价比远期价高出的比例，除以一个标准差的宽度</span><span class="l-en">How far the strike is above the forward price, as a fraction, divided by the width of one standard deviation</span></div>
+    <div class="note"><span class="l-zh">σ平 取远期价 353.69 处的隐含波动率 46.07%。1.2 用的 46.3% 是 350 call 自己的，它比远期价低 3.69。</span><span class="l-en">σ<sub>ATM</sub> is the implied volatility at the forward price of 353.69, 46.07%. The 46.3% used in 1.2 belongs to the 350 call itself, which is 3.69 below the forward price.</span></div>
   </div>
-  <p>讲义用一条抛物线去贴这些点。讲义的横轴是行权价，这里换成 z：同样一条抛物线，放到不同的日子、不同的到期日上才能比。</p>
+  <p><span class="l-zh">讲义用一条抛物线去贴这些点。讲义的横轴是行权价，这里换成 z：同样一条抛物线，放到不同的日子、不同的到期日上才能比。</span><span class="l-en">The lecture notes fit a parabola to these points. The lecture's horizontal axis is the strike; here it is z, so that the same parabola can be compared across different days and different expirations.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="隐含波动率，单位是波动率点（1 个点 = 1%）。">y</span> ＝ <span class="sym" data-say="曲率（curvature），讲义也直接叫 kurtosis。管两翼翘起多少：离中心 z 个标准差，这一项加 a × z² 个点，两边一样。">a</span>·z² ＋ <span class="sym" data-say="倾斜（tilt），讲义也叫 skew。管曲线往哪边歪：每往右一个标准差，这一项加 b 个点。b 为负就是左边高。">b</span>·z ＋ <span class="sym" data-say="水平（level）：中心附近的隐含波动率。">c</span></div>
-    <div class="gloss">隐含波动率 ＝ 曲率 × 距离的平方 ＋ 倾斜 × 距离 ＋ 水平</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="隐含波动率，单位是波动率点（1 个点 = 1%）。">y</span> ＝ <span class="sym" data-say="曲率（curvature），讲义也直接叫 kurtosis。管两翼翘起多少：离中心 z 个标准差，这一项加 a × z² 个点，两边一样。">a</span>·z² ＋ <span class="sym" data-say="倾斜（tilt），讲义也叫 skew。管曲线往哪边歪：每往右一个标准差，这一项加 b 个点。b 为负就是左边高。">b</span>·z ＋ <span class="sym" data-say="水平（level）：中心附近的隐含波动率。">c</span></span><span class="l-en"><span class="sym" data-say="Implied volatility, in volatility points (1 point = 1%).">y</span> = <span class="sym" data-say="Curvature; the lecture notes also call it kurtosis. It sets how far the wings turn up: z standard deviations from the center, this term adds a × z² points, the same on both sides.">a</span>·z² + <span class="sym" data-say="Tilt; the lecture notes also call it skew. It sets which way the curve leans: each standard deviation to the right, this term adds b points. Negative b means the left side is higher.">b</span>·z + <span class="sym" data-say="Level: implied volatility near the center.">c</span></span></div>
+    <div class="gloss"><span class="l-zh">隐含波动率 ＝ 曲率 × 距离的平方 ＋ 倾斜 × 距离 ＋ 水平</span><span class="l-en">Implied volatility = curvature × distance squared + tilt × distance + level</span></div>
   </div>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="s1Play">再放一遍</button></div>
-    <svg id="s1c" viewBox="0 0 640 330" role="img" aria-label="用水平、倾斜、曲率三项一步步拼出 TSLA 的微笑"></svg>
+    <div class="bar"><button class="btn ghost" id="s1Play"><span class="l-zh">再放一遍</span><span class="l-en">Replay</span></button></div>
+    <svg id="s1c" viewBox="0 0 640 330" role="img" aria-label="用水平、倾斜、曲率三项一步步拼出 TSLA 的微笑" data-en-aria-label="Building TSLA's smile step by step from level, tilt and curvature"></svg>
     <div class="legend">
-      <span><i class="dot" style="background:var(--ink-soft)"></i>4/13 收盘报价</span>
-      <span><i class="ln" style="background:var(--control)"></i>当前这一步的曲线</span>
-      <span><i class="dash" style="border-color:var(--ink-faint)"></i>上一步</span>
+      <span><i class="dot" style="background:var(--ink-soft)"></i><span class="l-zh">4/13 收盘报价</span><span class="l-en">4/13 closing quotes</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">当前这一步的曲线</span><span class="l-en">Curve at the current step</span></span>
+      <span><i class="dash" style="border-color:var(--ink-faint)"></i><span class="l-zh">上一步</span><span class="l-en">Previous step</span></span>
     </div>
   </div>
   <div class="tw"><table>
-    <thead><tr><th>离中心</th><th>行权价</th><th>水平 c</th><th>倾斜 b·z</th><th>曲率 a·z²</th><th>合计</th><th>市场</th></tr></thead>
+    <thead><tr><th><span class="l-zh">离中心</span><span class="l-en">Distance from center</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">水平 c</span><span class="l-en">Level c</span></th><th><span class="l-zh">倾斜 b·z</span><span class="l-en">Tilt b·z</span></th><th><span class="l-zh">曲率 a·z²</span><span class="l-en">Curvature a·z²</span></th><th><span class="l-zh">合计</span><span class="l-en">Total</span></th><th><span class="l-zh">市场</span><span class="l-en">Market</span></th></tr></thead>
     <tbody>
-      <tr><td>−2 个标准差</td><td>269</td><td>45.47</td><td>+4.14</td><td>+8.28</td><td>57.89</td><td>57.54</td></tr>
-      <tr><td>−1 个标准差</td><td>309</td><td>45.47</td><td>+2.07</td><td>+2.07</td><td>49.61</td><td>49.80</td></tr>
-      <tr><td>中心</td><td>354</td><td>45.47</td><td>0</td><td>0</td><td>45.47</td><td>46.07</td></tr>
-      <tr><td>+1 个标准差</td><td>405</td><td>45.47</td><td>−2.07</td><td>+2.07</td><td>45.47</td><td>45.06</td></tr>
-      <tr><td>+2 个标准差</td><td>465</td><td>45.47</td><td>−4.14</td><td>+8.28</td><td>49.60</td><td>49.27</td></tr>
+      <tr><td><span class="l-zh">−2 个标准差</span><span class="l-en">−2 SD</span></td><td>269</td><td>45.47</td><td>+4.14</td><td>+8.28</td><td>57.89</td><td>57.54</td></tr>
+      <tr><td><span class="l-zh">−1 个标准差</span><span class="l-en">−1 SD</span></td><td>309</td><td>45.47</td><td>+2.07</td><td>+2.07</td><td>49.61</td><td>49.80</td></tr>
+      <tr><td><span class="l-zh">中心</span><span class="l-en">Center</span></td><td>354</td><td>45.47</td><td>0</td><td>0</td><td>45.47</td><td>46.07</td></tr>
+      <tr><td><span class="l-zh">+1 个标准差</span><span class="l-en">+1 SD</span></td><td>405</td><td>45.47</td><td>−2.07</td><td>+2.07</td><td>45.47</td><td>45.06</td></tr>
+      <tr><td><span class="l-zh">+2 个标准差</span><span class="l-en">+2 SD</span></td><td>465</td><td>45.47</td><td>−4.14</td><td>+8.28</td><td>49.60</td><td>49.27</td></tr>
     </tbody>
   </table></div>
-  <p>用 −3 到 +3 个标准差之间（行权价 235 到 530）的 60 个报价去贴，得到 c = 45.47，b = −2.07，a = 2.07，单位都是波动率点。60 个点离这条线平均 0.33 个点，最远 0.77 个点。</p>
+  <p><span class="l-zh">用 −3 到 +3 个标准差之间（行权价 235 到 530）的 60 个报价去贴，得到 c = 45.47，b = −2.07，a = 2.07，单位都是波动率点。60 个点离这条线平均 0.33 个点，最远 0.77 个点。</span><span class="l-en">Fitting the 60 quotes between −3 and +3 standard deviations (strikes 235 to 530) gives c = 45.47, b = −2.07, a = 2.07, all in volatility points. The 60 points are on average 0.33 points from the curve, at most 0.77 points.</span></p>
   <ul>
-    <li><b>c 管高度</b>：中心附近的隐含波动率。</li>
-    <li><b>b 管倾斜</b>：每往左一个标准差，b·z 这一项加 2.07 个点，往右减 2.07 个点。b 为负，左边高。讲义把它叫 tilt，也叫 skew。</li>
-    <li><b>a 管弯曲</b>：离中心 1 个标准差加 2.07 个点，2 个加 8.28 个点，3 个加 18.63 个点，两边一样。a 为正，两翼上翘。讲义把它叫 curvature，也直接叫 kurtosis。</li>
+    <li><span class="l-zh"><b>c 管高度</b>：中心附近的隐含波动率。</span><span class="l-en"><b>c sets the height</b>: the implied volatility near the center.</span></li>
+    <li><span class="l-zh"><b>b 管倾斜</b>：每往左一个标准差，b·z 这一项加 2.07 个点，往右减 2.07 个点。b 为负，左边高。讲义把它叫 tilt，也叫 skew。</span><span class="l-en"><b>b sets the tilt</b>: each standard deviation to the left, the b·z term adds 2.07 points; to the right it subtracts 2.07 points. b is negative, so the left side is higher. The lecture notes call it tilt, and also skew.</span></li>
+    <li><span class="l-zh"><b>a 管弯曲</b>：离中心 1 个标准差加 2.07 个点，2 个加 8.28 个点，3 个加 18.63 个点，两边一样。a 为正，两翼上翘。讲义把它叫 curvature，也直接叫 kurtosis。</span><span class="l-en"><b>a sets the bend</b>: 1 standard deviation from the center adds 2.07 points, 2 add 8.28 points, 3 add 18.63 points, the same on both sides. a is positive, so the wings turn up. The lecture notes call it curvature, and also simply kurtosis.</span></li>
   </ul>
-  <p>这天 b 和 a 大小几乎相同、符号相反，所以 z = +1 那里倾斜和弯曲正好抵消，右边一个标准差（行权价 405）的拟合值和中心一样。抛物线的最低点在 z = +0.50，行权价 378.7，高度 44.95%。</p>
-  <p><span class="sym" data-say="峰度。说分布时指两头比钟形更长、中间更尖的程度；说曲线时指两翼相对平值翘起的程度。两者是同一件事。">峰度</span>（kurtosis）原本说的是分布：两头比钟形长，中间更尖。分布两头长，远虚值期权到期变成实值的机会就比钟形算出来的多，市场给它们更高的价格，反推出来的 σ 就高。曲线的弯曲 a 和分布的峰度是同一件事的两种写法；倾斜 b 对应分布的<span class="sym" data-say="偏度。分布两条尾巴长度不一样的程度。左尾更长叫负偏，右尾更长叫正偏。">偏度</span>，哪一边的尾巴更长。</p>
+  <p><span class="l-zh">这天 b 和 a 大小几乎相同、符号相反，所以 z = +1 那里倾斜和弯曲正好抵消，右边一个标准差（行权价 405）的拟合值和中心一样。抛物线的最低点在 z = +0.50，行权价 378.7，高度 44.95%。</span><span class="l-en">On this day b and a are almost equal in size and opposite in sign, so at z = +1 tilt and bend cancel exactly, and the fitted value one standard deviation to the right (strike 405) equals the center's. The parabola's lowest point is at z = +0.50, strike 378.7, height 44.95%.</span></p>
+  <p><span class="l-zh"><span class="sym" data-say="峰度。说分布时指两头比钟形更长、中间更尖的程度；说曲线时指两翼相对平值翘起的程度。两者是同一件事。">峰度</span>（kurtosis）原本说的是分布：两头比钟形长，中间更尖。分布两头长，远虚值期权到期变成实值的机会就比钟形算出来的多，市场给它们更高的价格，反推出来的 σ 就高。曲线的弯曲 a 和分布的峰度是同一件事的两种写法；倾斜 b 对应分布的<span class="sym" data-say="偏度。分布两条尾巴长度不一样的程度。左尾更长叫负偏，右尾更长叫正偏。">偏度</span>，哪一边的尾巴更长。</span><span class="l-en"><span class="sym" data-say="Kurtosis. For a distribution, how much longer the tails are and how much sharper the middle is than the bell shape; for a curve, how far the wings turn up relative to at-the-money. The two are the same thing.">Kurtosis</span> originally describes a distribution: tails longer than the bell shape, a sharper middle. When the distribution's tails are long, far OTM options end in the money more often than the bell shape says, the market prices them higher, and the backed-out σ is higher. The curve's bend a and the distribution's kurtosis are two ways of writing the same thing; the tilt b corresponds to the distribution's <span class="sym" data-say="Skewness. How unequal the two tails of a distribution are. A longer left tail is negative skew, a longer right tail positive skew.">skewness</span>, which tail is longer.</span></p>
 
-  <h3>哪张期权对哪个数最敏感</h3>
-  <p>先说交易员怎么称呼虚值期权。他们按 delta 起名：「25 delta 的 put」就是 delta 为 −0.25 的那张 put，也就是标的涨 1 美元、它跌 0.25 美元的那张（2.1 的整数写法），图表里简写成 25<span class="sym" data-say="delta 的符号。25Δ put 读作 25 delta 的 put：delta 为 −0.25 的那张 put。">Δ</span> put。2.1 第六节讲过，delta 约等于到期落在实值的概率。在处处同一个 σ 的世界里，这个概率就是钟形曲线在行权价外侧那一截的面积，所以 delta 和 z 一一对应：z = 0.674 外侧 25%，就是 25 delta；z = 1 外侧约 16%，是 16 delta；z = 1.645 外侧 5%，是 5 delta。平值的 z 是 0，delta 约 50。</p>
-  <p>把某个数加 1 个点，每张期权的隐含波动率变多少，看它的 z：c 加 1，所有期权都加 1 个点；b 加 1，每张加 z 个点；a 加 1，每张加 z² 个点。隐含波动率变 1 个点，价格变一个 <span class="sym" data-say="隐含波动率变 1 个点时期权价格变多少（2.3）。平值最大，往两边变小。">vega</span>。</p>
+  <h3><span class="l-zh">哪张期权对哪个数最敏感</span><span class="l-en">Which option is most sensitive to which number</span></h3>
+  <p><span class="l-zh">先说交易员怎么称呼虚值期权。他们按 delta 起名：「25 delta 的 put」就是 delta 为 −0.25 的那张 put，也就是标的涨 1 美元、它跌 0.25 美元的那张（2.1 的整数写法），图表里简写成 25<span class="sym" data-say="delta 的符号。25Δ put 读作 25 delta 的 put：delta 为 −0.25 的那张 put。">Δ</span> put。2.1 第六节讲过，delta 约等于到期落在实值的概率。在处处同一个 σ 的世界里，这个概率就是钟形曲线在行权价外侧那一截的面积，所以 delta 和 z 一一对应：z = 0.674 外侧 25%，就是 25 delta；z = 1 外侧约 16%，是 16 delta；z = 1.645 外侧 5%，是 5 delta。平值的 z 是 0，delta 约 50。</span><span class="l-en">First, how traders name OTM options. They name them by delta: "the 25 delta put" is the put with a delta of −0.25, the one that falls $0.25 when the underlying rises $1 (the whole-number convention of 2.1), written 25<span class="sym" data-say="The delta symbol. 25Δ put reads as the 25 delta put: the put with a delta of −0.25.">Δ</span> put on charts. Section 6 of 2.1 showed that delta is roughly the probability of finishing in the money. In a world with the same σ everywhere, that probability is the area of the bell curve beyond the strike, so delta and z correspond one to one: 25% lies beyond z = 0.674, so that is 25 delta; about 16% lies beyond z = 1, 16 delta; 5% lies beyond z = 1.645, 5 delta. At-the-money z is 0 and delta is about 50.</span></p>
+  <p><span class="l-zh">把某个数加 1 个点，每张期权的隐含波动率变多少，看它的 z：c 加 1，所有期权都加 1 个点；b 加 1，每张加 z 个点；a 加 1，每张加 z² 个点。隐含波动率变 1 个点，价格变一个 <span class="sym" data-say="隐含波动率变 1 个点时期权价格变多少（2.3）。平值最大，往两边变小。">vega</span>。</span><span class="l-en">When one of the numbers rises 1 point, how much each option's implied volatility changes depends on its z: c up 1 adds 1 point to every option; b up 1 adds z points to each; a up 1 adds z² points to each. A 1-point change in implied volatility changes the price by one <span class="sym" data-say="How much the option price changes when implied volatility changes 1 point (2.3). Largest at-the-money, smaller toward both sides.">vega</span>.</span></p>
   <div class="formula">
-    <div class="math">价格变化 ＝ vega × (<span class="sym" data-say="水平 c 加了几个点。">Δc</span> ＋ z·<span class="sym" data-say="倾斜 b 加了几个点。">Δb</span> ＋ z²·<span class="sym" data-say="曲率 a 加了几个点。">Δa</span>)</div>
-    <div class="gloss">每个波动率点的价格 × 这张期权的隐含波动率变了几个点</div>
+    <div class="math"><span class="l-zh">价格变化 ＝ vega × (<span class="sym" data-say="水平 c 加了几个点。">Δc</span> ＋ z·<span class="sym" data-say="倾斜 b 加了几个点。">Δb</span> ＋ z²·<span class="sym" data-say="曲率 a 加了几个点。">Δa</span></span><span class="l-en">Price change = vega × (<span class="sym" data-say="How many points level c rose.">Δc</span> + z·<span class="sym" data-say="How many points tilt b rose.">Δb</span> + z²·<span class="sym" data-say="How many points curvature a rose.">Δa</span></span>)</div>
+    <div class="gloss"><span class="l-zh">每个波动率点的价格 × 这张期权的隐含波动率变了几个点</span><span class="l-en">Price per volatility point × how many points this option's implied volatility moved</span></div>
   </div>
-  <p>在处处同一个 σ 的世界里，Black-Scholes 的 vega 正比于钟形曲线在 z 处的高度 <span class="sym" data-say="标准正态分布（钟形曲线）在 z 处的高度。z = 0 时最高，约 0.399，往两边变小。">φ(z)</span>（还差一个很小的修正），平值最大，往两边变小；z 在中心是 0，往两边变大。两样一乘，峰落在不同的地方。下图就在这样一个世界里算，纵轴以平值那张对 c 的敏感度为 1：</p>
+  <p><span class="l-zh">在处处同一个 σ 的世界里，Black-Scholes 的 vega 正比于钟形曲线在 z 处的高度 <span class="sym" data-say="标准正态分布（钟形曲线）在 z 处的高度。z = 0 时最高，约 0.399，往两边变小。">φ(z)</span>（还差一个很小的修正），平值最大，往两边变小；z 在中心是 0，往两边变大。两样一乘，峰落在不同的地方。下图就在这样一个世界里算，纵轴以平值那张对 c 的敏感度为 1：</span><span class="l-en">In a world with the same σ everywhere, Black-Scholes vega is proportional to the height of the bell curve at z, <span class="sym" data-say="Height of the standard normal distribution (the bell curve) at z. Highest at z = 0, about 0.399, smaller toward both sides.">φ(z)</span> (up to a very small correction): largest at-the-money, smaller toward both sides; z is 0 at the center and grows toward both sides. Multiply the two and the peaks land in different places. The chart below is computed in such a world, with the vertical axis scaled so the at-the-money option's sensitivity to c is 1:</span></p>
   <div class="panel">
-    <svg id="s1s" viewBox="0 0 640 300" role="img" aria-label="水平、倾斜、曲率三个数对不同 delta 的期权价格的影响"></svg>
+    <svg id="s1s" viewBox="0 0 640 300" role="img" aria-label="水平、倾斜、曲率三个数对不同 delta 的期权价格的影响" data-en-aria-label="How level, tilt and curvature affect the prices of options with different deltas"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--result)"></i>对水平 c</span>
-      <span><i class="ln" style="background:var(--control)"></i>对倾斜 b（绝对值）</span>
-      <span><i class="ln" style="background:var(--good)"></i>对曲率 a</span>
+      <span><i class="ln" style="background:var(--result)"></i><span class="l-zh">对水平 c</span><span class="l-en">To level c</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">对倾斜 b（绝对值）</span><span class="l-en">To tilt b (absolute value)</span></span>
+      <span><i class="ln" style="background:var(--good)"></i><span class="l-zh">对曲率 a</span><span class="l-en">To curvature a</span></span>
     </div>
   </div>
   <ul>
-    <li><b>c</b>：平值（±50 delta）最敏感。</li>
-    <li><b>b</b>：峰在离中心 1 个标准差，约 ±16 delta，高 0.61。作业用的三档里，±25 delta 是 0.54，±5 delta 是 0.43，平值是 0，±25 最敏感。</li>
-    <li><b>a</b>：峰在离中心 √2 个标准差，约 ±8 delta，高 0.74。三档里 ±5 delta 是 0.70，±25 是 0.36，±5 最敏感。</li>
+    <li><b>c</b><span class="l-zh">：平值（±50 delta）最敏感。</span><span class="l-en">: at-the-money (±50 delta) is most sensitive.</span></li>
+    <li><b>b</b><span class="l-zh">：峰在离中心 1 个标准差，约 ±16 delta，高 0.61。作业用的三档里，±25 delta 是 0.54，±5 delta 是 0.43，平值是 0，±25 最敏感。</span><span class="l-en">: peaks 1 standard deviation from the center, about ±16 delta, at 0.61. Of the three deltas in the homework, ±25 delta is 0.54, ±5 delta 0.43, at-the-money 0; ±25 is most sensitive.</span></li>
+    <li><b>a</b><span class="l-zh">：峰在离中心 √2 个标准差，约 ±8 delta，高 0.74。三档里 ±5 delta 是 0.70，±25 是 0.36，±5 最敏感。</span><span class="l-en">: peaks √2 standard deviations from the center, about ±8 delta, at 0.74. Of the three, ±5 delta is 0.70, ±25 is 0.36; ±5 is most sensitive.</span></li>
   </ul>
-  <p>这就是讲义作业题干给的设定：±25 delta 对 skew 最敏感，±5 delta 对 kurtosis 最敏感，所有期权都对波动率水平敏感，平值最多。换成 TSLA 这天真实的微笑，每档的行权价和隐含波动率按拟合的曲线取（模型值），每股价格变化。c 加 1 点，价格变化就是 vega 本身，表里只列一次：</p>
+  <p><span class="l-zh">这就是讲义作业题干给的设定：±25 delta 对 skew 最敏感，±5 delta 对 kurtosis 最敏感，所有期权都对波动率水平敏感，平值最多。换成 TSLA 这天真实的微笑，每档的行权价和隐含波动率按拟合的曲线取（模型值），每股价格变化。c 加 1 点，价格变化就是 vega 本身，表里只列一次：</span><span class="l-en">This is the setup given in the lecture's homework: ±25 delta is most sensitive to skew, ±5 delta is most sensitive to kurtosis, and every option is sensitive to the volatility level, at-the-money most of all. Switching to TSLA's real smile on this day, each delta's strike and implied volatility are read off the fitted curve (model values), and the table shows the price change per share. With c up 1 point, the price change is vega itself, so the table lists it once:</span></p>
   <div class="tw"><table>
-    <thead><tr><th>期权</th><th>行权价</th><th>z</th><th>隐含波动率</th><th>vega<br>（c 加 1 点）</th><th>b 加 1 点</th><th>a 加 1 点</th></tr></thead>
+    <thead><tr><th><span class="l-zh">期权</span><span class="l-en">Option</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th>z</th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></th><th>vega<br><span class="l-zh">（c 加 1 点）</span><span class="l-en">(c up 1 point)</span></th><th><span class="l-zh">b 加 1 点</span><span class="l-en">b up 1 point</span></th><th><span class="l-zh">a 加 1 点</span><span class="l-en">a up 1 point</span></th></tr></thead>
     <tbody id="sensTb"></tbody>
   </table></div>
-  <p>call 一侧和上面的规律一致。put 一侧，−5 与 −25 delta 对 b 的敏感度几乎相同（−0.209 与 −0.207）：左翼隐含波动率高（57.3%），同样是 5 delta，这张 put 离中心更远，z 是 −1.94 而不是 −1.645，多出来的距离补上了 vega 小的那一截。b 加 1 点时 put 一侧降价、call 一侧涨价，符号在平值两边相反。</p>
+  <p><span class="l-zh">call 一侧和上面的规律一致。put 一侧，−5 与 −25 delta 对 b 的敏感度几乎相同（−0.209 与 −0.207）：左翼隐含波动率高（57.3%），同样是 5 delta，这张 put 离中心更远，z 是 −1.94 而不是 −1.645，多出来的距离补上了 vega 小的那一截。b 加 1 点时 put 一侧降价、call 一侧涨价，符号在平值两边相反。</span><span class="l-en">The call side follows the pattern above. On the put side, −5 and −25 delta are almost equally sensitive to b (−0.209 and −0.207): left-wing implied volatility is high (57.3%), so at the same 5 delta this put is farther from the center, with z of −1.94 rather than −1.645, and the extra distance makes up for its smaller vega. When b rises 1 point, puts get cheaper and calls get more expensive; the sign flips across at-the-money.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>24 天里的微笑</h2>
-  <p class="sub">同一串 5/15 到期的期权，4/13 到 5/14 每天收盘画一次，一共 24 天。1.2 回放过 TSLA 这 24 天走了哪条路；这里看它的微笑怎么变。</p>
+  <h2><span class="l-zh"><span class="n">二</span>24 天里的微笑</span><span class="l-en"><span class="n">2</span>The smile over 24 days</span></h2>
+  <p class="sub"><span class="l-zh">同一串 5/15 到期的期权，4/13 到 5/14 每天收盘画一次，一共 24 天。1.2 回放过 TSLA 这 24 天走了哪条路；这里看它的微笑怎么变。</span><span class="l-en">The same string of 5/15 options, drawn at every close from 4/13 to 5/14, 24 days in all. 1.2 replayed the path TSLA took over these 24 days; here we watch how its smile changes.</span></p>
   <div class="panel">
     <div class="bar">
-      <div class="seg" id="s2Ax"><button data-v="z" aria-pressed="true">按标准差</button><button data-v="k" aria-pressed="false">按行权价</button></div>
-      <button class="btn" id="s2Play">逐天播放</button>
+      <div class="seg" id="s2Ax"><button data-v="z" aria-pressed="true"><span class="l-zh">按标准差</span><span class="l-en">By standard deviation</span></button><button data-v="k" aria-pressed="false"><span class="l-zh">按行权价</span><span class="l-en">By strike</span></button></div>
+      <button class="btn" id="s2Play"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button>
     </div>
-    <svg id="s2c" viewBox="0 0 640 420" role="img" aria-label="5/15 到期的微笑从 4/13 到 5/14 逐日变化，下方是倾斜 b 与曲率 a 的逐日记录"></svg>
+    <svg id="s2c" viewBox="0 0 640 420" role="img" aria-label="5/15 到期的微笑从 4/13 到 5/14 逐日变化，下方是倾斜 b 与曲率 a 的逐日记录" data-en-aria-label="Daily change of the 5/15 smile from 4/13 to 5/14, with daily tilt b and curvature a below"></svg>
     <div class="legend">
-      <span><i class="dot" style="background:var(--ink-soft)"></i>当天报价</span>
-      <span><i class="ln" style="background:var(--control)"></i>当天拟合</span>
-      <span><i class="dash" style="border-color:var(--ink-faint)"></i>4/13 的拟合</span>
-      <span id="s2LgS"><i class="dash" style="border-color:var(--result)"></i>TSLA 收盘价；▲ 谷底</span>
+      <span><i class="dot" style="background:var(--ink-soft)"></i><span class="l-zh">当天报价</span><span class="l-en">That day's quotes</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">当天拟合</span><span class="l-en">That day's fit</span></span>
+      <span><i class="dash" style="border-color:var(--ink-faint)"></i><span class="l-zh">4/13 的拟合</span><span class="l-en">4/13 fit</span></span>
+      <span id="s2LgS"><i class="dash" style="border-color:var(--result)"></i><span class="l-zh">TSLA 收盘价；▲ 谷底</span><span class="l-en">TSLA close; ▲ trough</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="s2D"></div><div class="d2" id="s2Db"></div></div>
-      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="s2S"></div><div class="d2" id="s2Sb"></div></div>
-      <div class="stat"><div class="k">平值 σ平</div><div class="d" id="s2A"></div></div>
-      <div class="stat"><div class="k">倾斜 b</div><div class="d" id="s2B" style="color:var(--control)"></div></div>
-      <div class="stat"><div class="k">曲率 a</div><div class="d" id="s2K" style="color:var(--good)"></div></div>
-      <div class="stat"><div class="k">25 delta put 减 call</div><div class="d" id="s2R"></div><div class="d2">隐含波动率之差，点</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="s2D"></div><div class="d2" id="s2Db"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 收盘</span><span class="l-en">TSLA close</span></div><div class="d" id="s2S"></div><div class="d2" id="s2Sb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">平值 σ平</span><span class="l-en">ATM σ<sub>ATM</sub></span></div><div class="d" id="s2A"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">倾斜 b</span><span class="l-en">Tilt b</span></div><div class="d" id="s2B" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">曲率 a</span><span class="l-en">Curvature a</span></div><div class="d" id="s2K" style="color:var(--good)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">25 delta put 减 call</span><span class="l-en">25 delta put minus call</span></div><div class="d" id="s2R"></div><div class="d2"><span class="l-zh">隐含波动率之差，点</span><span class="l-en">implied volatility difference, points</span></div></div>
     </div>
   </div>
-  <p>24 天里 a 从没变成负数，最小 1.91（5/1），最大 3.10（5/12），两翼一直上翘。讲义说所有交易所交易的期权市场都倾向于有某种程度的正峰度，TSLA 这 24 天每一天都是。</p>
-  <p>b 变得多得多。4/13 是 −2.07，左边高；4/15 TSLA 一天涨到 391.93，b 缩到 −0.62；5/7 起明显转正，5/12 到 +1.80。25 delta 的 put 减 25 delta 的 call，从 4/13 的 +3.04 个点变成 5/13 的 −4.97 个点。TSLA 从 352 涨到 445 这几周，高行权价那一头被抬了起来，形状从投资型变成了需求型。</p>
-  <p>按行权价画，曲线的谷底跟着 TSLA 走：4/13 在 378.7，5/13 在 444.5。讲义说标的涨跌时，整条 skew 曲线跟着左右平移（<span class="sym" data-say="floating skew，浮动偏斜：skew 曲线跟着标的价格左右平移，而不是钉在固定的行权价上。">floating skew</span>）。按标准差画，这一层平移已经扣掉了，剩下的变化是形状本身在变。</p>
-  <p>4/22 盘后 Tesla 发一季度财报。第二天 σ平 从 48.13% 落到 42.17%，整条曲线往下掉了约 6 个点，a 只从 2.23 变成 2.08。5/11 起（离到期 4 天及以内）σ平 在 56.30% 到 58.90% 之间，a 在 2.47 到 3.10 之间；5/11 当天 TSLA 从 428.45 涨了 3.9%，到 445.06。</p>
-  <p class="tiny">每天用 |z| ≤ 3 的虚值报价拟合。25 delta 的隐含波动率：每个报价用自己的隐含波动率算模型 delta，在 delta 为 ±0.25 处插值。财报时间：Tesla 2026 年一季度财报于 2026-04-22 盘后发布。</p>
+  <p><span class="l-zh">24 天里 a 从没变成负数，最小 1.91（5/1），最大 3.10（5/12），两翼一直上翘。讲义说所有交易所交易的期权市场都倾向于有某种程度的正峰度，TSLA 这 24 天每一天都是。</span><span class="l-en">Over the 24 days a never turned negative: at least 1.91 (5/1), at most 3.10 (5/12); the wings turned up throughout. The lecture notes say all exchange-traded option markets tend to show some positive kurtosis, and TSLA did on every one of these 24 days.</span></p>
+  <p><span class="l-zh">b 变得多得多。4/13 是 −2.07，左边高；4/15 TSLA 一天涨到 391.93，b 缩到 −0.62；5/7 起明显转正，5/12 到 +1.80。25 delta 的 put 减 25 delta 的 call，从 4/13 的 +3.04 个点变成 5/13 的 −4.97 个点。TSLA 从 352 涨到 445 这几周，高行权价那一头被抬了起来，形状从投资型变成了需求型。</span><span class="l-en">b moved much more. On 4/13 it was −2.07, left side higher; on 4/15 TSLA jumped to 391.93 in one day and b shrank to −0.62; from 5/7 it turned clearly positive, reaching +1.80 on 5/12. The 25 delta put minus the 25 delta call went from +3.04 points on 4/13 to −4.97 points on 5/13. In the weeks TSLA rose from 352 to 445, the high-strike end was lifted, and the shape changed from investment skew to demand skew.</span></p>
+  <p><span class="l-zh">按行权价画，曲线的谷底跟着 TSLA 走：4/13 在 378.7，5/13 在 444.5。讲义说标的涨跌时，整条 skew 曲线跟着左右平移（<span class="sym" data-say="floating skew，浮动偏斜：skew 曲线跟着标的价格左右平移，而不是钉在固定的行权价上。">floating skew</span>）。按标准差画，这一层平移已经扣掉了，剩下的变化是形状本身在变。</span><span class="l-en">Drawn by strike, the curve's trough follows TSLA: 378.7 on 4/13, 444.5 on 5/13. The lecture notes say that when the underlying moves, the whole skew curve shifts left or right with it (<span class="sym" data-say="Floating skew: the skew curve shifts left and right with the underlying price instead of staying pinned to fixed strikes.">floating skew</span>). Drawn by standard deviation, this shift is already removed, and what changes is the shape itself.</span></p>
+  <p><span class="l-zh">4/22 盘后 Tesla 发一季度财报。第二天 σ平 从 48.13% 落到 42.17%，整条曲线往下掉了约 6 个点，a 只从 2.23 变成 2.08。5/11 起（离到期 4 天及以内）σ平 在 56.30% 到 58.90% 之间，a 在 2.47 到 3.10 之间；5/11 当天 TSLA 从 428.45 涨了 3.9%，到 445.06。</span><span class="l-en">Tesla reported first-quarter earnings after the close on 4/22. The next day σ<sub>ATM</sub> fell from 48.13% to 42.17%: the whole curve dropped about 6 points, while a only went from 2.23 to 2.08. From 5/11 (4 days or less to expiration) σ<sub>ATM</sub> stayed between 56.30% and 58.90% and a between 2.47 and 3.10; on 5/11 itself TSLA rose 3.9% from 428.45 to 445.06.</span></p>
+  <p class="tiny"><span class="l-zh">每天用 |z| ≤ 3 的虚值报价拟合。25 delta 的隐含波动率：每个报价用自己的隐含波动率算模型 delta，在 delta 为 ±0.25 处插值。财报时间：Tesla 2026 年一季度财报于 2026-04-22 盘后发布。</span><span class="l-en">Each day is fitted to the OTM quotes with |z| ≤ 3. 25 delta implied volatility: each quote's model delta is computed with its own implied volatility, then interpolated at delta ±0.25. Earnings timing: Tesla released its 2026 first-quarter results after the close on 2026-04-22.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>skew 是乘在波动率上的</h2>
-  <p class="sub">波动率整体涨跌的时候，skew 是按点数平移，还是按比例放大？</p>
-  <p>讲义的例子：</p>
+  <h2><span class="l-zh"><span class="n">三</span>skew 是乘在波动率上的</span><span class="l-en"><span class="n">3</span>Skew is multiplied onto volatility</span></h2>
+  <p class="sub"><span class="l-zh">波动率整体涨跌的时候，skew 是按点数平移，还是按比例放大？</span><span class="l-en">When volatility as a whole rises or falls, does skew shift by a number of points, or scale by a proportion?</span></p>
+  <p><span class="l-zh">讲义的例子：</span><span class="l-en">The lecture's example:</span></p>
   <div class="tw"><table style="max-width:30rem">
-    <thead><tr><th>行权价</th><th>原来</th><th>波动率翻倍后</th></tr></thead>
+    <thead><tr><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">原来</span><span class="l-en">Before</span></th><th><span class="l-zh">波动率翻倍后</span><span class="l-en">After volatility doubles</span></th></tr></thead>
     <tbody>
-      <tr><td>100（平值）</td><td>20%</td><td>40%</td></tr>
+      <tr><td><span class="l-zh">100（平值）</span><span class="l-en">100 (ATM)</span></td><td>20%</td><td>40%</td></tr>
       <tr><td>90</td><td>25%</td><td>50%</td></tr>
-      <tr><td>90 比平值高出</td><td>5 个点</td><td>10 个点</td></tr>
-      <tr><td>90 占平值</td><td>125%</td><td>125%</td></tr>
+      <tr><td><span class="l-zh">90 比平值高出</span><span class="l-en">90 above ATM by</span></td><td><span class="l-zh">5 个点</span><span class="l-en">5 points</span></td><td><span class="l-zh">10 个点</span><span class="l-en">10 points</span></td></tr>
+      <tr><td><span class="l-zh">90 占平值</span><span class="l-en">90 as a share of ATM</span></td><td>125%</td><td>125%</td></tr>
     </tbody>
   </table></div>
-  <p>翻倍以后，90 比 100 高出的点数也翻倍，占平值的比例不变。skew 是乘在波动率上的比例，不是加在上面的固定点数。</p>
+  <p><span class="l-zh">翻倍以后，90 比 100 高出的点数也翻倍，占平值的比例不变。skew 是乘在波动率上的比例，不是加在上面的固定点数。</span><span class="l-en">After doubling, the number of points by which 90 sits above 100 also doubles, and its share of at-the-money stays the same. Skew is a proportion multiplied onto volatility, not a fixed number of points added to it.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="行权价 X 那张期权的隐含波动率。">σ(X)</span> ÷ <span class="sym" data-say="平值隐含波动率。">σ平</span> ＝ 常数</div>
-    <div class="gloss">某个行权价的隐含波动率占平值的比例，在波动率水平变化时保持不变</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="行权价 X 那张期权的隐含波动率。">σ(X)</span> ÷ <span class="sym" data-say="平值隐含波动率。">σ平</span> ＝ 常数</span><span class="l-en"><span class="sym" data-say="Implied volatility of the option at strike X.">σ(X)</span> ÷ <span class="sym" data-say="At-the-money implied volatility.">σ<sub>ATM</sub></span> = constant</span></div>
+    <div class="gloss"><span class="l-zh">某个行权价的隐含波动率占平值的比例，在波动率水平变化时保持不变</span><span class="l-en">A strike's implied volatility as a share of at-the-money stays the same when the volatility level changes</span></div>
   </div>
-  <p>拿 TSLA 4/13 的真实报价推算一次：假如平值从 46.07% 翻倍，按乘性每个行权价都乘以同一个倍数，按加性每个行权价都加上同样的点数。</p>
+  <p><span class="l-zh">拿 TSLA 4/13 的真实报价推算一次：假如平值从 46.07% 翻倍，按乘性每个行权价都乘以同一个倍数，按加性每个行权价都加上同样的点数。</span><span class="l-en">Work it through once with TSLA's real 4/13 quotes: suppose at-the-money doubles from 46.07%. Multiplicatively, every strike is multiplied by the same factor; additively, every strike gets the same number of points added.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="s3Play">再放一遍</button></div>
-    <svg id="s3c" viewBox="0 0 640 330" role="img" aria-label="平值从 46% 翻倍时，按乘性与按加性推算的两条曲线"></svg>
+    <div class="bar"><button class="btn ghost" id="s3Play"><span class="l-zh">再放一遍</span><span class="l-en">Replay</span></button></div>
+    <svg id="s3c" viewBox="0 0 640 330" role="img" aria-label="平值从 46% 翻倍时，按乘性与按加性推算的两条曲线" data-en-aria-label="The two curves projected multiplicatively and additively when at-the-money doubles from 46%"></svg>
     <div class="legend">
-      <span><i class="dash" style="border-color:var(--ink-faint)"></i>4/13 报价</span>
-      <span><i class="ln" style="background:var(--control)"></i>按乘性推算</span>
-      <span><i class="dash" style="border-color:var(--result)"></i>按加性推算</span>
+      <span><i class="dash" style="border-color:var(--ink-faint)"></i><span class="l-zh">4/13 报价</span><span class="l-en">4/13 quotes</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">按乘性推算</span><span class="l-en">Projected multiplicatively</span></span>
+      <span><i class="dash" style="border-color:var(--result)"></i><span class="l-zh">按加性推算</span><span class="l-en">Projected additively</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">平值</div><div class="d" id="s3A"></div><div class="d2" id="s3Ab"></div></div>
-      <div class="stat"><div class="k">300 put，乘性</div><div class="d" id="s3M" style="color:var(--control)"></div><div class="d2" id="s3Mb"></div></div>
-      <div class="stat"><div class="k">300 put，加性</div><div class="d" id="s3P" style="color:var(--result)"></div><div class="d2" id="s3Pb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">平值</span><span class="l-en">ATM</span></div><div class="d" id="s3A"></div><div class="d2" id="s3Ab"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">300 put，乘性</span><span class="l-en">300 put, multiplicative</span></div><div class="d" id="s3M" style="color:var(--control)"></div><div class="d2" id="s3Mb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">300 put，加性</span><span class="l-en">300 put, additive</span></div><div class="d" id="s3P" style="color:var(--result)"></div><div class="d2" id="s3Pb"></div></div>
     </div>
   </div>
-  <p>按乘性，300 的 put 从 51.10% 变成 102.20%，比平值高出的点数从 5.03 变成 10.07，占平值一直是 110.9%。按加性，它只到 97.17%，点差留在 5.03，占平值降到 105.5%。用固定点差记 skew，平值翻倍那天会少算一半。</p>
-  <p>TSLA 这几周的数据检验不了这一条：5/15 这串期权 24 天里 σ平 只在 40.19% 到 58.90% 之间，形状本身还在翻转（第二节），水平变化带来的那一点缩放被形状的变化盖住了。</p>
+  <p><span class="l-zh">按乘性，300 的 put 从 51.10% 变成 102.20%，比平值高出的点数从 5.03 变成 10.07，占平值一直是 110.9%。按加性，它只到 97.17%，点差留在 5.03，占平值降到 105.5%。用固定点差记 skew，平值翻倍那天会少算一半。</span><span class="l-en">Multiplicatively, the 300 put goes from 51.10% to 102.20%, its points above at-the-money go from 5.03 to 10.07, and its share of at-the-money stays at 110.9%. Additively, it reaches only 97.17%, the spread stays at 5.03 points, and its share of at-the-money falls to 105.5%. Recording skew as a fixed spread in points undercounts it by half on the day at-the-money doubles.</span></p>
+  <p><span class="l-zh">TSLA 这几周的数据检验不了这一条：5/15 这串期权 24 天里 σ平 只在 40.19% 到 58.90% 之间，形状本身还在翻转（第二节），水平变化带来的那一点缩放被形状的变化盖住了。</span><span class="l-en">TSLA's data from these weeks cannot test this rule: over the 24 days σ<sub>ATM</sub> of the 5/15 options stayed between 40.19% and 58.90%, and the shape itself was flipping (section 2), so the small scaling from the level change is buried under the change in shape.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>波动率曲面</h2>
-  <p class="sub">到期日是第二个维度。同一天所有到期日的微笑放在一起，就是波动率曲面。</p>
-  <p>这份数据只收了 35 天以内的到期日。4/13 收盘，数据里有 8 个到期日，最近 2 天，最远 32 天；TSLA 还有更远的月度和长期到期日，这份数据没有，下面的期限结构只讲到 32 天。每一行是一个到期日，每一格是一个行权价，橙色越浓隐含波动率越高：</p>
+  <h2><span class="l-zh"><span class="n">四</span>波动率曲面</span><span class="l-en"><span class="n">4</span>Volatility surface</span></h2>
+  <p class="sub"><span class="l-zh">到期日是第二个维度。同一天所有到期日的微笑放在一起，就是波动率曲面。</span><span class="l-en">Expiration is the second dimension. Put the smiles of every expiration on the same day together and you have the volatility surface.</span></p>
+  <p><span class="l-zh">这份数据只收了 35 天以内的到期日。4/13 收盘，数据里有 8 个到期日，最近 2 天，最远 32 天；TSLA 还有更远的月度和长期到期日，这份数据没有，下面的期限结构只讲到 32 天。每一行是一个到期日，每一格是一个行权价，橙色越浓隐含波动率越高：</span><span class="l-en">This data set only covers expirations within 35 days. At the 4/13 close it has 8 expirations, the nearest 2 days out and the farthest 32 days; TSLA also has later monthly and long-dated expirations that the data set does not include, so the term structure below only goes out to 32 days. Each row is an expiration and each cell a strike; the deeper the orange, the higher the implied volatility:</span></p>
   <div class="panel">
-    <svg id="s4h" viewBox="0 0 640 300" role="img" aria-label="4/13 收盘，数据里 35 天以内的 8 个到期日乘各行权价的隐含波动率热力图"></svg>
-    <p class="tiny" style="margin-bottom:0">只含 35 天以内的到期日（数据的限制），更远的到期日不在图里。</p>
+    <svg id="s4h" viewBox="0 0 640 300" role="img" aria-label="4/13 收盘，数据里 35 天以内的 8 个到期日乘各行权价的隐含波动率热力图" data-en-aria-label="Heat map of implied volatility for the 8 expirations within 35 days in the data, by strike, 4/13 close"></svg>
+    <p class="tiny" style="margin-bottom:0"><span class="l-zh">只含 35 天以内的到期日（数据的限制），更远的到期日不在图里。</span><span class="l-en">Only expirations within 35 days (a limit of the data); later expirations are not in the chart.</span></p>
   </div>
-  <p>横着读是 skew：每一行都是一条微笑，前三节讲的都是这一维。竖着读是<span class="sym" data-say="term structure。同一个行权价（通常看平值），不同到期日的隐含波动率。">期限结构</span>：平值从 2 天的 42.49% 降到 7 天的 37.44%，11 天突然跳到 54.05%，再慢慢降到 32 天的 46.07%。11 天那一行（4/24 到期）是第一个包含 4/22 盘后财报的到期日，财报那一天可能出现的大涨大跌，全部摊在剩下的几天里。4/22 收盘时它的平值是 90.0%，财报出来后的 4/23 收盘只剩 48.3%。</p>
+  <p><span class="l-zh">横着读是 skew：每一行都是一条微笑，前三节讲的都是这一维。竖着读是<span class="sym" data-say="term structure。同一个行权价（通常看平值），不同到期日的隐含波动率。">期限结构</span>：平值从 2 天的 42.49% 降到 7 天的 37.44%，11 天突然跳到 54.05%，再慢慢降到 32 天的 46.07%。11 天那一行（4/24 到期）是第一个包含 4/22 盘后财报的到期日，财报那一天可能出现的大涨大跌，全部摊在剩下的几天里。4/22 收盘时它的平值是 90.0%，财报出来后的 4/23 收盘只剩 48.3%。</span><span class="l-en">Read across, it is skew: every row is a smile, and that is the dimension the first three sections covered. Read down, it is the <span class="sym" data-say="Term structure. Implied volatility of the same strike (usually at-the-money) across different expirations.">term structure</span>: at-the-money falls from 42.49% at 2 days to 37.44% at 7 days, jumps to 54.05% at 11 days, then slowly declines to 46.07% at 32 days. The 11-day row (4/24 expiration) is the first expiration that includes the 4/22 after-close earnings, so the large move earnings day might bring is spread over the few days left. At the 4/22 close its at-the-money was 90.0%; at the 4/23 close, after earnings, only 48.3% was left.</span></p>
 
-  <h3>近到期的 skew 更陡</h3>
-  <p>讲义问：股价 100，行权价 90 的 put，一个月到期和三个月到期，哪个更虚值？答案是一个月的。同样 10 美元的距离，一个月里能走的典型幅度只有三个月的 √(1/3)，折成标准差个数更远，就更靠近翼，隐含波动率比平值高得更多。</p>
-  <p>TSLA 这天，330 的 put 离现价 −6.3%。7 天到期时它离中心 −1.28 个标准差，隐含波动率 42.6%，是平值 37.4% 的 113.7%；32 天到期时它离中心只有 −0.51 个标准差，隐含波动率 47.6%，是平值 46.1% 的 103.3%。按行权价画，近到期的 skew 更陡。</p>
+  <h3><span class="l-zh">近到期的 skew 更陡</span><span class="l-en">Near-term skew is steeper</span></h3>
+  <p><span class="l-zh">讲义问：股价 100，行权价 90 的 put，一个月到期和三个月到期，哪个更虚值？答案是一个月的。同样 10 美元的距离，一个月里能走的典型幅度只有三个月的 √(1/3)，折成标准差个数更远，就更靠近翼，隐含波动率比平值高得更多。</span><span class="l-en">The lecture notes ask: with the stock at 100, which 90 put is further out of the money, the one-month or the three-month? The answer is the one-month. The same $10 distance is worth more standard deviations because the typical move over one month is only √(1/3) of the three-month move; that puts the option closer to the wing, and its implied volatility sits further above at-the-money.</span></p>
+  <p><span class="l-zh">TSLA 这天，330 的 put 离现价 −6.3%。7 天到期时它离中心 −1.28 个标准差，隐含波动率 42.6%，是平值 37.4% 的 113.7%；32 天到期时它离中心只有 −0.51 个标准差，隐含波动率 47.6%，是平值 46.1% 的 103.3%。按行权价画，近到期的 skew 更陡。</span><span class="l-en">On this day the 330 put is −6.3% from the current price. At 7 days to expiration it is −1.28 standard deviations from the center, with implied volatility 42.6%, 113.7% of the at-the-money 37.4%; at 32 days it is only −0.51 standard deviations from the center, with implied volatility 47.6%, 103.3% of the at-the-money 46.1%. Drawn by strike, near-term skew is steeper.</span></p>
 
-  <h3>把 8 条微笑叠成一条</h3>
-  <p>讲义的办法是换两次坐标：纵轴除以平值，把高度对齐；横轴换成</p>
+  <h3><span class="l-zh">把 8 条微笑叠成一条</span><span class="l-en">Collapsing 8 smiles into one</span></h3>
+  <p><span class="l-zh">讲义的办法是换两次坐标：纵轴除以平值，把高度对齐；横轴换成</span><span class="l-en">The lecture's method changes coordinates twice: divide the vertical axis by at-the-money to line up the heights, and change the horizontal axis to</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="natural log，自然对数。ln(X/S) 是行权价比现价高出的比例（按连续复利算）。">ln</span>(X ÷ <span class="sym" data-say="标的现价。4/13 收盘 352.36。">S</span>) ÷ √t</div>
-    <div class="gloss">行权价离现价的比例，除以到期时间的平方根</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="natural log，自然对数。ln(X/S) 是行权价比现价高出的比例（按连续复利算）。">ln</span>(X ÷ <span class="sym" data-say="标的现价。4/13 收盘 352.36。">S</span></span><span class="l-en"><span class="sym" data-say="Natural log. ln(X/S) is how far the strike is above the current price, as a continuously compounded fraction.">ln</span>(X ÷ <span class="sym" data-say="Current underlying price. 352.36 at the 4/13 close.">S</span></span>) ÷ √t</div>
+    <div class="gloss"><span class="l-zh">行权价离现价的比例，除以到期时间的平方根</span><span class="l-en">The strike's distance from the current price as a fraction, divided by the square root of time to expiration</span></div>
   </div>
-  <p>除以 √t，是因为 1.2 第三节讲过价格能走的典型幅度按 √t 张开：到期时间是 4 倍，同样的比例距离只算一半远。再除以 σ平，就是第一节用的 z（中心从 S 换成 F，32 天差 0.4%）。</p>
+  <p><span class="l-zh">除以 √t，是因为 1.2 第三节讲过价格能走的典型幅度按 √t 张开：到期时间是 4 倍，同样的比例距离只算一半远。再除以 σ平，就是第一节用的 z（中心从 S 换成 F，32 天差 0.4%）。</span><span class="l-en">Dividing by √t is because, as section 3 of 1.2 showed, the typical range a price can travel widens with √t: with 4 times the time to expiration, the same fractional distance counts as only half as far. Dividing again by σ<sub>ATM</sub> gives the z used in section 1 (with the center moved from S to F, a 0.4% difference at 32 days).</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="s4Play">再放一遍</button></div>
-    <svg id="s4m" viewBox="0 0 640 330" role="img" aria-label="8 个到期日的微笑先除以平值，再把横轴换成 ln(X/S)/√t"></svg>
+    <div class="bar"><button class="btn ghost" id="s4Play"><span class="l-zh">再放一遍</span><span class="l-en">Replay</span></button></div>
+    <svg id="s4m" viewBox="0 0 640 330" role="img" aria-label="8 个到期日的微笑先除以平值，再把横轴换成 ln(X/S)/√t" data-en-aria-label="The 8 expirations' smiles divided by at-the-money, with the horizontal axis changed to ln(X/S)/√t"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:color-mix(in oklch,var(--result) 45%,var(--panel))"></i>2 天</span>
-      <span><i class="ln" style="background:var(--result)"></i>32 天，颜色越深离到期越远</span>
+      <span><i class="ln" style="background:color-mix(in oklch,var(--result) 45%,var(--panel))"></i><span class="l-zh">2 天</span><span class="l-en">2 days</span></span>
+      <span><i class="ln" style="background:var(--result)"></i><span class="l-zh">32 天，颜色越深离到期越远</span><span class="l-en">32 days; darker means further from expiration</span></span>
     </div>
     <div class="say plain" id="s4Say"></div>
   </div>
-  <p>同一个行权价 330，8 个到期日的隐含波动率占平值从 103.3% 到 122.4%，相差 19 个百分点；换成同样的 ln(X/S)/√t = −0.3，只从 104.1% 到 108.0%。这一处的差别分成两组：不含财报的 3 个到期日在 105.2% 到 108.0%，含财报的 5 个在 104.1% 到 104.8%。</p>
-  <p>但 −0.3 还在中间段。往两翼走，8 条线又分开：−1.0 处是 118.0% 到 140.5%，+1.0 处是 104.1% 到 124.0%。两翼最高的都是 7 天那条（财报前最后一个到期日，平值只有 37.44%），最低的都是 11 天那条（第一个含财报的到期日）。归一化以后，−0.3 到 +0.4 之间 8 条线相差不到 4 个点，两翼仍差 20 个点左右，没有叠成一条。</p>
+  <p><span class="l-zh">同一个行权价 330，8 个到期日的隐含波动率占平值从 103.3% 到 122.4%，相差 19 个百分点；换成同样的 ln(X/S)/√t = −0.3，只从 104.1% 到 108.0%。这一处的差别分成两组：不含财报的 3 个到期日在 105.2% 到 108.0%，含财报的 5 个在 104.1% 到 104.8%。</span><span class="l-en">At the same strike, 330, the 8 expirations' implied volatilities as a share of at-the-money range from 103.3% to 122.4%, 19 percentage points apart; at the same ln(X/S)/√t = −0.3 they range only from 104.1% to 108.0%. The difference here splits into two groups: the 3 expirations without earnings are at 105.2% to 108.0%, the 5 with earnings at 104.1% to 104.8%.</span></p>
+  <p><span class="l-zh">但 −0.3 还在中间段。往两翼走，8 条线又分开：−1.0 处是 118.0% 到 140.5%，+1.0 处是 104.1% 到 124.0%。两翼最高的都是 7 天那条（财报前最后一个到期日，平值只有 37.44%），最低的都是 11 天那条（第一个含财报的到期日）。归一化以后，−0.3 到 +0.4 之间 8 条线相差不到 4 个点，两翼仍差 20 个点左右，没有叠成一条。</span><span class="l-en">But −0.3 is still in the middle section. Toward the wings the 8 lines separate again: 118.0% to 140.5% at −1.0, 104.1% to 124.0% at +1.0. The highest in both wings is the 7-day line (the last expiration before earnings, with at-the-money at only 37.44%), and the lowest in both is the 11-day line (the first expiration that includes earnings). After normalizing, the 8 lines are less than 4 points apart between −0.3 and +0.4, but the wings are still about 20 points apart; they do not collapse into one.</span></p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>真实 delta</h2>
-  <p class="sub">模型 delta 假设标的动的时候，这张期权的隐含波动率不变。第二节看到，TSLA 一动，微笑就跟着挪。</p>
-  <h3>讲义的两个算例</h3>
-  <p>标的 100 涨到 101。95 的 put 原来 2.00，隐含波动率 26.0%，模型 delta −25；105 的 call 原来 2.30，隐含波动率 21%，模型 delta +17。价格分两步走：</p>
+  <h2><span class="l-zh"><span class="n">五</span>真实 delta</span><span class="l-en"><span class="n">5</span>True delta</span></h2>
+  <p class="sub"><span class="l-zh">模型 delta 假设标的动的时候，这张期权的隐含波动率不变。第二节看到，TSLA 一动，微笑就跟着挪。</span><span class="l-en">Model delta assumes that when the underlying moves, the option's implied volatility stays the same. Section 2 showed that when TSLA moves, the smile moves with it.</span></p>
+  <h3><span class="l-zh">讲义的两个算例</span><span class="l-en">The lecture's two worked examples</span></h3>
+  <p><span class="l-zh">标的 100 涨到 101。95 的 put 原来 2.00，隐含波动率 26.0%，模型 delta −25；105 的 call 原来 2.30，隐含波动率 21%，模型 delta +17。价格分两步走：</span><span class="l-en">The underlying rises from 100 to 101. The 95 put was 2.00, implied volatility 26.0%, model delta −25; the 105 call was 2.30, implied volatility 21%, model delta +17. The price moves in two steps:</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="s5Play">再放一遍</button></div>
-    <svg id="s5w" viewBox="0 0 640 350" role="img" aria-label="讲义算例：标的涨 1 元，95 put 与 105 call 的价格分两步变化"></svg>
+    <div class="bar"><button class="btn ghost" id="s5Play"><span class="l-zh">再放一遍</span><span class="l-en">Replay</span></button></div>
+    <svg id="s5w" viewBox="0 0 640 350" role="img" aria-label="讲义算例：标的涨 1 元，95 put 与 105 call 的价格分两步变化" data-en-aria-label="Lecture example: the underlying rises $1, and the prices of the 95 put and 105 call change in two steps"></svg>
   </div>
-  <p>put：标的上涨，微笑往右挪，95 离中心更远，更深地进到左翼，隐含波动率从 26.0% 升到 27.0%，vega 0.07 把价格推回 0.07。净跌 0.18，真实 delta 是 −18。call：105 离中心更近，往谷底靠，隐含波动率从 21% 降到 20.5%，价格少涨 0.5 × 0.16 = 0.08，真实 delta 是 +9。两边虚值期权的 delta 绝对值同时变小，按模型 delta 对冲，两边都对冲过头。</p>
+  <p><span class="l-zh">put：标的上涨，微笑往右挪，95 离中心更远，更深地进到左翼，隐含波动率从 26.0% 升到 27.0%，vega 0.07 把价格推回 0.07。净跌 0.18，真实 delta 是 −18。call：105 离中心更近，往谷底靠，隐含波动率从 21% 降到 20.5%，价格少涨 0.5 × 0.16 = 0.08，真实 delta 是 +9。两边虚值期权的 delta 绝对值同时变小，按模型 delta 对冲，两边都对冲过头。</span><span class="l-en">Put: as the underlying rises the smile shifts right, the 95 is further from the center and deeper in the left wing, and its implied volatility rises from 26.0% to 27.0%; a vega of 0.07 pushes the price back up 0.07. Net fall 0.18, so the true delta is −18. Call: the 105 moves closer to the center, toward the trough, its implied volatility falls from 21% to 20.5%, and the price rises 0.5 × 0.16 = 0.08 less, so the true delta is +9. The absolute deltas of the OTM options on both sides shrink at the same time; hedging with model delta over-hedges both sides.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="偏斜 delta（skewed delta，讲义也叫 adjusted delta）：把标的动时这张期权的隐含波动率也跟着变算进去之后的 delta。">Δ偏斜</span> ＝ <span class="sym" data-say="模型 delta（implied delta）：定价模型直接给出的 delta，假设隐含波动率不变。">Δ模型</span> ＋ vega × <span class="sym" data-say="标的动一下，这张期权的隐含波动率变几个点。">Δσ</span> ÷ <span class="sym" data-say="标的价格变化，美元。">ΔS</span></div>
-    <div class="gloss">真实 delta ＝ 模型 delta ＋ 每个波动率点的价格 × 标的每动 1 美元，隐含波动率变几个点</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="偏斜 delta（skewed delta，讲义也叫 adjusted delta）：把标的动时这张期权的隐含波动率也跟着变算进去之后的 delta。">Δ偏斜</span> ＝ <span class="sym" data-say="模型 delta（implied delta）：定价模型直接给出的 delta，假设隐含波动率不变。">Δ模型</span> ＋ vega × <span class="sym" data-say="标的动一下，这张期权的隐含波动率变几个点。">Δσ</span> ÷ <span class="sym" data-say="标的价格变化，美元。">ΔS</span></span><span class="l-en"><span class="sym" data-say="Skewed delta (the lecture notes also call it adjusted delta): the delta after accounting for the option's implied volatility changing as the underlying moves.">Δ<sub>skew</sub></span> = <span class="sym" data-say="Model delta (implied delta): the delta the pricing model gives directly, assuming implied volatility stays the same.">Δ<sub>model</sub></span> + vega × <span class="sym" data-say="How many points this option's implied volatility changes when the underlying moves.">Δσ</span> ÷ <span class="sym" data-say="Change in the underlying price, in dollars.">ΔS</span></span></div>
+    <div class="gloss"><span class="l-zh">真实 delta ＝ 模型 delta ＋ 每个波动率点的价格 × 标的每动 1 美元，隐含波动率变几个点</span><span class="l-en">True delta = model delta + price per volatility point × points of implied volatility change per $1 move in the underlying</span></div>
   </div>
 
-  <h3>用 TSLA 的微笑算</h3>
-  <p>假设 4/13 这条微笑按标准差个数整条跟着 TSLA 平移。TSLA 涨 1 美元，远期价跟着涨，每个行权价的 z 变小一点，在曲线上往左滑；隐含波动率变多少，由那一点的斜率决定：</p>
+  <h3><span class="l-zh">用 TSLA 的微笑算</span><span class="l-en">Computing with TSLA's smile</span></h3>
+  <p><span class="l-zh">假设 4/13 这条微笑按标准差个数整条跟着 TSLA 平移。TSLA 涨 1 美元，远期价跟着涨，每个行权价的 z 变小一点，在曲线上往左滑；隐含波动率变多少，由那一点的斜率决定：</span><span class="l-en">Assume the whole 4/13 smile shifts with TSLA in standard-deviation terms. When TSLA rises $1, the forward price rises with it, each strike's z gets a little smaller, and it slides left along the curve; how much its implied volatility changes is set by the slope at that point:</span></p>
   <div class="tw"><table>
-    <thead><tr><th>期权</th><th>行权价</th><th>隐含波动率</th><th>模型 delta</th><th>标的 +1 美元<br>隐含变化（点）</th><th>偏斜 delta</th><th>占模型</th></tr></thead>
+    <thead><tr><th><span class="l-zh">期权</span><span class="l-en">Option</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></th><th><span class="l-zh">模型 delta</span><span class="l-en">Model delta</span></th><th><span class="l-zh">标的 +1 美元<br>隐含变化（点）</span><span class="l-en">Underlying +$1<br>implied change (pts)</span></th><th><span class="l-zh">偏斜 delta</span><span class="l-en">Skewed delta</span></th><th><span class="l-zh">占模型</span><span class="l-en">Share of model</span></th></tr></thead>
     <tbody id="skdTb"></tbody>
   </table></div>
-  <p>put 一侧全部缩小，越虚值缩得越多：25 delta 的 put 从 −0.250 变成 −0.218，5 delta 的只剩模型的 55%。call 一侧，在谷底 378.7 右边的缩小，5 delta 的 call 剩 76%；35 和 45 delta 的 call 在谷底左边，TSLA 上涨时它们往离谷底更远的地方滑，隐含波动率微升，delta 反而大 1% 到 2%。讲义的 105 call 在谷底右边，所以缩小。</p>
+  <p><span class="l-zh">put 一侧全部缩小，越虚值缩得越多：25 delta 的 put 从 −0.250 变成 −0.218，5 delta 的只剩模型的 55%。call 一侧，在谷底 378.7 右边的缩小，5 delta 的 call 剩 76%；35 和 45 delta 的 call 在谷底左边，TSLA 上涨时它们往离谷底更远的地方滑，隐含波动率微升，delta 反而大 1% 到 2%。讲义的 105 call 在谷底右边，所以缩小。</span><span class="l-en">Every put shrinks, and the further out of the money, the more: the 25 delta put goes from −0.250 to −0.218, and the 5 delta put keeps only 55% of model. On the call side, those right of the trough at 378.7 shrink, with the 5 delta call keeping 76%; the 35 and 45 delta calls are left of the trough, so when TSLA rises they slide further from it, their implied volatility edges up, and their delta is 1% to 2% larger instead. The lecture's 105 call is right of the trough, so it shrinks.</span></p>
 
-  <h3>拿真实的价格变动检验</h3>
-  <p>上面的推算依赖一个假设：微笑整条跟着平移。换成真实数据量一次。4/13 到 5/8，5/15 到期、模型 delta 绝对值在 0.02 到 0.55 之间的每张期权，每半小时记一次 TSLA 价格和期权中间价，前后两次配成一对，一共 9209 对。按模型 delta 分成 6 档，每一档拿期权价格的变化对 TSLA 价格的变化拟合一条过原点的直线，斜率就是实际的 delta。浮动推算用的是当天收盘拟合出的微笑。</p>
+  <h3><span class="l-zh">拿真实的价格变动检验</span><span class="l-en">Testing against real price changes</span></h3>
+  <p><span class="l-zh">上面的推算依赖一个假设：微笑整条跟着平移。换成真实数据量一次。4/13 到 5/8，5/15 到期、模型 delta 绝对值在 0.02 到 0.55 之间的每张期权，每半小时记一次 TSLA 价格和期权中间价，前后两次配成一对，一共 9209 对。按模型 delta 分成 6 档，每一档拿期权价格的变化对 TSLA 价格的变化拟合一条过原点的直线，斜率就是实际的 delta。浮动推算用的是当天收盘拟合出的微笑。</span><span class="l-en">The estimate above rests on one assumption: the whole smile shifts as a unit. Measure it once with real data instead. From 4/13 to 5/8, for every 5/15 option with an absolute model delta between 0.02 and 0.55, record TSLA's price and the option's mid every half hour, and pair each record with the next one: 9209 pairs in all. Split them into 6 bins by model delta, and in each bin fit a line through the origin of the option's price change against TSLA's price change; the slope is the actual delta. The floating estimate uses the smile fitted at that day's close.</span></p>
   <div class="panel">
-    <svg id="s5m" viewBox="0 0 640 310" role="img" aria-label="各档期权实测 delta 与模型 delta 之比，及浮动推算"></svg>
+    <svg id="s5m" viewBox="0 0 640 310" role="img" aria-label="各档期权实测 delta 与模型 delta 之比，及浮动推算" data-en-aria-label="Measured delta as a share of model delta for each bin, with the floating estimate"></svg>
     <div class="legend">
-      <span><i class="dot" style="background:var(--control)"></i>put 实测</span>
-      <span><i class="dot" style="background:none;border:2px solid var(--control)"></i>put 浮动推算</span>
-      <span><i style="background:var(--result)"></i>call 实测</span>
-      <span><i style="background:none;border:2px solid var(--result)"></i>call 浮动推算</span>
+      <span><i class="dot" style="background:var(--control)"></i><span class="l-zh">put 实测</span><span class="l-en">Put, measured</span></span>
+      <span><i class="dot" style="background:none;border:2px solid var(--control)"></i><span class="l-zh">put 浮动推算</span><span class="l-en">Put, floating estimate</span></span>
+      <span><i style="background:var(--result)"></i><span class="l-zh">call 实测</span><span class="l-en">Call, measured</span></span>
+      <span><i style="background:none;border:2px solid var(--result)"></i><span class="l-zh">call 浮动推算</span><span class="l-en">Call, floating estimate</span></span>
     </div>
   </div>
-  <p>put 一侧，实测和推算几乎重合。25 delta 那一档（模型 delta 0.20 到 0.30），模型 −0.244，推算 −0.223，实测 −0.220；7 到 13 delta 那一档，实测是模型的 73%，推算 75%。讲义说的 put 一侧 delta 变小，在 TSLA 上对 2 到 40 delta 的各档成立；40 到 55 delta 那一档接近平值，实测是模型的 105%，反而略大。</p>
-  <p>call 一侧对不上。推算说 call 的 delta 应该缩小，25 delta 那一档应是模型的 91%，实测反而大了两成，是 120%。只有最远的 2 到 7 delta 缩小了，是模型的 82%。这几周 TSLA 一涨，call 那一侧的隐含波动率就被抬高（第二节 b 由负转正），微笑不只平移，形状也跟着价格变。浮动的假设只管平移，这一层算不进去。</p>
-  <p>这个结论要带着噪音看。按天分开算 13 到 40 delta，put 一侧 20 天里有 12 天实测小于模型，中位数 93%；call 一侧 20 天里只有 8 天实测小于模型，中位数 102%。平值隐含波动率本身，TSLA 每涨 1%，平均跟着涨 0.31 个点（这里是点数，不是比例），相关系数只有 0.18。</p>
-  <p>落到对冲上：put 翼按偏斜 delta 对冲；call 翼要先看最近标的上涨时，隐含波动率是跟着涨还是跟着跌。节点 7 讲过的 down faster（下跌时波动更大）是股指的常态；节点 7 用 30 天隐含波动率量过 TSLA，每涨 1%，隐含波动率按比例降约 0.3%，相关系数 −0.21。4/13 到 5/8 这几周是反过来的。</p>
-  <p class="tiny">实测：每个半小时快照（9:30、10:00 … 16:00）与下一个快照配对，两个快照必须正好隔 30 分钟。数据大多数天缺 12:00 到 13:30 的四个快照（4/28 只缺 12:00、12:30），4/21 另缺 9:30，4/30 另缺 9:30 到 10:30。只用买价不低于 0.05 的期权；模型 delta 用 Black-Scholes（r = 4.3%）和这张期权自己的隐含波动率算。40 到 55 delta 那一档接近平值，put 有一半、call 有 18% 是实值，其余各档全是虚值。斜率 = Σ(ΔS × ΔV) ÷ Σ(ΔS²)，模型与推算按 ΔS² 加权平均。</p>
+  <p><span class="l-zh">put 一侧，实测和推算几乎重合。25 delta 那一档（模型 delta 0.20 到 0.30），模型 −0.244，推算 −0.223，实测 −0.220；7 到 13 delta 那一档，实测是模型的 73%，推算 75%。讲义说的 put 一侧 delta 变小，在 TSLA 上对 2 到 40 delta 的各档成立；40 到 55 delta 那一档接近平值，实测是模型的 105%，反而略大。</span><span class="l-en">On the put side, measured and estimate almost coincide. In the 25 delta bin (model delta 0.20 to 0.30), model is −0.244, estimate −0.223, measured −0.220; in the 7 to 13 delta bin, measured is 73% of model and the estimate 75%. The lecture's point that put deltas shrink holds on TSLA for every bin from 2 to 40 delta; the 40 to 55 delta bin is near at-the-money, and there measured is 105% of model, slightly larger.</span></p>
+  <p><span class="l-zh">call 一侧对不上。推算说 call 的 delta 应该缩小，25 delta 那一档应是模型的 91%，实测反而大了两成，是 120%。只有最远的 2 到 7 delta 缩小了，是模型的 82%。这几周 TSLA 一涨，call 那一侧的隐含波动率就被抬高（第二节 b 由负转正），微笑不只平移，形状也跟着价格变。浮动的假设只管平移，这一层算不进去。</span><span class="l-en">On the call side they do not match. The estimate says call deltas should shrink, with the 25 delta bin at 91% of model; measured is instead 20% larger, at 120%. Only the farthest bin, 2 to 7 delta, shrinks, to 82% of model. In these weeks, whenever TSLA rose, call-side implied volatility was lifted (in section 2, b turned from negative to positive): the smile did not just shift, its shape changed with the price as well. The floating assumption only covers the shift and cannot account for this.</span></p>
+  <p><span class="l-zh">这个结论要带着噪音看。按天分开算 13 到 40 delta，put 一侧 20 天里有 12 天实测小于模型，中位数 93%；call 一侧 20 天里只有 8 天实测小于模型，中位数 102%。平值隐含波动率本身，TSLA 每涨 1%，平均跟着涨 0.31 个点（这里是点数，不是比例），相关系数只有 0.18。</span><span class="l-en">Read this result with the noise in mind. Computed day by day for 13 to 40 delta, the put side's measured delta was below model on 12 of 20 days, median 93%; the call side's was below model on only 8 of 20 days, median 102%. At-the-money implied volatility itself rose an average of 0.31 points for each 1% rise in TSLA (points here, not a proportion), with a correlation of only 0.18.</span></p>
+  <p><span class="l-zh">落到对冲上：put 翼按偏斜 delta 对冲；call 翼要先看最近标的上涨时，隐含波动率是跟着涨还是跟着跌。节点 7 讲过的 down faster（下跌时波动更大）是股指的常态；节点 7 用 30 天隐含波动率量过 TSLA，每涨 1%，隐含波动率按比例降约 0.3%，相关系数 −0.21。4/13 到 5/8 这几周是反过来的。</span><span class="l-en">For hedging: hedge the put wing with skewed delta; for the call wing, first check whether implied volatility has recently risen or fallen when the underlying rose. Down faster (volatility is higher on the way down), from node 7, is the norm for stock indexes; node 7 measured TSLA with 30-day implied volatility and found that each 1% rise lowered implied volatility proportionally by about 0.3%, with a correlation of −0.21. The weeks from 4/13 to 5/8 went the other way.</span></p>
+  <p class="tiny"><span class="l-zh">实测：每个半小时快照（9:30、10:00 … 16:00）与下一个快照配对，两个快照必须正好隔 30 分钟。数据大多数天缺 12:00 到 13:30 的四个快照（4/28 只缺 12:00、12:30），4/21 另缺 9:30，4/30 另缺 9:30 到 10:30。只用买价不低于 0.05 的期权；模型 delta 用 Black-Scholes（r = 4.3%）和这张期权自己的隐含波动率算。40 到 55 delta 那一档接近平值，put 有一半、call 有 18% 是实值，其余各档全是虚值。斜率 = Σ(ΔS × ΔV) ÷ Σ(ΔS²)，模型与推算按 ΔS² 加权平均。</span><span class="l-en">Measurement: each half-hour snapshot (9:30, 10:00 … 16:00) is paired with the next, and the two must be exactly 30 minutes apart. On most days the data lack the four snapshots from 12:00 to 13:30 (4/28 lacks only 12:00 and 12:30); 4/21 also lacks 9:30, and 4/30 lacks 9:30 to 10:30. Only options with a bid of at least 0.05 are used; model delta is computed with Black-Scholes (r = 4.3%) and the option's own implied volatility. The 40 to 55 delta bin is near at-the-money: half its puts and 18% of its calls are in the money; every other bin is entirely OTM. Slope = Σ(ΔS × ΔV) ÷ Σ(ΔS²); model and estimate are averages weighted by ΔS².</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>市场心里的分布</h2>
-  <p class="sub">曲面是市场的报价，也是市场心里的到期分布。讲义用蝶式（butterfly）把两者换算过来。</p>
-  <p>3.2 讲过 butterfly：买一张行权价 X − 5 的 call，卖两张 X 的 call，买一张 X + 5 的 call。到期时标的正好在 X，它值 5；离 X 超过 5，它值 0；中间按距离直线变化。</p>
-  <p>讲义的推理：假设行权价从 0 开始每 5 美元一档，覆盖所有可能的到期价，把每一张间距 5 的蝶式各买一张。如果到期价只会落在行权价上，到期时正好有一张蝶式的中心被命中，值 5，其余都是 0。</p>
-  <p>再用上 1.1 的定价四步：期权今天的价格，是到期价值按概率加权的期望值，再折回今天。一张蝶式到期只有两种结果，命中值 5，不命中值 0，所以它今天的价格 ＝ 命中的概率 × 5，再折回今天。反过来，蝶式价格 ÷ 5，再乘回折现的那一点，就是标的到期落在它中心的概率。一整套不管标的到哪都值 5，说明这些概率加起来正好是 1：</p>
+  <h2><span class="l-zh"><span class="n">六</span>市场心里的分布</span><span class="l-en"><span class="n">6</span>The distribution the market has in mind</span></h2>
+  <p class="sub"><span class="l-zh">曲面是市场的报价，也是市场心里的到期分布。讲义用蝶式（butterfly）把两者换算过来。</span><span class="l-en">The surface is the market's quotes, and it is also the distribution at expiration the market has in mind. The lecture notes convert one into the other with butterflies.</span></p>
+  <p><span class="l-zh">3.2 讲过 butterfly：买一张行权价 X − 5 的 call，卖两张 X 的 call，买一张 X + 5 的 call。到期时标的正好在 X，它值 5；离 X 超过 5，它值 0；中间按距离直线变化。</span><span class="l-en">3.2 covered the butterfly: buy one call at strike X − 5, sell two calls at X, buy one call at X + 5. If the underlying finishes exactly at X it is worth 5; more than 5 away from X it is worth 0; in between it changes linearly with distance.</span></p>
+  <p><span class="l-zh">讲义的推理：假设行权价从 0 开始每 5 美元一档，覆盖所有可能的到期价，把每一张间距 5 的蝶式各买一张。如果到期价只会落在行权价上，到期时正好有一张蝶式的中心被命中，值 5，其余都是 0。</span><span class="l-en">The lecture's reasoning: suppose strikes run from 0 in steps of $5 and cover every possible price at expiration, and buy one of every butterfly 5 wide. If the price at expiration could only land on a strike, exactly one butterfly's center would be hit at expiration, worth 5, and all the others would be worth 0.</span></p>
+  <p><span class="l-zh">再用上 1.1 的定价四步：期权今天的价格，是到期价值按概率加权的期望值，再折回今天。一张蝶式到期只有两种结果，命中值 5，不命中值 0，所以它今天的价格 ＝ 命中的概率 × 5，再折回今天。反过来，蝶式价格 ÷ 5，再乘回折现的那一点，就是标的到期落在它中心的概率。一整套不管标的到哪都值 5，说明这些概率加起来正好是 1：</span><span class="l-en">Now apply the four pricing steps of 1.1: an option's price today is the probability-weighted expected value at expiration, discounted back to today. A butterfly has only two outcomes at expiration, hit and worth 5 or missed and worth 0, so its price today = probability of a hit × 5, discounted to today. In reverse, butterfly price ÷ 5, multiplied back by the discount, is the probability that the underlying finishes at its center. The whole set is worth 5 wherever the underlying ends up, so these probabilities add up to exactly 1:</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="概率。">P</span>(到期落在 X) ＝ 以 X 为中心的蝶式价格 ÷ 行权价间距 × (1 ＋ <span class="sym" data-say="利率，这里用 4.3%（1.1 从 parity 反解）。">r</span>·<span class="sym" data-say="离到期的时间，以年计。32 天是 32/365。">t</span>)</div>
-    <div class="gloss">蝶式价格是今天付的钱，乘 1 ＋ r·t 换成到期那天的钱（32 天是 1.0038），再除以命中时的价值，也就是行权价间距 5</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="概率。">P</span>(到期落在 X) ＝ 以 X 为中心的蝶式价格 ÷ 行权价间距 × (1 ＋ <span class="sym" data-say="利率，这里用 4.3%（1.1 从 parity 反解）。">r</span>·<span class="sym" data-say="离到期的时间，以年计。32 天是 32/365。">t</span></span><span class="l-en"><span class="sym" data-say="Probability.">P</span>(finishes at X) = price of the butterfly centered at X ÷ strike spacing × (1 + <span class="sym" data-say="Interest rate, 4.3% here (backed out from parity in 1.1).">r</span>·<span class="sym" data-say="Time to expiration in years. 32 days is 32/365.">t</span></span>)</div>
+    <div class="gloss"><span class="l-zh">蝶式价格是今天付的钱，乘 1 ＋ r·t 换成到期那天的钱（32 天是 1.0038），再除以命中时的价值，也就是行权价间距 5</span><span class="l-en">The butterfly price is money paid today; multiplying by 1 + r·t turns it into money on expiration day (1.0038 for 32 days), then divide by its value when hit, which is the strike spacing of 5</span></div>
   </div>
-  <p>TSLA 的例子：345 / 350 / 355 的 call 蝶式，中间价 23.80 − 2 × 21.05 + 18.55 = 0.25，除以 5 是 5.0%。同样的行权价用 put 算，中间价 15.125 − 2 × 17.40 + 19.85 = 0.175，是 3.5%。两者理论上应该相等。这几档的买卖价之间差 0.10 到 0.20，而一张蝶式只值两三毛，报价的一点零头就占了它一大块。</p>
+  <p><span class="l-zh">TSLA 的例子：345 / 350 / 355 的 call 蝶式，中间价 23.80 − 2 × 21.05 + 18.55 = 0.25，除以 5 是 5.0%。同样的行权价用 put 算，中间价 15.125 − 2 × 17.40 + 19.85 = 0.175，是 3.5%。两者理论上应该相等。这几档的买卖价之间差 0.10 到 0.20，而一张蝶式只值两三毛，报价的一点零头就占了它一大块。</span><span class="l-en">The TSLA example: the 345 / 350 / 355 call butterfly has a mid of 23.80 − 2 × 21.05 + 18.55 = 0.25; divided by 5 that is 5.0%. The same strikes with puts give a mid of 15.125 − 2 × 17.40 + 19.85 = 0.175, or 3.5%. In theory the two should be equal. At these strikes bid and ask are 0.10 to 0.20 apart, while a butterfly is worth only 20 or 30 cents, so a small piece of the quote takes up a large share of it.</span></p>
   <div class="panel">
     <div class="bar">
-      <div class="seg" id="bfMode"><button data-v="raw" aria-pressed="false">中间价直接算</button><button data-v="fit" aria-pressed="true">用拟合的微笑重算</button></div>
-      <button class="btn ghost" id="bfPlay">再算一遍</button>
+      <div class="seg" id="bfMode"><button data-v="raw" aria-pressed="false"><span class="l-zh">中间价直接算</span><span class="l-en">Straight from mids</span></button><button data-v="fit" aria-pressed="true"><span class="l-zh">用拟合的微笑重算</span><span class="l-en">Recomputed from the fitted smile</span></button></div>
+      <button class="btn ghost" id="bfPlay"><span class="l-zh">再算一遍</span><span class="l-en">Compute again</span></button>
     </div>
-    <div class="stage"><div class="cvbox"><canvas id="bfcv" width="264" height="138" aria-label="81 张蝶式逐张算出的到期概率，叠加对数正态分布"></canvas><div class="scale" id="bfScale"></div></div></div>
+    <div class="stage"><div class="cvbox"><canvas id="bfcv" width="264" height="138" aria-label="81 张蝶式逐张算出的到期概率，叠加对数正态分布" data-en-aria-label="Probability at expiration from each of 81 butterflies, with the lognormal distribution overlaid"></canvas><div class="scale" id="bfScale"></div></div></div>
     <div class="legend">
-      <span><i style="background:var(--ink)"></i>每张蝶式算出的概率，一格一张</span>
-      <span><i style="background:var(--control)"></i>算出负数的</span>
-      <span><i style="background:var(--result);width:.3rem;height:.3rem;vertical-align:.1rem"></i>点线：同一个平值波动率的对数正态</span>
-      <span><i style="background:var(--good);width:2px"></i>5/15 实际收盘 422.32</span>
+      <span><i style="background:var(--ink)"></i><span class="l-zh">每张蝶式算出的概率，一格一张</span><span class="l-en">Probability from each butterfly, one bar each</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">算出负数的</span><span class="l-en">Negative results</span></span>
+      <span><i style="background:var(--result);width:.3rem;height:.3rem;vertical-align:.1rem"></i><span class="l-zh">点线：同一个平值波动率的对数正态</span><span class="l-en">Dotted line: lognormal with the same at-the-money volatility</span></span>
+      <span><i style="background:var(--good);width:2px"></i><span class="l-zh">5/15 实际收盘 422.32</span><span class="l-en">Actual 5/15 close 422.32</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">正在算</div><div class="d" id="bfK"></div><div class="d2" id="bfKb"></div></div>
-      <div class="stat"><div class="k">这一张的概率</div><div class="d" id="bfP" style="color:var(--control)"></div><div class="d2" id="bfPb"></div></div>
-      <div class="stat"><div class="k">已算 / 合计</div><div class="d" id="bfN"></div><div class="d2" id="bfNb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">正在算</span><span class="l-en">Computing</span></div><div class="d" id="bfK"></div><div class="d2" id="bfKb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这一张的概率</span><span class="l-en">This butterfly's probability</span></div><div class="d" id="bfP" style="color:var(--control)"></div><div class="d2" id="bfPb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已算 / 合计</span><span class="l-en">Computed / total</span></div><div class="d" id="bfN"></div><div class="d2" id="bfNb"></div></div>
     </div>
   </div>
-  <p>直接用中间价算，中心从 200 到 600 的 81 张蝶式里有 6 张算出负的概率，合计 98.9%，高低不齐。换成第一节拟合的那条微笑：用 a、b、c 算出每个行权价的隐含波动率，用 Black-Scholes 算出价格，再算蝶式。这样得到的分布没有负数，合计 100.0%，平均值 353.85，和远期价 353.69 只差 0.16。</p>
+  <p><span class="l-zh">直接用中间价算，中心从 200 到 600 的 81 张蝶式里有 6 张算出负的概率，合计 98.9%，高低不齐。换成第一节拟合的那条微笑：用 a、b、c 算出每个行权价的隐含波动率，用 Black-Scholes 算出价格，再算蝶式。这样得到的分布没有负数，合计 100.0%，平均值 353.85，和远期价 353.69 只差 0.16。</span><span class="l-en">Computed straight from mids, 6 of the 81 butterflies centered from 200 to 600 give negative probabilities, the total is 98.9%, and the bars are uneven. Switch to the smile fitted in section 1: use a, b and c to get each strike's implied volatility, use Black-Scholes to get its price, then compute the butterflies. The resulting distribution has no negatives, totals 100.0%, and has a mean of 353.85, only 0.16 from the forward price of 353.69.</span></p>
 
-  <h3>和对数正态比</h3>
+  <h3><span class="l-zh">和对数正态比</span><span class="l-en">Against the lognormal</span></h3>
   <div class="tw"><table style="max-width:34rem">
-    <thead><tr><th>到期价</th><th>市场隐含</th><th>对数正态</th><th>差</th></tr></thead>
+    <thead><tr><th><span class="l-zh">到期价</span><span class="l-en">Price at expiration</span></th><th><span class="l-zh">市场隐含</span><span class="l-en">Market implied</span></th><th><span class="l-zh">对数正态</span><span class="l-en">Lognormal</span></th><th><span class="l-zh">差</span><span class="l-en">Difference</span></th></tr></thead>
     <tbody id="bkTb"></tbody>
   </table></div>
-  <p>对数正态用同一个平值波动率 46.07%，中心在远期价。跌破 250 的概率，市场给 1.73%，对数正态只有 0.67%，是它的 2.6 倍。250 到 340 的中等下跌，市场 36.8%，对数正态 40.6%；340 到 420 的中心附近，市场 53.4%，对数正态 49.5%；420 到 500 的中等上涨，市场 7.5%，对数正态 8.8%；500 以上（比现价高 42% 以上），市场 0.62%，对数正态 0.46%。左尾更肥，中间更高，中等幅度的涨跌更少，右边最远的那一截也比对数正态肥。</p>
-  <p>讲义拿 2014-06-20 的 Eurostoxx 50 做过同样的比较，结论是四条：小到中等的上涨更可能，非常大的下跌更可能，非常大的上涨更不可能，小到中等的下跌更不可能。按上表的分段，TSLA 这天第一、二、四条成立。第三条只对了一半：420 到 500 的大涨，市场给得比对数正态少；500 以上更大的涨幅，市场反而给得多。这和右翼 call 的隐含波动率一路上翘（500 的 call 是 53.5%，a 为正）是同一件事。</p>
-  <p>5/15 TSLA 收在 422.32。事前看，市场给到期在 420 以上的概率是 8.1%，对数正态给 9.2%。</p>
+  <p><span class="l-zh">对数正态用同一个平值波动率 46.07%，中心在远期价。跌破 250 的概率，市场给 1.73%，对数正态只有 0.67%，是它的 2.6 倍。250 到 340 的中等下跌，市场 36.8%，对数正态 40.6%；340 到 420 的中心附近，市场 53.4%，对数正态 49.5%；420 到 500 的中等上涨，市场 7.5%，对数正态 8.8%；500 以上（比现价高 42% 以上），市场 0.62%，对数正态 0.46%。左尾更肥，中间更高，中等幅度的涨跌更少，右边最远的那一截也比对数正态肥。</span><span class="l-en">The lognormal uses the same at-the-money volatility of 46.07%, centered on the forward price. The probability of falling below 250 is 1.73% from the market and only 0.67% from the lognormal, 2.6 times as much. Moderate declines, 250 to 340: market 36.8%, lognormal 40.6%; near the center, 340 to 420: market 53.4%, lognormal 49.5%; moderate rises, 420 to 500: market 7.5%, lognormal 8.8%; above 500 (more than 42% above the current price): market 0.62%, lognormal 0.46%. The left tail is fatter, the middle higher, moderate moves either way less likely, and the farthest stretch on the right is also fatter than the lognormal.</span></p>
+  <p><span class="l-zh">讲义拿 2014-06-20 的 Eurostoxx 50 做过同样的比较，结论是四条：小到中等的上涨更可能，非常大的下跌更可能，非常大的上涨更不可能，小到中等的下跌更不可能。按上表的分段，TSLA 这天第一、二、四条成立。第三条只对了一半：420 到 500 的大涨，市场给得比对数正态少；500 以上更大的涨幅，市场反而给得多。这和右翼 call 的隐含波动率一路上翘（500 的 call 是 53.5%，a 为正）是同一件事。</span><span class="l-en">The lecture notes made the same comparison for the Eurostoxx 50 on 2014-06-20, with four conclusions: small to moderate rises are more likely, very large falls are more likely, very large rises are less likely, and small to moderate falls are less likely. By the bands in the table above, the first, second and fourth hold for TSLA on this day. The third is only half right: large rises of 420 to 500 get less probability from the market than from the lognormal, but rises above 500 get more. That is the same fact as right-wing call implied volatility turning up all the way (the 500 call is at 53.5%, a is positive).</span></p>
+  <p><span class="l-zh">5/15 TSLA 收在 422.32。事前看，市场给到期在 420 以上的概率是 8.1%，对数正态给 9.2%。</span><span class="l-en">TSLA closed at 422.32 on 5/15. Beforehand, the market gave an 8.1% probability of finishing above 420, the lognormal 9.2%.</span></p>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>怎么交易 skew 和 kurtosis</h2>
-  <p class="sub">倾斜和弯曲都可以单独下注。讲义给的两种结构，都要同时做到 delta 中性和 vega 中性。</p>
-  <p>不做 delta 中性，赚亏主要来自方向；不做 vega 中性，赚亏主要来自整体波动率的涨跌。两个都中性，剩下的才是形状。</p>
+  <h2><span class="l-zh"><span class="n">七</span>怎么交易 skew 和 kurtosis</span><span class="l-en"><span class="n">7</span>How to trade skew and kurtosis</span></h2>
+  <p class="sub"><span class="l-zh">倾斜和弯曲都可以单独下注。讲义给的两种结构，都要同时做到 delta 中性和 vega 中性。</span><span class="l-en">Tilt and bend can each be bet on separately. The two structures the lecture notes give both have to be delta neutral and vega neutral at the same time.</span></p>
+  <p><span class="l-zh">不做 delta 中性，赚亏主要来自方向；不做 vega 中性，赚亏主要来自整体波动率的涨跌。两个都中性，剩下的才是形状。</span><span class="l-en">Without delta neutrality, profit and loss come mainly from direction; without vega neutrality, mainly from moves in overall volatility. With both neutral, what is left is the shape.</span></p>
 
-  <h3>赌倾斜：risk reversal</h3>
-  <p>讲义的定义：买（卖）低行权价的 put，卖（买）高行权价的 call，再用标的把 delta 补成零。常用的 skew 度量就是 25 delta 的 put 和 25 delta 的 call 隐含波动率之差，叫 25 delta <span class="sym" data-say="risk reversal，风险逆转：一买一卖两张虚值期权（一张 put、一张 call），加标的补成 delta 中性。">risk reversal</span>。用 4/13 收盘的真实报价搭一组：</p>
+  <h3><span class="l-zh">赌倾斜：risk reversal</span><span class="l-en">Betting on tilt: risk reversal</span></h3>
+  <p><span class="l-zh">讲义的定义：买（卖）低行权价的 put，卖（买）高行权价的 call，再用标的把 delta 补成零。常用的 skew 度量就是 25 delta 的 put 和 25 delta 的 call 隐含波动率之差，叫 25 delta <span class="sym" data-say="risk reversal，风险逆转：一买一卖两张虚值期权（一张 put、一张 call），加标的补成 delta 中性。">risk reversal</span>。用 4/13 收盘的真实报价搭一组：</span><span class="l-en">The lecture's definition: buy (sell) a low-strike put, sell (buy) a high-strike call, and bring delta to zero with the underlying. The common skew measure is the difference between the implied volatilities of the 25 delta put and the 25 delta call, called the 25 delta <span class="sym" data-say="Risk reversal: buy one OTM option and sell another (one put, one call), with the underlying added to make it delta neutral.">risk reversal</span>. Build one with real quotes from the 4/13 close:</span></p>
   <div class="tw"><table>
-    <thead><tr><th>腿</th><th>买一 / 卖一</th><th>delta</th><th>vega</th><th>隐含波动率</th></tr></thead>
+    <thead><tr><th><span class="l-zh">腿</span><span class="l-en">Leg</span></th><th><span class="l-zh">买一 / 卖一</span><span class="l-en">Bid / ask</span></th><th>delta</th><th>vega</th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></th></tr></thead>
     <tbody>
-      <tr><td>买 325 put</td><td>8.15 / 8.25</td><td>−0.2532</td><td>0.3378</td><td>48.02%</td></tr>
-      <tr><td>卖 390 call</td><td>6.60 / 6.70</td><td>+0.2519</td><td>0.3370</td><td>45.03%</td></tr>
-      <tr class="sum"><td>合计（中间价）</td><td>付 1.55</td><td>−0.5051</td><td>+0.0008</td><td></td></tr>
+      <tr><td><span class="l-zh">买 325 put</span><span class="l-en">Buy 325 put</span></td><td>8.15 / 8.25</td><td>−0.2532</td><td>0.3378</td><td>48.02%</td></tr>
+      <tr><td><span class="l-zh">卖 390 call</span><span class="l-en">Sell 390 call</span></td><td>6.60 / 6.70</td><td>+0.2519</td><td>0.3370</td><td>45.03%</td></tr>
+      <tr class="sum"><td><span class="l-zh">合计（中间价）</span><span class="l-en">Total (mid)</span></td><td><span class="l-zh">付 1.55</span><span class="l-en">Pay 1.55</span></td><td>−0.5051</td><td>+0.0008</td><td></td></tr>
     </tbody>
   </table></div>
-  <p>两条腿的 vega 几乎一样，一买一卖正好抵消。delta 合计 −0.505，每组合约（各 100 股）买 50 股 TSLA 补平。这个仓位在等低行权价的隐含波动率相对高行权价涨上去，也就是 skew 更负。讲义作业把希望 skew 更负的仓位叫 short skew。</p>
-  <p>TSLA 之后，25 delta put 减 call 从 4/13 的 +3.04 个点变成 5/8 的 −3.19、5/13 的 −4.97，按这个度量 skew 翻了过来。但反过来做（卖 325 put、买 390 call、卖 50 股）的人，并没有因此在形状上赚到这 6 个多点。25 delta 是按 delta 取的点，TSLA 一涨，25 delta 就换到了别的行权价；这组仓位的 vega 盈亏只看建仓的 325 和 390 这两张自己的隐含波动率，而它们的差反而拉大了。4/13 是 48.02% 对 45.03%，差 3.0 个点；到 5/1，TSLA 涨到 390.83，325 滑到离中心 2.4 个标准差的左翼，被曲率抬到 51.65%，390 成了平值，落在谷底附近的 40.52%，差 11.1 个点。同一天 25 delta 的差已经缩到 +0.23。</p>
-  <p>要吃到 25 delta 度量的变化，得在重新对冲时把两条腿换到当时新的 25 delta 行权价上。delta 和 vega 中性也只在建仓那一刻成立：TSLA 涨到 390 附近，390 那张已是平值，两条腿的 delta 与 vega 都变了，要重新对冲。</p>
+  <p><span class="l-zh">两条腿的 vega 几乎一样，一买一卖正好抵消。delta 合计 −0.505，每组合约（各 100 股）买 50 股 TSLA 补平。这个仓位在等低行权价的隐含波动率相对高行权价涨上去，也就是 skew 更负。讲义作业把希望 skew 更负的仓位叫 short skew。</span><span class="l-en">The two legs' vegas are almost the same, so buying one and selling the other cancels them. Delta totals −0.505; each set of contracts (100 shares each) is evened out by buying 50 shares of TSLA. This position is waiting for low-strike implied volatility to rise relative to high strikes, that is, for skew to become more negative. The lecture's homework calls a position that wants skew more negative short skew.</span></p>
+  <p><span class="l-zh">TSLA 之后，25 delta put 减 call 从 4/13 的 +3.04 个点变成 5/8 的 −3.19、5/13 的 −4.97，按这个度量 skew 翻了过来。但反过来做（卖 325 put、买 390 call、卖 50 股）的人，并没有因此在形状上赚到这 6 个多点。25 delta 是按 delta 取的点，TSLA 一涨，25 delta 就换到了别的行权价；这组仓位的 vega 盈亏只看建仓的 325 和 390 这两张自己的隐含波动率，而它们的差反而拉大了。4/13 是 48.02% 对 45.03%，差 3.0 个点；到 5/1，TSLA 涨到 390.83，325 滑到离中心 2.4 个标准差的左翼，被曲率抬到 51.65%，390 成了平值，落在谷底附近的 40.52%，差 11.1 个点。同一天 25 delta 的差已经缩到 +0.23。</span><span class="l-en">Afterwards, TSLA's 25 delta put minus call went from +3.04 points on 4/13 to −3.19 on 5/8 and −4.97 on 5/13; by this measure the skew flipped. But someone who did the reverse (sell the 325 put, buy the 390 call, sell 50 shares) did not earn those 6-plus points on the shape. 25 delta is a point chosen by delta: when TSLA rises, 25 delta moves to other strikes, while this position's vega P&amp;L depends only on the implied volatilities of its own 325 and 390, and the gap between those widened. On 4/13 it was 48.02% against 45.03%, a 3.0-point gap; by 5/1 TSLA had risen to 390.83, the 325 had slid into the left wing 2.4 standard deviations from the center and been lifted by the curvature to 51.65%, and the 390 had become at-the-money, sitting near the trough at 40.52%: an 11.1-point gap. The same day, the 25 delta difference had already shrunk to +0.23.</span></p>
+  <p><span class="l-zh">要吃到 25 delta 度量的变化，得在重新对冲时把两条腿换到当时新的 25 delta 行权价上。delta 和 vega 中性也只在建仓那一刻成立：TSLA 涨到 390 附近，390 那张已是平值，两条腿的 delta 与 vega 都变了，要重新对冲。</span><span class="l-en">To capture changes in the 25 delta measure, each rehedge has to move both legs to the new 25 delta strikes of the moment. Delta and vega neutrality also hold only at the moment of entry: with TSLA near 390, the 390 is at-the-money, both legs' delta and vega have changed, and the position has to be rehedged.</span></p>
 
-  <h3>赌弯曲：kurtosis 策略</h3>
-  <p>讲义的定义：买（卖）虚值的 call 与 put，卖（买）平值的 call 与 put，同样做成 delta 与 vega 双中性。</p>
+  <h3><span class="l-zh">赌弯曲：kurtosis 策略</span><span class="l-en">Betting on bend: kurtosis strategy</span></h3>
+  <p><span class="l-zh">讲义的定义：买（卖）虚值的 call 与 put，卖（买）平值的 call 与 put，同样做成 delta 与 vega 双中性。</span><span class="l-en">The lecture's definition: buy (sell) OTM calls and puts, sell (buy) at-the-money calls and puts, again making it both delta and vega neutral.</span></p>
   <div class="tw"><table>
-    <thead><tr><th>腿</th><th>买一 / 卖一</th><th>delta</th><th>vega</th><th>隐含波动率</th></tr></thead>
+    <thead><tr><th><span class="l-zh">腿</span><span class="l-en">Leg</span></th><th><span class="l-zh">买一 / 卖一</span><span class="l-en">Bid / ask</span></th><th>delta</th><th>vega</th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></th></tr></thead>
     <tbody>
-      <tr><td>买 4 张 280 put</td><td>1.68 / 1.71</td><td>−0.0520</td><td>0.1075</td><td>54.77%</td></tr>
-      <tr><td>买 4 张 445 call</td><td>1.14 / 1.17</td><td>+0.0500</td><td>0.1058</td><td>47.28%</td></tr>
-      <tr><td>卖 1 张 350 call</td><td>21.00 / 21.10</td><td>+0.5574</td><td>0.4125</td><td>46.29%</td></tr>
-      <tr><td>卖 1 张 350 put</td><td>17.35 / 17.45</td><td>−0.4426</td><td>0.4125</td><td>46.08%</td></tr>
-      <tr class="sum"><td>合计（中间价）</td><td>收 27.05</td><td>−0.1228</td><td>+0.0282</td><td></td></tr>
+      <tr><td><span class="l-zh">买 4 张 280 put</span><span class="l-en">Buy 4 280 puts</span></td><td>1.68 / 1.71</td><td>−0.0520</td><td>0.1075</td><td>54.77%</td></tr>
+      <tr><td><span class="l-zh">买 4 张 445 call</span><span class="l-en">Buy 4 445 calls</span></td><td>1.14 / 1.17</td><td>+0.0500</td><td>0.1058</td><td>47.28%</td></tr>
+      <tr><td><span class="l-zh">卖 1 张 350 call</span><span class="l-en">Sell 1 350 call</span></td><td>21.00 / 21.10</td><td>+0.5574</td><td>0.4125</td><td>46.29%</td></tr>
+      <tr><td><span class="l-zh">卖 1 张 350 put</span><span class="l-en">Sell 1 350 put</span></td><td>17.35 / 17.45</td><td>−0.4426</td><td>0.4125</td><td>46.08%</td></tr>
+      <tr class="sum"><td><span class="l-zh">合计（中间价）</span><span class="l-en">Total (mid)</span></td><td><span class="l-zh">收 27.05</span><span class="l-en">Receive 27.05</span></td><td>−0.1228</td><td>+0.0282</td><td></td></tr>
     </tbody>
   </table></div>
-  <p>一对翼（一张 280 put 加一张 445 call）的 vega 是 0.2133；平值那一对是一个 straddle（跨式，3.2 讲过：同一行权价的一张 call 加一张 put），vega 是 0.8250。要 3.87 对翼才抵得上一个跨式，取整买 4 对。delta 合计 −0.123，每组配 12 股 TSLA。这个仓位在等两翼相对平值涨上去，也就是 a 变大。建仓那一刻 gamma 也几乎抵消：4 对翼 0.01668，跨式 0.01640。</p>
+  <p><span class="l-zh">一对翼（一张 280 put 加一张 445 call）的 vega 是 0.2133；平值那一对是一个 straddle（跨式，3.2 讲过：同一行权价的一张 call 加一张 put），vega 是 0.8250。要 3.87 对翼才抵得上一个跨式，取整买 4 对。delta 合计 −0.123，每组配 12 股 TSLA。这个仓位在等两翼相对平值涨上去，也就是 a 变大。建仓那一刻 gamma 也几乎抵消：4 对翼 0.01668，跨式 0.01640。</span><span class="l-en">One pair of wings (one 280 put plus one 445 call) has a vega of 0.2133; the at-the-money pair is a straddle (from 3.2: one call plus one put at the same strike), with a vega of 0.8250. It takes 3.87 pairs of wings to match one straddle; rounded, buy 4 pairs. Delta totals −0.123, so each set gets 12 shares of TSLA. This position is waiting for the wings to rise relative to at-the-money, that is, for a to grow. At entry gamma also nearly cancels: 0.01668 for 4 pairs of wings, 0.01640 for the straddle.</span></p>
 </section>
 
 <!-- ══════════ 八 ══════════ -->
 <section id="s8">
-  <h2><span class="n">八</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">八</span>费曼检验</span><span class="l-en"><span class="n">8</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">skew（偏斜）</div><div class="t">同一到期日、不同行权价的期权以不同的隐含波动率交易。也专指曲线往一边倾斜的程度，即 b。</div></div>
-      <div class="gl"><div class="s">微笑</div><div class="t">两翼都比平值高、中间低的隐含波动率曲线。</div></div>
-      <div class="gl"><div class="s">kurtosis（峰度）</div><div class="t">分布两头比钟形更长、中间更尖的程度；在曲线上就是两翼翘起的程度，即 a。</div></div>
-      <div class="gl"><div class="s">偏度</div><div class="t">分布两条尾巴长度不同的程度。左尾更长叫负偏。</div></div>
-      <div class="gl"><div class="s">投资型 / 需求型 / 平衡型</div><div class="t">讲义按哪一头被抬高给 skew 分的三类：低行权价高、高行权价高、两头都高。</div></div>
-      <div class="gl"><div class="s">σ平</div><div class="t">平值隐含波动率，在远期价处插值。4/13 的 5/15 到期是 46.07%。</div></div>
-      <div class="gl"><div class="s">z</div><div class="t">行权价离中心几个标准差：ln(X/F) ÷ (σ平 √t)。</div></div>
-      <div class="gl"><div class="s">y = a z² + b z + c</div><div class="t">用抛物线描述一条微笑。c 水平，b 倾斜，a 曲率，单位都是波动率点。</div></div>
-      <div class="gl"><div class="s">floating skew</div><div class="t">skew 曲线跟着标的价格左右平移，而不是钉在固定的行权价上。波动率水平变化时整条曲线按比例上下缩放，见第三节。</div></div>
-      <div class="gl"><div class="s">25 delta 的 put / 25Δ put</div><div class="t">按 delta 给虚值期权起的名字：delta 为 −0.25 的那张 put。同一个 σ 下，25 delta 离中心约 0.674 个标准差，16 delta 约 1 个，5 delta 约 1.645 个。</div></div>
-      <div class="gl"><div class="s">φ(z)</div><div class="t">钟形曲线（标准正态分布）在 z 处的高度。同一个 σ 下，vega 大致正比于它。</div></div>
-      <div class="gl"><div class="s">Δc / Δb / Δa</div><div class="t">水平、倾斜、曲率各加了几个点。一张期权的隐含波动率随之变 Δc ＋ z·Δb ＋ z²·Δa 个点。</div></div>
-      <div class="gl"><div class="s">σ(X)</div><div class="t">行权价 X 那张期权的隐含波动率。</div></div>
-      <div class="gl"><div class="s">波动率曲面</div><div class="t">行权价 × 到期日两个维度上的隐含波动率。</div></div>
-      <div class="gl"><div class="s">期限结构</div><div class="t">同一个行权价（通常是平值）在不同到期日的隐含波动率。</div></div>
-      <div class="gl"><div class="s">ln(X/S)/√t</div><div class="t">曲面的归一化横轴：行权价离现价的比例除以 √t。再把纵轴除以平值，不同到期日的微笑在中间段基本重合，两翼仍然分开。</div></div>
-      <div class="gl"><div class="s">vega</div><div class="t">隐含波动率变 1 个点，期权价格变多少（2.3）。</div></div>
-      <div class="gl"><div class="s">Δ模型 / Δ偏斜</div><div class="t">模型 delta 假设隐含波动率不变；偏斜 delta 把标的动时隐含波动率的变化也算进去：Δ模型 + vega × Δσ/ΔS。</div></div>
-      <div class="gl"><div class="s">蝶式法</div><div class="t">用等间距蝶式的价格反推到期概率 P：蝶式价格 ÷ 行权价间距 × (1 ＋ r·t)，r 是利率，t 是离到期的年数。</div></div>
-      <div class="gl"><div class="s">隐含分布</div><div class="t">从期权价格反推出来的到期价格分布，拿来和对数正态比。</div></div>
-      <div class="gl"><div class="s">对数正态分布</div><div class="t">涨跌按比例算时到期价的分布（1.2），Black-Scholes 假设的就是它。</div></div>
-      <div class="gl"><div class="s">risk reversal</div><div class="t">一买一卖两张虚值期权（put 与 call），加标的补成 delta 中性，用来交易倾斜。</div></div>
-      <div class="gl"><div class="s">short skew</div><div class="t">希望 skew 变得更负（或不那么正）的仓位：多低行权价、空高行权价。</div></div>
-      <div class="gl"><div class="s">kurtosis 策略</div><div class="t">买（卖）两翼、卖（买）平值，delta 与 vega 双中性，用来交易弯曲。</div></div>
-      <div class="gl"><div class="s">straddle（跨式）</div><div class="t">同一行权价的一张 call 加一张 put（3.2）。</div></div>
+      <div class="gl"><div class="s"><span class="l-zh">skew（偏斜）</span><span class="l-en">skew</span></div><div class="t"><span class="l-zh">同一到期日、不同行权价的期权以不同的隐含波动率交易。也专指曲线往一边倾斜的程度，即 b。</span><span class="l-en">Options with the same expiration and different strikes trade at different implied volatilities. Also used specifically for how far the curve leans to one side, that is, b.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">微笑</span><span class="l-en">Smile</span></div><div class="t"><span class="l-zh">两翼都比平值高、中间低的隐含波动率曲线。</span><span class="l-en">An implied volatility curve with both wings above at-the-money and a low middle.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">kurtosis（峰度）</span><span class="l-en">kurtosis</span></div><div class="t"><span class="l-zh">分布两头比钟形更长、中间更尖的程度；在曲线上就是两翼翘起的程度，即 a。</span><span class="l-en">How much longer a distribution's tails are and how much sharper its middle is than the bell shape; on the curve, how far the wings turn up, that is, a.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">偏度</span><span class="l-en">Skewness</span></div><div class="t"><span class="l-zh">分布两条尾巴长度不同的程度。左尾更长叫负偏。</span><span class="l-en">How unequal the two tails of a distribution are. A longer left tail is negative skew.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">投资型 / 需求型 / 平衡型</span><span class="l-en">Investment / demand / balanced</span></div><div class="t"><span class="l-zh">讲义按哪一头被抬高给 skew 分的三类：低行权价高、高行权价高、两头都高。</span><span class="l-en">The lecture's three kinds of skew by which end is raised: low strikes high, high strikes high, both ends high.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">σ平</span><span class="l-en">σ<sub>ATM</sub></span></div><div class="t"><span class="l-zh">平值隐含波动率，在远期价处插值。4/13 的 5/15 到期是 46.07%。</span><span class="l-en">At-the-money implied volatility, interpolated at the forward price. 46.07% for the 5/15 expiration on 4/13.</span></div></div>
+      <div class="gl"><div class="s">z</div><div class="t"><span class="l-zh">行权价离中心几个标准差：ln(X/F) ÷ (σ平 √t)。</span><span class="l-en">How many standard deviations the strike is from the center: ln(X/F) ÷ (σ<sub>ATM</sub> √t).</span></div></div>
+      <div class="gl"><div class="s">y = a z² + b z + c</div><div class="t"><span class="l-zh">用抛物线描述一条微笑。c 水平，b 倾斜，a 曲率，单位都是波动率点。</span><span class="l-en">Describes a smile with a parabola. c is level, b tilt, a curvature, all in volatility points.</span></div></div>
+      <div class="gl"><div class="s">floating skew</div><div class="t"><span class="l-zh">skew 曲线跟着标的价格左右平移，而不是钉在固定的行权价上。波动率水平变化时整条曲线按比例上下缩放，见第三节。</span><span class="l-en">The skew curve shifts left and right with the underlying price instead of staying pinned to fixed strikes. When the volatility level changes, the whole curve scales up or down proportionally; see section 3.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">25 delta 的 put / 25Δ put</span><span class="l-en">25 delta put / 25Δ put</span></div><div class="t"><span class="l-zh">按 delta 给虚值期权起的名字：delta 为 −0.25 的那张 put。同一个 σ 下，25 delta 离中心约 0.674 个标准差，16 delta 约 1 个，5 delta 约 1.645 个。</span><span class="l-en">Naming OTM options by delta: the put with a delta of −0.25. With a single σ, 25 delta is about 0.674 standard deviations from the center, 16 delta about 1, 5 delta about 1.645.</span></div></div>
+      <div class="gl"><div class="s">φ(z)</div><div class="t"><span class="l-zh">钟形曲线（标准正态分布）在 z 处的高度。同一个 σ 下，vega 大致正比于它。</span><span class="l-en">Height of the bell curve (standard normal distribution) at z. With a single σ, vega is roughly proportional to it.</span></div></div>
+      <div class="gl"><div class="s">Δc / Δb / Δa</div><div class="t"><span class="l-zh">水平、倾斜、曲率各加了几个点。一张期权的隐含波动率随之变 Δc ＋ z·Δb ＋ z²·Δa 个点。</span><span class="l-en">How many points level, tilt and curvature each rose. An option's implied volatility then changes by Δc + z·Δb + z²·Δa points.</span></div></div>
+      <div class="gl"><div class="s">σ(X)</div><div class="t"><span class="l-zh">行权价 X 那张期权的隐含波动率。</span><span class="l-en">Implied volatility of the option at strike X.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">波动率曲面</span><span class="l-en">Volatility surface</span></div><div class="t"><span class="l-zh">行权价 × 到期日两个维度上的隐含波动率。</span><span class="l-en">Implied volatility across two dimensions, strike × expiration.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期限结构</span><span class="l-en">Term structure</span></div><div class="t"><span class="l-zh">同一个行权价（通常是平值）在不同到期日的隐含波动率。</span><span class="l-en">Implied volatility of the same strike (usually at-the-money) across different expirations.</span></div></div>
+      <div class="gl"><div class="s">ln(X/S)/√t</div><div class="t"><span class="l-zh">曲面的归一化横轴：行权价离现价的比例除以 √t。再把纵轴除以平值，不同到期日的微笑在中间段基本重合，两翼仍然分开。</span><span class="l-en">Normalized horizontal axis of the surface: the strike's distance from the current price as a fraction, divided by √t. With the vertical axis also divided by at-the-money, smiles of different expirations largely coincide in the middle section; the wings stay apart.</span></div></div>
+      <div class="gl"><div class="s">vega</div><div class="t"><span class="l-zh">隐含波动率变 1 个点，期权价格变多少（2.3）。</span><span class="l-en">How much the option price changes when implied volatility changes 1 point (2.3).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">Δ模型 / Δ偏斜</span><span class="l-en">Δ<sub>model</sub> / Δ<sub>skew</sub></span></div><div class="t"><span class="l-zh">模型 delta 假设隐含波动率不变；偏斜 delta 把标的动时隐含波动率的变化也算进去：Δ模型 + vega × Δσ/ΔS。</span><span class="l-en">Model delta assumes implied volatility stays the same; skewed delta also counts the change in implied volatility as the underlying moves: Δ<sub>model</sub> + vega × Δσ/ΔS.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">蝶式法</span><span class="l-en">Butterfly method</span></div><div class="t"><span class="l-zh">用等间距蝶式的价格反推到期概率 P：蝶式价格 ÷ 行权价间距 × (1 ＋ r·t)，r 是利率，t 是离到期的年数。</span><span class="l-en">Backing out the probability at expiration P from the prices of evenly spaced butterflies: butterfly price ÷ strike spacing × (1 + r·t), where r is the interest rate and t the years to expiration.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含分布</span><span class="l-en">Implied distribution</span></div><div class="t"><span class="l-zh">从期权价格反推出来的到期价格分布，拿来和对数正态比。</span><span class="l-en">The distribution of prices at expiration backed out from option prices, compared against the lognormal.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">对数正态分布</span><span class="l-en">Lognormal distribution</span></div><div class="t"><span class="l-zh">涨跌按比例算时到期价的分布（1.2），Black-Scholes 假设的就是它。</span><span class="l-en">The distribution of the price at expiration when moves are proportional (1.2); it is what Black-Scholes assumes.</span></div></div>
+      <div class="gl"><div class="s">risk reversal</div><div class="t"><span class="l-zh">一买一卖两张虚值期权（put 与 call），加标的补成 delta 中性，用来交易倾斜。</span><span class="l-en">Buy one OTM option and sell another (a put and a call), with the underlying added to make it delta neutral; used to trade tilt.</span></div></div>
+      <div class="gl"><div class="s">short skew</div><div class="t"><span class="l-zh">希望 skew 变得更负（或不那么正）的仓位：多低行权价、空高行权价。</span><span class="l-en">A position that wants skew to become more negative (or less positive): long low strikes, short high strikes.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">kurtosis 策略</span><span class="l-en">Kurtosis strategy</span></div><div class="t"><span class="l-zh">买（卖）两翼、卖（买）平值，delta 与 vega 双中性，用来交易弯曲。</span><span class="l-en">Buy (sell) the wings, sell (buy) at-the-money, both delta and vega neutral; used to trade bend.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">straddle（跨式）</span><span class="l-en">straddle</span></div><div class="t"><span class="l-zh">同一行权价的一张 call 加一张 put（3.2）。</span><span class="l-en">One call plus one put at the same strike (3.2).</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节有两条支线。<a href="station-m-market-making.html"><b>M 做市报价</b></a>：拿着这张曲面给每个行权价报双边价，边际从哪来。<a href="station-v-vix.html"><b>V 波动率合约与 VIX</b></a>：VIX 就是用一整排虚值期权的价格算出来的。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节有两条支线。<a href="station-m-market-making.html"><b>M 做市报价</b></a>：拿着这张曲面给每个行权价报双边价，边际从哪来。<a href="station-v-vix.html"><b>V 波动率合约与 VIX</b></a>：VIX 就是用一整排虚值期权的价格算出来的。</span><span class="l-en">The next node has two branches. <a href="station-m-market-making.html"><b>M Market making</b></a>: holding this surface, quote two-sided prices at every strike, and see where the edge comes from. <a href="station-v-vix.html"><b>V Volatility contracts and VIX</b></a>: VIX is computed from the prices of a whole row of OTM options.</span></p>
+  <p><a href="./"><span class="l-zh">← 回到课程路线图</span><span class="l-en">← Back to the course roadmap</span></a></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
 <script>
+/* 英文模式（lang.js）：页面标题，以及带 data-en-* 的悬停说明、title、aria-label 换成英文 */
+document.title=L(document.title,'Skew and the volatility surface');
+if(LANG==='en') document.querySelectorAll('[data-en-say],[data-en-title],[data-en-aria-label],[data-en-placeholder]').forEach(e=>{
+  for(const a of ['say','title','aria-label','placeholder']){ const v=e.getAttribute('data-en-'+a); if(v!=null) e.setAttribute(a==='say'?'data-say':a,v); }
+});
 const $ = id => document.getElementById(id);
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
@@ -691,24 +697,24 @@ function drawS0(){
   let g='';
   [40,60,80,100].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
   [200,300,400,500,600,700].forEach(k=>g+=lab(X(k),B+19,k,'var(--ink-faint)','middle',12));
-  g+=lab((L+R)/2,H-6,'行权价','var(--ink-soft)','middle',12.5);
+  g+=lab((L+R)/2,H-6,window.L('行权价','Strike'),'var(--ink-soft)','middle',12.5);
   g+=hline(L,R,Y(46.3),'var(--ink-soft)',1.3,'6 5');
-  g+=lab(R,Y(46.3)+17,'1.2 用的一个 σ：46.3%','var(--ink-soft)','end',12);
+  g+=lab(R,Y(46.3)+17,window.L('1.2 用的一个 σ：46.3%','1.2\'s single σ: 46.3%'),'var(--ink-soft)','end',12);
   g+=vline(X(S0),T,B,'var(--ink-faint)',1,'2 4')+lab(X(S0)+5,T+10,'TSLA 352.36','var(--ink-faint)','start',12);
   const P=D.S0.pts;
   g+=poly(P.map(p=>[X(p[0]),Y(p[4])]),'var(--result)',1.6,'stroke-dasharray="4 3"');
   P.forEach(p=>{ if(p[3]-p[2]>0.3) g+=vline(X(p[0]),Y(p[3]),Y(p[2]),'var(--ink-faint)',1); });
   g+=`<g fill="var(--control)">`+P.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="2.5"/>`).join('')+'</g>';
   const at=k=>P.find(p=>p[0]===k);
-  [[150,'150 put 112.6%','start',8,4],[200,'200 put 86.5%','start',8,4],[300,'300 put 51.1%','start',10,-12],[385,'385 最低 45.0%','middle',0,22],
+  [[150,'150 put 112.6%','start',8,4],[200,'200 put 86.5%','start',8,4],[300,'300 put 51.1%','start',10,-12],[385,window.L('385 最低 45.0%','385 low 45.0%'),'middle',0,22],
    narrow?[500,'500 call 53.5%','start',10,28]:[500,'500 call 53.5%','end',-6,-26]].forEach(([k,t,a,dx,dy])=>{
     const p=at(k); if(!p) return;
     g+=lab(X(k)+dx,Y(p[1])+dy,t,'var(--control)',a,12,600);
   });
-  g+=lab(X(146),Y(61.4)+17,'平滑值 61.4%','var(--result)','start',11.5);
-  g+=lab(L+6,B-8,'左翼：虚值 put','var(--ink-faint)','start',12);
-  g+=lab(R,T+10,'右翼：虚值 call','var(--ink-faint)','end',12);
-  if(FK===1) g+=`<text transform="translate(13 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">隐含波动率</text>`;
+  g+=lab(X(146),Y(61.4)+17,window.L('平滑值 61.4%','Smoothed 61.4%'),'var(--result)','start',11.5);
+  g+=lab(L+6,B-8,window.L('左翼：虚值 put','Left: OTM puts'),'var(--ink-faint)','start',12);
+  g+=lab(R,T+10,window.L('右翼：虚值 call','Right: OTM calls'),'var(--ink-faint)','end',12);
+  if(FK===1) g+=window.L(`<text transform="translate(13 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">隐含波动率</text>`,`<text transform="translate(13 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">Implied volatility</text>`);
   $('s0c').innerHTML=g;
 }
 
@@ -719,7 +725,7 @@ const BUILD=(()=>{
   const f=D.FIT0, pts=D.S0.pts.map(p=>[zOf(p[0],F0,ATM0,T0),p[1]]).filter(p=>Math.abs(p[0])<=3.2);
   const F=[z=>f.c, z=>f.c+f.b*z, z=>f.c+f.b*z+f.a*z*z];
   const curve=(fn,xmax=z1)=>{ const o=[]; for(let z=z0;z<=xmax+1e-9;z+=0.05) o.push([X(z),Y(clamp(fn(z),y0-4,y1+4))]); return o; };
-  const STEP=['① 水平 c = 45.47','② 加上倾斜 b·z，b = −2.07','③ 加上曲率 a·z²，a = 2.07'];
+  const STEP=[window.L('① 水平 c = 45.47','① Level c = 45.47'),window.L('② 加上倾斜 b·z，b = −2.07','② Add tilt b·z, b = −2.07'),window.L('③ 加上曲率 a·z²，a = 2.07','③ Add curvature a·z², a = 2.07')];
   const st={};
   function frame(e){
     let g='';
@@ -729,8 +735,8 @@ const BUILD=(()=>{
       g+=lab(X(z),B+19,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12);
       g+=lab(X(z),B+36,Math.round(F0*Math.exp(z*ATM0*SQ0)),'var(--ink-faint)','middle',11);
     }
-    g+=lab(L-8,B+19,'z','var(--ink-faint)','end',12); g+=lab(L-8,B+36,'行权价','var(--ink-faint)','end',11);
-    g+=lab((L+R)/2,H-6,'离中心几个标准差','var(--ink-soft)','middle',12.5);
+    g+=lab(L-8,B+19,'z','var(--ink-faint)','end',12); g+=lab(L-8,B+36,window.L('行权价','X'),'var(--ink-faint)','end',11);
+    g+=lab((L+R)/2,H-6,window.L('离中心几个标准差','Standard deviations from center'),'var(--ink-soft)','middle',12.5);
     const op=clamp(e/800);
     g+=`<g fill="var(--ink-soft)" fill-opacity="${(op*0.75).toFixed(2)}">`+pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="2.6"/>`).join('')+'</g>';
     let k=0, line='';
@@ -742,7 +748,7 @@ const BUILD=(()=>{
     if(e>=5200){
       const zm=-f.b/(2*f.a), ym=quad(f,zm);
       g+=`<circle cx="${X(zm)}" cy="${Y(ym)}" r="4" fill="var(--paper)" stroke="var(--control)" stroke-width="2"/>`;
-      g+=lab(X(zm),Y(ym)+20,'谷底 z = +0.50，378.7','var(--control)','middle',12);
+      g+=lab(X(zm),Y(ym)+20,window.L('谷底 z = +0.50，378.7','Trough z = +0.50, 378.7'),'var(--control)','middle',12);
     }
     $('s1c').innerHTML=g;
   }
@@ -762,10 +768,10 @@ function drawSens(){
   const fc=z=>npdf(z)/p0, fb=z=>Math.abs(z)*npdf(z)/p0, fa=z=>z*z*npdf(z)/p0;
   g+=poly(cur(fc),'var(--result)',2.4)+poly(cur(fb),'var(--control)',2.4)+poly(cur(fa),'var(--good)',2.4);
   Q.forEach(([z])=>{ [[fc,'var(--result)'],[fb,'var(--control)'],[fa,'var(--good)']].forEach(([fn,c])=>g+=`<circle cx="${X(z)}" cy="${Y(fn(z))}" r="3.6" fill="${c}"/>`); });
-  g+=`<line x1="${X(1)}" y1="${Y(fb(1))-5}" x2="${X(1.25)}" y2="${Y(0.9)}" stroke="var(--control)"/>`+lab(X(2.6),Y(0.97),'b 的峰 z = 1，约 16Δ','var(--control)','end',11.5);
-  g+=`<line x1="${X(-Math.SQRT2)}" y1="${Y(fa(Math.SQRT2))-5}" x2="${X(-1.6)}" y2="${Y(0.9)}" stroke="var(--good)"/>`+lab(X(-2.6),Y(0.97),'a 的峰 z = √2，约 8Δ','var(--good)','start',11.5);
+  g+=`<line x1="${X(1)}" y1="${Y(fb(1))-5}" x2="${X(1.25)}" y2="${Y(0.9)}" stroke="var(--control)"/>`+lab(X(2.6),Y(0.97),window.L('b 的峰 z = 1，约 16Δ','b peaks at z = 1, about 16Δ'),'var(--control)','end',11.5);
+  g+=`<line x1="${X(-Math.SQRT2)}" y1="${Y(fa(Math.SQRT2))-5}" x2="${X(-1.6)}" y2="${Y(0.9)}" stroke="var(--good)"/>`+lab(X(-2.6),Y(0.97),window.L('a 的峰 z = √2，约 8Δ','a peaks at z = √2, about 8Δ'),'var(--good)','start',11.5);
   for(let z=-2;z<=2;z++) g+=lab(X(z),B+18,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12);
-  g+=lab((L+R)/2,B+40,'离中心几个标准差 z（左边是 put，右边是 call）','var(--ink-soft)','middle',12);
+  g+=lab((L+R)/2,B+40,window.L('离中心几个标准差 z（左边是 put，右边是 call）','z, SDs from center: puts left, calls right'),'var(--ink-soft)','middle',12);
   $('s1s').innerHTML=g;
   // TSLA 表
   // 列：vega（= c 加 1 点，r[5] 与 r[6] 相同，只列一次）、b 加 1 点、a 加 1 点；每一侧最大的标色
@@ -788,8 +794,8 @@ const REPLAY=(()=>{
     const X= mode==='z' ? (z=>L+(z+zr)/(2*zr)*(R-L)) : (k=>L+(k-k0)/(k1-k0)*(R-L));
     let g=`<defs><clipPath id="s2clip"><rect x="${L}" y="${T-4}" width="${R-L}" height="${B-T+8}"/></clipPath></defs>`;
     [40,50,60,70,80,90].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
-    if(mode==='z'){ for(let z=-3;z<=3;z++) g+=lab(X(z),B+18,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12); g+=lab((L+R)/2,B+36,'离中心几个标准差 z','var(--ink-soft)','middle',12); }
-    else { [250,300,350,400,450,500,550].forEach(k=>g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',12)); g+=lab((L+R)/2,B+36,'行权价','var(--ink-soft)','middle',12); }
+    if(mode==='z'){ for(let z=-3;z<=3;z++) g+=lab(X(z),B+18,z===0?'0':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',12); g+=lab((L+R)/2,B+36,window.L('离中心几个标准差 z','Standard deviations from center, z'),'var(--ink-soft)','middle',12); }
+    else { [250,300,350,400,450,500,550].forEach(k=>g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',12)); g+=lab((L+R)/2,B+36,window.L('行权价','Strike'),'var(--ink-soft)','middle',12); }
     const cv=(ff,GG)=>{ const o=[];
       if(mode==='z'){ for(let z=-zr;z<=zr+1e-9;z+=0.05) o.push([X(z),Y(quad(ff,z))]); }
       else { for(let k=k0;k<=k1;k+=2){ const z=zOf(k,GG.F,GG.atm,GG.t); if(Math.abs(z)<=zr) o.push([X(k),Y(quad(ff,z))]); } }
@@ -803,20 +809,20 @@ const REPLAY=(()=>{
     if(mode==='k'){ const zm=-f.b/(2*f.a), xm=X(d.kmin), ym=Y(quad(f,zm)); g+=`<path d="M${xm-5} ${ym+14} L${xm+5} ${ym+14} L${xm} ${ym+6} Z" fill="var(--control)"/>`; }
     g+='</g>';
     if(mode==='k') g+=lab(clamp(X(d.S),L+40,R-40),T-8,'TSLA '+d.S.toFixed(2),'var(--result)','middle',12,600);
-    else g+=lab(L+8,T-8,d.d+'，离到期 '+d.n+' 天','var(--control)','start',13,600);
+    else g+=lab(L+8,T-8,d.d+window.L('，离到期 ',', ')+d.n+window.L(' 天',' days to expiration'),'var(--control)','start',13,600);
     // 下方：b 与 a 逐日
     const X2=i=>L+i/(n-1)*(R-L), Y2=v=>S2B-(v+2.5)/6*(S2B-S2T);
     g+=hline(L,R,Y2(0),'var(--ink-faint)',1);
     [-2,0,2].forEach(v=>g+=lab(L-8,Y2(v)+4,fm(v,0),'var(--ink-faint)','end',11));
-    g+=vline((X2(7)+X2(8))/2,S2T,S2B,'var(--ink-faint)',1,'2 3')+lab((X2(7)+X2(8))/2+5,Y2(-2.1),'财报','var(--ink-faint)','start',11);
+    g+=vline((X2(7)+X2(8))/2,S2T,S2B,'var(--ink-faint)',1,'2 3')+lab((X2(7)+X2(8))/2+5,Y2(-2.1),window.L('财报','Earnings'),'var(--ink-faint)','start',11);
     [0,5,10,15,19,23].forEach(i=>g+=lab(X2(i),S2B+16,DS[i].d,'var(--ink-faint)','middle',11));
     const sb=[],sa=[]; for(let i=0;i<=day;i++){ sb.push([X2(i),Y2(DS[i].b)]); sa.push([X2(i),Y2(DS[i].a)]); }
     g+=poly(sa,'var(--good)',2.2)+poly(sb,'var(--control)',2.2);
     g+=`<circle cx="${X2(day)}" cy="${Y2(d.a)}" r="4" fill="var(--good)"/><circle cx="${X2(day)}" cy="${Y2(d.b)}" r="4" fill="var(--control)"/>`;
-    g+=lab(L+6,Y2(2.2)-6,'曲率 a','var(--good)','start',12,600)+lab(X2(2.6),Y2(-1.8),'倾斜 b','var(--control)','start',12,600);
+    g+=lab(L+6,Y2(2.2)-6,window.L('曲率 a','Curvature a'),'var(--good)','start',12,600)+lab(X2(2.6),Y2(-1.8),window.L('倾斜 b','Tilt b'),'var(--control)','start',12,600);
     $('s2c').innerHTML=g;
-    $('s2D').textContent=d.d; $('s2Db').textContent='离到期 '+d.n+' 天';
-    $('s2S').textContent=d.S.toFixed(2); $('s2Sb').textContent=sgn((d.S/S0-1)*100,1)+'%，入场 352.36';
+    $('s2D').textContent=d.d; $('s2Db').textContent=window.L('离到期 ','Expires in ')+d.n+window.L(' 天',' days');
+    $('s2S').textContent=d.S.toFixed(2); $('s2Sb').textContent=sgn((d.S/S0-1)*100,1)+window.L('%，入场 352.36','% from 352.36');
     $('s2A').textContent=d.atm.toFixed(2)+'%';
     $('s2B').textContent=sgn(d.b); $('s2K').textContent=d.a.toFixed(2); $('s2R').textContent=sgn(d.rr);
     $('s2LgS').style.display= mode==='k'?'':'none';
@@ -839,20 +845,20 @@ const SCALE=(()=>{
     let g='';
     [40,60,80,100,120].forEach(v=>{ g+=hline(L,R,Y(v),'var(--rule)'); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
     [300,350,400,450,500].forEach(k=>g+=lab(X(k),B+18,k,'var(--ink-faint)','middle',12));
-    g+=lab((L+R)/2,H-8,'行权价','var(--ink-soft)','middle',12.5);
+    g+=lab((L+R)/2,H-8,window.L('行权价','Strike'),'var(--ink-soft)','middle',12.5);
     g+=poly(P.map(p=>[X(p[0]),Y(p[1])]),'var(--ink-faint)',1.5,'stroke-dasharray="5 4"');
     g+=poly(P.map(p=>[X(p[0]),Y(p[1]+(m-1)*A)]),'var(--result)',2,'stroke-dasharray="7 4"');
     g+=poly(P.map(p=>[X(p[0]),Y(p[1]*m)]),'var(--control)',2.6);
     g+=vline(X(F0),Y(A*m),B,'var(--ink-faint)',1,'2 3');
-    g+=`<circle cx="${X(F0)}" cy="${Y(A*m)}" r="4" fill="var(--ink)"/>`+lab(X(F0)+8,Y(A*m)+18,'平值 '+(A*m).toFixed(1)+'%','var(--ink)','start',12,600);
+    g+=`<circle cx="${X(F0)}" cy="${Y(A*m)}" r="4" fill="var(--ink)"/>`+lab(X(F0)+8,Y(A*m)+18,window.L('平值 ','ATM ')+(A*m).toFixed(1)+'%','var(--ink)','start',12,600);
     const vm=p300*m, va=p300+(m-1)*A;
     g+=`<circle cx="${X(300)}" cy="${Y(vm)}" r="4.5" fill="var(--control)"/><circle cx="${X(300)}" cy="${Y(va)}" r="4.5" fill="var(--paper)" stroke="var(--result)" stroke-width="2"/>`;
-    g+=lab(X(300)+10,Y(vm)-12,'乘性 '+vm.toFixed(1)+'%','var(--control)','start',12,600);
-    g+=lab(X(300)-10,Y(va)+20,'加性 '+va.toFixed(1)+'%','var(--result)','end',12,600);
+    g+=lab(X(300)+10,Y(vm)-12,window.L('乘性 ','Mult. ')+vm.toFixed(1)+'%','var(--control)','start',12,600);
+    g+=lab(X(300)-10,Y(va)+20,window.L('加性 ','Add. ')+va.toFixed(1)+'%','var(--result)','end',12,600);
     $('s3c').innerHTML=g;
     $('s3A').textContent=(A*m).toFixed(1)+'%'; $('s3Ab').textContent='× '+m.toFixed(2);
-    $('s3M').textContent=vm.toFixed(1)+'%'; $('s3Mb').textContent=`高出平值 ${(vm-A*m).toFixed(1)} 点，占 ${(vm/(A*m)*100).toFixed(1)}%`;
-    $('s3P').textContent=va.toFixed(1)+'%'; $('s3Pb').textContent=`高出平值 ${(va-A*m).toFixed(1)} 点，占 ${(va/(A*m)*100).toFixed(1)}%`;
+    $('s3M').textContent=vm.toFixed(1)+'%'; $('s3Mb').textContent=window.L(`高出平值 ${(vm-A*m).toFixed(1)} 点，占 ${(vm/(A*m)*100).toFixed(1)}%`,`${(vm-A*m).toFixed(1)} points above ATM, ${(vm/(A*m)*100).toFixed(1)}% of ATM`);
+    $('s3P').textContent=va.toFixed(1)+'%'; $('s3Pb').textContent=window.L(`高出平值 ${(va-A*m).toFixed(1)} 点，占 ${(va/(A*m)*100).toFixed(1)}%`,`${(va-A*m).toFixed(1)} points above ATM, ${(va/(A*m)*100).toFixed(1)}% of ATM`);
   }
   $('s3Play').addEventListener('click',()=>timeline(st,3200,frame));
   return {start:()=>timeline(st,3200,frame), draw:()=>frame(st.e??3200)};
@@ -869,19 +875,19 @@ function drawHeat(){
     const y=T+r*RH;
     for(let c=0;c<nc;c++){ const v=surfAt(s,k0+c*dk); if(v===null) continue;
       g+=`<rect x="${(L+c*cw).toFixed(1)}" y="${y}" width="${(cw+.4).toFixed(1)}" height="${RH-1}" style="fill:${col(v)}"/>`; }
-    g+=lab(L-8,y+RH/2+4,FK>1?`${s.n} 天`:`${s.e} · ${s.n} 天`,'var(--ink-soft)','end',12);
+    g+=lab(L-8,y+RH/2+4,FK>1?window.L(`${s.n} 天`,`${s.n} days`):window.L(`${s.e} · ${s.n} 天`,`${s.e} · ${s.n}d`),'var(--ink-soft)','end',12);
     g+=lab(R+10,y+RH/2+4,s.atm.toFixed(2)+'%',s.n===11?'var(--control)':'var(--ink)','start',12,s.n===11?600:400);
   });
-  g+=lab(R+10,T-4,'平值','var(--ink-faint)','start',11);
+  g+=lab(R+10,T-4,window.L('平值','ATM'),'var(--ink-faint)','start',11);
   g+=vline(X(S0)+cw/2,T-4,B+4,'var(--ink)',1.2,'3 3');
   [250,300,350,400,450].forEach(k=>g+=lab(X(k)+cw/2,B+18,k,'var(--ink-faint)','middle',12));
   g+=lab(X(S0)+cw/2+4,B+34,'TSLA 352.36','var(--ink-soft)','start',11.5);
-  g+=lab(R+10,B+18,'行权价','var(--ink-soft)','start',12);   // 放在刻度那一行的右端，手机上不压 250
+  g+=lab(R+10,B+18,window.L('行权价','Strike'),'var(--ink-soft)','start',12);   // 放在刻度那一行的右端，手机上不压 250
   // 图例
   const lx=L, ly=H-18, lw=200;
   for(let i=0;i<40;i++) g+=`<rect x="${lx+i*lw/40}" y="${ly}" width="${lw/40+.5}" height="9" style="fill:${col(v0+(v1-v0)*i/39)}"/>`;
   [40,60,80].forEach(v=>g+=lab(lx+(v-v0)/(v1-v0)*lw,ly-4,v+'%','var(--ink-faint)','middle',11));
-  g+=lab(lx+lw+10,ly+9,'隐含波动率','var(--ink-faint)','start',11.5);
+  g+=lab(lx+lw+10,ly+9,window.L('隐含波动率','Implied volatility'),'var(--ink-faint)','start',11.5);
   $('s4h').innerHTML=g;
 }
 
@@ -902,8 +908,8 @@ const MORPH=(()=>{
     [1,1.2,1.4,1.6,1.8,2].filter(w=>w<=ybH+1e-9).forEach(w=>{ g+=`<g opacity="${v.toFixed(2)}">`+hline(L,R,Yb(w),'var(--rule)')+lab(L-8,Yb(w)+4,(w*100).toFixed(0)+'%','var(--ink-faint)','end',12)+'</g>'; });
     [300,350,400,450].forEach(k=>g+=`<g opacity="${(1-u).toFixed(2)}">`+lab(Xs(k),B+18,k,'var(--ink-faint)','middle',12)+'</g>');
     [-1,-0.5,0,0.5,1].forEach(x=>g+=`<g opacity="${u.toFixed(2)}">`+lab(Xn(x),B+18,x===0?'0':fm(x,1),'var(--ink-faint)','middle',12)+'</g>');
-    g+=lab((L+R)/2,H-18,u<0.5?'行权价':'ln(X/S) ÷ √t','var(--ink-soft)','middle',12.5);
-    if(FK===1) g+=`<text transform="translate(14 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">${v<0.5?'隐含波动率':'隐含波动率 ÷ 平值'}</text>`;
+    g+=lab((L+R)/2,H-18,u<0.5?window.L('行权价','Strike'):'ln(X/S) ÷ √t','var(--ink-soft)','middle',12.5);
+    if(FK===1) g+=`<text transform="translate(14 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12.5" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">${v<0.5?window.L('隐含波动率','Implied volatility'):window.L('隐含波动率 ÷ 平值','Implied volatility ÷ ATM')}</text>`;
     g+=`<g clip-path="url(#s4clip)">`;
     S.forEach((s,i)=>{
       const t=s.n/365, c=`color-mix(in oklch,var(--result) ${(45+55*i/(nS-1)).toFixed(0)}%,var(--panel))`;
@@ -912,13 +918,13 @@ const MORPH=(()=>{
       g+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke-width="2" stroke-linejoin="round" style="stroke:${c}"/>`;
     });
     g+='</g>';
-    const stage= e<1400?'① 原始：行权价 × 隐含波动率' : e<4000?'② 纵轴除以各自的平值' : '③ 横轴换成 ln(X/S) ÷ √t';
+    const stage= e<1400?window.L('① 原始：行权价 × 隐含波动率','① Raw: strike × implied volatility') : e<4000?window.L('② 纵轴除以各自的平值','② Vertical axis divided by each line\'s ATM') : window.L('③ 横轴换成 ln(X/S) ÷ √t','③ Horizontal axis changed to ln(X/S) ÷ √t');
     g+=lab(L+8,T-8,stage,'var(--control)','start',13,600);
     if(e>=3100 && e<4000) g+=vline(Xs(330),T,B,'var(--control)',1.2,'3 3')+lab(Xs(330)+5,T+14,'330','var(--control)','start',12);
     if(e>=5900){ [-1,-0.3].forEach(x=>{ g+=vline(Xn(x),T,B,'var(--control)',1.2,'3 3')+lab(Xn(x)+5,T+14,fm(x,1),'var(--control)','start',12); }); }
     $('s4m').innerHTML=g;
-    $('s4Say').textContent= e<4000 ? (e>=3100?'行权价 330：8 条线占平值从 103.3% 到 122.4%。高度对齐了，宽度还没有：近到期的线更窄、更陡。':'') :
-      (e>=5900?'ln(X/S)/√t = −0.3：8 条线占平值只从 104.1% 到 108.0%。−1.0：仍是 118.0% 到 140.5%，最高的是 7 天那条。':'');
+    $('s4Say').textContent= e<4000 ? (e>=3100?window.L('行权价 330：8 条线占平值从 103.3% 到 122.4%。高度对齐了，宽度还没有：近到期的线更窄、更陡。','Strike 330: the 8 lines run from 103.3% to 122.4% of ATM. The heights are aligned, the widths not yet: near-term lines are narrower and steeper.'):'') :
+      (e>=5900?window.L('ln(X/S)/√t = −0.3：8 条线占平值只从 104.1% 到 108.0%。−1.0：仍是 118.0% 到 140.5%，最高的是 7 天那条。','ln(X/S)/√t = −0.3: the 8 lines run only from 104.1% to 108.0% of ATM. At −1.0 they still run from 118.0% to 140.5%, highest the 7-day line.'):'');
   }
   $('s4Play').addEventListener('click',()=>timeline(st,6200,frame));
   return {start:()=>timeline(st,6200,frame), draw:()=>frame(st.e??6200)};
@@ -928,21 +934,21 @@ const MORPH=(()=>{
 const WF=(()=>{
   const W=640, st={};
   const cases=[
-    {t:'95 put',lo:1.60,hi:2.10,v:[2.00,1.75,1.82],d1:'① 按模型 delta：−0.25 × 1',d2:'② 隐含 26.0% → 27.0%：+1 × 0.07',r1:'偏斜 delta = (1.82 − 2.00) ÷ 1 = −0.18',r2:'模型 delta −0.25'},
-    {t:'105 call',lo:2.20,hi:2.60,v:[2.30,2.47,2.39],d1:'① 按模型 delta：+0.17 × 1',d2:'② 隐含 21% → 20.5%：−0.5 × 0.16',r1:'偏斜 delta = (2.39 − 2.30) ÷ 1 = +0.09',r2:'模型 delta +0.17'}
+    {t:'95 put',lo:1.60,hi:2.10,v:[2.00,1.75,1.82],d1:L('① 按模型 delta：−0.25 × 1','① By model delta: −0.25 × 1'),d2:L('② 隐含 26.0% → 27.0%：+1 × 0.07','② Implied 26.0% → 27.0%: +1 × 0.07'),r1:L('偏斜 delta = (1.82 − 2.00) ÷ 1 = −0.18','Skewed delta = (1.82 − 2.00) ÷ 1 = −0.18'),r2:L('模型 delta −0.25','Model delta −0.25')},
+    {t:'105 call',lo:2.20,hi:2.60,v:[2.30,2.47,2.39],d1:L('① 按模型 delta：+0.17 × 1','① By model delta: +0.17 × 1'),d2:L('② 隐含 21% → 20.5%：−0.5 × 0.16','② Implied 21% → 20.5%: −0.5 × 0.16'),r1:L('偏斜 delta = (2.39 − 2.30) ÷ 1 = +0.09','Skewed delta = (2.39 − 2.30) ÷ 1 = +0.09'),r2:L('模型 delta +0.17','Model delta +0.17')}
   ];
   function frame(e){
     const stack=FK>1, CH=392, H=stack?28+2*CH:350;
     $('s5w').setAttribute('viewBox',`0 0 ${W} ${H}`);
     let g='';
-    g+=lab(W/2,18,'标的 100 → 101','var(--ink)','middle',13,600);
+    g+=lab(W/2,18,L('标的 100 → 101','Underlying 100 → 101'),'var(--ink)','middle',13,600);
     cases.forEach((c,ci)=>{
       const x0=stack?20:(ci?330:20), x1=stack?620:(ci?620:310), oy=stack?28+ci*CH:0, q=stack?FK:1;
       const T=oy+58+(q-1)*14, B=oy+196;
       const Y=p=>B-(p-c.lo)/(c.hi-c.lo)*(B-T), cx=[x0+44*q,x0+(x1-x0)/2,x1-44*q], mid=(x0+x1)/2;
       g+=lab(mid,T-22*q,c.t,'var(--control)','middle',13,600);
       g+=hline(x0,x1,B+10,'var(--rule)',1);
-      ['原价','按模型 delta','加上隐含的变化'].forEach((t,i)=>g+=lab(cx[i],B+28*q,t,'var(--ink-faint)','middle',11.5));
+      [L('原价','Before'),L('按模型 delta','Model delta'),L('加上隐含的变化','+ implied vol')].forEach((t,i)=>g+=lab(cx[i],B+28*q,t,'var(--ink-faint)','middle',11.5));
       const u1=ease(clamp((e-600)/900)), u2=ease(clamp((e-2200)/900));
       if(e>=600){ g+=`<line x1="${cx[0]}" y1="${Y(c.v[0])}" x2="${lerp(cx[0],cx[1],u1)}" y2="${lerp(Y(c.v[0]),Y(c.v[1]),u1)}" stroke="var(--ink-soft)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
         g+=lab(mid,B+54*q,c.d1,'var(--ink-soft)','middle',11.5); }
@@ -967,9 +973,9 @@ function drawDelta(){
   const X=i=>L+(i+0.5)/nb*(R-L), Y=v=>B-(v-y0)/(y1-y0)*(B-T);
   let g='';
   [40,60,80,100,120].forEach(v=>{ g+=hline(L,R,Y(v),v===100?'var(--ink-faint)':'var(--rule)',v===100?1.4:.8); g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',12); });
-  g+=lab(L+4,Y(100)-6,'和模型一样','var(--ink-faint)','start',11.5);
-  bk.forEach((b,i)=>{ const [a,c]=b.split('–').map(Number); g+=lab(X(i),B+18,`${Math.round(a*100)} 到 ${Math.round(c*100)}`,'var(--ink-faint)','middle',12); });
-  g+=lab((L+R)/2,B+40,'模型 delta 的绝对值（× 100）','var(--ink-soft)','middle',12);
+  g+=lab(L+4,Y(100)-6,window.L('和模型一样','Same as model'),'var(--ink-faint)','start',11.5);
+  bk.forEach((b,i)=>{ const [a,c]=b.split('–').map(Number); g+=lab(X(i),B+18,window.L(`${Math.round(a*100)} 到 ${Math.round(c*100)}`,`${Math.round(a*100)} to ${Math.round(c*100)}`),'var(--ink-faint)','middle',12); });
+  g+=lab((L+R)/2,B+40,window.L('模型 delta 的绝对值（× 100）','Absolute model delta (× 100)'),'var(--ink-soft)','middle',12);
   [['put','var(--control)',-7],['call','var(--result)',7]].forEach(([side,c,dx])=>{
     const rows=bk.map(b=>M.find(r=>r[0]===side&&r[1]===b));
     g+=poly(rows.map((r,i)=>[X(i)+dx,Y(r[4]/r[3]*100)]),c,1.4);
@@ -980,8 +986,8 @@ function drawDelta(){
     });
   });
   const pc=M.find(r=>r[0]==='call'&&r[1].startsWith('0.20')), pp=M.find(r=>r[0]==='put'&&r[1].startsWith('0.02'));
-  g+=lab(X(3)+7,Y(pc[4]/pc[3]*100)-12,'call 实测 '+(pc[4]/pc[3]*100).toFixed(0)+'%','var(--result)','middle',12,600);
-  g+=lab(X(0)+14,Y(pp[4]/pp[3]*100)+4,'put 实测 '+(pp[4]/pp[3]*100).toFixed(0)+'%','var(--control)','start',12,600);
+  g+=lab(X(3)+7,Y(pc[4]/pc[3]*100)-12,window.L('call 实测 ','Call measured ')+(pc[4]/pc[3]*100).toFixed(0)+'%','var(--result)','middle',12,600);
+  g+=lab(X(0)+14,Y(pp[4]/pp[3]*100)+4,window.L('put 实测 ','Put measured ')+(pp[4]/pp[3]*100).toFixed(0)+'%','var(--control)','start',12,600);
   $('s5m').innerHTML=g;
 }
 
@@ -1009,10 +1015,10 @@ const BF=(()=>{
     }
     if(done>=nb){ c.fillStyle=C.res; D.BF.ln.forEach((p,i)=>{ const y=BASE-Math.round(p/PX)+1; c.fillRect(xOf(i),y,2,1); }); }
     const i=Math.min(nb-1,done), K=K0+i*DK, p=P[i];
-    $('bfK').textContent='中心 '+K; $('bfKb').textContent=`${K-5} / ${K} / ${K+5}，价格 ${(p*5*DF).toFixed(3)}`;
-    $('bfP').textContent=(p*100).toFixed(2)+'%'; $('bfPb').textContent='对数正态 '+(D.BF.ln[i]*100).toFixed(2)+'%';
+    $('bfK').textContent=L('中心 ','Center ')+K; $('bfKb').textContent=L(`${K-5} / ${K} / ${K+5}，价格 ${(p*5*DF).toFixed(3)}`,`${K-5} / ${K} / ${K+5}, price ${(p*5*DF).toFixed(3)}`);
+    $('bfP').textContent=(p*100).toFixed(2)+'%'; $('bfPb').textContent=L('对数正态 ','Lognormal ')+(D.BF.ln[i]*100).toFixed(2)+'%';
     const sum=P.slice(0,Math.min(nb,done+1)).reduce((a,b)=>a+b,0), neg=P.slice(0,Math.min(nb,done+1)).filter(x=>x<0).length;
-    $('bfN').textContent=`${Math.min(nb,done+1)} / ${nb}`; $('bfNb').textContent=`合计 ${(sum*100).toFixed(1)}%，负数 ${neg} 张`;
+    $('bfN').textContent=`${Math.min(nb,done+1)} / ${nb}`; $('bfNb').textContent=L(`合计 ${(sum*100).toFixed(1)}%，负数 ${neg} 张`,`Total ${(sum*100).toFixed(1)}%, ${neg} negative`);
   }
   function start(){
     if(reduced){ s.i=nb; draw(); return; }
@@ -1026,59 +1032,59 @@ const BF=(()=>{
 })();
 function drawBk(){
   $('bkTb').innerHTML=D.BF.bk.map(([lo,hi,m,l])=>{
-    const t= lo===0?`${hi} 以下`: hi===0?`${lo} 以上`:`${lo} 到 ${hi}`;
+    const t= lo===0?L(`${hi} 以下`,`Below ${hi}`): hi===0?L(`${lo} 以上`,`Above ${lo}`):L(`${lo} 到 ${hi}`,`${lo} to ${hi}`);
     return `<tr><td>${t}</td><td>${(m*100).toFixed(1)}%</td><td>${(l*100).toFixed(1)}%</td><td${Math.abs(m-l)>0.01?' class="max"':''}>${sgn((m-l)*100,1)}</td></tr>`;
   }).join('');
 }
 
 /* ══════════ 八 · 费曼检验 ══════════ */
 const QS=[
- {q:`如果市场完全相信 Black-Scholes，同一个到期日各个行权价的隐含波动率应该画成什么形状？TSLA 4/13 实际画出来是什么形状，这说明市场相信什么？`,
-  a:['Black-Scholes 对一个标的只用一个 σ，同一到期日每张期权反推出来的 σ 都该一样，画出来是一条水平线。',
-     'TSLA 实际是一条微笑：200 的 put 86.5%，平值 46%，500 的 call 53.5%，两头高，左头更高。',
-     '两头高，说明市场认为大涨大跌比钟形算的多（正峰度）；左头更高，说明市场认为大跌比大涨更可能、更猛（负偏）。',
-     '这正是节点 7 讲的两条假设失效：分布两头长，下跌时波动更大。'],
-  s:'「因为虚值期权便宜，大家爱买」：只说了需求，没说出曲线形状对应的是市场眼中的分布。'},
- {q:`y = a z² + b z + c 的三个数各管什么？为什么 ±25 delta 的期权对 b 最敏感、±5 delta 的对 a 最敏感、平值对 c 最敏感？`,
-  a:['c 是整体高度，b 是倾斜（每个标准差加减几个点），a 是弯曲（离中心 z 个标准差加 a·z² 个点）。',
-     '某个数加 1 点，一张期权的隐含波动率分别变 1、z、z² 个点；价格变化再乘上这张期权的 vega。',
-     'vega 在平值最大、往两边变小，z 在平值是 0、往两边变大，乘积的峰落在中间某处：对 b 峰在 z = 1（约 16 delta），对 a 峰在 z = √2（约 8 delta）。',
-     '在作业的 5、25、50 三档里，所以是 25 对 b 最敏感、5 对 a 最敏感、50 对 c 最敏感。'],
-  s:'「因为 25 delta 在中间」：没有说出 vega 和距离两个量一增一减相乘的道理。'},
- {q:`讲义例子里平值从 20% 翻倍到 40%，90 的隐含波动率变成多少？如果你把 skew 记成「90 比平值贵 5 个点」，平值翻倍那天会错在哪？`,
-  a:['skew 是乘性的：90 占平值 125% 不变，所以变成 50%。',
-     '点差跟着翻倍，从 5 个点变成 10 个点。',
-     '按固定 5 个点记，你会以为 90 是 45%，低估 5 个点；拿它定价或对冲，翼会被系统性地算便宜。',
-     'TSLA 4/13 推算同样如此：300 的 put 按乘性是 102.2%，按加性只有 97.2%。'],
-  s:'「形状不变，所以还是贵 5 个点」：形状不变说的是比例不变，点数会跟着缩放。'},
- {q:`同一个比现价低 6% 的 put，7 天到期和 32 天到期，哪个更「虚值」？为什么画曲面要把横轴换成 ln(X/S)/√t？`,
-  a:['7 天到期的更虚值。7 天里能走的典型幅度只有 32 天的 √(7/32)，同样 6% 的距离折成标准差个数更多（TSLA 330 put：−1.28 对 −0.51）。',
-     '离中心的标准差个数越多，越靠近翼，隐含波动率占平值越高（113.7% 对 103.3%），所以按行权价画，近到期的 skew 更陡。',
-     '除以 √t 把不同到期日的距离换成同一把尺子，8 条微笑就能叠在一起；再除以平值，高度也对齐。',
-     '叠完之后，中间段基本重合（−0.3 处 104.1% 到 108.0%），两翼仍差 20 个点左右（−1.0 处 118.0% 到 140.5%），最高的是财报前最后一个到期日。'],
-  s:'「32 天的离到期远，所以更虚值」：把时间长短和距离远近弄反了。时间越长，同样的距离越容易走到。'},
- {q:`标的从 100 涨到 101，模型 delta −25 的 95 put 为什么只跌了 0.18？TSLA 的实测里，哪一侧符合这个结论，哪一侧不符合，为什么？`,
-  a:['按模型 delta 应跌 0.25。但标的上涨时微笑往右挪，95 更深地进入左翼，隐含波动率从 26% 升到 27%，vega 0.07 补回 0.07。',
-     '真实 delta ＝ 模型 delta ＋ vega × 隐含波动率的变化 ÷ 标的的变化，结果是 −18。',
-     'TSLA 4/13 到 5/8 每半小时的实测：put 一侧和推算几乎重合（25 delta：模型 −0.244，实测 −0.220）。',
-     'call 一侧不符合：推算应该缩小，实测反而大了约两成。这几周 TSLA 上涨时 call 那一侧的隐含波动率被抬高，微笑不只平移，形状也跟着变。'],
-  s:'「因为 put 有 theta」：一天之内的 theta 很小，这里说的是标的动 1 美元时 put 价格变多少。'},
- {q:`为什么把每一张间距 5 的蝶式都买下来，到期一定值 5？由此怎么从期权价格读出市场心里的概率？为什么要除以间距？`,
-  a:['每张蝶式只在到期价落在它中心附近时才值钱，中心被命中时值 5。',
-     '行权价覆盖所有可能的价格时，到期价总会落在某一张的中心，一整套恒等于 5。',
-     '期权今天的价格是到期价值按概率加权的期望值再折回今天（1.1）。一张蝶式到期要么值 5、要么值 0，所以它的价格 ＝ 命中的概率 × 5，再折回今天；反过来，概率 ＝ 价格 ÷ 5 × (1 ＋ r·t)。一整套恒等于 5，说明这些概率加起来是 1。',
-     '除以间距，是因为命中时蝶式值的就是间距；间距越细，每一格装的概率越少，蝶式也越便宜。TSLA 用拟合的微笑算，81 张合计 100.0%。'],
-  s:'「蝶式越贵说明越可能赚钱」：没说出「价格是到期价值的期望值折回今天」和「蝶式到期只有 5 和 0 两种结果」这两步，就推不出价格对应概率。'},
- {q:`你认为 TSLA 的 put 翼太贵，想只赌 skew 会变平，不赌方向、也不赌整体波动率。怎么搭？搭好以后还剩什么风险？`,
-  a:['卖低行权价的 put、买高行权价的 call（例如卖 325 put、买 390 call），vega 大致相等，一买一卖抵消 vega。',
-     '两张期权的 delta 都是正的（卖 put 是正、买 call 是正），合计约 +0.5，卖约 50 股标的补成 delta 中性。',
-     '赚钱的条件是建仓这两个行权价的隐含波动率之差变小（325 相对 390 变便宜）。这只在建仓那一刻等于 25 delta put 减 call 变小：TSLA 之后 25 delta 的差从 +3.04 变成 −3.19，但标的上涨把 325 推进了左翼深处，325 与 390 的差到 5/1 反而从 3.0 拉大到 11.1 个点。要跟着 25 delta 度量走，重新对冲时得把腿换到新的 25 delta 行权价。',
-     '中性只在建仓那一刻成立：标的一动，两条腿的 delta、vega、gamma 都变，要不断重新对冲；标的大幅上涨时 call 变成实值，这一组不再只是在赌形状。'],
-  s:'「买 call 卖 put 就行」：没有补 delta，这其实是一个看涨的合成多头。'}
+ {q:L(`如果市场完全相信 Black-Scholes，同一个到期日各个行权价的隐含波动率应该画成什么形状？TSLA 4/13 实际画出来是什么形状，这说明市场相信什么？`,`If the market fully believed Black-Scholes, what shape should the implied volatilities of the strikes of one expiration draw? What shape did TSLA actually draw on 4/13, and what does that say the market believes?`),
+  a:[L('Black-Scholes 对一个标的只用一个 σ，同一到期日每张期权反推出来的 σ 都该一样，画出来是一条水平线。','Black-Scholes uses a single σ for an underlying, so every option of one expiration should back out the same σ, and the chart is a horizontal line.'),
+     L('TSLA 实际是一条微笑：200 的 put 86.5%，平值 46%，500 的 call 53.5%，两头高，左头更高。','TSLA actually draws a smile: the 200 put at 86.5%, at-the-money 46%, the 500 call at 53.5%; high at both ends, higher on the left.'),
+     L('两头高，说明市场认为大涨大跌比钟形算的多（正峰度）；左头更高，说明市场认为大跌比大涨更可能、更猛（负偏）。','High at both ends means the market thinks large rises and falls are more common than the bell shape says (positive kurtosis); higher on the left means it thinks large falls are more likely and more violent than large rises (negative skew).'),
+     L('这正是节点 7 讲的两条假设失效：分布两头长，下跌时波动更大。','These are exactly the two failed assumptions from node 7: the distribution has long tails, and volatility is higher on the way down.')],
+  s:L('「因为虚值期权便宜，大家爱买」：只说了需求，没说出曲线形状对应的是市场眼中的分布。','"OTM options are cheap, so people like buying them": that only talks about demand, and does not say that the curve\'s shape corresponds to the distribution the market sees.')},
+ {q:L(`y = a z² + b z + c 的三个数各管什么？为什么 ±25 delta 的期权对 b 最敏感、±5 delta 的对 a 最敏感、平值对 c 最敏感？`,`What does each of the three numbers in y = a z² + b z + c control? Why are ±25 delta options most sensitive to b, ±5 delta most sensitive to a, and at-the-money most sensitive to c?`),
+  a:[L('c 是整体高度，b 是倾斜（每个标准差加减几个点），a 是弯曲（离中心 z 个标准差加 a·z² 个点）。','c is the overall height, b is the tilt (points added or subtracted per standard deviation), a is the bend (a·z² points added z standard deviations from the center).'),
+     L('某个数加 1 点，一张期权的隐含波动率分别变 1、z、z² 个点；价格变化再乘上这张期权的 vega。','When one number rises 1 point, an option\'s implied volatility changes by 1, z or z² points respectively; the price change then multiplies by that option\'s vega.'),
+     L('vega 在平值最大、往两边变小，z 在平值是 0、往两边变大，乘积的峰落在中间某处：对 b 峰在 z = 1（约 16 delta），对 a 峰在 z = √2（约 8 delta）。','vega is largest at-the-money and smaller toward both sides; z is 0 at-the-money and grows toward both sides; their product peaks somewhere in between: for b at z = 1 (about 16 delta), for a at z = √2 (about 8 delta).'),
+     L('在作业的 5、25、50 三档里，所以是 25 对 b 最敏感、5 对 a 最敏感、50 对 c 最敏感。','Among the homework\'s three deltas, 5, 25 and 50, that makes 25 most sensitive to b, 5 most sensitive to a, and 50 most sensitive to c.')],
+  s:L('「因为 25 delta 在中间」：没有说出 vega 和距离两个量一增一减相乘的道理。','"Because 25 delta is in the middle": that leaves out the reason, the product of two quantities, vega and distance, one growing while the other shrinks.')},
+ {q:L(`讲义例子里平值从 20% 翻倍到 40%，90 的隐含波动率变成多少？如果你把 skew 记成「90 比平值贵 5 个点」，平值翻倍那天会错在哪？`,`In the lecture's example at-the-money doubles from 20% to 40%. What does the 90's implied volatility become? If you recorded skew as "90 is 5 points over at-the-money", where would you go wrong on the day at-the-money doubles?`),
+  a:[L('skew 是乘性的：90 占平值 125% 不变，所以变成 50%。','Skew is multiplicative: the 90 stays at 125% of at-the-money, so it becomes 50%.'),
+     L('点差跟着翻倍，从 5 个点变成 10 个点。','The spread in points doubles with it, from 5 points to 10 points.'),
+     L('按固定 5 个点记，你会以为 90 是 45%，低估 5 个点；拿它定价或对冲，翼会被系统性地算便宜。','Recorded as a fixed 5 points, you would take the 90 to be 45%, 5 points too low; price or hedge with it and the wings come out systematically too cheap.'),
+     L('TSLA 4/13 推算同样如此：300 的 put 按乘性是 102.2%，按加性只有 97.2%。','The same holds for the TSLA 4/13 projection: the 300 put is 102.2% multiplicatively, only 97.2% additively.')],
+  s:L('「形状不变，所以还是贵 5 个点」：形状不变说的是比例不变，点数会跟着缩放。','"The shape is unchanged, so it is still 5 points more expensive": an unchanged shape means the proportion is unchanged; the points scale with it.')},
+ {q:L(`同一个比现价低 6% 的 put，7 天到期和 32 天到期，哪个更「虚值」？为什么画曲面要把横轴换成 ln(X/S)/√t？`,`For the same put 6% below the current price, which is more "out of the money", the 7-day or the 32-day? Why change the surface's horizontal axis to ln(X/S)/√t?`),
+  a:[L('7 天到期的更虚值。7 天里能走的典型幅度只有 32 天的 √(7/32)，同样 6% 的距离折成标准差个数更多（TSLA 330 put：−1.28 对 −0.51）。','The 7-day is further out of the money. The typical move over 7 days is only √(7/32) of the move over 32 days, so the same 6% distance is more standard deviations (TSLA 330 put: −1.28 against −0.51).'),
+     L('离中心的标准差个数越多，越靠近翼，隐含波动率占平值越高（113.7% 对 103.3%），所以按行权价画，近到期的 skew 更陡。','The more standard deviations from the center, the closer to the wing and the higher the implied volatility as a share of at-the-money (113.7% against 103.3%), so drawn by strike, near-term skew is steeper.'),
+     L('除以 √t 把不同到期日的距离换成同一把尺子，8 条微笑就能叠在一起；再除以平值，高度也对齐。','Dividing by √t puts the distances of different expirations on the same ruler, so the 8 smiles can be laid on top of each other; dividing again by at-the-money lines up the heights too.'),
+     L('叠完之后，中间段基本重合（−0.3 处 104.1% 到 108.0%），两翼仍差 20 个点左右（−1.0 处 118.0% 到 140.5%），最高的是财报前最后一个到期日。','After stacking, the middle section largely coincides (104.1% to 108.0% at −0.3), while the wings are still about 20 points apart (118.0% to 140.5% at −1.0), highest the last expiration before earnings.')],
+  s:L('「32 天的离到期远，所以更虚值」：把时间长短和距离远近弄反了。时间越长，同样的距离越容易走到。','"The 32-day is further from expiration, so it is further out of the money": that swaps time and distance. The longer the time, the easier it is to cover the same distance.')},
+ {q:L(`标的从 100 涨到 101，模型 delta −25 的 95 put 为什么只跌了 0.18？TSLA 的实测里，哪一侧符合这个结论，哪一侧不符合，为什么？`,`The underlying rises from 100 to 101. Why does the 95 put with model delta −25 fall only 0.18? In TSLA's measurements, which side fits this result, which does not, and why?`),
+  a:[L('按模型 delta 应跌 0.25。但标的上涨时微笑往右挪，95 更深地进入左翼，隐含波动率从 26% 升到 27%，vega 0.07 补回 0.07。','By model delta it should fall 0.25. But as the underlying rises the smile shifts right, the 95 goes deeper into the left wing, its implied volatility rises from 26% to 27%, and a vega of 0.07 adds back 0.07.'),
+     L('真实 delta ＝ 模型 delta ＋ vega × 隐含波动率的变化 ÷ 标的的变化，结果是 −18。','True delta = model delta + vega × change in implied volatility ÷ change in the underlying, which gives −18.'),
+     L('TSLA 4/13 到 5/8 每半小时的实测：put 一侧和推算几乎重合（25 delta：模型 −0.244，实测 −0.220）。','TSLA\'s half-hourly measurements from 4/13 to 5/8: the put side almost coincides with the estimate (25 delta: model −0.244, measured −0.220).'),
+     L('call 一侧不符合：推算应该缩小，实测反而大了约两成。这几周 TSLA 上涨时 call 那一侧的隐含波动率被抬高，微笑不只平移，形状也跟着变。','The call side does not fit: the estimate says it should shrink, but measured it was about 20% larger. In these weeks, when TSLA rose, call-side implied volatility was lifted; the smile did not just shift, its shape changed too.')],
+  s:L('「因为 put 有 theta」：一天之内的 theta 很小，这里说的是标的动 1 美元时 put 价格变多少。','"Because the put has theta": theta within one day is tiny; the question is how much the put\'s price changes when the underlying moves $1.')},
+ {q:L(`为什么把每一张间距 5 的蝶式都买下来，到期一定值 5？由此怎么从期权价格读出市场心里的概率？为什么要除以间距？`,`Why is a full set of butterflies 5 wide certain to be worth 5 at expiration? How does that let you read the market's probabilities from option prices? Why divide by the spacing?`),
+  a:[L('每张蝶式只在到期价落在它中心附近时才值钱，中心被命中时值 5。','Each butterfly is worth something only when the price at expiration lands near its center, and it is worth 5 when the center is hit.'),
+     L('行权价覆盖所有可能的价格时，到期价总会落在某一张的中心，一整套恒等于 5。','When the strikes cover every possible price, the price at expiration always lands on some butterfly\'s center, so the whole set is always worth 5.'),
+     L('期权今天的价格是到期价值按概率加权的期望值再折回今天（1.1）。一张蝶式到期要么值 5、要么值 0，所以它的价格 ＝ 命中的概率 × 5，再折回今天；反过来，概率 ＝ 价格 ÷ 5 × (1 ＋ r·t)。一整套恒等于 5，说明这些概率加起来是 1。','An option\'s price today is the probability-weighted expected value at expiration, discounted to today (1.1). A butterfly is worth either 5 or 0 at expiration, so its price = probability of a hit × 5, discounted to today; in reverse, probability = price ÷ 5 × (1 + r·t). The whole set is always worth 5, so these probabilities add up to 1.'),
+     L('除以间距，是因为命中时蝶式值的就是间距；间距越细，每一格装的概率越少，蝶式也越便宜。TSLA 用拟合的微笑算，81 张合计 100.0%。','Divide by the spacing because a butterfly is worth exactly the spacing when hit; the finer the spacing, the less probability each bin holds and the cheaper the butterfly. Computed from TSLA\'s fitted smile, the 81 butterflies total 100.0%.')],
+  s:L('「蝶式越贵说明越可能赚钱」：没说出「价格是到期价值的期望值折回今天」和「蝶式到期只有 5 和 0 两种结果」这两步，就推不出价格对应概率。','"A more expensive butterfly is more likely to make money": without the two steps "the price is the expected value at expiration discounted to today" and "a butterfly has only two outcomes at expiration, 5 or 0", you cannot get from price to probability.')},
+ {q:L(`你认为 TSLA 的 put 翼太贵，想只赌 skew 会变平，不赌方向、也不赌整体波动率。怎么搭？搭好以后还剩什么风险？`,`You think TSLA's put wing is too expensive and want to bet only that skew will flatten, without betting on direction or on overall volatility. How do you build it? Once built, what risk is left?`),
+  a:[L('卖低行权价的 put、买高行权价的 call（例如卖 325 put、买 390 call），vega 大致相等，一买一卖抵消 vega。','Sell a low-strike put and buy a high-strike call (for example, sell the 325 put and buy the 390 call); their vegas are roughly equal, so selling one and buying the other cancels vega.'),
+     L('两张期权的 delta 都是正的（卖 put 是正、买 call 是正），合计约 +0.5，卖约 50 股标的补成 delta 中性。','Both options have positive delta (a short put is positive, a long call is positive), about +0.5 in total, so sell about 50 shares of the underlying to make it delta neutral.'),
+     L('赚钱的条件是建仓这两个行权价的隐含波动率之差变小（325 相对 390 变便宜）。这只在建仓那一刻等于 25 delta put 减 call 变小：TSLA 之后 25 delta 的差从 +3.04 变成 −3.19，但标的上涨把 325 推进了左翼深处，325 与 390 的差到 5/1 反而从 3.0 拉大到 11.1 个点。要跟着 25 delta 度量走，重新对冲时得把腿换到新的 25 delta 行权价。','It makes money if the gap between the implied volatilities of the two entry strikes narrows (325 gets cheaper relative to 390). Only at the moment of entry is that the same as the 25 delta put minus call narrowing: afterwards TSLA\'s 25 delta difference went from +3.04 to −3.19, but the rise in the underlying pushed 325 deep into the left wing, and the 325 to 390 gap actually widened from 3.0 to 11.1 points by 5/1. To follow the 25 delta measure, each rehedge has to move the legs to the new 25 delta strikes.'),
+     L('中性只在建仓那一刻成立：标的一动，两条腿的 delta、vega、gamma 都变，要不断重新对冲；标的大幅上涨时 call 变成实值，这一组不再只是在赌形状。','Neutrality holds only at the moment of entry: once the underlying moves, both legs\' delta, vega and gamma change and have to be rehedged again and again; if the underlying rises sharply the call goes in the money, and the position is no longer just a bet on the shape.')],
+  s:L('「买 call 卖 put 就行」：没有补 delta，这其实是一个看涨的合成多头。','"Just buy the call and sell the put": without the delta hedge, this is actually a bullish synthetic long.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1092,7 +1098,20 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fmk${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-8-q'+i); if(v) t.value=v; }catch(e){}
@@ -1101,8 +1120,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fmk'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? L('对照参考答案','Compare with the reference answer') : L('收起参考答案','Hide the reference answer');
+    $('fmk'+i).textContent = (!a.hidden && t.value.trim().length<20) ? L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 

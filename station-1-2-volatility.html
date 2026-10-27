@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>波动率</title>
+<script src="lang.js"></script><script>document.title=L('波动率','Volatility');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2023C10%2023%2011.5%208%2016%208S22%2023%2027%2023'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,335 +206,336 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   .formula .math{font-size:1.05rem}
   .vb{grid-template-columns:5.6rem 1fr 3.8rem;gap:.5rem}
 }
+span.l-zh,span.l-en{display:contents}
 </style>
 </head>
 <body>
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 宽度</a><a href="#s1">一 价格怎么动</a><a href="#s2">二 检验假设</a><a href="#s3">三 时间缩放</a>
-  <a href="#s4">四 量出波动率</a><a href="#s5">五 两种区间</a><a href="#s6">六 离中心多远</a><a href="#s7">七 四种波动率</a><a href="#s8">八 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 宽度</span><span class="l-en">0 Width</span></a><a href="#s1"><span class="l-zh">一 价格怎么动</span><span class="l-en">1 How prices move</span></a><a href="#s2"><span class="l-zh">二 检验假设</span><span class="l-en">2 Testing the assumptions</span></a><a href="#s3"><span class="l-zh">三 时间缩放</span><span class="l-en">3 Time scaling</span></a>
+  <a href="#s4"><span class="l-zh">四 量出波动率</span><span class="l-en">4 Measuring volatility</span></a><a href="#s5"><span class="l-zh">五 两种区间</span><span class="l-en">5 Two kinds of range</span></a><a href="#s6"><span class="l-zh">六 离中心多远</span><span class="l-en">6 Distance from the center</span></a><a href="#s7"><span class="l-zh">七 四种波动率</span><span class="l-en">7 Four kinds of volatility</span></a><a href="#s8"><span class="l-zh">八 费曼检验</span><span class="l-en">8 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 1.2</p>
-  <h1>波动率</h1>
-  <p class="lede">1.1 定下了分布的中心：远期价。这一节定分布的宽度：到期时标的大概会离中心多远。案例还是同一笔交易，2026-04-13 收盘买入 TSLA 5/15 到期的 350 call。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 1.2</span><span class="l-en">FIN 580 review · Node 1.2</span></p>
+  <h1><span class="l-zh">波动率</span><span class="l-en">Volatility</span></h1>
+  <p class="lede"><span class="l-zh">1.1 定下了分布的中心：远期价。这一节定分布的宽度：到期时标的大概会离中心多远。案例还是同一笔交易，2026-04-13 收盘买入 TSLA 5/15 到期的 350 call。</span><span class="l-en">Node 1.1 set the center of the distribution: the forward price. This node sets its width: roughly how far from the center the underlying will be at expiration. The case is the same trade: a TSLA 350 call expiring 5/15, bought at the 2026-04-13 close.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>宽度是什么</h2>
-  <p class="sub">1.1 的玩具模型里，中心放在 352，五个价格的间距要拉到约 49，理论价值才追上市场的 21.05。那个间距是在猜：到期时 TSLA 大概会离中心多远。波动率就是量这段距离的尺子。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>宽度是什么</span><span class="l-en"><span class="n">0</span>What width means</span></h2>
+  <p class="sub"><span class="l-zh">1.1 的玩具模型里，中心放在 352，五个价格的间距要拉到约 49，理论价值才追上市场的 21.05。那个间距是在猜：到期时 TSLA 大概会离中心多远。波动率就是量这段距离的尺子。</span><span class="l-en">In the toy model of 1.1, with the center at 352, the spacing between the five prices had to be stretched to about 49 before the theoretical value caught up with the market's 21.05. That spacing was a guess at how far from the center TSLA might be at expiration. Volatility is the ruler that measures this distance.</span></p>
 
-  <h3>先说标准差</h3>
-  <p>一组数有大有小。把每个数离中心的距离取一个典型值，就是<span class="sym" data-say="standard deviation。先把每个数离中心的距离平方，求平均，再开平方根。平方是为了让正负距离都算成正的。">标准差</span>。如果这组数是钟形分布（中间多、两头少），落在中心附近的比例是固定的：</p>
+  <h3><span class="l-zh">先说标准差</span><span class="l-en">First, standard deviation</span></h3>
+  <p><span class="l-zh">一组数有大有小。把每个数离中心的距离取一个典型值，就是<span class="sym" data-say="standard deviation。先把每个数离中心的距离平方，求平均，再开平方根。平方是为了让正负距离都算成正的。">标准差</span>。如果这组数是钟形分布（中间多、两头少），落在中心附近的比例是固定的：</span><span class="l-en">A set of numbers has large and small values. A typical value of each number's distance from the center is the <span class="sym" data-say="Standard deviation: square each number's distance from the center, take the average, then take the square root. Squaring makes distances on both sides count as positive.">standard deviation</span>. If the numbers follow a bell-shaped distribution (many in the middle, few at the ends), the share that falls near the center is fixed:</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="gtPlay">再落一遍</button></div>
-    <div class="stage"><canvas id="gt" width="264" height="150" aria-label="1000 颗小球落过 24 排钉子，在底部堆成钟形"></canvas></div>
+    <div class="bar"><button class="btn ghost" id="gtPlay"><span class="l-zh">再落一遍</span><span class="l-en">Drop again</span></button></div>
+    <div class="stage"><canvas id="gt" width="264" height="150" aria-label="1000 颗小球落过 24 排钉子，在底部堆成钟形" data-en-aria-label="1000 balls fall through 24 rows of pegs and pile up in a bell shape at the bottom"></canvas></div>
     <div class="legend">
-      <span><i style="background:var(--ink)"></i>±1 个标准差以内</span>
-      <span><i class="rp" data-k="2"></i>1 到 2 个标准差</span>
-      <span><i style="background:var(--control)"></i>2 个标准差以外</span>
-      <span>点线：钟形预测的高度</span>
+      <span class="l-zh"><span><i style="background:var(--ink)"></i>±1 个标准差以内</span></span><span class="l-en"><span><i style="background:var(--ink)"></i>within ±1 standard deviation</span></span>
+      <span><i class="rp" data-k="2"></i><span class="l-zh">1 到 2 个标准差</span><span class="l-en">1 to 2 standard deviations</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>2 个标准差以外</span><span class="l-en"><i style="background:var(--control)"></i>beyond 2 standard deviations</span></span>
+      <span><span class="l-zh">点线：钟形预测的高度</span><span class="l-en">dotted line: height predicted by the bell curve</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已落下</div><div class="d" id="gtN"></div><div class="d2">共 1000 颗</div></div>
-      <div class="stat"><div class="k">±1 个标准差以内</div><div class="d" id="gt1"></div><div class="d2" id="gt1b"></div></div>
-      <div class="stat"><div class="k">2 个标准差以外</div><div class="d" id="gt2" style="color:var(--control)"></div><div class="d2" id="gt2b"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已落下</span><span class="l-en">Dropped</span></div><div class="d" id="gtN"></div><div class="d2"><span class="l-zh">共 1000 颗</span><span class="l-en">1000 in total</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">±1 个标准差以内</span><span class="l-en">Within ±1 standard deviation</span></div><div class="d" id="gt1"></div><div class="d2" id="gt1b"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">2 个标准差以外</span><span class="l-en">Beyond 2 standard deviations</span></div><div class="d" id="gt2" style="color:var(--control)"></div><div class="d2" id="gt2b"></div></div>
     </div>
   </div>
-  <p>每颗球从顶上落下，要碰 24 排钉子，每碰一次随机往左或往右弹半格。最后落在哪一格，是这 24 次左右的总和。左右次数差不多的走法最多，所以中间收的球最多；24 次全往一边的走法只有一种，所以两头几乎是空的。很多个随机推力加在一起，堆出来就是钟形。</p>
-  <p>记住两句就够：<b>三次里有两次落在一个标准差以内</b>；<b>二十次里只有一次落在两个标准差以外</b>，只算往上的那一边是四十次里一次。</p>
+  <p><span class="l-zh">每颗球从顶上落下，要碰 24 排钉子，每碰一次随机往左或往右弹半格。最后落在哪一格，是这 24 次左右的总和。左右次数差不多的走法最多，所以中间收的球最多；24 次全往一边的走法只有一种，所以两头几乎是空的。很多个随机推力加在一起，堆出来就是钟形。</span><span class="l-en">Each ball falls from the top and hits 24 rows of pegs, bouncing half a slot left or right at random each time. Where it ends up is the sum of these 24 left and right moves. Paths with roughly equal numbers of lefts and rights are the most numerous, so the middle collects the most balls; there is only one path that goes the same way all 24 times, so the two ends are almost empty. Many random pushes added together pile up into a bell shape.</span></p>
+  <p><span class="l-zh">记住两句就够：<b>三次里有两次落在一个标准差以内</b>；<b>二十次里只有一次落在两个标准差以外</b>，只算往上的那一边是四十次里一次。</span><span class="l-en">Two statements are enough to remember: <b>two times out of three it lands within one standard deviation</b>; <b>only one time in twenty does it land beyond two standard deviations</b>, and counting only the upside, one time in forty.</span></p>
 
-  <h3>波动率的定义</h3>
+  <h3><span class="l-zh">波动率的定义</span><span class="l-en">Definition of volatility</span></h3>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="sigma，读作「西格玛」。年化波动率，写成百分比。">σ</span> ＝ 以一年为期、按百分比计的一个标准差</div>
-    <div class="gloss">TSLA 入场那天，市场给 350 call 定价用的 σ 是 46.3%。按这个报价，一年后 TSLA 大约三次里有两次落在远期价的 ±46.3% 以内。</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="sigma，读作「西格玛」。年化波动率，写成百分比。">σ</span> ＝ 以一年为期、按百分比计的一个标准差</span><span class="l-en"><span class="sym" data-say="Sigma: annualized volatility, written as a percentage.">σ</span> = one standard deviation over one year, in percent</span></div>
+    <div class="gloss"><span class="l-zh">TSLA 入场那天，市场给 350 call 定价用的 σ 是 46.3%。按这个报价，一年后 TSLA 大约三次里有两次落在远期价的 ±46.3% 以内。</span><span class="l-en">On the entry day, the market priced the 350 call with σ = 46.3%. By that quote, one year from now TSLA would be within ±46.3% of the forward price about two times out of three.</span></div>
   </div>
-  <p>期权的期限一般不是一年，要换成期限内的一个标准差，以美元计：</p>
+  <p><span class="l-zh">期权的期限一般不是一年，要换成期限内的一个标准差，以美元计：</span><span class="l-en">An option's term is usually not one year, so convert to one standard deviation over the term, in dollars:</span></p>
   <div class="formula">
-    <div class="math">一个标准差 ＝ <span class="sym" data-say="远期价。1.1 讲过：F = S(1 + r·t) − D，是分布的中心。">F</span> × <span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="到期时间 t（以年计）的平方根。32 天是 32/365 年，平方根约 0.296。为什么是平方根，第三节讲。">√t</span></div>
-    <div class="gloss">远期价 × 年化波动率 × 年数的平方根</div>
+    <div class="math"><span class="l-zh">一个标准差 ＝ <span class="sym" data-say="远期价。1.1 讲过：F = S(1 + r·t) − D，是分布的中心。">F</span> × <span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="到期时间 t（以年计）的平方根。32 天是 32/365 年，平方根约 0.296。为什么是平方根，第三节讲。">√t</span></span><span class="l-en">One standard deviation = <span class="sym" data-say="Forward price. From 1.1: F = S(1 + r·t) − D, the center of the distribution.">F</span> × <span class="sym" data-say="Annualized volatility.">σ</span> × <span class="sym" data-say="Square root of the time to expiration t (in years). 32 days is 32/365 years, whose square root is about 0.296. Section 3 explains why it is a square root.">√t</span></span></div>
+    <div class="gloss"><span class="l-zh">远期价 × 年化波动率 × 年数的平方根</span><span class="l-en">forward price × annualized volatility × square root of the number of years</span></div>
     <div class="note" id="oneSd"></div>
   </div>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>价格怎么动</h2>
-  <p class="sub">〇节的钉板里，每颗球的落点是 24 次随机左右推的总和。常用的股价模型也把价格看成被很多随机推力推着走，这个模型来自物理学里的布朗运动。</p>
+  <h2><span class="l-zh"><span class="n">一</span>价格怎么动</span><span class="l-en"><span class="n">1</span>How prices move</span></h2>
+  <p class="sub"><span class="l-zh">〇节的钉板里，每颗球的落点是 24 次随机左右推的总和。常用的股价模型也把价格看成被很多随机推力推着走，这个模型来自物理学里的布朗运动。</span><span class="l-en">On the peg board in section 0, each ball's landing spot is the sum of 24 random left and right pushes. The usual stock price model also treats price as pushed along by many random pushes; the model comes from Brownian motion in physics.</span></p>
 
-  <h3>布朗运动</h3>
-  <p>1827 年，植物学家布朗（Robert Brown）在显微镜下观察水里的花粉，看到花粉里掉出来的细小微粒一直在乱动，不会停下来。他换成磨碎的石头粉，也一样动，所以这不是生命现象。</p>
-  <p>1905 年，爱因斯坦给出了解释。水由大量分子组成，分子一直在乱跑，从四面八方撞这颗微粒。每一下都很轻，方向随机。某一瞬间左边撞得多一点，微粒就往右挪一点；下一瞬间换成别的方向多一点。微粒看起来在自己乱走，其实是被推着走。</p>
+  <h3><span class="l-zh">布朗运动</span><span class="l-en">Brownian motion</span></h3>
+  <p><span class="l-zh">1827 年，植物学家布朗（Robert Brown）在显微镜下观察水里的花粉，看到花粉里掉出来的细小微粒一直在乱动，不会停下来。他换成磨碎的石头粉，也一样动，所以这不是生命现象。</span><span class="l-en">In 1827 the botanist Robert Brown looked at pollen in water under a microscope and saw tiny particles from the pollen moving about constantly, never stopping. When he switched to ground-up stone dust, it moved the same way, so it was not a sign of life.</span></p>
+  <p><span class="l-zh">1905 年，爱因斯坦给出了解释。水由大量分子组成，分子一直在乱跑，从四面八方撞这颗微粒。每一下都很轻，方向随机。某一瞬间左边撞得多一点，微粒就往右挪一点；下一瞬间换成别的方向多一点。微粒看起来在自己乱走，其实是被推着走。</span><span class="l-en">In 1905 Einstein explained it. Water is made of a huge number of molecules that move about constantly and hit the particle from all directions. Each hit is very light and its direction is random. If at one instant slightly more hits come from the left, the particle moves a little to the right; at the next instant a different direction dominates. The particle seems to wander by itself, but it is being pushed.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="molSeg">
-        <button data-v="1" aria-pressed="true">显示水分子</button>
-        <button data-v="0" aria-pressed="false">隐藏水分子</button>
+        <button data-v="1" aria-pressed="true"><span class="l-zh">显示水分子</span><span class="l-en">Show water molecules</span></button>
+        <button data-v="0" aria-pressed="false"><span class="l-zh">隐藏水分子</span><span class="l-en">Hide water molecules</span></button>
       </div>
-      <button class="btn ghost" id="bmBtn">再来一次</button>
+      <button class="btn ghost" id="bmBtn"><span class="l-zh">再来一次</span><span class="l-en">Run again</span></button>
     </div>
-    <div class="stage"><canvas id="bm" width="264" height="124" aria-label="水分子撞击一颗微粒；右边是微粒的高低随时间的变化"></canvas></div>
+    <div class="stage"><canvas id="bm" width="264" height="124" aria-label="水分子撞击一颗微粒；右边是微粒的高低随时间的变化" data-en-aria-label="Water molecules hitting a particle; on the right, the particle's height over time"></canvas></div>
     <div class="legend">
-      <span><i style="background:var(--ink-faint);width:.3rem;height:.3rem;vertical-align:.1rem"></i>水分子</span>
-      <span><i style="background:var(--ink)"></i>微粒</span>
-      <span><i style="background:var(--control);height:2px;vertical-align:.2rem"></i>微粒走过的路</span>
-      <span>右图：微粒的高低；疏点线：出发时的高度</span>
+      <span><span class="l-zh"><i style="background:var(--ink-faint);width:.3rem;height:.3rem;vertical-align:.1rem"></i>水分子</span><span class="l-en"><i style="background:var(--ink-faint);width:.3rem;height:.3rem;vertical-align:.1rem"></i>water molecules</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink)"></i>微粒</span><span class="l-en"><i style="background:var(--ink)"></i>particle</span></span>
+      <span><span class="l-zh"><i style="background:var(--control);height:2px;vertical-align:.2rem"></i>微粒走过的路</span><span class="l-en"><i style="background:var(--control);height:2px;vertical-align:.2rem"></i>path of the particle</span></span>
+      <span><span class="l-zh">右图：微粒的高低；疏点线：出发时的高度</span><span class="l-en">right chart: the particle's height; sparse dotted line: starting height</span></span>
     </div>
   </div>
-  <p>只看微粒的高低，随时间画出来，就是右图。它和股价图长得很像。</p>
-  <p>这条线有两个性质，后面都要用到：</p>
+  <p><span class="l-zh">只看微粒的高低，随时间画出来，就是右图。它和股价图长得很像。</span><span class="l-en">Plot only the particle's height over time and you get the chart on the right. It looks a lot like a stock chart.</span></p>
+  <p><span class="l-zh">这条线有两个性质，后面都要用到：</span><span class="l-en">This line has two properties that we will use later:</span></p>
   <ul>
-    <li>每一下撞击和上一下无关，所以微粒这一步往哪走，和上一步往哪走无关。</li>
-    <li>离起点的典型距离随时间变大，但按时间的平方根变大：时间变成 4 倍，距离只变成 2 倍。第三节讲原因。</li>
+    <li><span class="l-zh">每一下撞击和上一下无关，所以微粒这一步往哪走，和上一步往哪走无关。</span><span class="l-en">Each hit is unrelated to the previous one, so the direction of the particle's next step is unrelated to the direction of its last step.</span></li>
+    <li><span class="l-zh">离起点的典型距离随时间变大，但按时间的平方根变大：时间变成 4 倍，距离只变成 2 倍。第三节讲原因。</span><span class="l-en">The typical distance from the starting point grows with time, but with the square root of time: four times the time gives only twice the distance. Section 3 explains why.</span></li>
   </ul>
 
-  <h3>搬到股价上：四个假设</h3>
-  <p>1900 年，巴黎的博士生 Bachelier 在论文里把同样的模型用在巴黎交易所的债券价格上，并用它给债券期权定价，比爱因斯坦解释花粉还早 5 年。对应关系是：股价是那颗微粒，每一笔买卖、每一条新消息是撞它的分子。</p>
-  <p>用这个模型画股价，等于接受下面四个假设。</p>
+  <h3><span class="l-zh">搬到股价上：四个假设</span><span class="l-en">Moving it to stock prices: four assumptions</span></h3>
+  <p><span class="l-zh">1900 年，巴黎的博士生 Bachelier 在论文里把同样的模型用在巴黎交易所的债券价格上，并用它给债券期权定价，比爱因斯坦解释花粉还早 5 年。对应关系是：股价是那颗微粒，每一笔买卖、每一条新消息是撞它的分子。</span><span class="l-en">In 1900 Bachelier, a doctoral student in Paris, applied the same model to bond prices on the Paris exchange in his thesis and used it to price bond options, five years before Einstein explained the pollen. The correspondence: the stock price is the particle, and each trade and each piece of news is a molecule hitting it.</span></p>
+  <p><span class="l-zh">用这个模型画股价，等于接受下面四个假设。</span><span class="l-en">Drawing stock prices with this model means accepting the four assumptions below.</span></p>
   <table>
-    <thead><tr><th>假设</th><th class="txt">说的是什么</th></tr></thead>
+    <thead><tr><th><span class="l-zh">假设</span><span class="l-en">Assumption</span></th><th class="txt"><span class="l-zh">说的是什么</span><span class="l-en">What it says</span></th></tr></thead>
     <tbody>
-      <tr><td>① 每天独立</td><td class="txt">今天的涨跌和以前的涨跌无关。昨天大涨，不说明今天更可能涨，也不说明更可能跌。</td></tr>
-      <tr><td>② 每天同一个钟形</td><td class="txt">每天的涨跌都来自同一个分布：形状是钟形，宽度每天一样。</td></tr>
-      <tr><td>③ 按比例</td><td class="txt">涨跌按当前价格的百分比算。股价 100 时涨 3% 的可能性，和股价 400 时涨 3% 一样。Bachelier 当年按美元加减算；1959 年 Osborne 改成按比例算，1973 年的 Black-Scholes 期权定价公式用的也是按比例。</td></tr>
-      <tr><td>④ 漂移当 0</td><td class="txt">平均每天的涨幅很小，只看几周时可以当成 0。</td></tr>
+      <tr><td><span class="l-zh">① 每天独立</span><span class="l-en">① Days are independent</span></td><td class="txt"><span class="l-zh">今天的涨跌和以前的涨跌无关。昨天大涨，不说明今天更可能涨，也不说明更可能跌。</span><span class="l-en">Today's change is unrelated to past changes. A big rise yesterday does not make a rise today more likely, nor a fall.</span></td></tr>
+      <tr><td><span class="l-zh">② 每天同一个钟形</span><span class="l-en">② The same bell shape every day</span></td><td class="txt"><span class="l-zh">每天的涨跌都来自同一个分布：形状是钟形，宽度每天一样。</span><span class="l-en">Every day's change comes from the same distribution: bell-shaped, with the same width every day.</span></td></tr>
+      <tr><td><span class="l-zh">③ 按比例</span><span class="l-en">③ Proportional</span></td><td class="txt"><span class="l-zh">涨跌按当前价格的百分比算。股价 100 时涨 3% 的可能性，和股价 400 时涨 3% 一样。Bachelier 当年按美元加减算；1959 年 Osborne 改成按比例算，1973 年的 Black-Scholes 期权定价公式用的也是按比例。</span><span class="l-en">Changes are percentages of the current price. A 3% rise is as likely at a price of 100 as at 400. Bachelier worked with dollar additions and subtractions; in 1959 Osborne switched to proportional changes, and the 1973 Black-Scholes option pricing formula is proportional as well.</span></td></tr>
+      <tr><td><span class="l-zh">④ 漂移当 0</span><span class="l-en">④ Drift taken as 0</span></td><td class="txt"><span class="l-zh">平均每天的涨幅很小，只看几周时可以当成 0。</span><span class="l-en">The average daily rise is very small and can be taken as 0 over a few weeks.</span></td></tr>
     </tbody>
   </table>
 
-  <h3>为什么这些假设可能是真的</h3>
-  <p><b>① 能预测的涨跌会被提前买掉。</b>假设昨天大涨之后，今天通常也涨。看出这个规律的人会在昨天收盘前买入，等今天涨了再卖。买的人一多，价格在昨天就涨上去了，今天就没得涨了。能从过去推出来的涨跌，会被交易提前用掉。剩下的涨跌来自事先不知道的新消息：财报比预期好还是差，政策怎么变。新消息事先没人知道，所以也没法从过去的涨跌里推出来。1965 年 Samuelson 把这个论证写成了数学证明。</p>
-  <p><b>② 很多小推力加在一起接近钟形。</b>一天的涨跌是成千上万笔买卖和很多条消息叠加的结果，和钉板上的球一样，也和微粒一秒钟里挨了很多下撞击一样。很多个互不相关的小随机量加在一起，不管每一个单独是什么形状，总和都接近钟形。这叫<span class="sym" data-say="central limit theorem。成立要三个条件：数量多；互不相关；没有哪一个大到能单独决定结果。第三个条件在第二节会出问题。">中心极限定理</span>。如果每天挨推的方式差不多，每天的宽度也就差不多。</p>
-  <p><b>③ 人们按百分比算盈亏。</b>同样涨 10 美元，对 50 美元的股票是 20%，对 500 美元的股票只是 2%。买股票的人看的是百分比：投 1 万美元，关心的是赚了百分之几。1 股拆成 3 股之后，股价变成三分之一，每天的美元波动也变成三分之一，百分比波动不变。按比例算还有一个好处：每一步最多跌掉当前价格的一部分，价格永远不会跌到 0 以下。</p>
-  <p><b>④ 漂移比波动小得多。</b>一只股票一年平均涨 10%，摊到每天约 0.04%。一天的标准差，大盘约 1%，TSLA 约 3% 到 4%。只看几周的时候，漂移造成的差别远小于波动。</p>
+  <h3><span class="l-zh">为什么这些假设可能是真的</span><span class="l-en">Why these assumptions might be true</span></h3>
+  <p><span class="l-zh"><b>① 能预测的涨跌会被提前买掉。</b>假设昨天大涨之后，今天通常也涨。看出这个规律的人会在昨天收盘前买入，等今天涨了再卖。买的人一多，价格在昨天就涨上去了，今天就没得涨了。能从过去推出来的涨跌，会被交易提前用掉。剩下的涨跌来自事先不知道的新消息：财报比预期好还是差，政策怎么变。新消息事先没人知道，所以也没法从过去的涨跌里推出来。1965 年 Samuelson 把这个论证写成了数学证明。</span><span class="l-en"><b>① Predictable moves get bought in advance.</b> Suppose that after a big rise yesterday, prices usually rise again today. Whoever spots this pattern buys before yesterday's close and sells after today's rise. Once enough people buy, the price rises yesterday, and there is nothing left to rise today. Moves that can be inferred from the past get used up by trading in advance. What remains comes from news that was not known beforehand: whether earnings beat or miss expectations, how policy changes. Nobody knows the news in advance, so it cannot be inferred from past changes either. In 1965 Samuelson turned this argument into a mathematical proof.</span></p>
+  <p><span class="l-zh"><b>② 很多小推力加在一起接近钟形。</b>一天的涨跌是成千上万笔买卖和很多条消息叠加的结果，和钉板上的球一样，也和微粒一秒钟里挨了很多下撞击一样。很多个互不相关的小随机量加在一起，不管每一个单独是什么形状，总和都接近钟形。这叫<span class="sym" data-say="central limit theorem。成立要三个条件：数量多；互不相关；没有哪一个大到能单独决定结果。第三个条件在第二节会出问题。">中心极限定理</span>。如果每天挨推的方式差不多，每天的宽度也就差不多。</span><span class="l-en"><b>② Many small pushes add up to something close to a bell.</b> A day's change is the combined result of thousands of trades and many pieces of news, like the balls on the peg board, or the particle taking many hits in one second. Many small random quantities that are unrelated to each other add up to something close to a bell shape, whatever the shape of each one. This is the <span class="sym" data-say="Central limit theorem. It needs three conditions: many quantities; unrelated to each other; none large enough to decide the result on its own. The third condition runs into trouble in section 2.">central limit theorem</span>. If the pushes arrive in a similar way every day, the width is also similar every day.</span></p>
+  <p><span class="l-zh"><b>③ 人们按百分比算盈亏。</b>同样涨 10 美元，对 50 美元的股票是 20%，对 500 美元的股票只是 2%。买股票的人看的是百分比：投 1 万美元，关心的是赚了百分之几。1 股拆成 3 股之后，股价变成三分之一，每天的美元波动也变成三分之一，百分比波动不变。按比例算还有一个好处：每一步最多跌掉当前价格的一部分，价格永远不会跌到 0 以下。</span><span class="l-en"><b>③ People count gains and losses in percent.</b> The same 10-dollar rise is 20% for a 50-dollar stock and only 2% for a 500-dollar stock. Stock buyers look at percentages: someone who invests 10,000 dollars cares what percent it made. After a 3-for-1 split the price becomes a third, the daily dollar moves become a third, and the percentage moves stay the same. Proportional changes have another advantage: each step can lose at most part of the current price, so the price never goes below 0.</span></p>
+  <p><span class="l-zh"><b>④ 漂移比波动小得多。</b>一只股票一年平均涨 10%，摊到每天约 0.04%。一天的标准差，大盘约 1%，TSLA 约 3% 到 4%。只看几周的时候，漂移造成的差别远小于波动。</span><span class="l-en"><b>④ Drift is much smaller than the fluctuations.</b> A stock that rises 10% a year on average gains about 0.04% a day. One day's standard deviation is about 1% for the broad market and about 3% to 4% for TSLA. Over a few weeks, the difference caused by drift is far smaller than the fluctuations.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>这些假设在 TSLA 上成立吗</h2>
-  <p class="sub">道理说得通，不等于真实数据就是这样。下面用 TSLA <span id="t0"></span> 共 <span id="tn"></span> 个交易日的收盘涨跌逐条检验。</p>
-  <p>检验 ① 和 ② 用同一个对照：把这 <span class="tnn"></span> 个涨跌随机打乱顺序。涨跌本身一个没变，只有先后变了。如果先后顺序里没有信息，真实数据和打乱后的数据应该看不出差别。每种检验都打乱 1000 次。</p>
+  <h2><span class="l-zh"><span class="n">二</span>这些假设在 TSLA 上成立吗</span><span class="l-en"><span class="n">2</span>Do these assumptions hold for TSLA?</span></h2>
+  <p class="sub"><span class="l-zh">道理说得通，不等于真实数据就是这样。下面用 TSLA </span><span class="l-en">The reasoning holds up, but that does not mean real data behaves this way. Below, each assumption is checked against TSLA, </span><span id="t0"></span><span class="l-zh"> 共 </span><span class="l-en"> a total of </span><span id="tn"></span><span class="l-zh"> 个交易日的收盘涨跌逐条检验。</span><span class="l-en"> trading days of daily closing changes.</span></p>
+  <p><span class="l-zh">检验 ① 和 ② 用同一个对照：把这 <span class="tnn"></span> 个涨跌随机打乱顺序。涨跌本身一个没变，只有先后变了。如果先后顺序里没有信息，真实数据和打乱后的数据应该看不出差别。每种检验都打乱 1000 次。</span><span class="l-en">Tests ① and ② use the same control: shuffle the order of these <span class="tnn"></span> changes at random. Not a single change is altered; only the order is. If the order carries no information, the real data and the shuffled data should look the same. Each test shuffles 1000 times.</span></p>
 
-  <h3>① 昨天的涨跌能不能预测今天：不能</h3>
+  <h3><span class="l-zh">① 昨天的涨跌能不能预测今天：不能</span><span class="l-en">① Can yesterday's change predict today's? No</span></h3>
   <div class="panel">
-    <div class="chart"><svg id="sc1" viewBox="0 0 460 410" role="img" aria-label="前一天涨跌与当天涨跌的散点图"></svg></div>
+    <div class="chart"><svg id="sc1" viewBox="0 0 460 410" role="img" aria-label="前一天涨跌与当天涨跌的散点图" data-en-aria-label="Scatter plot of the previous day's change against the same day's change"></svg></div>
     <div class="stats">
-      <div class="stat"><div class="k">真实顺序的相关系数</div><div class="d" id="c1" style="color:var(--control)"></div></div>
-      <div class="stat"><div class="k">打乱 1000 次，95% 落在</div><div class="d" id="c1r"></div></div>
-      <div class="stat"><div class="k">涨跌连续段</div><div class="d" id="runs"></div><div class="d2" id="runsb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">真实顺序的相关系数</span><span class="l-en">Correlation in the real order</span></div><div class="d" id="c1" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">打乱 1000 次，95% 落在</span><span class="l-en">1000 shuffles, 95% fall within</span></div><div class="d" id="c1r"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">涨跌连续段</span><span class="l-en">Up and down runs</span></div><div class="d" id="runs"></div><div class="d2" id="runsb"></div></div>
     </div>
   </div>
-  <p>如果昨天涨预示今天涨，这团点会沿左下到右上斜着排开。实际上它是一团，<span class="sym" data-say="correlation，在 −1 到 +1 之间。+1：一个大，另一个一定大；0：看不出关系；−1：一个大，另一个一定小。">相关系数</span> <b id="c1b"></b>，落在打乱顺序后的范围里面。</p>
-  <p>另一个看法是数涨跌连续段：连着涨算一段，连着跌算一段。真实数据有 <b id="runs2"></b> 段；如果每天涨跌由抛硬币决定，平均 <span id="runsE"></span> 段，95% 的情况在上下 <span id="runsS"></span> 段以内。两个检验都说明：知道过去的涨跌，对猜今天没有帮助。假设 ① 在 TSLA 上成立。</p>
+  <p><span class="l-zh">如果昨天涨预示今天涨，这团点会沿左下到右上斜着排开。实际上它是一团，<span class="sym" data-say="correlation，在 −1 到 +1 之间。+1：一个大，另一个一定大；0：看不出关系；−1：一个大，另一个一定小。">相关系数</span> </span><span class="l-en">If a rise yesterday signaled a rise today, the points would line up from lower left to upper right. Instead they form one blob, with a <span class="sym" data-say="Correlation, between −1 and +1. +1: when one is large, the other is always large; 0: no visible relation; −1: when one is large, the other is always small.">correlation</span> of </span><b id="c1b"></b><span class="l-zh">，落在打乱顺序后的范围里面。</span><span class="l-en">, inside the range of the shuffled orders.</span></p>
+  <p><span class="l-zh">另一个看法是数涨跌连续段：连着涨算一段，连着跌算一段。真实数据有 </span><span class="l-en">Another view is to count runs: consecutive up days form one run, consecutive down days form another. The real data has </span><b id="runs2"></b><span class="l-zh"> 段；如果每天涨跌由抛硬币决定，平均 </span><span class="l-en"> runs; if each day's direction were decided by a coin flip, the average would be </span><span id="runsE"></span><span class="l-zh"> 段，95% 的情况在上下 </span><span class="l-en"> runs, and 95% of the time within plus or minus </span><span id="runsS"></span><span class="l-zh"> 段以内。两个检验都说明：知道过去的涨跌，对猜今天没有帮助。假设 ① 在 TSLA 上成立。</span><span class="l-en"> runs of that. Both tests say the same thing: knowing past changes does not help you guess today. Assumption ① holds for TSLA.</span></p>
 
-  <h3>② 宽度每天一样吗：不一样，波动会扎堆</h3>
+  <h3><span class="l-zh">② 宽度每天一样吗：不一样，波动会扎堆</span><span class="l-en">② Is the width the same every day? No, volatility clusters</span></h3>
   <div class="panel">
-    <div class="chart"><svg id="sc2" viewBox="0 0 460 410" role="img" aria-label="这 21 天的波动率与下 21 天的波动率的散点图"></svg></div>
+    <div class="chart"><svg id="sc2" viewBox="0 0 460 410" role="img" aria-label="这 21 天的波动率与下 21 天的波动率的散点图" data-en-aria-label="Scatter plot of volatility over these 21 days against volatility over the next 21 days"></svg></div>
     <div class="stats">
-      <div class="stat"><div class="k">真实顺序的相关系数</div><div class="d" id="c2" style="color:var(--control)"></div></div>
-      <div class="stat"><div class="k">打乱 1000 次，95% 落在</div><div class="d" id="c2r"></div><div class="d2" id="c2m"></div></div>
-      <div class="stat"><div class="k">21 天波动率</div><div class="d" id="mvr"></div><div class="d2">最低 / 最高，年化</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">真实顺序的相关系数</span><span class="l-en">Correlation in the real order</span></div><div class="d" id="c2" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">打乱 1000 次，95% 落在</span><span class="l-en">1000 shuffles, 95% fall within</span></div><div class="d" id="c2r"></div><div class="d2" id="c2m"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">21 天波动率</span><span class="l-en">21-day volatility</span></div><div class="d" id="mvr"></div><div class="d2"><span class="l-zh">最低 / 最高，年化</span><span class="l-en">lowest / highest, annualized</span></div></div>
     </div>
   </div>
-  <p>把这些交易日按先后切成 <span id="nm"></span> 段，每段 21 个交易日（约一个月），各算一个年化波动率，再看相邻两段的关系。</p>
-  <p>点沿左下到右上排开，相关系数 <b id="c2b"></b>，<span id="c2say"></span>。波动大的一个月后面，下一个月的波动通常也大；平静的月份后面通常还是平静。宽度不是每天一样，假设 ② 的这一半不成立。</p>
+  <p><span class="l-zh">把这些交易日按先后切成 </span><span class="l-en">Split these trading days in order into </span><span id="nm"></span><span class="l-zh"> 段，每段 21 个交易日（约一个月），各算一个年化波动率，再看相邻两段的关系。</span><span class="l-en"> blocks of 21 trading days (about a month), compute an annualized volatility for each, and look at the relation between adjacent blocks.</span></p>
+  <p><span class="l-zh">点沿左下到右上排开，相关系数 </span><span class="l-en">The points line up from lower left to upper right, with a correlation of </span><b id="c2b"></b><span class="l-zh">，</span><span class="l-en">, </span><span id="c2say"></span><span class="l-zh">。波动大的一个月后面，下一个月的波动通常也大；平静的月份后面通常还是平静。宽度不是每天一样，假设 ② 的这一半不成立。</span><span class="l-en">. After a volatile month, the next month is usually volatile too; a calm month is usually followed by another calm one. The width is not the same every day, so this half of assumption ② fails.</span></p>
 
-  <h3>② 形状是钟形吗：中间更尖，两头更长</h3>
+  <h3><span class="l-zh">② 形状是钟形吗：中间更尖，两头更长</span><span class="l-en">② Is the shape a bell? Sharper in the middle, longer at the ends</span></h3>
   <div class="panel">
-    <svg id="hist" viewBox="0 0 720 280" role="img" aria-label="每天涨跌离平均值几个标准差的直方图，叠加钟形曲线"></svg>
+    <svg id="hist" viewBox="0 0 720 280" role="img" aria-label="每天涨跌离平均值几个标准差的直方图，叠加钟形曲线" data-en-aria-label="Histogram of how many standard deviations each day's change is from the mean, with the bell curve overlaid"></svg>
     <table style="max-width:30rem;margin-left:auto;margin-right:auto">
-      <thead><tr><th>离平均值</th><th>真实天数</th><th>钟形预测</th></tr></thead>
+      <thead><tr><th><span class="l-zh">离平均值</span><span class="l-en">From the mean</span></th><th><span class="l-zh">真实天数</span><span class="l-en">Actual days</span></th><th><span class="l-zh">钟形预测</span><span class="l-en">Bell curve predicts</span></th></tr></thead>
       <tbody id="bellTb"></tbody>
     </table>
   </div>
-  <p>把每天的涨跌换算成离平均值几个标准差，数每一档有多少天，和钟形预测的天数比。安静的日子比钟形多，中等幅度的日子比钟形少，极端的日子多很多。<span id="t5"></span></p>
+  <p><span class="l-zh">把每天的涨跌换算成离平均值几个标准差，数每一档有多少天，和钟形预测的天数比。安静的日子比钟形多，中等幅度的日子比钟形少，极端的日子多很多。</span><span class="l-en">Convert each day's change into the number of standard deviations from the mean, count the days in each bucket, and compare with the number of days the bell curve predicts. There are more quiet days than the bell curve predicts, fewer medium-sized days, and many more extreme days.</span><span id="t5"></span></p>
   <p id="whyTail"></p>
 
-  <h3>③ 按比例还是按加减：更接近按比例</h3>
+  <h3><span class="l-zh">③ 按比例还是按加减：更接近按比例</span><span class="l-en">③ Proportional or additive? Closer to proportional</span></h3>
   <table>
-    <thead><tr><th>前一天收盘</th><th>天数</th><th>平均价</th><th>一天的标准差<br>美元</th><th>一天的标准差<br>百分比</th></tr></thead>
+    <thead><tr><th><span class="l-zh">前一天收盘</span><span class="l-en">Previous close</span></th><th><span class="l-zh">天数</span><span class="l-en">Days</span></th><th><span class="l-zh">平均价</span><span class="l-en">Average price</span></th><th><span class="l-zh">一天的标准差<br>美元</span><span class="l-en">One-day standard deviation<br>dollars</span></th><th><span class="l-zh">一天的标准差<br>百分比</span><span class="l-en">One-day standard deviation<br>percent</span></th></tr></thead>
     <tbody id="lvTb"></tbody>
   </table>
   <p id="lvSay"></p>
 
-  <h3>④ 漂移能不能当 0：几周内可以</h3>
+  <h3><span class="l-zh">④ 漂移能不能当 0：几周内可以</span><span class="l-en">④ Can drift be taken as 0? Over a few weeks, yes</span></h3>
   <p id="drSay"></p>
-  <p>给期权定价时，分布的中心本来就不用历史漂移，而用 1.1 的远期价 F。第七节用模拟给 350 call 定价时，会把中心挪到 F。</p>
+  <p><span class="l-zh">给期权定价时，分布的中心本来就不用历史漂移，而用 1.1 的远期价 F。第七节用模拟给 350 call 定价时，会把中心挪到 F。</span><span class="l-en">When pricing options, the center of the distribution does not use historical drift anyway; it uses the forward price F from 1.1. When section 7 prices the 350 call by simulation, it moves the center to F.</span></p>
 
-  <h3>小结</h3>
+  <h3><span class="l-zh">小结</span><span class="l-en">Summary</span></h3>
   <table>
-    <thead><tr><th>假设</th><th class="txt">在 TSLA 上</th><th class="txt">依据</th></tr></thead>
+    <thead><tr><th><span class="l-zh">假设</span><span class="l-en">Assumption</span></th><th class="txt"><span class="l-zh">在 TSLA 上</span><span class="l-en">For TSLA</span></th><th class="txt"><span class="l-zh">依据</span><span class="l-en">Evidence</span></th></tr></thead>
     <tbody>
-      <tr><td>① 每天独立</td><td class="txt">成立</td><td class="txt" id="sm1"></td></tr>
-      <tr><td>② 宽度每天一样</td><td class="txt no">不成立</td><td class="txt" id="sm2"></td></tr>
-      <tr><td>② 钟形</td><td class="txt no">不成立</td><td class="txt" id="sm3"></td></tr>
-      <tr><td>③ 按比例</td><td class="txt">基本成立</td><td class="txt" id="sm4"></td></tr>
-      <tr><td>④ 漂移当 0</td><td class="txt">几周内成立</td><td class="txt" id="sm5"></td></tr>
+      <tr><td><span class="l-zh">① 每天独立</span><span class="l-en">① Days are independent</span></td><td class="txt"><span class="l-zh">成立</span><span class="l-en">Holds</span></td><td class="txt" id="sm1"></td></tr>
+      <tr><td><span class="l-zh">② 宽度每天一样</span><span class="l-en">② Same width every day</span></td><td class="txt no"><span class="l-zh">不成立</span><span class="l-en">Fails</span></td><td class="txt" id="sm2"></td></tr>
+      <tr><td><span class="l-zh">② 钟形</span><span class="l-en">② Bell shape</span></td><td class="txt no"><span class="l-zh">不成立</span><span class="l-en">Fails</span></td><td class="txt" id="sm3"></td></tr>
+      <tr><td><span class="l-zh">③ 按比例</span><span class="l-en">③ Proportional</span></td><td class="txt"><span class="l-zh">基本成立</span><span class="l-en">Mostly holds</span></td><td class="txt" id="sm4"></td></tr>
+      <tr><td><span class="l-zh">④ 漂移当 0</span><span class="l-en">④ Drift taken as 0</span></td><td class="txt"><span class="l-zh">几周内成立</span><span class="l-en">Holds over a few weeks</span></td><td class="txt" id="sm5"></td></tr>
     </tbody>
   </table>
-  <p class="tiny">数据：TSLA 分钟线，取每个交易日 15:59 那根的收盘（半日市取 12:59），价格已按拆股调整。</p>
+  <p class="tiny"><span class="l-zh">数据：TSLA 分钟线，取每个交易日 15:59 那根的收盘（半日市取 12:59），价格已按拆股调整。</span><span class="l-en">Data: TSLA minute bars, using the close of the 15:59 bar on each trading day (12:59 on half days), with prices adjusted for splits.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>时间缩放</h2>
-  <p class="sub">一年的标准差是 46.3%，一天是多少？不是 46.3% 除以 365。</p>
-  <p>如果每天的涨跌互不相关，今天涨、明天跌会抵消掉一部分。n 天加起来，典型幅度不是一天的 n 倍，而是 <b>√n 倍</b>：4 天是 2 倍，25 天是 5 倍。</p>
+  <h2><span class="l-zh"><span class="n">三</span>时间缩放</span><span class="l-en"><span class="n">3</span>Time scaling</span></h2>
+  <p class="sub"><span class="l-zh">一年的标准差是 46.3%，一天是多少？不是 46.3% 除以 365。</span><span class="l-en">If one year's standard deviation is 46.3%, what is one day's? It is not 46.3% divided by 365.</span></p>
+  <p><span class="l-zh">如果每天的涨跌互不相关，今天涨、明天跌会抵消掉一部分。n 天加起来，典型幅度不是一天的 n 倍，而是 <b>√n 倍</b>：4 天是 2 倍，25 天是 5 倍。</span><span class="l-en">If daily changes are unrelated to each other, a rise today and a fall tomorrow partly cancel. Over n days, the typical size is not n times one day's but <b>√n times</b>: twice for 4 days, five times for 25 days.</span></p>
   <div class="formula">
-    <div class="math">t 年内的标准差 ＝ σ × √t</div>
-    <div class="gloss">独立的涨跌相加时，标准差的平方按天数相加，所以标准差本身按天数的平方根增长</div>
+    <div class="math"><span class="l-zh">t 年内的标准差 ＝ σ × √t</span><span class="l-en">Standard deviation over t years = σ × √t</span></div>
+    <div class="gloss"><span class="l-zh">独立的涨跌相加时，标准差的平方按天数相加，所以标准差本身按天数的平方根增长</span><span class="l-en">When independent changes are added, the squares of the standard deviations add up by day, so the standard deviation itself grows with the square root of the number of days</span></div>
   </div>
 
-  <h3>100 条可能的走势</h3>
-  <p>用第一节的模型画 100 条走势，看宽度怎么随时间变。每条线从 352.36 出发，每过一个交易日，从 TSLA 入场前一年（2025-04-14 至 2026-04-13）真实的 249 个日涨跌里随机抽一个，按比例涨跌一次。和第一节几条假设的对应：</p>
+  <h3><span class="l-zh">100 条可能的走势</span><span class="l-en">100 possible paths</span></h3>
+  <p><span class="l-zh">用第一节的模型画 100 条走势，看宽度怎么随时间变。每条线从 352.36 出发，每过一个交易日，从 TSLA 入场前一年（2025-04-14 至 2026-04-13）真实的 249 个日涨跌里随机抽一个，按比例涨跌一次。和第一节几条假设的对应：</span><span class="l-en">Draw 100 paths with the model from section 1 and watch how the width changes over time. Each line starts at 352.36; each trading day, it draws one of the 249 real daily changes from the year before the TSLA entry (2025-04-14 to 2026-04-13) at random and moves by that proportion. How this maps to the assumptions of section 1:</span></p>
   <ul>
-    <li>每一步单独抽，不看前面抽到了什么：假设 ①。</li>
-    <li>每一步都从同一堆涨跌里抽：假设 ② 的「宽度每天一样」。</li>
-    <li>不从钟形里抽，直接抽真实的涨跌：第二节看到的大涨大跌，按真实的频率出现。</li>
-    <li>抽之前每个涨跌都减掉这一年的平均值 +0.18%：假设 ④。减完之后一天的标准差是 3.07%。</li>
+    <li><span class="l-zh">每一步单独抽，不看前面抽到了什么：假设 ①。</span><span class="l-en">Each step is drawn on its own, regardless of earlier draws: assumption ①.</span></li>
+    <li><span class="l-zh">每一步都从同一堆涨跌里抽：假设 ② 的「宽度每天一样」。</span><span class="l-en">Every step draws from the same pile of changes: the "same width every day" part of assumption ②.</span></li>
+    <li><span class="l-zh">不从钟形里抽，直接抽真实的涨跌：第二节看到的大涨大跌，按真实的频率出现。</span><span class="l-en">Draws come from the real changes, not from a bell curve: the big rises and falls seen in section 2 appear at their real frequency.</span></li>
+    <li><span class="l-zh">抽之前每个涨跌都减掉这一年的平均值 +0.18%：假设 ④。减完之后一天的标准差是 3.07%。</span><span class="l-en">Before drawing, the year's average of +0.18% is subtracted from every change: assumption ④. After subtracting, one day's standard deviation is 3.07%.</span></li>
   </ul>
-  <p>只用最近一年，是因为波动会扎堆，最近一年更接近眼下的波动。随机抽会打乱先后顺序，波动扎堆这一点没有保留下来，这是这种画法的缺陷。</p>
+  <p><span class="l-zh">只用最近一年，是因为波动会扎堆，最近一年更接近眼下的波动。随机抽会打乱先后顺序，波动扎堆这一点没有保留下来，这是这种画法的缺陷。</span><span class="l-en">Only the most recent year is used because volatility clusters, and the most recent year is closer to current volatility. Random draws scramble the order, so the clustering is lost; this is a weakness of the method.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="paT">
-        <button data-t="24" aria-pressed="true">24 天（到 5/15 到期）</button>
-        <button data-t="250" aria-pressed="false">250 天（一年）</button>
+        <button data-t="24" aria-pressed="true"><span class="l-zh">24 天（到 5/15 到期）</span><span class="l-en">24 days (to the 5/15 expiration)</span></button>
+        <button data-t="250" aria-pressed="false"><span class="l-zh">250 天（一年）</span><span class="l-en">250 days (one year)</span></button>
       </div>
-      <button class="btn" id="paPlay">播放</button>
-      <button class="btn ghost" id="paNew">重新抽 100 条</button>
+      <button class="btn" id="paPlay"><span class="l-zh">播放</span><span class="l-en">Play</span></button>
+      <button class="btn ghost" id="paNew"><span class="l-zh">重新抽 100 条</span><span class="l-en">Draw 100 new paths</span></button>
     </div>
-    <div class="stage"><canvas id="pacv" width="264" height="150" aria-label="100 条可能的价格走势与此刻价格的分布"></canvas></div>
+    <div class="stage"><canvas id="pacv" width="264" height="150" aria-label="100 条可能的价格走势与此刻价格的分布" data-en-aria-label="100 possible price paths and the distribution of prices at this moment"></canvas></div>
     <div class="legend">
-      <span>经过的走势 <i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i> 1 条 → 16 条以上</span>
-      <span><i style="background:var(--ink)"></i>线头在带内；点线：±1 个标准差（一天 × √天数）；疏点线：起点 352.36</span>
-      <span><i style="background:var(--control)"></i>线头在带外</span>
+      <span><span class="l-zh">经过的走势 </span><span class="l-en">Paths passing through </span><i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i><span class="l-zh"> 1 条 → 16 条以上</span><span class="l-en"> 1 path → 16 or more</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink)"></i>线头在带内；点线：±1 个标准差（一天 × √天数）；疏点线：起点 352.36</span><span class="l-en"><i style="background:var(--ink)"></i>line end inside the band; dotted lines: ±1 standard deviation (one day × √days); sparse dotted line: start 352.36</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>线头在带外</span><span class="l-en"><i style="background:var(--control)"></i>line end outside the band</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">天数</div><div class="d" id="paDay"></div><div class="d2" id="paDayb"></div></div>
-      <div class="stat"><div class="k">100 条线散开的宽度，以一天的标准差为单位</div><div class="d" id="paW"></div><div class="d2" id="paWb"></div></div>
-      <div class="stat"><div class="k">线头在带外</div><div class="d" id="paOut" style="color:var(--control)"></div><div class="d2">约三分之一应在带外</div></div>
-      <div class="stat"><div class="k">最低 / 最高</div><div class="d" id="paExt"></div><div class="d2" id="paExtb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">天数</span><span class="l-en">Days</span></div><div class="d" id="paDay"></div><div class="d2" id="paDayb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">100 条线散开的宽度，以一天的标准差为单位</span><span class="l-en">spread of the 100 lines, in units of one day's standard deviation</span></div><div class="d" id="paW"></div><div class="d2" id="paWb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">线头在带外</span><span class="l-en">Line ends outside the band</span></div><div class="d" id="paOut" style="color:var(--control)"></div><div class="d2"><span class="l-zh">约三分之一应在带外</span><span class="l-en">about one third should be outside</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">最低 / 最高</span><span class="l-en">Lowest / highest</span></div><div class="d" id="paExt"></div><div class="d2" id="paExtb"></div></div>
     </div>
     <div class="say plain" id="paSay"></div>
   </div>
 
-  <p>一年约 256 个交易日，√256 ＝ 16。交易员心算用三个除数：</p>
+  <p><span class="l-zh">一年约 256 个交易日，√256 ＝ 16。交易员心算用三个除数：</span><span class="l-en">A year has about 256 trading days, and √256 = 16. Traders use three divisors for mental math:</span></p>
   <div class="panel">
-    <div class="ctl"><label><span>年化波动率 <span class="sym" data-say="年化波动率。">σ</span></span><span class="v" id="vSig1"></span></label>
+    <div class="ctl"><label><span class="l-zh"><span>年化波动率 <span class="sym" data-say="年化波动率。">σ</span></span></span><span class="l-en"><span>Annualized volatility <span class="sym" data-say="Annualized volatility.">σ</span></span></span><span class="v" id="vSig1"></span></label>
       <input type="range" id="iSig1" min="5" max="150" step="0.1" value="46.3"></div>
     <table>
-      <thead><tr><th>期限</th><th>除以</th><th>来历</th><th>标准差</th><th>TSLA 352.36 折成美元</th></tr></thead>
+      <thead><tr><th><span class="l-zh">期限</span><span class="l-en">Term</span></th><th><span class="l-zh">除以</span><span class="l-en">Divide by</span></th><th><span class="l-zh">来历</span><span class="l-en">Where it comes from</span></th><th><span class="l-zh">标准差</span><span class="l-en">Standard deviation</span></th><th><span class="l-zh">TSLA 352.36 折成美元</span><span class="l-en">In dollars for TSLA at 352.36</span></th></tr></thead>
       <tbody id="mnem"></tbody>
     </table>
   </div>
 
-  <h3>用 TSLA 的真实日线检验 √t</h3>
-  <p class="sub">取 TSLA 每天的收盘价，算出每一段连续 1 天、2 天、直到 21 天的涨跌幅，每个期限各算一个标准差。√t 成立的话，点会落在曲线上。</p>
+  <h3><span class="l-zh">用 TSLA 的真实日线检验 √t</span><span class="l-en">Testing √t on real TSLA daily data</span></h3>
+  <p class="sub"><span class="l-zh">取 TSLA 每天的收盘价，算出每一段连续 1 天、2 天、直到 21 天的涨跌幅，每个期限各算一个标准差。√t 成立的话，点会落在曲线上。</span><span class="l-en">Take TSLA's daily closing prices, compute the change over every run of 1 day, 2 days, up to 21 consecutive days, and compute a standard deviation for each term. If √t holds, the points fall on the curve.</span></p>
   <div class="panel">
     <div class="seg" id="sqWin">
-      <button data-w="1y" aria-pressed="true">最近 1 年</button>
-      <button data-w="2y" aria-pressed="false">最近 2 年</button>
-      <button data-w="all" aria-pressed="false">全部 5.7 年</button>
+      <button data-w="1y" aria-pressed="true"><span class="l-zh">最近 1 年</span><span class="l-en">Last 1 year</span></button>
+      <button data-w="2y" aria-pressed="false"><span class="l-zh">最近 2 年</span><span class="l-en">Last 2 years</span></button>
+      <button data-w="all" aria-pressed="false"><span class="l-zh">全部 5.7 年</span><span class="l-en">All 5.7 years</span></button>
     </div>
-    <svg id="sqrtChart" viewBox="0 0 720 330" role="img" aria-label="不同期限的实测标准差与 √t 曲线"></svg>
+    <svg id="sqrtChart" viewBox="0 0 720 330" role="img" aria-label="不同期限的实测标准差与 √t 曲线" data-en-aria-label="Measured standard deviation by term against the √t curve"></svg>
     <div class="stats">
-      <div class="stat"><div class="k">一天实测</div><div class="d" id="sq1"></div><div class="d2" id="sq1b"></div></div>
-      <div class="stat"><div class="k">5 天实测</div><div class="d" id="sq5"></div><div class="d2" id="sq5b"></div></div>
-      <div class="stat"><div class="k">21 天实测</div><div class="d" id="sq21"></div><div class="d2" id="sq21b"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">一天实测</span><span class="l-en">Measured, one day</span></div><div class="d" id="sq1"></div><div class="d2" id="sq1b"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">5 天实测</span><span class="l-en">Measured, 5 days</span></div><div class="d" id="sq5"></div><div class="d2" id="sq5b"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">21 天实测</span><span class="l-en">Measured, 21 days</span></div><div class="d" id="sq21"></div><div class="d2" id="sq21b"></div></div>
     </div>
     <div class="say plain" id="sqSay"></div>
   </div>
-  <p>√t 的前提是每天的涨跌互不相关，也就是第一节的假设 ①。真实价格只是大致满足：有时涨了接着涨，有时涨了又跌回来。节点 7 专门讲这类模型假设在哪里失效。</p>
-  <p class="tiny">数据：TSLA 分钟线，取每个交易日 15:59 那根的收盘（半日市取 12:59），截止 2026-04-13 入场日。「连续 5 天」指每个交易日往后数 5 个交易日，所以相邻的窗口有重叠。</p>
+  <p><span class="l-zh">√t 的前提是每天的涨跌互不相关，也就是第一节的假设 ①。真实价格只是大致满足：有时涨了接着涨，有时涨了又跌回来。节点 7 专门讲这类模型假设在哪里失效。</span><span class="l-en">√t requires daily changes to be unrelated to each other, which is assumption ① from section 1. Real prices only roughly satisfy it: sometimes a rise is followed by another rise, sometimes it falls back. Node 7 is about where model assumptions like this one break down.</span></p>
+  <p class="tiny"><span class="l-zh">数据：TSLA 分钟线，取每个交易日 15:59 那根的收盘（半日市取 12:59），截止 2026-04-13 入场日。「连续 5 天」指每个交易日往后数 5 个交易日，所以相邻的窗口有重叠。</span><span class="l-en">Data: TSLA minute bars, using the close of the 15:59 bar on each trading day (12:59 on half days), up to the 2026-04-13 entry day. "5 consecutive days" means counting 5 trading days forward from each trading day, so adjacent windows overlap.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>从日涨跌里量出波动率</h2>
-  <p class="sub">讲义有一个心算法。按〇节的比例，大约三分之一的日子应该落在一个标准差以外。所以找一条线，让三分之一的日子在线外，这条线就是一天的标准差，再乘 16 就是年化波动率。</p>
+  <h2><span class="l-zh"><span class="n">四</span>从日涨跌里量出波动率</span><span class="l-en"><span class="n">4</span>Measuring volatility from daily changes</span></h2>
+  <p class="sub"><span class="l-zh">讲义有一个心算法。按〇节的比例，大约三分之一的日子应该落在一个标准差以外。所以找一条线，让三分之一的日子在线外，这条线就是一天的标准差，再乘 16 就是年化波动率。</span><span class="l-en">The lecture notes give a mental-math method. By the proportions in section 0, about one third of the days should fall outside one standard deviation. So find a line with one third of the days outside it; that line is one day's standard deviation, and multiplying by 16 gives the annualized volatility.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="dsSeg">
-        <button data-d="tsla" aria-pressed="true">TSLA 4/14 – 5/15，24 天</button>
-        <button data-d="lec" aria-pressed="false">讲义例子，10 天</button>
+        <button data-d="tsla" aria-pressed="true"><span class="l-zh">TSLA 4/14 – 5/15，24 天</span><span class="l-en">TSLA 4/14 – 5/15, 24 days</span></button>
+        <button data-d="lec" aria-pressed="false"><span class="l-zh">讲义例子，10 天</span><span class="l-en">Lecture example, 10 days</span></button>
       </div>
-      <button class="btn ghost" id="dgPlay">逐天播放</button>
+      <button class="btn ghost" id="dgPlay"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button>
     </div>
-    <svg id="drag" viewBox="0 0 720 300" role="img" aria-label="每日涨跌幅柱状图与可调的一个标准差线"></svg>
-    <div class="ctl" style="margin-top:.6rem"><label><span>一天的标准差，线的位置 ±</span><span class="v" id="vLine"></span></label>
+    <svg id="drag" viewBox="0 0 720 300" role="img" aria-label="每日涨跌幅柱状图与可调的一个标准差线" data-en-aria-label="Bar chart of daily changes with an adjustable one-standard-deviation line"></svg>
+    <div class="ctl" style="margin-top:.6rem"><label><span class="l-zh"><span>一天的标准差，线的位置 ±</span></span><span class="l-en"><span>One day's standard deviation, line at ±</span></span><span class="v" id="vLine"></span></label>
       <input type="range" id="iLine" min="0.1" max="8" step="0.01" value="1"></div>
     <div class="count" id="cnt"><span class="big" id="cntBig"></span><span class="cap" id="cntCap"></span></div>
     <div class="say plain" id="dragSay"></div>
   </div>
 
-  <h3>为什么数的是离 0 多远</h3>
-  <p>上面数的是每天离 0 有多远，没有先减掉平均值。这叫<b>零均值假设</b>。原因用一个例子就能说清：</p>
+  <h3><span class="l-zh">为什么数的是离 0 多远</span><span class="l-en">Why count the distance from 0</span></h3>
+  <p><span class="l-zh">上面数的是每天离 0 有多远，没有先减掉平均值。这叫<b>零均值假设</b>。原因用一个例子就能说清：</span><span class="l-en">The count above measures how far each day is from 0, without subtracting the average first. This is called the <b>zero-mean assumption</b>. One example makes the reason clear:</span></p>
   <div class="story">
-    <p>某股票连涨十天，每天都是 +1%。平均每天 +1%，每天离平均值的距离都是 0。</p>
+    <p><span class="l-zh">某股票连涨十天，每天都是 +1%。平均每天 +1%，每天离平均值的距离都是 0。</span><span class="l-en">A stock rises ten days in a row, +1% every day. The average is +1% a day, and every day's distance from the average is 0.</span></p>
     <table>
-      <thead><tr><th>算法</th><th>一天的标准差</th><th>年化</th></tr></thead>
+      <thead><tr><th><span class="l-zh">算法</span><span class="l-en">Method</span></th><th><span class="l-zh">一天的标准差</span><span class="l-en">One day's standard deviation</span></th><th><span class="l-zh">年化</span><span class="l-en">Annualized</span></th></tr></thead>
       <tbody>
-        <tr><td>先减掉平均值（普通标准差）</td><td>0%</td><td>0%</td></tr>
-        <tr><td>直接量离 0 多远（零均值）</td><td>1%</td><td>16%</td></tr>
+        <tr><td><span class="l-zh">先减掉平均值（普通标准差）</span><span class="l-en">Subtract the average first (ordinary standard deviation)</span></td><td>0%</td><td>0%</td></tr>
+        <tr><td><span class="l-zh">直接量离 0 多远（零均值）</span><span class="l-en">Measure the distance from 0 directly (zero mean)</span></td><td>1%</td><td>16%</td></tr>
       </tbody>
     </table>
-    <p style="margin-top:1rem">十天涨了约 10%，说它的波动率是 0，显然不对。普通标准差只量「围着平均值晃多少」，把稳定的趋势当成了不动。对期权持有人来说，价格朝一个方向稳定地走也是变动。</p>
+    <p style="margin-top:1rem"><span class="l-zh">十天涨了约 10%，说它的波动率是 0，显然不对。普通标准差只量「围着平均值晃多少」，把稳定的趋势当成了不动。对期权持有人来说，价格朝一个方向稳定地走也是变动。</span><span class="l-en">It rose about 10% in ten days; saying its volatility is 0 is plainly wrong. The ordinary standard deviation measures only "how much it wobbles around the average", and treats a steady trend as no movement. For an option holder, a price moving steadily in one direction is movement too.</span></p>
   </div>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>正态区间和对数正态区间</h2>
-  <p class="sub">有了宽度，就能写出 n 个标准差的价格区间。有两种写法，区别在于涨跌按加减算还是按乘除算。</p>
+  <h2><span class="l-zh"><span class="n">五</span>正态区间和对数正态区间</span><span class="l-en"><span class="n">5</span>Normal range and lognormal range</span></h2>
+  <p class="sub"><span class="l-zh">有了宽度，就能写出 n 个标准差的价格区间。有两种写法，区别在于涨跌按加减算还是按乘除算。</span><span class="l-en">With a width, you can write the price range for n standard deviations. There are two ways to write it; the difference is whether changes add and subtract or multiply and divide.</span></p>
   <div class="pair">
     <div class="formula">
-      <div class="math">F ± <span class="sym" data-say="几个标准差。1 个标准差以内约三分之二，2 个以内约 95%。">n</span> × F × σ × √t</div>
-      <div class="gloss"><b>正态</b>：上下各伸出相同的美元距离</div>
+      <div class="math"><span class="l-zh">F ± <span class="sym" data-say="几个标准差。1 个标准差以内约三分之二，2 个以内约 95%。">n</span> × F × σ × √t</span><span class="l-en">F ± <span class="sym" data-say="Number of standard deviations. Within 1 standard deviation is about two thirds, within 2 about 95%.">n</span> × F × σ × √t</span></div>
+      <div class="gloss"><span class="l-zh"><b>正态</b>：上下各伸出相同的美元距离</span><span class="l-en"><b>Normal</b>: the same dollar distance up and down</span></div>
     </div>
     <div class="formula">
-      <div class="math">F × <span class="sym" data-say="自然常数，约 2.718。e 的 x 次方可以读成「按连续复利涨 x」：e^0.1 ≈ 1.105，e^−0.1 ≈ 0.905。">e</span><sup>±n × σ × √t</sup></div>
-      <div class="gloss"><b>对数正态</b>：上下各伸出相同的比例</div>
+      <div class="math"><span class="l-zh">F × <span class="sym" data-say="自然常数，约 2.718。e 的 x 次方可以读成「按连续复利涨 x」：e^0.1 ≈ 1.105，e^−0.1 ≈ 0.905。">e</span><sup>±n × σ × √t</sup></span><span class="l-en">F × <span class="sym" data-say="The natural constant, about 2.718. e to the power x can be read as &quot;grow by x with continuous compounding&quot;: e^0.1 ≈ 1.105, e^−0.1 ≈ 0.905.">e</span><sup>±n × σ × √t</sup></span></div>
+      <div class="gloss"><span class="l-zh"><b>对数正态</b>：上下各伸出相同的比例</span><span class="l-en"><b>Lognormal</b>: the same proportion up and down</span></div>
     </div>
   </div>
-  <p>股价按比例变化：100 涨 10% 是 110，再跌 10% 是 99，回不到 100。按比例走的价格，分布叫对数正态：往下永远到不了 0，往上没有顶。涨到 2 倍和跌到一半，在它眼里一样远。</p>
-  <p>还是第三节的画法。两个按钮用同一串抽到的涨跌，只换算法。<b>按加减算</b>：每一步的美元幅度按起点价格算，抽到 +3% 就是 +10.57 美元，不管这条线现在在哪个价位，这是 Bachelier 的做法，走出来是正态分布。<b>按比例算</b>：每一步按这条线当前价格的百分比算，价格越低，同样 3% 对应的美元越少，这是 Osborne 的做法，走出来是对数正态分布。</p>
+  <p><span class="l-zh">股价按比例变化：100 涨 10% 是 110，再跌 10% 是 99，回不到 100。按比例走的价格，分布叫对数正态：往下永远到不了 0，往上没有顶。涨到 2 倍和跌到一半，在它眼里一样远。</span><span class="l-en">Stock prices change by proportion: 100 up 10% is 110, then down 10% is 99, not back to 100. A price that moves by proportion has a lognormal distribution: it can never reach 0 on the way down, and has no ceiling on the way up. To it, doubling and halving are the same distance.</span></p>
+  <p><span class="l-zh">还是第三节的画法。两个按钮用同一串抽到的涨跌，只换算法。<b>按加减算</b>：每一步的美元幅度按起点价格算，抽到 +3% 就是 +10.57 美元，不管这条线现在在哪个价位，这是 Bachelier 的做法，走出来是正态分布。<b>按比例算</b>：每一步按这条线当前价格的百分比算，价格越低，同样 3% 对应的美元越少，这是 Osborne 的做法，走出来是对数正态分布。</span><span class="l-en">Same method as section 3. The two buttons use the same series of drawn changes and only switch the arithmetic. <b>Additive</b>: each step's dollar size is based on the starting price, so a draw of +3% is +10.57 dollars, whatever price the line is at now. This is Bachelier's approach, and it produces a normal distribution. <b>Proportional</b>: each step is a percentage of the line's current price, so the lower the price, the fewer dollars the same 3% is. This is Osborne's approach, and it produces a lognormal distribution.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="pbMode">
-        <button data-m="add" aria-pressed="true">按加减算</button>
-        <button data-m="mul" aria-pressed="false">按比例算</button>
+        <button data-m="add" aria-pressed="true"><span class="l-zh">按加减算</span><span class="l-en">Additive</span></button>
+        <button data-m="mul" aria-pressed="false"><span class="l-zh">按比例算</span><span class="l-en">Proportional</span></button>
       </div>
       <div class="seg" id="pbT">
-        <button data-t="24" aria-pressed="false">24 天（到 5/15 到期）</button>
-        <button data-t="250" aria-pressed="true">250 天（一年）</button>
+        <button data-t="24" aria-pressed="false"><span class="l-zh">24 天（到 5/15 到期）</span><span class="l-en">24 days (to the 5/15 expiration)</span></button>
+        <button data-t="250" aria-pressed="true"><span class="l-zh">250 天（一年）</span><span class="l-en">250 days (one year)</span></button>
       </div>
-      <button class="btn" id="pbPlay">播放</button>
-      <button class="btn ghost" id="pbNew">重新抽 100 条</button>
+      <button class="btn" id="pbPlay"><span class="l-zh">播放</span><span class="l-en">Play</span></button>
+      <button class="btn ghost" id="pbNew"><span class="l-zh">重新抽 100 条</span><span class="l-en">Draw 100 new paths</span></button>
     </div>
-    <div class="stage"><canvas id="pbcv" width="264" height="150" aria-label="100 条可能的价格走势与此刻价格的分布"></canvas></div>
+    <div class="stage"><canvas id="pbcv" width="264" height="150" aria-label="100 条可能的价格走势与此刻价格的分布" data-en-aria-label="100 possible price paths and the distribution of prices at this moment"></canvas></div>
     <div class="legend">
-      <span>经过的走势 <i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i> 1 条 → 16 条以上</span>
-      <span><i style="background:var(--ink)"></i>线头在带内；点线：±1 个标准差（一天 × √天数）；疏点线：起点 352.36</span>
-      <span><i style="background:var(--control)"></i>线头在带外</span>
-      <span id="pbNeg"><i style="background:var(--ink-soft);height:2px;vertical-align:.2rem"></i>实线：价格 0，线下是负价格</span>
+      <span><span class="l-zh">经过的走势 </span><span class="l-en">Paths passing through </span><i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i><span class="l-zh"> 1 条 → 16 条以上</span><span class="l-en"> 1 path → 16 or more</span></span>
+      <span><span class="l-zh"><i style="background:var(--ink)"></i>线头在带内；点线：±1 个标准差（一天 × √天数）；疏点线：起点 352.36</span><span class="l-en"><i style="background:var(--ink)"></i>line end inside the band; dotted lines: ±1 standard deviation (one day × √days); sparse dotted line: start 352.36</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>线头在带外</span><span class="l-en"><i style="background:var(--control)"></i>line end outside the band</span></span>
+      <span id="pbNeg"><span class="l-zh"><i style="background:var(--ink-soft);height:2px;vertical-align:.2rem"></i>实线：价格 0，线下是负价格</span><span class="l-en"><i style="background:var(--ink-soft);height:2px;vertical-align:.2rem"></i>solid line: price 0; below it are negative prices</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">天数</div><div class="d" id="pbDay"></div><div class="d2" id="pbDayb"></div></div>
-      <div class="stat"><div class="k">100 条线散开的宽度，以一天的标准差为单位</div><div class="d" id="pbW"></div><div class="d2" id="pbWb"></div></div>
-      <div class="stat"><div class="k">线头在带外</div><div class="d" id="pbOut" style="color:var(--control)"></div><div class="d2">约三分之一应在带外</div></div>
-      <div class="stat"><div class="k">最低 / 最高</div><div class="d" id="pbExt"></div><div class="d2" id="pbExtb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">天数</span><span class="l-en">Days</span></div><div class="d" id="pbDay"></div><div class="d2" id="pbDayb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">100 条线散开的宽度，以一天的标准差为单位</span><span class="l-en">spread of the 100 lines, in units of one day's standard deviation</span></div><div class="d" id="pbW"></div><div class="d2" id="pbWb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">线头在带外</span><span class="l-en">Line ends outside the band</span></div><div class="d" id="pbOut" style="color:var(--control)"></div><div class="d2"><span class="l-zh">约三分之一应在带外</span><span class="l-en">about one third should be outside</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">最低 / 最高</span><span class="l-en">Lowest / highest</span></div><div class="d" id="pbExt"></div><div class="d2" id="pbExtb"></div></div>
     </div>
     <div class="say plain" id="pbSay"></div>
   </div>
 
-  <h3>三个例子的区间</h3>
+  <h3><span class="l-zh">三个例子的区间</span><span class="l-en">Ranges for three examples</span></h3>
   <table>
-    <thead><tr><th>例子</th><th>远期价 F</th><th>一个标准差 σ√t</th><th>正态区间</th><th>对数正态区间</th></tr></thead>
+    <thead><tr><th><span class="l-zh">例子</span><span class="l-en">Example</span></th><th><span class="l-zh">远期价 F</span><span class="l-en">Forward F</span></th><th><span class="l-zh">一个标准差 σ√t</span><span class="l-en">One standard deviation σ√t</span></th><th><span class="l-zh">正态区间</span><span class="l-en">Normal range</span></th><th><span class="l-zh">对数正态区间</span><span class="l-en">Lognormal range</span></th></tr></thead>
     <tbody id="rgTb"></tbody>
   </table>
   <p id="rgSay"></p>
@@ -541,120 +543,120 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>一个行权价离中心有多远</h2>
-  <p class="sub">离中心 50 美元，对一只年化波动 15% 的股票很远，对 TSLA 不算远。距离要用标准差的个数来量。</p>
+  <h2><span class="l-zh"><span class="n">六</span>一个行权价离中心有多远</span><span class="l-en"><span class="n">6</span>How far a strike is from the center</span></h2>
+  <p class="sub"><span class="l-zh">离中心 50 美元，对一只年化波动 15% 的股票很远，对 TSLA 不算远。距离要用标准差的个数来量。</span><span class="l-en">Fifty dollars from the center is far for a stock with 15% annual volatility, and not far for TSLA. Distance has to be measured in standard deviations.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="离中心几个标准差。正数在中心上方，负数在下方。">z</span> ＝ <span class="sym" data-say="natural log，自然对数，e 的反运算。ln(X/F) 就是 X 比 F 高出的比例（按连续复利算）。ln(1.1) ≈ 0.095。">ln</span>(<span class="sym" data-say="行权价。">X</span> ÷ F) ÷ (σ × √t)</div>
-    <div class="gloss">行权价比远期价高出的比例，除以一个标准差的宽度</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="离中心几个标准差。正数在中心上方，负数在下方。">z</span> ＝ <span class="sym" data-say="natural log，自然对数，e 的反运算。ln(X/F) 就是 X 比 F 高出的比例（按连续复利算）。ln(1.1) ≈ 0.095。">ln</span>(<span class="sym" data-say="行权价。">X</span> ÷ F) ÷ (σ × √t)</span><span class="l-en"><span class="sym" data-say="Number of standard deviations from the center. Positive above the center, negative below.">z</span> = <span class="sym" data-say="Natural log, the inverse of e. ln(X/F) is how much higher X is than F as a proportion (with continuous compounding). ln(1.1) ≈ 0.095.">ln</span>(<span class="sym" data-say="Strike price.">X</span> ÷ F) ÷ (σ × √t)</span></div>
+    <div class="gloss"><span class="l-zh">行权价比远期价高出的比例，除以一个标准差的宽度</span><span class="l-en">how much higher the strike is than the forward price, as a proportion, divided by the width of one standard deviation</span></div>
   </div>
   <table style="max-width:34rem">
-    <thead><tr><th>离中心</th><th>单边落在外侧的概率</th><th>大约</th></tr></thead>
+    <thead><tr><th><span class="l-zh">离中心</span><span class="l-en">From the center</span></th><th><span class="l-zh">单边落在外侧的概率</span><span class="l-en">Probability of finishing beyond it, one side</span></th><th><span class="l-zh">大约</span><span class="l-en">Roughly</span></th></tr></thead>
     <tbody>
-      <tr><td>1 个标准差</td><td>15.9%</td><td>6 次里 1 次</td></tr>
-      <tr><td>2 个标准差</td><td>2.3%</td><td>40 次里 1 次</td></tr>
-      <tr><td>3 个标准差</td><td>0.13%</td><td>740 次里 1 次</td></tr>
+      <tr><td><span class="l-zh">1 个标准差</span><span class="l-en">1 standard deviation</span></td><td>15.9%</td><td><span class="l-zh">6 次里 1 次</span><span class="l-en">1 time in 6</span></td></tr>
+      <tr><td><span class="l-zh">2 个标准差</span><span class="l-en">2 standard deviations</span></td><td>2.3%</td><td><span class="l-zh">40 次里 1 次</span><span class="l-en">1 time in 40</span></td></tr>
+      <tr><td><span class="l-zh">3 个标准差</span><span class="l-en">3 standard deviations</span></td><td>0.13%</td><td><span class="l-zh">740 次里 1 次</span><span class="l-en">1 time in 740</span></td></tr>
     </tbody>
   </table>
   <div class="panel">
     <div class="controls" style="margin-top:0">
-      <div class="ctl"><label><span>行权价 X</span><span class="v" id="vK"></span></label>
+      <div class="ctl"><label><span class="l-zh"><span>行权价 X</span></span><span class="l-en"><span>Strike X</span></span><span class="v" id="vK"></span></label>
         <input type="range" id="iK" min="300" max="470" step="5" value="400"></div>
-      <div class="ctl"><label><span>离到期天数</span><span class="v" id="vKD"></span></label>
+      <div class="ctl"><label><span class="l-zh"><span>离到期天数</span></span><span class="l-en"><span>Days to expiration</span></span><span class="v" id="vKD"></span></label>
         <input type="range" id="iKD" min="1" max="32" step="1" value="32"></div>
     </div>
-    <svg id="ruler" viewBox="0 0 720 250" role="img" aria-label="以标准差个数为刻度的行权价标尺" style="margin-top:1.1rem"></svg>
+    <svg id="ruler" viewBox="0 0 720 250" role="img" aria-label="以标准差个数为刻度的行权价标尺" data-en-aria-label="Strike ruler marked in standard deviations" style="margin-top:1.1rem"></svg>
     <div class="stats">
-      <div class="stat"><div class="k">美元距离</div><div class="d" id="kDist"></div><div class="d2" id="kDistb"></div></div>
-      <div class="stat"><div class="k">标准差个数 z</div><div class="d" id="kZ" style="color:var(--control)"></div><div class="d2" id="kZb"></div></div>
-      <div class="stat"><div class="k">到期落在它外侧</div><div class="d" id="kP" style="color:var(--result)"></div><div class="d2" id="kPb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">美元距离</span><span class="l-en">Dollar distance</span></div><div class="d" id="kDist"></div><div class="d2" id="kDistb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">标准差个数 z</span><span class="l-en">Standard deviations z</span></div><div class="d" id="kZ" style="color:var(--control)"></div><div class="d2" id="kZb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">到期落在它外侧</span><span class="l-en">Finishing beyond it</span></div><div class="d" id="kP" style="color:var(--result)"></div><div class="d2" id="kPb"></div></div>
     </div>
     <div class="say plain" id="kSay"></div>
   </div>
-  <h3>真实走了哪一条</h3>
-  <p>入场那天，按隐含波动率 46.3% 可以画出之后每一天的 ±1、±2 个标准差范围：中心是到那天的远期价，宽度按 √t 张开。TSLA 这 24 个交易日真实的收盘是其中一条。</p>
+  <h3><span class="l-zh">真实走了哪一条</span><span class="l-en">Which path it actually took</span></h3>
+  <p><span class="l-zh">入场那天，按隐含波动率 46.3% 可以画出之后每一天的 ±1、±2 个标准差范围：中心是到那天的远期价，宽度按 √t 张开。TSLA 这 24 个交易日真实的收盘是其中一条。</span><span class="l-en">On the entry day, the implied volatility of 46.3% gives the ±1 and ±2 standard deviation range for every day after: centered on the forward price to that day, widening with √t. TSLA's real closes over these 24 trading days are one path through it.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="rpPlay">重播</button></div>
-    <div class="stage"><canvas id="rpc" width="264" height="130" aria-label="入场时按隐含波动率画出的范围，与 TSLA 之后 24 个交易日的真实收盘"></canvas></div>
+    <div class="bar"><button class="btn ghost" id="rpPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <div class="stage"><canvas id="rpc" width="264" height="130" aria-label="入场时按隐含波动率画出的范围，与 TSLA 之后 24 个交易日的真实收盘" data-en-aria-label="The range drawn from implied volatility at entry, with TSLA's real closes over the next 24 trading days"></canvas></div>
     <div class="legend">
-      <span><i style="background:var(--ink)"></i>TSLA 收盘；线头在 ±1 以内</span>
-      <span><i style="background:var(--control)"></i>线头在 ±1 以外</span>
-      <span>点线：±1 个标准差；疏点线：±2 个标准差</span>
+      <span><span class="l-zh"><i style="background:var(--ink)"></i>TSLA 收盘；线头在 ±1 以内</span><span class="l-en"><i style="background:var(--ink)"></i>TSLA close; line end within ±1</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>线头在 ±1 以外</span><span class="l-en"><i style="background:var(--control)"></i>line end outside ±1</span></span>
+      <span><span class="l-zh">点线：±1 个标准差；疏点线：±2 个标准差</span><span class="l-en">dotted lines: ±1 standard deviation; sparse dotted lines: ±2 standard deviations</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
-      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="rpU"></div><div class="d2" id="rpUb"></div></div>
-      <div class="stat"><div class="k">离中心几个标准差</div><div class="d" id="rpZ" style="color:var(--control)"></div><div class="d2">按到那天为止的宽度算</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 收盘</span><span class="l-en">TSLA close</span></div><div class="d" id="rpU"></div><div class="d2" id="rpUb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">离中心几个标准差</span><span class="l-en">Standard deviations from the center</span></div><div class="d" id="rpZ" style="color:var(--control)"></div><div class="d2"><span class="l-zh">按到那天为止的宽度算</span><span class="l-en">using the width up to that day</span></div></div>
     </div>
     <div class="say plain" id="rpSay"></div>
   </div>
-  <p class="tiny">这里所有行权价都用同一个 σ = 46.3%。真实市场里每个行权价的隐含波动率不一样（TSLA 这天 300 是 51%，400 是 45%），那是节点 8 的内容。</p>
+  <p class="tiny"><span class="l-zh">这里所有行权价都用同一个 σ = 46.3%。真实市场里每个行权价的隐含波动率不一样（TSLA 这天 300 是 51%，400 是 45%），那是节点 8 的内容。</span><span class="l-en">Every strike here uses the same σ = 46.3%. In the real market each strike has its own implied volatility (on this day TSLA's 300 strike was at 51% and the 400 at 45%); that is the subject of node 8.</span></p>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>四种波动率</h2>
-  <p class="sub">说「TSLA 的波动率」时，要先说清是哪一种。</p>
+  <h2><span class="l-zh"><span class="n">七</span>四种波动率</span><span class="l-en"><span class="n">7</span>Four kinds of volatility</span></h2>
+  <p class="sub"><span class="l-zh">说「TSLA 的波动率」时，要先说清是哪一种。</span><span class="l-en">When you say "TSLA's volatility", first say which kind.</span></p>
   <table>
-    <thead><tr><th>名称</th><th style="text-align:left">意思</th><th>这笔交易</th></tr></thead>
+    <thead><tr><th><span class="l-zh">名称</span><span class="l-en">Name</span></th><th style="text-align:left"><span class="l-zh">意思</span><span class="l-en">Meaning</span></th><th><span class="l-zh">这笔交易</span><span class="l-en">This trade</span></th></tr></thead>
     <tbody id="fourVol"></tbody>
   </table>
   <div class="vbars" id="vbars"></div>
-  <p style="margin-top:1.6rem">讲义里有一句话：<b>隐含波动率是价格，未来波动率是价值。</b>买期权时付的是隐含波动率，事后拿到的是未来波动率。</p>
+  <p style="margin-top:1.6rem"><span class="l-zh">讲义里有一句话：<b>隐含波动率是价格，未来波动率是价值。</b>买期权时付的是隐含波动率，事后拿到的是未来波动率。</span><span class="l-en">The lecture notes have a line: <b>implied volatility is the price, future volatility is the value.</b> When you buy an option you pay implied volatility; afterward you receive future volatility.</span></p>
   <p id="pvSay"></p>
 
-  <h3>用历史波动率给 350 call 定价</h3>
-  <p>1.1 讲过定价四步：列出到期时可能的价格，给每个价格配概率，算出每个价格下期权值多少，再加权平均。前两步可以换成模拟：像第三节那样，从入场前一年的 249 个日涨跌里抽，走 24 个交易日到 5/15，每条走势代表一种可能，每条的可能性一样。这种做法叫 <span class="sym" data-say="Monte Carlo，蒙特卡洛。用大量随机模拟代替列公式：模拟很多种可能的结果，取平均。名字来自摩纳哥的赌场。">Monte Carlo</span>。</p>
+  <h3><span class="l-zh">用历史波动率给 350 call 定价</span><span class="l-en">Pricing the 350 call with historical volatility</span></h3>
+  <p><span class="l-zh">1.1 讲过定价四步：列出到期时可能的价格，给每个价格配概率，算出每个价格下期权值多少，再加权平均。前两步可以换成模拟：像第三节那样，从入场前一年的 249 个日涨跌里抽，走 24 个交易日到 5/15，每条走势代表一种可能，每条的可能性一样。这种做法叫 <span class="sym" data-say="Monte Carlo，蒙特卡洛。用大量随机模拟代替列公式：模拟很多种可能的结果，取平均。名字来自摩纳哥的赌场。">Monte Carlo</span>。</span><span class="l-en">Node 1.1 gave the four pricing steps: list the possible prices at expiration, assign each a probability, compute the option's value at each price, then take the weighted average. The first two steps can be replaced by simulation: as in section 3, draw from the 249 daily changes of the year before entry and walk 24 trading days to 5/15. Each path is one possible outcome, and every path is equally likely. This approach is called <span class="sym" data-say="Monte Carlo: replacing a formula with a large number of random simulations. Simulate many possible outcomes and take the average. The name comes from the casino in Monaco.">Monte Carlo</span>.</span></p>
   <div class="panel">
-    <div class="bar"><div class="seg" id="mcSeg"><button data-n="100" aria-pressed="true">100 条</button><button data-n="10000" aria-pressed="false">1 万条</button></div></div>
+    <div class="bar"><div class="seg" id="mcSeg"><button data-n="100" aria-pressed="true"><span class="l-zh">100 条</span><span class="l-en">100 paths</span></button><button data-n="10000" aria-pressed="false"><span class="l-zh">1 万条</span><span class="l-en">10,000 paths</span></button></div></div>
     <div class="stats" style="border-top:none;margin-top:0;padding-top:0">
-      <div class="stat"><div class="k">模拟出的 350 call 价值</div><div class="d" id="mcV" style="color:var(--control)"></div><div class="d2" id="mcVb"></div></div>
-      <div class="stat"><div class="k">4/13 市场价（买卖中间）</div><div class="d">21.05</div><div class="d2">买一 21.00，卖一 21.10</div></div>
-      <div class="stat"><div class="k">模拟减市场</div><div class="d" id="mcD"></div><div class="d2" id="mcDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">模拟出的 350 call 价值</span><span class="l-en">Simulated value of the 350 call</span></div><div class="d" id="mcV" style="color:var(--control)"></div><div class="d2" id="mcVb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">4/13 市场价（买卖中间）</span><span class="l-en">4/13 market price (bid-ask mid)</span></div><div class="d">21.05</div><div class="d2"><span class="l-zh">买一 21.00，卖一 21.10</span><span class="l-en">bid 21.00, ask 21.10</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">模拟减市场</span><span class="l-en">Simulation minus market</span></div><div class="d" id="mcD"></div><div class="d2" id="mcDb"></div></div>
     </div>
     <p class="tiny" id="mcRep"></p>
     <div class="say plain" id="mcSay"></div>
   </div>
-  <p class="tiny">算法：① 每条走势按比例走 24 个交易日（到 5/15），取最后的价格；② 把这些价格整体缩放，让平均值等于远期价 F = 353.69，1.1 讲过分布的中心在 F；③ 每条算 max(价格 − 350, 0)，取平均，再按 4.3% 的利率折回 4/13。</p>
+  <p class="tiny"><span class="l-zh">算法：① 每条走势按比例走 24 个交易日（到 5/15），取最后的价格；② 把这些价格整体缩放，让平均值等于远期价 F = 353.69，1.1 讲过分布的中心在 F；③ 每条算 max(价格 − 350, 0)，取平均，再按 4.3% 的利率折回 4/13。</span><span class="l-en">Method: ① each path moves proportionally for 24 trading days (to 5/15), and its final price is taken; ② these prices are scaled together so that their average equals the forward price F = 353.69, since 1.1 showed the distribution is centered on F; ③ for each path compute max(price − 350, 0), take the average, and discount back to 4/13 at a 4.3% rate.</span></p>
 </section>
 
 <!-- ══════════ 八 ══════════ -->
 <section id="s8">
-  <h2><span class="n">八</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">八</span>费曼检验</span><span class="l-en"><span class="n">8</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号</summary>
+    <summary><span class="l-zh">本页出现的全部符号</span><span class="l-en">All symbols on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">σ</div><div class="t">读作「西格玛」，年化波动率：以一年为期、按百分比计的一个标准差。</div></div>
-      <div class="gl"><div class="s">标准差</div><div class="t">一组数离中心的典型距离。钟形分布里，三分之二的数落在一个标准差以内。</div></div>
-      <div class="gl"><div class="s">t, √t</div><div class="t">到期时间，以年计。32 天 = 32/365 年。√t 是它的平方根，标准差按 √t 随时间放大。</div></div>
-      <div class="gl"><div class="s">16, 7.2, 3.5</div><div class="t">√256、√52、√12。年化波动率除以它们，得到一天、一周、一个月的标准差。</div></div>
-      <div class="gl"><div class="s">F</div><div class="t">远期价，分布的中心（1.1）。</div></div>
-      <div class="gl"><div class="s">X</div><div class="t">行权价。</div></div>
-      <div class="gl"><div class="s">n</div><div class="t">几个标准差。</div></div>
-      <div class="gl"><div class="s">e</div><div class="t">自然常数，约 2.718。e 的 x 次方可以读成「按连续复利涨 x」。</div></div>
-      <div class="gl"><div class="s">ln</div><div class="t">自然对数，e 的反运算。ln(X/F) 是 X 比 F 高出的比例。</div></div>
-      <div class="gl"><div class="s">z</div><div class="t">离中心几个标准差。z = ln(X/F) ÷ (σ√t)。</div></div>
-      <div class="gl"><div class="s">正态分布</div><div class="t">钟形分布，涨跌按加减算，上下对称，可以跌到负数。</div></div>
-      <div class="gl"><div class="s">对数正态分布</div><div class="t">涨跌按乘除算，往下到不了 0，往上没有顶。股价更接近这一种。</div></div>
-      <div class="gl"><div class="s">零均值假设</div><div class="t">算波动率时不减平均值，直接量每天离 0 有多远。</div></div>
-      <div class="gl"><div class="s">布朗运动</div><div class="t">微粒被大量分子从四面八方随机撞击而乱走。股价模型借用了它：价格被很多随机推力推着走。</div></div>
-      <div class="gl"><div class="s">相关系数</div><div class="t">两组数一起变的程度，在 −1 到 +1 之间。0 表示看不出关系。</div></div>
-      <div class="gl"><div class="s">中心极限定理</div><div class="t">很多个互不相关的小随机量加在一起，总和接近钟形。</div></div>
-      <div class="gl"><div class="s">Monte Carlo</div><div class="t">模拟大量可能的走势，按结果取平均来定价。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从市场上的期权价格反推出来的 σ，相当于市场的报价。</div></div>
+      <div class="gl"><div class="s">σ</div><div class="t"><span class="l-zh">读作「西格玛」，年化波动率：以一年为期、按百分比计的一个标准差。</span><span class="l-en">Sigma: annualized volatility, one standard deviation over one year, in percent.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">标准差</span><span class="l-en">standard deviation</span></div><div class="t"><span class="l-zh">一组数离中心的典型距离。钟形分布里，三分之二的数落在一个标准差以内。</span><span class="l-en">The typical distance of a set of numbers from the center. In a bell-shaped distribution, two thirds of the numbers fall within one standard deviation.</span></div></div>
+      <div class="gl"><div class="s">t, √t</div><div class="t"><span class="l-zh">到期时间，以年计。32 天 = 32/365 年。√t 是它的平方根，标准差按 √t 随时间放大。</span><span class="l-en">Time to expiration in years. 32 days = 32/365 years. √t is its square root; the standard deviation grows over time with √t.</span></div></div>
+      <div class="gl"><div class="s">16, 7.2, 3.5</div><div class="t"><span class="l-zh">√256、√52、√12。年化波动率除以它们，得到一天、一周、一个月的标准差。</span><span class="l-en">√256, √52, √12. Dividing annualized volatility by them gives the standard deviation for one day, one week and one month.</span></div></div>
+      <div class="gl"><div class="s">F</div><div class="t"><span class="l-zh">远期价，分布的中心（1.1）。</span><span class="l-en">Forward price, the center of the distribution (1.1).</span></div></div>
+      <div class="gl"><div class="s">X</div><div class="t"><span class="l-zh">行权价。</span><span class="l-en">Strike price.</span></div></div>
+      <div class="gl"><div class="s">n</div><div class="t"><span class="l-zh">几个标准差。</span><span class="l-en">Number of standard deviations.</span></div></div>
+      <div class="gl"><div class="s">e</div><div class="t"><span class="l-zh">自然常数，约 2.718。e 的 x 次方可以读成「按连续复利涨 x」。</span><span class="l-en">The natural constant, about 2.718. e to the power x can be read as "grow by x with continuous compounding".</span></div></div>
+      <div class="gl"><div class="s">ln</div><div class="t"><span class="l-zh">自然对数，e 的反运算。ln(X/F) 是 X 比 F 高出的比例。</span><span class="l-en">Natural log, the inverse of e. ln(X/F) is how much higher X is than F, as a proportion.</span></div></div>
+      <div class="gl"><div class="s">z</div><div class="t"><span class="l-zh">离中心几个标准差。z = ln(X/F) ÷ (σ√t)。</span><span class="l-en">Number of standard deviations from the center. z = ln(X/F) ÷ (σ√t).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">正态分布</span><span class="l-en">normal distribution</span></div><div class="t"><span class="l-zh">钟形分布，涨跌按加减算，上下对称，可以跌到负数。</span><span class="l-en">A bell-shaped distribution; changes add and subtract, it is symmetric, and it can go negative.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">对数正态分布</span><span class="l-en">lognormal distribution</span></div><div class="t"><span class="l-zh">涨跌按乘除算，往下到不了 0，往上没有顶。股价更接近这一种。</span><span class="l-en">Changes multiply and divide; it cannot reach 0 on the way down and has no ceiling on the way up. Stock prices are closer to this one.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">零均值假设</span><span class="l-en">zero-mean assumption</span></div><div class="t"><span class="l-zh">算波动率时不减平均值，直接量每天离 0 有多远。</span><span class="l-en">When computing volatility, do not subtract the average; measure each day's distance from 0 directly.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">布朗运动</span><span class="l-en">Brownian motion</span></div><div class="t"><span class="l-zh">微粒被大量分子从四面八方随机撞击而乱走。股价模型借用了它：价格被很多随机推力推着走。</span><span class="l-en">A particle wandering because a huge number of molecules hit it at random from all directions. The stock price model borrows it: the price is pushed along by many random pushes.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">相关系数</span><span class="l-en">correlation</span></div><div class="t"><span class="l-zh">两组数一起变的程度，在 −1 到 +1 之间。0 表示看不出关系。</span><span class="l-en">How much two sets of numbers move together, between −1 and +1. 0 means no visible relation.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">中心极限定理</span><span class="l-en">central limit theorem</span></div><div class="t"><span class="l-zh">很多个互不相关的小随机量加在一起，总和接近钟形。</span><span class="l-en">Many small random quantities that are unrelated to each other add up to something close to a bell shape.</span></div></div>
+      <div class="gl"><div class="s">Monte Carlo</div><div class="t"><span class="l-zh">模拟大量可能的走势，按结果取平均来定价。</span><span class="l-en">Simulate a large number of possible paths and price by averaging the outcomes.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率</span><span class="l-en">implied volatility</span></div><div class="t"><span class="l-zh">从市场上的期权价格反推出来的 σ，相当于市场的报价。</span><span class="l-en">The σ backed out from option prices in the market, effectively the market's quote.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-2-1-delta.html"><b>2.1 delta</b></a>：期权价格跟着标的动多少，以及为什么这个比例自己会变。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-2-1-delta.html"><b>2.1 delta</b></a>：期权价格跟着标的动多少，以及为什么这个比例自己会变。</span><span class="l-en">Next: <a href="station-2-1-delta.html"><b>2.1 Delta</b></a>: how much the option price moves with the underlying, and why that ratio changes on its own.</span></p>
+  <p><span class="l-zh"><a href="./">← 回到课程路线图</a></span><span class="l-en"><a href="./">← Back to the course roadmap</a></span></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
@@ -663,7 +665,7 @@ const $ = id => document.getElementById(id);
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
 const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);          // 负数用真正的减号
-const pctP = p => p<0.001 ? '不到 0.1%' : (p*100).toFixed(p<0.01?2:1)+'%';
+const pctP = p => p<0.001 ? window.L('不到 0.1%','under 0.1%') : (p*100).toFixed(p<0.01?2:1)+'%';
 const lab = (x,y,t,c,a='start',s=11)=>`<text x="${x}" y="${y}" text-anchor="${a}" font-size="${s}" fill="${c}" font-family="IBM Plex Mono,monospace">${t}</text>`;
 function ncdf(x){   // 标准正态累积分布，Abramowitz–Stegun 7.1.26
   const z=Math.abs(x)/Math.SQRT2, t=1/(1+0.3275911*z);
@@ -671,7 +673,7 @@ function ncdf(x){   // 标准正态累积分布，Abramowitz–Stegun 7.1.26
   return x>=0 ? 0.5*(1+e) : 0.5*(1-e);
 }
 const npdf = z => Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
-function oneIn(p){ if(p<0.001) return '不到千分之一'; const n=1/p; return '约 '+(n<10?n.toFixed(1):Math.round(n))+' 次里 1 次'; }
+function oneIn(p){ if(p<0.001) return window.L('不到千分之一','less than 1 in 1000'); const n=1/p; return window.L('约 ','about 1 in ')+(n<10?n.toFixed(1):Math.round(n))+window.L(' 次里 1 次',''); }
 
 /* ══════════ 白话符号气泡 ══════════ */
 (function(){
@@ -831,7 +833,7 @@ const GT=(()=>{
       else c.fillRect(Math.round(binX(b.j)),Math.round(b.y),1,1);
     });
     c.fillStyle=C.faint; [-2,-1,1,2].forEach(z=>c.fillRect(Math.round(CX+z*SDB*DX),BASE+2,1,2));
-    $('gtN').textContent=s.landed+' 颗';
+    $('gtN').textContent=s.landed+window.L(' 颗',' balls');
     $('gt1').textContent= s.landed? pc(s.zc[0]/s.landed):'—';
     $('gt2').textContent= s.landed? pc(s.zc[2]/s.landed):'—';
   }
@@ -842,8 +844,8 @@ const GT=(()=>{
     if(reduced){ while(!done()) step(); draw(); return; }
     runLoop(s,MS,step,draw,done);
   }
-  $('gt1b').textContent=`这块板理论 ${pc(theo[0])}，钟形 68%`;
-  $('gt2b').textContent=`这块板理论 ${pc(theo[2])}，钟形 5%`;
+  $('gt1b').textContent=window.L(`这块板理论 ${pc(theo[0])}，钟形 68%`,`this board: theory ${pc(theo[0])}, bell curve 68%`);
+  $('gt2b').textContent=window.L(`这块板理论 ${pc(theo[2])}，钟形 5%`,`this board: theory ${pc(theo[2])}, bell curve 5%`);
   $('gtPlay').addEventListener('click',()=>start((Math.random()*2**31)|0));
   init(580);
   return {start:()=>start(580), draw, fit:()=>fitCanvas(cv,W,H), cv};
@@ -932,7 +934,7 @@ function scatter(id,xs,ys,o){
   const mx=avg(xs), my=avg(ys); let sxy=0,sxx=0; xs.forEach((x,i)=>{ sxy+=(x-mx)*(ys[i]-my); sxx+=(x-mx)**2; });
   const b=sxy/sxx, a=my-b*mx;
   g+=`<line x1="${X(o.min)}" y1="${Y(a+b*o.min)}" x2="${X(o.max)}" y2="${Y(a+b*o.max)}" stroke="var(--control)" stroke-width="2.2"/>`;
-  g+=lab(R-2,Y(a+b*o.max)-8,'最贴合这些点的直线','var(--control)','end',11);
+  g+=lab(R-2,Y(a+b*o.max)-8,window.L('最贴合这些点的直线','best-fit line through these points'),'var(--control)','end',11);
   g+=lab((L+R)/2,H-8,o.xt,'var(--ink-soft)','middle',12);
   g+=`<text transform="translate(13 ${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">${o.yt}</text>`;
   $(id).innerHTML=g;
@@ -953,76 +955,76 @@ function drawHist(){
   g+=`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="var(--rule)"/>`;
   [-6,-4,-2,0,2,4,6].forEach(z=>{
     g+=`<line x1="${X(z)}" y1="${B}" x2="${X(z)}" y2="${B+5}" stroke="var(--ink-faint)"/>`;
-    g+=lab(X(z),B+19,z===0?'平均值':(z>0?'+':'−')+Math.abs(z)+' 个','var(--ink-faint)','middle',11);
+    g+=lab(X(z),B+19,z===0?window.L('平均值','mean'):(z>0?'+':'−')+Math.abs(z)+window.L(' 个',' SD'),'var(--ink-faint)','middle',11);
   });
-  g+=lab(X(0),H-4,'离平均值几个标准差','var(--ink-soft)','middle',12);
-  g+=lab(X(2.2),Y(NL*bw*npdf(1.9))-6,'钟形预测','var(--ink)','start',12);
+  g+=lab(X(0),H-4,window.L('离平均值几个标准差','standard deviations from the mean'),'var(--ink-soft)','middle',12);
+  g+=lab(X(2.2),Y(NL*bw*npdf(1.9))-6,window.L('钟形预测','bell curve predicts'),'var(--ink)','start',12);
   const tail=ZL.filter(z=>Math.abs(z)>3).length, exp3=NL*erfc(3/Math.SQRT2);
-  g+=lab(X(4.6),B-58,'3 个标准差以外','var(--control)','middle',12);
-  g+=lab(X(4.6),B-40,`真实 ${tail} 天，钟形 ${exp3.toFixed(1)} 天`,'var(--control)','middle',12);
+  g+=lab(X(4.6),B-58,window.L('3 个标准差以外','beyond 3 standard deviations'),'var(--control)','middle',12);
+  g+=lab(X(4.6),B-40,window.L(`真实 ${tail} 天，钟形 ${exp3.toFixed(1)} 天`,`actual ${tail} days, bell curve ${exp3.toFixed(1)} days`),'var(--control)','middle',12);
   $('hist').innerHTML=g;
   return {tail,exp3};
 }
 function renderEvidence(){
-  $('t0').textContent='2020-08-04 至 2026-04-13'; $('tn').textContent=NL;
+  $('t0').textContent=window.L('2020-08-04 至 2026-04-13','2020-08-04 to 2026-04-13'); $('tn').textContent=NL;
   document.querySelectorAll('.tnn').forEach(e=>e.textContent=NL);
 
   // ① 昨天 vs 今天
   const c1=lag1(RL), rA=mulberry32(580), sh1=[];
   for(let k=0;k<1000;k++) sh1.push(lag1(shuffled(RL,rA)));
   const [lo1,hi1]=q95(sh1);
-  scatter('sc1',RL.slice(0,-1),RL.slice(1),{min:-25,max:25,ticks:[-20,-10,0,10,20],r:1.7,op:.32,xt:'前一天的涨跌（%）',yt:'当天的涨跌（%）'});
-  $('c1').textContent=fm(c1); $('c1b').textContent=fm(c1); $('c1r').textContent=`${fm(lo1)} 到 ${sgn(hi1)}`;
+  scatter('sc1',RL.slice(0,-1),RL.slice(1),{min:-25,max:25,ticks:[-20,-10,0,10,20],r:1.7,op:.32,xt:window.L('前一天的涨跌（%）','previous day\'s change (%)'),yt:window.L('当天的涨跌（%）','same day\'s change (%)')});
+  $('c1').textContent=fm(c1); $('c1b').textContent=fm(c1); $('c1r').textContent=window.L(`${fm(lo1)} 到 ${sgn(hi1)}`,`${fm(lo1)} to ${sgn(hi1)}`);
   const sg=RL.filter(x=>x!==0).map(Math.sign); let runs=1, up=0, dn=0;
   sg.forEach(s=>s>0?up++:dn++); for(let i=1;i<sg.length;i++) if(sg[i]!==sg[i-1]) runs++;
   const eR=1+2*up*dn/(up+dn), sR=Math.sqrt(2*up*dn*(2*up*dn-up-dn)/((up+dn)**2*(up+dn-1)));
-  $('runs').textContent=`${runs} 段`; $('runsb').textContent=`抛硬币平均 ${Math.round(eR)}，95% 在 ±${Math.round(2*sR)} 以内`;
+  $('runs').textContent=window.L(`${runs} 段`,`${runs} runs`); $('runsb').textContent=window.L(`抛硬币平均 ${Math.round(eR)}，95% 在 ±${Math.round(2*sR)} 以内`,`coin flip average ${Math.round(eR)}, 95% within ±${Math.round(2*sR)}`);
   $('runs2').textContent=runs; $('runsE').textContent=Math.round(eR); $('runsS').textContent=Math.round(2*sR);
 
   // ② 这个月 vs 下个月的波动率
   const MV=monthVol(RL), c2=lag1(MV), rB=mulberry32(1905), sh2=[];
   for(let k=0;k<1000;k++) sh2.push(lag1(monthVol(shuffled(RL,rB))));
   const [lo2,hi2]=q95(sh2), mx2=Math.max(...sh2);
-  scatter('sc2',MV.slice(0,-1),MV.slice(1),{min:0,max:130,ticks:[0,40,80,120],r:3.4,op:.55,xt:'这 21 天的波动率（%，年化）',yt:'下 21 天的波动率（%，年化）'});
+  scatter('sc2',MV.slice(0,-1),MV.slice(1),{min:0,max:130,ticks:[0,40,80,120],r:3.4,op:.55,xt:window.L('这 21 天的波动率（%，年化）','volatility over these 21 days (%, annualized)'),yt:window.L('下 21 天的波动率（%，年化）','volatility over the next 21 days (%, annualized)')});
   $('nm').textContent=MV.length;
-  $('c2').textContent=fm(c2); $('c2b').textContent=fm(c2); $('c2r').textContent=`${fm(lo2)} 到 ${sgn(hi2)}`;
-  $('c2m').textContent=`1000 次里最高 ${fm(mx2)}`;
-  $('c2say').textContent= c2>mx2 ? '比打乱顺序的 1000 次都高' : '超出打乱顺序后的 95% 范围';
+  $('c2').textContent=fm(c2); $('c2b').textContent=fm(c2); $('c2r').textContent=window.L(`${fm(lo2)} 到 ${sgn(hi2)}`,`${fm(lo2)} to ${sgn(hi2)}`);
+  $('c2m').textContent=window.L(`1000 次里最高 ${fm(mx2)}`,`highest of 1000: ${fm(mx2)}`);
+  $('c2say').textContent= c2>mx2 ? window.L('比打乱顺序的 1000 次都高','higher than all 1000 shuffled orders') : window.L('超出打乱顺序后的 95% 范围','outside the 95% range of the shuffled orders');
   $('mvr').textContent=`${Math.min(...MV).toFixed(0)}% / ${Math.max(...MV).toFixed(0)}%`;
 
   // ② 钟形
   const {tail,exp3}=drawHist();
-  const rows=[['0.5 个标准差以内',ZL.filter(z=>Math.abs(z)<.5).length,NL*(1-erfc(.5/Math.SQRT2))]]
-    .concat([1,2,3,4,5].map(k=>[`${k} 个标准差以外`,ZL.filter(z=>Math.abs(z)>k).length,NL*erfc(k/Math.SQRT2)]));
-  const e=v=> v>=10?v.toFixed(0) : v>=0.1?v.toFixed(1) : v>=0.01?v.toFixed(2) : '不到 0.01';
+  const rows=[[window.L('0.5 个标准差以内','within 0.5 standard deviations'),ZL.filter(z=>Math.abs(z)<.5).length,NL*(1-erfc(.5/Math.SQRT2))]]
+    .concat([1,2,3,4,5].map(k=>[window.L(`${k} 个标准差以外`,`beyond ${k} standard deviations`),ZL.filter(z=>Math.abs(z)>k).length,NL*erfc(k/Math.SQRT2)]));
+  const e=v=> v>=10?v.toFixed(0) : v>=0.1?v.toFixed(1) : v>=0.01?v.toFixed(2) : window.L('不到 0.01','under 0.01');
   $('bellTb').innerHTML=rows.map(([k,a,b])=>`<tr><td>${k}</td><td${a>1.15*b||a<.85*b?' class="no"':''}>${a}</td><td>${e(b)}</td></tr>`).join('');
   const n5=rows[5][1], yrs=1/erfc(5/Math.SQRT2)/256;
-  $('t5').textContent=`超过 5 个标准差的日子，按钟形平均约 ${Math.round(yrs/100)*100} 年才有一天，TSLA 这 5.7 年里有 ${n5} 天。`;
+  $('t5').textContent=window.L(`超过 5 个标准差的日子，按钟形平均约 ${Math.round(yrs/100)*100} 年才有一天，TSLA 这 5.7 年里有 ${n5} 天。`,`Under a bell curve, a day beyond 5 standard deviations comes about once in ${Math.round(yrs/100)*100} years; TSLA had ${n5} such days in these 5.7 years.`);
   // 先除以前 21 个交易日的波动，扣掉扎堆的影响，再数超过 3 个标准差的天数
   const zs=[]; for(let i=21;i<NL;i++) zs.push(RL[i]/rms(RL.slice(i-21,i)));
   const mz=avg(zs), sz=Math.sqrt(avg(zs.map(x=>(x-mz)**2)));
   const t3s=zs.filter(x=>Math.abs((x-mz)/sz)>3).length, e3s=zs.length*erfc(3/Math.SQRT2);
-  $('whyTail').textContent=`原因有两个，数据里都看得到。第一，有些日子是一条大消息一次推完：2020-09-08 跌 21%（上一个交易日盘后公布，标普 500 这次没有纳入 TSLA），2024-10-24 涨 22%（前一天盘后发财报），2025-04-09 涨 23%（当天宣布暂缓加征关税）。中心极限定理要求没有哪一个推力大到能单独决定结果，这几天不满足。第二，波动会扎堆：平静的月份和剧烈的月份混在一起数，平静月份让中间变尖，剧烈月份让两头变长。把每天的涨跌除以前 21 个交易日的波动，扣掉扎堆的影响之后，超过 3 个标准差的日子从 ${tail} 天降到 ${t3s} 天，钟形预测 ${e3s.toFixed(1)} 天。扎堆解释了一部分，剩下的仍然比钟形多很多。`;
+  $('whyTail').textContent=window.L(`原因有两个，数据里都看得到。第一，有些日子是一条大消息一次推完：2020-09-08 跌 21%（上一个交易日盘后公布，标普 500 这次没有纳入 TSLA），2024-10-24 涨 22%（前一天盘后发财报），2025-04-09 涨 23%（当天宣布暂缓加征关税）。中心极限定理要求没有哪一个推力大到能单独决定结果，这几天不满足。第二，波动会扎堆：平静的月份和剧烈的月份混在一起数，平静月份让中间变尖，剧烈月份让两头变长。把每天的涨跌除以前 21 个交易日的波动，扣掉扎堆的影响之后，超过 3 个标准差的日子从 ${tail} 天降到 ${t3s} 天，钟形预测 ${e3s.toFixed(1)} 天。扎堆解释了一部分，剩下的仍然比钟形多很多。`,`There are two reasons, both visible in the data. First, some days are one big piece of news pushing all at once: 2020-09-08 down 21% (announced after the close of the previous trading day: the S&P 500 did not add TSLA this time), 2024-10-24 up 22% (earnings released after the previous day's close), 2025-04-09 up 23% (a pause on new tariffs announced that day). The central limit theorem requires that no single push be large enough to decide the result on its own, and these days violate that. Second, volatility clusters: counting calm months and violent months together, the calm months make the middle sharper and the violent months make the ends longer. Dividing each day's change by the volatility of the previous 21 trading days removes the effect of clustering, and the days beyond 3 standard deviations drop from ${tail} to ${t3s}, against ${e3s.toFixed(1)} predicted by the bell curve. Clustering explains part of it; what remains is still far more than the bell curve.`);
 
   // ③ 按价位分组
-  const grp=[['200 以下',0,200],['200 到 300',200,300],['300 以上',300,1e9]].map(([k,lo,hi])=>{
+  const grp=[[window.L('200 以下','below 200'),0,200],[window.L('200 到 300','200 to 300'),200,300],[window.L('300 以上','above 300'),300,1e9]].map(([k,lo,hi])=>{
     const r=[], d=[], p=[];
     RL.forEach((x,i)=>{ const pv=CL[i]; if(pv>=lo&&pv<hi){ r.push(x); d.push(pv*x/100); p.push(pv); } });
     return {k,n:r.length,p:avg(p),d:rms(d),r:rms(r)};
   });
   $('lvTb').innerHTML=grp.map(g=>`<tr><td>${g.k}</td><td>${g.n}</td><td>${g.p.toFixed(0)}</td><td>${g.d.toFixed(2)}</td><td>${g.r.toFixed(2)}%</td></tr>`).join('');
   const a=grp[0], z=grp[2];
-  $('lvSay').textContent=`如果按加减算是对的，美元幅度应该不随价格变。实际上平均价从 ${a.p.toFixed(0)} 涨到 ${z.p.toFixed(0)}，是 ${(z.p/a.p).toFixed(1)} 倍；美元幅度从 ${a.d.toFixed(2)} 涨到 ${z.d.toFixed(2)}，是 ${(z.d/a.d).toFixed(1)} 倍，跟着价格涨。百分比幅度只从 ${a.r.toFixed(2)}% 变到 ${z.r.toFixed(2)}%。按比例比按加减更接近真实，但不完全是：价格高的时候，百分比幅度略小一些。`;
+  $('lvSay').textContent=window.L(`如果按加减算是对的，美元幅度应该不随价格变。实际上平均价从 ${a.p.toFixed(0)} 涨到 ${z.p.toFixed(0)}，是 ${(z.p/a.p).toFixed(1)} 倍；美元幅度从 ${a.d.toFixed(2)} 涨到 ${z.d.toFixed(2)}，是 ${(z.d/a.d).toFixed(1)} 倍，跟着价格涨。百分比幅度只从 ${a.r.toFixed(2)}% 变到 ${z.r.toFixed(2)}%。按比例比按加减更接近真实，但不完全是：价格高的时候，百分比幅度略小一些。`,`If additive changes were right, the dollar size should not change with price. In fact the average price rose from ${a.p.toFixed(0)} to ${z.p.toFixed(0)}, ${(z.p/a.p).toFixed(1)} times; the dollar size rose from ${a.d.toFixed(2)} to ${z.d.toFixed(2)}, ${(z.d/a.d).toFixed(1)} times, rising with the price. The percentage size only changed from ${a.r.toFixed(2)}% to ${z.r.toFixed(2)}%. Proportional is closer to reality than additive, but not exactly: at higher prices the percentage size is slightly smaller.`);
 
   // ④ 漂移
   const d24=ML*24, s24=SL*Math.sqrt(24);
-  $('drSay').textContent=`这 5.7 年 TSLA 平均每天 ${sgn(ML)}%，一天的标准差 ${SL.toFixed(2)}%。看 24 个交易日（350 call 的期限），漂移累计约 ${d24.toFixed(1)}%，一个标准差约 ${SL.toFixed(2)}% × √24 ≈ ${s24.toFixed(1)}%，漂移约是 ${(d24/s24).toFixed(1)} 个标准差。看一年（约 256 个交易日），漂移累计约 ${(ML*256).toFixed(0)}%，一个标准差约 ${(SL*16).toFixed(0)}%，就不能忽略了。`;
+  $('drSay').textContent=window.L(`这 5.7 年 TSLA 平均每天 ${sgn(ML)}%，一天的标准差 ${SL.toFixed(2)}%。看 24 个交易日（350 call 的期限），漂移累计约 ${d24.toFixed(1)}%，一个标准差约 ${SL.toFixed(2)}% × √24 ≈ ${s24.toFixed(1)}%，漂移约是 ${(d24/s24).toFixed(1)} 个标准差。看一年（约 256 个交易日），漂移累计约 ${(ML*256).toFixed(0)}%，一个标准差约 ${(SL*16).toFixed(0)}%，就不能忽略了。`,`Over these 5.7 years TSLA averaged ${sgn(ML)}% a day, with a one-day standard deviation of ${SL.toFixed(2)}%. Over 24 trading days (the term of the 350 call), drift adds up to about ${d24.toFixed(1)}% and one standard deviation is about ${SL.toFixed(2)}% × √24 ≈ ${s24.toFixed(1)}%, so drift is about ${(d24/s24).toFixed(1)} standard deviations. Over a year (about 256 trading days), drift adds up to about ${(ML*256).toFixed(0)}% and one standard deviation is about ${(SL*16).toFixed(0)}%, and it can no longer be ignored.`);
 
-  $('sm1').textContent=`昨天和今天的相关系数 ${fm(c1)}，在打乱顺序的范围里`;
-  $('sm2').textContent=`这个月和下个月波动率的相关系数 ${fm(c2)}`;
-  $('sm3').textContent=`超过 3 个标准差的 ${tail} 天，钟形预测 ${exp3.toFixed(1)} 天`;
-  $('sm4').textContent=`价格 ${(z.p/a.p).toFixed(1)} 倍时，美元幅度 ${(z.d/a.d).toFixed(1)} 倍，百分比幅度 ${(z.r/a.r).toFixed(2)} 倍`;
-  $('sm5').textContent=`24 天漂移约 ${(d24/s24).toFixed(1)} 个标准差`;
+  $('sm1').textContent=window.L(`昨天和今天的相关系数 ${fm(c1)}，在打乱顺序的范围里`,`correlation between yesterday and today ${fm(c1)}, within the shuffled range`);
+  $('sm2').textContent=window.L(`这个月和下个月波动率的相关系数 ${fm(c2)}`,`correlation between this month's and next month's volatility ${fm(c2)}`);
+  $('sm3').textContent=window.L(`超过 3 个标准差的 ${tail} 天，钟形预测 ${exp3.toFixed(1)} 天`,`${tail} days beyond 3 standard deviations, bell curve predicts ${exp3.toFixed(1)}`);
+  $('sm4').textContent=window.L(`价格 ${(z.p/a.p).toFixed(1)} 倍时，美元幅度 ${(z.d/a.d).toFixed(1)} 倍，百分比幅度 ${(z.r/a.r).toFixed(2)} 倍`,`at ${(z.p/a.p).toFixed(1)}× the price, dollar size ${(z.d/a.d).toFixed(1)}×, percentage size ${(z.r/a.r).toFixed(2)}×`);
+  $('sm5').textContent=window.L(`24 天漂移约 ${(d24/s24).toFixed(1)} 个标准差`,`24-day drift about ${(d24/s24).toFixed(1)} standard deviations`);
 }
 
 /* ══════════ 三、五 · 100 条走势 ══════════
@@ -1116,28 +1118,28 @@ function PathLab(p,o){
   }
   function stats(pos){
     const d=st.prog;
-    $(p+'Day').textContent=`第 ${Math.floor(d)} 天`; $(p+'Dayb').textContent=`共 ${st.T} 天`;
+    $(p+'Day').textContent=window.L(`第 ${Math.floor(d)} 天`,`Day ${Math.floor(d)}`); $(p+'Dayb').textContent=window.L(`共 ${st.T} 天`,`of ${st.T} days`);
     const rets=pos.map(v=> st.mode==='add' ? (v-S0)/S0 : Math.log(Math.max(v,1e-9)/S0));
     const w=Math.sqrt(rets.reduce((s,x)=>s+x*x,0)/N)/SD1, dd=Math.max(d,0);
-    $(p+'W').textContent= d<0.05 ? '0' : w.toFixed(1)+' 个';
-    $(p+'Wb').textContent= d<0.05 ? '' : `√天数 = ${Math.sqrt(dd).toFixed(1)}，按天数算是 ${dd.toFixed(0)}`;
+    $(p+'W').textContent= d<0.05 ? '0' : w.toFixed(1)+window.L(' 个','×');
+    $(p+'Wb').textContent= d<0.05 ? '' : window.L(`√天数 = ${Math.sqrt(dd).toFixed(1)}，按天数算是 ${dd.toFixed(0)}`,`√days = ${Math.sqrt(dd).toFixed(1)}; scaling by days would give ${dd.toFixed(0)}`);
     const out=pos.filter(v=>isOut(v,d)).length;
     $(p+'Out').textContent=`${out} / ${N}`;
     const lo=Math.min(...pos), hi=Math.max(...pos), neg=pos.filter(v=>v<0).length, med=median(pos);
     $(p+'Ext').textContent=`${fm(lo,0)} / ${hi.toFixed(0)}`;
-    $(p+'Extb').textContent= st.mode==='add' ? `跌破 0 的 ${neg} 条` : `中位数 ${med.toFixed(0)}`;
+    $(p+'Extb').textContent= st.mode==='add' ? window.L(`跌破 0 的 ${neg} 条`,`${neg} below 0`) : window.L(`中位数 ${med.toFixed(0)}`,`median ${med.toFixed(0)}`);
     const say=$(p+'Say');
     if(d<st.T){ say.textContent=''; return; }
     if(o.kind==='width'){
-      say.textContent=`第 ${st.T} 天：100 条线散开的宽度是一天标准差的 ${w.toFixed(1)} 倍。√${st.T} = ${Math.sqrt(st.T).toFixed(1)}，按天数算会是 ${st.T} 倍。${out} 条在带外。`;
+      say.textContent=window.L(`第 ${st.T} 天：100 条线散开的宽度是一天标准差的 ${w.toFixed(1)} 倍。√${st.T} = ${Math.sqrt(st.T).toFixed(1)}，按天数算会是 ${st.T} 倍。${out} 条在带外。`,`Day ${st.T}: the spread of the 100 lines is ${w.toFixed(1)} times one day's standard deviation. √${st.T} = ${Math.sqrt(st.T).toFixed(1)}; scaling by days would give ${st.T} times. ${out} lines are outside the band.`);
     } else if(st.mode==='add'){
-      let t=`第 ${st.T} 天：${out} 条在带外。`;
-      if(neg>0) t+=`有 ${neg} 条走势跌到了 0 以下：按加减算，跌幅不会随价格变低而缩小，价格就可能变成负数。真实股价不会这样。`;
-      else if(st.T>100) t+=`这一次最低走到 ${lo.toFixed(0)}。按加减算，价格没有下限，走得再远一点就会穿过 0。`;
-      else t+=`24 天时两种算法几乎一样，差别要拉长到一年才看得出来。`;
+      let t=window.L(`第 ${st.T} 天：${out} 条在带外。`,`Day ${st.T}: ${out} lines are outside the band.`);
+      if(neg>0) t+=window.L(`有 ${neg} 条走势跌到了 0 以下：按加减算，跌幅不会随价格变低而缩小，价格就可能变成负数。真实股价不会这样。`,` ${neg} paths fell below 0: with additive changes, the size of a fall does not shrink as the price gets lower, so the price can go negative. Real stock prices do not do this.`);
+      else if(st.T>100) t+=window.L(`这一次最低走到 ${lo.toFixed(0)}。按加减算，价格没有下限，走得再远一点就会穿过 0。`,` This time the lowest point was ${lo.toFixed(0)}. With additive changes the price has no floor; go a little further and it crosses 0.`);
+      else t+=window.L(`24 天时两种算法几乎一样，差别要拉长到一年才看得出来。`,` At 24 days the two methods are nearly the same; the difference only shows when stretched to a year.`);
       say.textContent=t;
     } else {
-      say.textContent=`第 ${st.T} 天：最高 ${hi.toFixed(0)}，最低 ${lo.toFixed(0)}，中位数 ${med.toFixed(0)}。按比例算，往上拖得远，往下越走越慢，没有一条到达 0。中位数${med<S0?'比起点低':'不比起点低'}：涨 10% 再跌 10% 回不到原点。${out} 条在带外。`;
+      say.textContent=window.L(`第 ${st.T} 天：最高 ${hi.toFixed(0)}，最低 ${lo.toFixed(0)}，中位数 ${med.toFixed(0)}。按比例算，往上拖得远，往下越走越慢，没有一条到达 0。中位数${med<S0?'比起点低':'不比起点低'}：涨 10% 再跌 10% 回不到原点。${out} 条在带外。`,`Day ${st.T}: highest ${hi.toFixed(0)}, lowest ${lo.toFixed(0)}, median ${med.toFixed(0)}. With proportional changes, the upside stretches far, the downside slows as it goes, and no path reaches 0. The median is ${med<S0?'below':'not below'} the start: up 10% then down 10% does not get back to the start. ${out} lines are outside the band.`);
     }
   }
   let last=0;
@@ -1147,15 +1149,15 @@ function PathLab(p,o){
     const dt=last?Math.min(t-last,100):16; last=t;
     st.prog=Math.min(st.T, st.prog+dt/msPerDay());
     draw();
-    if(st.prog>=st.T){ st.playing=false; $(p+'Play').textContent='重播'; draw(); return; }
+    if(st.prog>=st.T){ st.playing=false; $(p+'Play').textContent=window.L('重播','Replay'); draw(); return; }
     requestAnimationFrame(tick);
   }
-  function play(){ if(st.prog>=st.T){ st.prog=0; resetDensity(); } st.playing=true; last=0; $(p+'Play').textContent='暂停'; requestAnimationFrame(tick); }
-  function pause(){ st.playing=false; $(p+'Play').textContent='播放'; draw(); }
+  function play(){ if(st.prog>=st.T){ st.prog=0; resetDensity(); } st.playing=true; last=0; $(p+'Play').textContent=window.L('暂停','Pause'); requestAnimationFrame(tick); }
+  function pause(){ st.playing=false; $(p+'Play').textContent=window.L('播放','Play'); draw(); }
   function restart(){
     st.playing=false; computePaths();
     const neg=$(p+'Neg'); if(neg) neg.style.display= yMin<=0?'':'none';
-    if(reduced){ st.prog=st.T; draw(); $(p+'Play').textContent='重播'; } else play();
+    if(reduced){ st.prog=st.T; draw(); $(p+'Play').textContent=window.L('重播','Replay'); } else play();
   }
   $(p+'Play').addEventListener('click',()=> st.playing?pause():play());
   $(p+'New').addEventListener('click',()=>{ st.seed=(Math.random()*2**31)|0; build(); restart(); });
@@ -1168,14 +1170,14 @@ function PathLab(p,o){
 
 /* ══════════ 五 · 三个例子的区间 ══════════ */
 function renderRanges(){
-  const rows=[['TSLA 本例',S0,RATE,46.3,32,1],['讲义例子（F 直接给定）',133.95,0,18.61,84,1],['TSLA 拉长到两年',S0,RATE,46.3,730,2]];
+  const rows=[[window.L('TSLA 本例','TSLA, this case'),S0,RATE,46.3,32,1],[window.L('讲义例子（F 直接给定）','Lecture example (F given directly)'),133.95,0,18.61,84,1],[window.L('TSLA 拉长到两年','TSLA stretched to two years'),S0,RATE,46.3,730,2]];
   $('rgTb').innerHTML=rows.map(([name,S,r,sig,days,n])=>{
     const F=S*(1+r*days/365), s=sig/100*Math.sqrt(days/365);
     const nLo=F*(1-n*s), nHi=F*(1+n*s), lLo=F*Math.exp(-n*s), lHi=F*Math.exp(n*s);
-    return `<tr><td>${name}<br><span class="tiny">σ ${sig}%，${days} 天，±${n} 个标准差</span></td><td>${f2(F)}</td><td>${(s*100).toFixed(1)}%</td><td${nLo<0?' class="no"':''}>${fm(nLo)} – ${f2(nHi)}</td><td>${f2(lLo)} – ${f2(lHi)}</td></tr>`;
+    return window.L(`<tr><td>${name}<br><span class="tiny">σ ${sig}%，${days} 天，±${n} 个标准差</span></td><td>${f2(F)}</td><td>${(s*100).toFixed(1)}%</td><td${nLo<0?' class="no"':''}>${fm(nLo)} – ${f2(nHi)}</td><td>${f2(lLo)} – ${f2(lHi)}</td></tr>`,`<tr><td>${name}<br><span class="tiny">σ ${sig}%, ${days} days, ±${n} standard deviations</span></td><td>${f2(F)}</td><td>${(s*100).toFixed(1)}%</td><td${nLo<0?' class="no"':''}>${fm(nLo)} – ${f2(nHi)}</td><td>${f2(lLo)} – ${f2(lHi)}</td></tr>`);
   }).join('');
   const s=IV*Math.sqrt(T0), z=Math.log(SETTLE/F0)/s;
-  $('rgSay').textContent=`两年、两个标准差时，正态区间的下限是负的，负的股价不存在；对数正态的下限永远大于 0。三行里对数正态区间都往上伸得比往下远：同样的标准差个数，涨的空间比跌的空间大，σ√t 越大差得越多。5/15 TSLA 实际收在 ${SETTLE}，是对数正态下的 +${z.toFixed(2)} 个标准差，落在一个标准差区间之外。`;
+  $('rgSay').textContent=window.L(`两年、两个标准差时，正态区间的下限是负的，负的股价不存在；对数正态的下限永远大于 0。三行里对数正态区间都往上伸得比往下远：同样的标准差个数，涨的空间比跌的空间大，σ√t 越大差得越多。5/15 TSLA 实际收在 ${SETTLE}，是对数正态下的 +${z.toFixed(2)} 个标准差，落在一个标准差区间之外。`,`At two years and two standard deviations, the lower end of the normal range is negative, and negative stock prices do not exist; the lower end of the lognormal range is always above 0. In all three rows the lognormal range reaches further up than down: for the same number of standard deviations there is more room to rise than to fall, and the larger σ√t, the bigger the difference. On 5/15 TSLA actually closed at ${SETTLE}, +${z.toFixed(2)} standard deviations under the lognormal, outside the one-standard-deviation range.`);
 }
 
 /* ══════════ 六 · 真实走了哪一条 ══════════
@@ -1204,13 +1206,13 @@ const RPATH=(()=>{
     if(k<n && pe>k){ const fr=pe-k; hx=X(k)+(X(k+1)-X(k))*fr; hv=U[k]+(U[k+1]-U[k])*fr; pxLine(c,Math.round(X(k)),Y(U[k]),Math.round(hx),Y(hv)); }
     const z=zAt(k);
     c.fillStyle= Math.abs(z)>1 ? C.ctl : C.ink; c.fillRect(Math.round(hx)-1,Y(hv)-1,3,3);
-    $('rpD').textContent=md(DAYS[k]); $('rpDb').textContent=`第 ${k} 个交易日`;
-    $('rpU').textContent=f2(U[k]); $('rpUb').textContent=(k?sgn((U[k]/S0-1)*100,1)+'%，':'')+'入场 352.36';
+    $('rpD').textContent=md(DAYS[k]); $('rpDb').textContent=window.L(`第 ${k} 个交易日`,`Trading day ${k}`);
+    $('rpU').textContent=f2(U[k]); $('rpUb').textContent=(k?sgn((U[k]/S0-1)*100,1)+window.L('%，','%, '):'')+window.L('入场 352.36','entry 352.36');
     $('rpZ').textContent=k?sgn(z):'0';
     const say=$('rpSay');
     if(pe<n){ say.textContent=''; return; }
     let bi=1; for(let i=2;i<=n;i++) if(Math.abs(zAt(i))>Math.abs(zAt(bi))) bi=i;
-    say.textContent=`5/15 收在 ${SETTLE}，离中心 ${sgn(zAt(n))} 个标准差，落在 ±1 之外。路上离中心最远的一天是 ${md(DAYS[bi])}：${bi} 个交易日涨了 ${((U[bi]/S0-1)*100).toFixed(1)}%，按到那天为止的宽度是 ${sgn(zAt(bi),1)} 个标准差。宽度按 √t 张开，头几天范围很窄，同样的涨幅折成标准差个数就大。`;
+    say.textContent=window.L(`5/15 收在 ${SETTLE}，离中心 ${sgn(zAt(n))} 个标准差，落在 ±1 之外。路上离中心最远的一天是 ${md(DAYS[bi])}：${bi} 个交易日涨了 ${((U[bi]/S0-1)*100).toFixed(1)}%，按到那天为止的宽度是 ${sgn(zAt(bi),1)} 个标准差。宽度按 √t 张开，头几天范围很窄，同样的涨幅折成标准差个数就大。`,`It closed at ${SETTLE} on 5/15, ${sgn(zAt(n))} standard deviations from the center, outside ±1. The day furthest from the center along the way was ${md(DAYS[bi])}: up ${((U[bi]/S0-1)*100).toFixed(1)}% in ${bi} trading days, ${sgn(zAt(bi),1)} standard deviations using the width up to that day. The width opens with √t, so the range is narrow in the first few days, and the same rise converts into more standard deviations.`);
   }
   function start(){
     s.playing=false; s.prog=0;
@@ -1241,12 +1243,12 @@ const MC=(()=>{
     const v= mcN===100?cache.v100:cache.v10k, rs= mcN===100?cache.r100:cache.r10k;
     const spread=a=>Math.max(...a)-Math.min(...a), s100=spread(cache.r100), s10k=spread(cache.r10k), big=cache.v10k;
     $('mcV').textContent=f2(v);
-    $('mcVb').textContent=mcN===100?'100 条走势':'1 万条走势';
+    $('mcVb').textContent=mcN===100?window.L('100 条走势','100 paths'):window.L('1 万条走势','10,000 paths');
     $('mcD').textContent=sgn(v-MKT);
-    $('mcDb').textContent=v>MKT?'模拟价高于市场价':'模拟价低于市场价';
-    $('mcRep').textContent=`同样 ${mcN===100?'100 条':'1 万条'}，换 5 批随机数：${rs.map(f2).join('、')}。最高减最低 ${f2(spread(rs))}。`;
-    $('mcSay').textContent=`换 5 批随机数，最高减最低：100 条时 ${f2(s100)}，1 万条时 ${f2(s10k)}。条数多了 100 倍，差距只缩到约 1/${Math.round(s100/s10k)}：误差按 1 / √条数 缩小，理论上是 1/10，又是平方根。100 条只够看出形状，算价格要上万条。`
-      + `1 万条算出 ${f2(big)}，比市场价 21.05 ${big>MKT?'高':'低'} ${f2(Math.abs(big-MKT))}：模拟用的是入场前一年的波动，一天 ${(SD1*100).toFixed(2)}%，年化约 ${(SD1*1600).toFixed(0)}%，就是上面的历史波动率；市场给这张期权的隐含波动率是 46.3%。波动越大，call 越值钱。`;
+    $('mcDb').textContent=v>MKT?window.L('模拟价高于市场价','simulated price above market price'):window.L('模拟价低于市场价','simulated price below market price');
+    $('mcRep').textContent=window.L(`同样 ${mcN===100?'100 条':'1 万条'}，换 5 批随机数：${rs.map(f2).join('、')}。最高减最低 ${f2(spread(rs))}。`,`With the same ${mcN===100?'100 paths':'10,000 paths'}, five batches of random numbers give: ${rs.map(f2).join(', ')}. Highest minus lowest: ${f2(spread(rs))}.`);
+    $('mcSay').textContent=window.L(`换 5 批随机数，最高减最低：100 条时 ${f2(s100)}，1 万条时 ${f2(s10k)}。条数多了 100 倍，差距只缩到约 1/${Math.round(s100/s10k)}：误差按 1 / √条数 缩小，理论上是 1/10，又是平方根。100 条只够看出形状，算价格要上万条。`,`Five batches of random numbers, highest minus lowest: ${f2(s100)} with 100 paths, ${f2(s10k)} with 10,000 paths. With 100 times as many paths, the gap shrinks only to about 1/${Math.round(s100/s10k)}: the error shrinks as 1 / √paths, which in theory is 1/10, a square root again. 100 paths are enough to see the shape; pricing needs tens of thousands. `)
+      + window.L(`1 万条算出 ${f2(big)}，比市场价 21.05 ${big>MKT?'高':'低'} ${f2(Math.abs(big-MKT))}：模拟用的是入场前一年的波动，一天 ${(SD1*100).toFixed(2)}%，年化约 ${(SD1*1600).toFixed(0)}%，就是上面的历史波动率；市场给这张期权的隐含波动率是 46.3%。波动越大，call 越值钱。`,`10,000 paths give ${f2(big)}, ${f2(Math.abs(big-MKT))} ${big>MKT?'above':'below'} the market price of 21.05: the simulation uses the volatility of the year before entry, ${(SD1*100).toFixed(2)}% a day, about ${(SD1*1600).toFixed(0)}% annualized, which is the historical volatility above; the market's implied volatility for this option is 46.3%. The higher the volatility, the more a call is worth.`);
   }
   segOn('mcSeg',d=>{ mcN=+d.n; render(); });
   return {render};
@@ -1255,13 +1257,13 @@ const MC=(()=>{
 /* ══════════ 〇 · 一个标准差的算例 ══════════ */
 function renderOneSd(){
   const sd=F0*IV*Math.sqrt(T0);
-  $('oneSd').textContent=`TSLA 本例：F ≈ ${f2(F0)}，σ = 46.3%，t = 32/365 年。一个标准差 ≈ ${f2(F0)} × 0.463 × ${Math.sqrt(T0).toFixed(3)} ≈ ${f1(sd)} 美元，和玩具模型里约 49 的间距是同一个量级。`;
+  $('oneSd').textContent=window.L(`TSLA 本例：F ≈ ${f2(F0)}，σ = 46.3%，t = 32/365 年。一个标准差 ≈ ${f2(F0)} × 0.463 × ${Math.sqrt(T0).toFixed(3)} ≈ ${f1(sd)} 美元，和玩具模型里约 49 的间距是同一个量级。`,`TSLA in this case: F ≈ ${f2(F0)}, σ = 46.3%, t = 32/365 years. One standard deviation ≈ ${f2(F0)} × 0.463 × ${Math.sqrt(T0).toFixed(3)} ≈ ${f1(sd)} dollars, the same order of magnitude as the spacing of about 49 in the toy model.`);
 }
 
 /* ══════════ 三 · 口诀表 + √t 检验 ══════════ */
 function renderMnem(){
   const s=+$('iSig1').value; $('vSig1').textContent=f1(s)+'%';
-  const rows=[['一天',16,'√256'],['一周',7.2,'√52 ≈ 7.21'],['一个月',3.5,'√12 ≈ 3.46']];
+  const rows=[[window.L('一天','One day'),16,'√256'],[window.L('一周','One week'),7.2,'√52 ≈ 7.21'],[window.L('一个月','One month'),3.5,'√12 ≈ 3.46']];
   $('mnem').innerHTML=rows.map(([n,d,w])=>`<tr><td>${n}</td><td>${d}</td><td>${w}</td><td>${f2(s/d)}%</td><td>${f2(S0*s/d/100)}</td></tr>`).join('');
 }
 let sqWin='1y';
@@ -1276,39 +1278,39 @@ function drawSqrt(){
     g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.2:.8}"/>`;
     g+=lab(L-8,Y(v)+4,v+'%','var(--ink-faint)','end',10.5);
   }
-  [1,5,10,15,21].forEach(h=>g+=lab(X(h),B+18,h+' 天','var(--ink-faint)','middle',10.5));
-  g+=lab((L+R)/2,B+36,'连续几个交易日','var(--ink-faint)','middle',10.5);
+  [1,5,10,15,21].forEach(h=>g+=lab(X(h),B+18,h+window.L(' 天',' d'),'var(--ink-faint)','middle',10.5));
+  g+=lab((L+R)/2,B+36,window.L('连续几个交易日','consecutive trading days'),'var(--ink-faint)','middle',10.5);
   // 按 t 线性放大：很快冲出图顶
   const hEnd=Math.min(21, ymax/s1);
   g+=`<line x1="${X(1)}" y1="${Y(s1)}" x2="${X(hEnd)}" y2="${Y(s1*hEnd)}" stroke="var(--ink-faint)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
-  g+=lab(X(hEnd)+6,Y(s1*hEnd)+12,'按 t 放大','var(--ink-faint)','start',11);
+  g+=lab(X(hEnd)+6,Y(s1*hEnd)+12,window.L('按 t 放大','scaled by t'),'var(--ink-faint)','start',11);
   // 按 √t 放大
   let p=[]; for(let h=1;h<=21.001;h+=0.25) p.push(X(h)+','+Y(s1*Math.sqrt(h)));
   g+=`<polyline points="${p.join(' ')}" fill="none" stroke="var(--result)" stroke-width="2.4"/>`;
-  g+=lab(X(21)-4,Y(s1*Math.sqrt(21))+22,'按 √t 放大','var(--result)','end',11.5);
+  g+=lab(X(21)-4,Y(s1*Math.sqrt(21))+22,window.L('按 √t 放大','scaled by √t'),'var(--result)','end',11.5);
   s.forEach((v,i)=>g+=`<circle cx="${X(i+1)}" cy="${Y(v)}" r="4.2" fill="var(--control)"/>`);
-  g+=lab(X(3),Y(s[2])+24,'实测','var(--control)','middle',11.5);
+  g+=lab(X(3),Y(s[2])+24,window.L('实测','measured'),'var(--control)','middle',11.5);
   $('sqrtChart').innerHTML=g;
 
   const p5=s1*Math.sqrt(5), p21=s1*Math.sqrt(21);
-  $('sq1').textContent=f2(s1)+'%'; $('sq1b').textContent='× 16 = 年化 '+f1(s1*16)+'%';
-  $('sq5').textContent=f2(s[4])+'%'; $('sq5b').textContent='√t 预测 '+f2(p5)+'%';
-  $('sq21').textContent=f2(s[20])+'%'; $('sq21b').textContent='√t 预测 '+f2(p21)+'%';
+  $('sq1').textContent=f2(s1)+'%'; $('sq1b').textContent=window.L('× 16 = 年化 ','× 16 = annualized ')+f1(s1*16)+'%';
+  $('sq5').textContent=f2(s[4])+'%'; $('sq5b').textContent=window.L('√t 预测 ','√t predicts ')+f2(p5)+'%';
+  $('sq21').textContent=f2(s[20])+'%'; $('sq21b').textContent=window.L('√t 预测 ','√t predicts ')+f2(p21)+'%';
   const dev=(s[20]/p21-1)*100;
-  const name={ '1y':'最近 1 年','2y':'最近 2 年','all':'全部 5.7 年'}[sqWin];
+  const name={ '1y':window.L('最近 1 年','Last 1 year'),'2y':window.L('最近 2 年','Last 2 years'),'all':window.L('全部 5.7 年','All 5.7 years')}[sqWin];
   const extra={
-    '1y':'这一年 TSLA 常常涨一段又跌回来，一个月里的涨跌抵消得比「互不相关」更多。一年只有 250 个交易日，这个估计本身的误差也不小。',
-    '2y':'两年里包含 2024 年 11 月一周涨三成那一段，一天的标准差也被抬高到 3.9%。',
-    'all':'数据越长，点越贴近曲线。'
+    '1y':window.L('这一年 TSLA 常常涨一段又跌回来，一个月里的涨跌抵消得比「互不相关」更多。一年只有 250 个交易日，这个估计本身的误差也不小。','In this year TSLA often rose for a stretch and then fell back, so moves within a month canceled more than "unrelated" would imply. A year has only 250 trading days, so the estimate itself has a sizable error.'),
+    '2y':window.L('两年里包含 2024 年 11 月一周涨三成那一段，一天的标准差也被抬高到 3.9%。','The two years include the week in November 2024 when it rose 30%, which also pushes one day\'s standard deviation up to 3.9%.'),
+    'all':window.L('数据越长，点越贴近曲线。','The longer the data, the closer the points are to the curve.')
   }[sqWin];
-  $('sqSay').textContent=`${name}（${d.from} 至 ${d.to}，${d.days} 个交易日）：21 天的实测标准差比 √t 预测${dev>=0?'高':'低'} ${Math.abs(dev).toFixed(0)}%，按 t 放大则会是 ${f1(s1*21)}%。${extra}`;
+  $('sqSay').textContent=window.L(`${name}（${d.from} 至 ${d.to}，${d.days} 个交易日）：21 天的实测标准差比 √t 预测${dev>=0?'高':'低'} ${Math.abs(dev).toFixed(0)}%，按 t 放大则会是 ${f1(s1*21)}%。${extra}`,`${name} (${d.from} to ${d.to}, ${d.days} trading days): the measured 21-day standard deviation is ${Math.abs(dev).toFixed(0)}% ${dev>=0?'above':'below'} the √t prediction; scaling by t would give ${f1(s1*21)}%. ${extra}`);
 }
 
 /* ══════════ 四 · 拖线实验 ══════════ */
 const LEC=[0.75,-1.55,-2.40,3.20,1.75,0.15,0.40,1.40,-1.00,-0.55];
 const DS={
   tsla:{moves:MOVES, labels:DAYS.slice(1).map(d=>d.slice(5).replace('-','/')), start:1},
-  lec:{moves:LEC, labels:LEC.map((_,i)=>'第'+(i+1)+'天'), start:0.5}
+  lec:{moves:LEC, labels:LEC.map((_,i)=>window.L('第','Day ')+(i+1)+window.L('天','')), start:0.5}
 };
 let ds='tsla', line=DS.tsla.start, dragging=false;
 const dgA={k:Infinity, playing:false};             // 逐天播放：已经出现几天（可带小数）
@@ -1331,7 +1333,7 @@ function drawDrag(){
   if(ds==='tsla' && solvedTsla() && dgA.k>=n){
     const d=IV*100/16;
     [d,-d].forEach(v=>g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--result)" stroke-width="1.4" stroke-dasharray="5 4"/>`);
-    g+=lab(L+4,Y(-d)+14,'隐含波动率换算的一天：±'+d.toFixed(2)+'%','var(--result)','start',10.5);
+    g+=lab(L+4,Y(-d)+14,window.L('隐含波动率换算的一天：±','one day from implied volatility: ±')+d.toFixed(2)+'%','var(--result)','start',10.5);
   }
   [x,-x].forEach((v,k)=>{
     g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--control)" stroke-width="2.2"/>`;
@@ -1352,31 +1354,31 @@ function renderDrag(){
   if(dgA.k<n){                                          // 播放中：只数已经出现的日子
     const shown=Math.floor(dgA.k), ko=m.slice(0,shown).filter(v=>Math.abs(v)>line).length;
     $('cntBig').textContent=`${ko} / ${shown}`;
-    $('cntCap').textContent=`天在线外（已出现 ${shown} 天，共 ${n} 天）`;
+    $('cntCap').textContent=window.L(`天在线外（已出现 ${shown} 天，共 ${n} 天）`,`days outside the line (${shown} days shown, ${n} in total)`);
     $('cnt').classList.remove('hit'); $('dragSay').className='say plain'; $('dragSay').textContent='';
     return;
   }
   $('cntBig').textContent=`${k} / ${n}`;
-  $('cntCap').textContent=`天在线外，占 ${(k/n*100).toFixed(0)}%。三分之一是 ${(n/3).toFixed(n%3?1:0)} 天。`;
+  $('cntCap').textContent=window.L(`天在线外，占 ${(k/n*100).toFixed(0)}%。三分之一是 ${(n/3).toFixed(n%3?1:0)} 天。`,`days outside the line, ${(k/n*100).toFixed(0)}%. One third is ${(n/3).toFixed(n%3?1:0)} days.`);
   const hit = k===tk;
   $('cnt').classList.toggle('hit',hit);
   const say=$('dragSay');
   if(!hit){
     say.className='say plain';
-    say.textContent = k>tk ? `线外的日子多于三分之一，一天的标准差比 ${line.toFixed(2)}% 大。`
-                           : `线外的日子少于三分之一，一天的标准差比 ${line.toFixed(2)}% 小。`;
+    say.textContent = k>tk ? window.L(`线外的日子多于三分之一，一天的标准差比 ${line.toFixed(2)}% 大。`,`More than one third of the days are outside the line, so one day's standard deviation is larger than ${line.toFixed(2)}%.`)
+                           : window.L(`线外的日子少于三分之一，一天的标准差比 ${line.toFixed(2)}% 小。`,`Fewer than one third of the days are outside the line, so one day's standard deviation is smaller than ${line.toFixed(2)}%.`);
     return;
   }
   const sorted=m.map(Math.abs).sort((a,b)=>b-a), hi=sorted[tk-1], lo=sorted[tk], mid=(hi+lo)/2, zm=zeroMean(m);
   say.className='say flat';
-  let h=`线外 ${k} 天，${n%3?'最接近':'正好是'}三分之一。<br>你的线：${line.toFixed(2)}% × 16 = <b>${f1(line*16)}%</b>。`+
-        `讲义的取法是第 ${tk} 大（${hi.toFixed(2)}）和第 ${tk+1} 大（${lo.toFixed(2)}）取中点：${mid.toFixed(2)}% × 16 = <b>${f1(mid*16)}%</b>。<br>`+
-        `精确计算（零均值）：一天 ${zm.toFixed(2)}%，× 16 = <b>${f1(zm*16)}%</b>。`;
+  let h=window.L(`线外 ${k} 天，${n%3?'最接近':'正好是'}三分之一。<br>你的线：${line.toFixed(2)}% × 16 = <b>${f1(line*16)}%</b>。`,`${k} days outside the line, ${n%3?'the closest to':'exactly'} one third.<br>Your line: ${line.toFixed(2)}% × 16 = <b>${f1(line*16)}%</b>. `)+
+        window.L(`讲义的取法是第 ${tk} 大（${hi.toFixed(2)}）和第 ${tk+1} 大（${lo.toFixed(2)}）取中点：${mid.toFixed(2)}% × 16 = <b>${f1(mid*16)}%</b>。<br>`,`The lecture notes take the midpoint of the ${tk}th largest (${hi.toFixed(2)}) and the ${tk+1}th largest (${lo.toFixed(2)}): ${mid.toFixed(2)}% × 16 = <b>${f1(mid*16)}%</b>.<br>`)+
+        window.L(`精确计算（零均值）：一天 ${zm.toFixed(2)}%，× 16 = <b>${f1(zm*16)}%</b>。`,`Exact calculation (zero mean): one day ${zm.toFixed(2)}%, × 16 = <b>${f1(zm*16)}%</b>.`);
   if(ds==='tsla'){
     const d=IV*100/16, over=m.filter(v=>Math.abs(v)>d).length;
-    h+=`<br><br>入场那天市场给的隐含波动率是 46.3%，换算成一天是 ${d.toFixed(2)}%（虚线）。之后 ${n} 天里，有 ${over} 天超过它，也是三分之一。事后量出的 ${f1(zm*16)}% 和市场事前给的 46.3% 只差 ${(46.3-zm*16).toFixed(1)} 个点。`;
+    h+=window.L(`<br><br>入场那天市场给的隐含波动率是 46.3%，换算成一天是 ${d.toFixed(2)}%（虚线）。之后 ${n} 天里，有 ${over} 天超过它，也是三分之一。事后量出的 ${f1(zm*16)}% 和市场事前给的 46.3% 只差 ${(46.3-zm*16).toFixed(1)} 个点。`,`<br><br>On the entry day the market's implied volatility was 46.3%, which is ${d.toFixed(2)}% for one day (dashed line). Over the following ${n} days, ${over} days exceeded it, also one third. The ${f1(zm*16)}% measured afterward differs from the market's 46.3% quoted beforehand by only ${(46.3-zm*16).toFixed(1)} points.`);
   } else {
-    h+=`<br><br>讲义印的真值是 26.67%，那是普通样本标准差（先减掉平均值，再除以 n − 1）。算法不同差一个点左右，心算的 ${f1(mid*16)}% 落在两者之间。`;
+    h+=window.L(`<br><br>讲义印的真值是 26.67%，那是普通样本标准差（先减掉平均值，再除以 n − 1）。算法不同差一个点左右，心算的 ${f1(mid*16)}% 落在两者之间。`,`<br><br>The true value printed in the lecture notes is 26.67%; that is the ordinary sample standard deviation (subtract the average first, then divide by n − 1). The different methods differ by about a point, and the mental-math ${f1(mid*16)}% falls between the two.`);
   }
   say.innerHTML=h;
 }
@@ -1423,7 +1425,7 @@ function drawRuler(){
     g+=`<line x1="${X(k)}" y1="${B}" x2="${X(k)}" y2="${B+6}" stroke="var(--ink-faint)"/>`;
     g+=lab(X(k),B+20,k===0?'0':(k>0?'+':'−')+Math.abs(k),'var(--ink-faint)','middle',10.5);
   }
-  g+=lab(R,B+20,'个标准差','var(--ink-faint)','end',10);
+  g+=lab(R,B+20,window.L('个标准差','standard deviations'),'var(--ink-faint)','end',10);
   // 行权价刻度
   for(let k=300;k<=470;k+=5){
     const zk=zOf(k,d); if(Math.abs(zk)>zr) continue;
@@ -1431,7 +1433,7 @@ function drawRuler(){
     g+=`<line x1="${X(zk)}" y1="${B+30}" x2="${X(zk)}" y2="${B+(big?44:37)}" stroke="var(--ink-faint)" stroke-width="${big?1.4:.8}"/>`;
     if(big) g+=lab(X(zk),B+58,k,'var(--ink-faint)','middle',10);
   }
-  g+=lab(L,B+58,'行权价','var(--ink-faint)','start',10);
+  g+=lab(L,B+58,window.L('行权价','strike'),'var(--ink-faint)','start',10);
   // 选中的行权价
   const out=Math.abs(z)>zr;
   g+=`<line x1="${X(zc)}" y1="${T}" x2="${X(zc)}" y2="${B+44}" stroke="var(--control)" stroke-width="2.2"/>`;
@@ -1439,18 +1441,18 @@ function drawRuler(){
   if(d===32){
     const zs=Math.log(SETTLE/F)/(IV*Math.sqrt(d/365));
     g+=`<line x1="${X(zs)}" y1="${T+30}" x2="${X(zs)}" y2="${B}" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
-    g+=lab(X(zs)+(zs>2.4?-5:5),T+42,'5/15 收盘','var(--good)',zs>2.4?'end':'start',10.5);
+    g+=lab(X(zs)+(zs>2.4?-5:5),T+42,window.L('5/15 收盘','5/15 close'),'var(--good)',zs>2.4?'end':'start',10.5);
   }
   $('ruler').innerHTML=g;
 
-  $('vK').textContent=K; $('vKD').textContent=d+' 天';
+  $('vK').textContent=K; $('vKD').textContent=d+window.L(' 天',' days');
   const dist=K-F, p= z>=0 ? 1-ncdf(z) : ncdf(z);
   $('kDist').textContent=sgn(dist); $('kDistb').textContent='F = '+f2(F);
-  $('kZ').textContent=sgn(z); $('kZb').textContent='一个标准差 = '+f2(F*IV*Math.sqrt(d/365))+' 美元';
+  $('kZ').textContent=sgn(z); $('kZb').textContent=window.L('一个标准差 = ','one standard deviation = ')+f2(F*IV*Math.sqrt(d/365))+window.L(' 美元',' dollars');
   $('kP').textContent=pctP(p); $('kPb').textContent=oneIn(p);
   const other = d>=10 ? 5 : 32, zo=zOf(K,other);
-  let t=`到期落在 ${K} ${K>=F?'上方':'下方'}的概率${p<0.001?'':'约 '}${pctP(p)}。同一个行权价，离到期 ${other} 天时是 ${sgn(zo)} 个标准差：美元距离几乎没变，时间${other<d?'越少':'越多'}，能走的幅度${other<d?'越小':'越大'}，它就显得${other<d?'越远':'越近'}。`;
-  if(d===32){ const zs=Math.log(SETTLE/F)/(IV*Math.sqrt(d/365)); t+=`5/15 TSLA 收在 ${SETTLE}，是 +${zs.toFixed(2)} 个标准差，事前看${oneIn(1-ncdf(zs))}。`; }
+  let t=window.L(`到期落在 ${K} ${K>=F?'上方':'下方'}的概率${p<0.001?'':'约 '}${pctP(p)}。同一个行权价，离到期 ${other} 天时是 ${sgn(zo)} 个标准差：美元距离几乎没变，时间${other<d?'越少':'越多'}，能走的幅度${other<d?'越小':'越大'}，它就显得${other<d?'越远':'越近'}。`,`Probability of finishing ${K>=F?'above':'below'} ${K}: ${p<0.001?'':'about '}${pctP(p)}. The same strike with ${other} days to expiration is ${sgn(zo)} standard deviations: the dollar distance has barely changed, but with ${other<d?'less':'more'} time the possible move is ${other<d?'smaller':'larger'}, so it looks ${other<d?'further':'closer'}.`);
+  if(d===32){ const zs=Math.log(SETTLE/F)/(IV*Math.sqrt(d/365)); t+=window.L(`5/15 TSLA 收在 ${SETTLE}，是 +${zs.toFixed(2)} 个标准差，事前看${oneIn(1-ncdf(zs))}。`,` On 5/15 TSLA closed at ${SETTLE}, +${zs.toFixed(2)} standard deviations; beforehand that was ${oneIn(1-ncdf(zs))}.`); }
   $('kSay').textContent=t;
 }
 $('iK').addEventListener('input',drawRuler);
@@ -1459,64 +1461,64 @@ $('iKD').addEventListener('input',drawRuler);
 /* ══════════ 七 · 四种波动率 ══════════ */
 function renderFour(){
   const rows=[
-    ['未来波动率','从现在到到期实际会发生的波动。事前没人知道。',`<b>${f1(FUT)}%</b><br><span class="tiny">4/14 – 5/15 的 24 天，事后才算得出</span>`],
-    ['历史波动率','过去某段时间实际发生的波动。',`<b>${f1(HIST)}%</b><br><span class="tiny">入场前一年，一天 ${f2(SQ['1y'].sig[0])}% × 16</span>`],
-    ['预测波动率','你自己对未来波动率的估计。','你给的数'],
-    ['隐含波动率','从市场上的期权价格反推出来的 σ，相当于市场的报价。',`<b>46.3%</b><br><span class="tiny">350 call 入场日的市价对应的 σ</span>`]
+    [window.L('未来波动率','Future volatility'),window.L('从现在到到期实际会发生的波动。事前没人知道。','The volatility that will actually occur between now and expiration. Nobody knows it in advance.'),window.L(`<b>${f1(FUT)}%</b><br><span class="tiny">4/14 – 5/15 的 24 天，事后才算得出</span>`,`<b>${f1(FUT)}%</b><br><span class="tiny">the 24 days from 4/14 to 5/15, known only afterward</span>`)],
+    [window.L('历史波动率','Historical volatility'),window.L('过去某段时间实际发生的波动。','The volatility that actually occurred over some past period.'),window.L(`<b>${f1(HIST)}%</b><br><span class="tiny">入场前一年，一天 ${f2(SQ['1y'].sig[0])}% × 16</span>`,`<b>${f1(HIST)}%</b><br><span class="tiny">year before entry, one day ${f2(SQ['1y'].sig[0])}% × 16</span>`)],
+    [window.L('预测波动率','Forecast volatility'),window.L('你自己对未来波动率的估计。','Your own estimate of future volatility.'),window.L('你给的数','your number')],
+    [window.L('隐含波动率','Implied volatility'),window.L('从市场上的期权价格反推出来的 σ，相当于市场的报价。','The σ backed out from option prices in the market, effectively the market\'s quote.'),window.L(`<b>46.3%</b><br><span class="tiny">350 call 入场日的市价对应的 σ</span>`,`<b>46.3%</b><br><span class="tiny">σ implied by the 350 call's market price on the entry day</span>`)]
   ];
   $('fourVol').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="txt">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
-  const bars=[['历史（入场前一年）',HIST,'var(--ink-faint)'],['隐含（入场时的价格）',46.3,'var(--control)'],['未来（事后的价值）',FUT,'var(--result)']];
+  const bars=[[window.L('历史（入场前一年）','historical (year before entry)'),HIST,'var(--ink-faint)'],[window.L('隐含（入场时的价格）','implied (price at entry)'),46.3,'var(--control)'],[window.L('未来（事后的价值）','future (value afterward)'),FUT,'var(--result)']];
   const mx=60;
   $('vbars').innerHTML=bars.map(([l,v,c])=>`<div class="vb"><span class="l">${l}</span><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${c}"></div></div><span class="n" style="color:${c}">${f1(v)}%</span></div>`).join('');
-  $('pvSay').innerHTML=`这笔交易里，价格是 46.3%，价值是 ${f1(FUT)}%，只差 ${(46.3-FUT).toFixed(1)} 个点：按波动率算，这张 350 call 的定价是公道的。1.1 里它赚了 244%，这笔钱来自方向，TSLA 到期时走到了 +1.29 个标准差。买 call 的同时用股票把方向风险对冲掉（节点 4.1 讲怎么做），剩下的盈亏就只来自隐含和未来波动率之差，这一次这个差很小。`;
+  $('pvSay').innerHTML=window.L(`这笔交易里，价格是 46.3%，价值是 ${f1(FUT)}%，只差 ${(46.3-FUT).toFixed(1)} 个点：按波动率算，这张 350 call 的定价是公道的。1.1 里它赚了 244%，这笔钱来自方向，TSLA 到期时走到了 +1.29 个标准差。买 call 的同时用股票把方向风险对冲掉（节点 4.1 讲怎么做），剩下的盈亏就只来自隐含和未来波动率之差，这一次这个差很小。`,`In this trade the price was 46.3% and the value was ${f1(FUT)}%, only ${(46.3-FUT).toFixed(1)} points apart: in volatility terms, the 350 call was fairly priced. In 1.1 it made 244%, and that money came from direction: TSLA ended at +1.29 standard deviations at expiration. If you buy the call and hedge the directional risk with stock (node 4.1 shows how), the remaining P&amp;L comes only from the difference between implied and future volatility, and this time that difference was small.`);
 }
 
 /* ══════════ 八 · 费曼检验 ══════════ */
 const QS=[
- {q:`不许用「标准差」这个词，向一个没学过统计的人解释：「TSLA 的波动率是 46%」这句话在说什么。`,
-  a:['这是在说典型的变动幅度，不说方向，涨和跌都算。',
-     '按这个数，一年后 TSLA 相对现在的变动，大约三次里有两次在 ±46% 以内，三次里有一次超出。',
-     '换成一天就是 46% ÷ 16，约 2.9%：普通的一天涨跌在 3% 上下，大约三天里有一天超过它。'],
-  s:'「说明 TSLA 风险很大」：这是评价，没说出这个数字能推出什么。'},
- {q:`为什么时间变成 4 倍，价格区间只变宽 2 倍？用抛硬币或走路的例子讲。`,
-  a:['每天的涨跌互不相关时，相邻的日子会互相抵消一部分。',
-     '四天全部同方向的情况很少，大多数时候有涨有跌，加起来的幅度比四个一天小。',
-     '独立的变动相加时，标准差的平方按天数相加，所以标准差本身按天数的平方根增长。',
-     '真实数据只是大致符合：最近一年 TSLA 21 天的实测比 √t 预测低 12%，因为这一年涨了又跌回来的时候多。'],
-  s:'「公式里就是根号」：说出了结果，没说为什么是根号而不是天数本身。'},
- {q:`某股票连涨十天，每天 +1%。用普通标准差算，它的波动率是多少？这个结果错在哪？零均值假设怎么修正它？`,
-  a:['平均每天 +1%，每天离平均值的距离都是 0，普通标准差是 0，波动率 0%。',
-     '但这只股票十天涨了约 10%，价格明显在动。普通标准差只量「围着平均值晃多少」，把稳定的趋势当成了不动。',
-     '零均值假设直接量每天离 0 有多远：一天 1%，年化 1% × 16 = 16%。'],
-  s:'「因为样本太少」：样本多少不是原因，一百天都是 +1% 结果还是 0。'},
- {q:`为什么对数正态区间往上伸得比往下远？什么情况下正态区间会给出荒谬的结果？`,
-  a:['对数正态按比例算：涨一个标准差是乘以 e<sup>σ√t</sup>，跌一个标准差是除以同一个数。',
-     '同一个比例，乘出来的美元距离比除出来的大，所以上沿离中心更远。',
-     '正态按美元算，上下对称。σ√t 大的时候下沿会跌破 0，比如 σ 46%、两年、两个标准差。',
-     '股价不能是负数，按比例变化的价格也永远到不了 0，所以对数正态更接近真实的股价。'],
-  s:'「因为股票长期会涨」：这是方向观点。F 和 σ 固定时，不对称完全来自按比例计算。'},
- {q:`同一个 400 的行权价，离到期 32 天时和只剩 5 天时，哪个时候它离中心「更远」？为什么量距离要除以 σ√t？`,
-  a:['美元距离几乎没变，都是 400 减去远期价。',
-     '5 天里 TSLA 能走的典型幅度只有 32 天的 √(5/32)，约 0.4 倍。同样的美元距离，折成标准差个数变大了。',
-     '所以到期越近，同一个虚值行权价越难到达，落在它外侧的概率越低。',
-     '除以 σ√t 是把距离换成「要走几个典型幅度」，不同股票、不同期限之间才能比较。'],
-  s:'「越近到期期权越便宜」：说的是期权价格，没回答距离为什么变了。'},
- {q:`入场时隐含波动率 46.3%，之后 24 天的实际波动率 ${f1(FUT)}%，这张 350 call 却赚了 244%。买方赚的是什么？如果之后 TSLA 实际波动只有 30%，但 5/15 同样收在 422.32，持有到期的买方还赚钱吗？`,
-  a:['持有到期的 call 只看到期价：422.32 − 350 = 72.32，减去成本 21.10。这笔钱与路上波动大小无关，实际波动 30% 时照样赚。',
-     '赚的是方向：TSLA 走了 +1.29 个标准差，事前看大约 10 次里 1 次。',
-     '隐含 46.3% 是买方付出的价格，未来 ' + f1(FUT) + '% 是事后体现的价值，两者几乎相等：按波动率算，这张期权定价公道。',
-     '波动率本身的盈亏，要在把方向风险对冲掉之后才显出来，节点 4.1 讲。'],
-  s:'「因为波动大所以赚钱」：实际波动比隐含还低一点，赚钱的原因不是波动率。'},
- {q:`入场前一年 TSLA 的历史波动率是 ${f1(HIST)}%，比隐含的 46.3% 高。能不能据此说这张期权「便宜」？`,
-  a:['不能直接这么说。期权的价值取决于从现在到到期的未来波动率，历史波动率只是过去。',
-     '历史是做预测的材料之一，但窗口选多长结果就不同：最近 1 年约 49%，全部 5.7 年约 62%。',
-     '该拿隐含去比的是你的预测。你预测未来波动高于 46.3%，才能说期权便宜。',
-     '这一次事后看，未来波动是 ' + f1(FUT) + '%，低于历史的 ' + f1(HIST) + '%。按历史波动率判断会觉得占了便宜，其实没有。'],
-  s:'「历史比隐含高，所以便宜」：把过去当成了未来。'}
+ {q:window.L(`不许用「标准差」这个词，向一个没学过统计的人解释：「TSLA 的波动率是 46%」这句话在说什么。`,`Without using the words "standard deviation", explain to someone who has never studied statistics what "TSLA's volatility is 46%" means.`),
+  a:[window.L('这是在说典型的变动幅度，不说方向，涨和跌都算。','It describes the typical size of a move, not its direction; rises and falls both count.'),
+     window.L('按这个数，一年后 TSLA 相对现在的变动，大约三次里有两次在 ±46% 以内，三次里有一次超出。','By this number, TSLA\'s change one year from now will be within ±46% about two times out of three, and outside it one time out of three.'),
+     window.L('换成一天就是 46% ÷ 16，约 2.9%：普通的一天涨跌在 3% 上下，大约三天里有一天超过它。','For one day it is 46% ÷ 16, about 2.9%: an ordinary day moves about 3% either way, and about one day in three exceeds it.')],
+  s:window.L('「说明 TSLA 风险很大」：这是评价，没说出这个数字能推出什么。','"It means TSLA is very risky": a judgment that says nothing about what the number lets you infer.')},
+ {q:window.L(`为什么时间变成 4 倍，价格区间只变宽 2 倍？用抛硬币或走路的例子讲。`,`Why does four times the time make the price range only twice as wide? Explain with coin flips or walking.`),
+  a:[window.L('每天的涨跌互不相关时，相邻的日子会互相抵消一部分。','When daily changes are unrelated to each other, neighboring days partly cancel.'),
+     window.L('四天全部同方向的情况很少，大多数时候有涨有跌，加起来的幅度比四个一天小。','Four days all in the same direction are rare; most of the time there are rises and falls, and the total is smaller than four single days.'),
+     window.L('独立的变动相加时，标准差的平方按天数相加，所以标准差本身按天数的平方根增长。','When independent changes are added, the squares of the standard deviations add up by day, so the standard deviation itself grows with the square root of the number of days.'),
+     window.L('真实数据只是大致符合：最近一年 TSLA 21 天的实测比 √t 预测低 12%，因为这一年涨了又跌回来的时候多。','Real data fits only roughly: over the last year TSLA\'s measured 21-day value was 12% below the √t prediction, because this year it often rose and then fell back.')],
+  s:window.L('「公式里就是根号」：说出了结果，没说为什么是根号而不是天数本身。','"The formula just has a square root": states the result without saying why it is the square root and not the number of days itself.')},
+ {q:window.L(`某股票连涨十天，每天 +1%。用普通标准差算，它的波动率是多少？这个结果错在哪？零均值假设怎么修正它？`,`A stock rises ten days in a row, +1% every day. Computed with the ordinary standard deviation, what is its volatility? What is wrong with the result? How does the zero-mean assumption fix it?`),
+  a:[window.L('平均每天 +1%，每天离平均值的距离都是 0，普通标准差是 0，波动率 0%。','The average is +1% a day and every day\'s distance from the average is 0, so the ordinary standard deviation is 0 and the volatility is 0%.'),
+     window.L('但这只股票十天涨了约 10%，价格明显在动。普通标准差只量「围着平均值晃多少」，把稳定的趋势当成了不动。','But the stock rose about 10% in ten days; the price is clearly moving. The ordinary standard deviation measures only "how much it wobbles around the average" and treats a steady trend as no movement.'),
+     window.L('零均值假设直接量每天离 0 有多远：一天 1%，年化 1% × 16 = 16%。','The zero-mean assumption measures each day\'s distance from 0 directly: 1% a day, annualized 1% × 16 = 16%.')],
+  s:window.L('「因为样本太少」：样本多少不是原因，一百天都是 +1% 结果还是 0。','"Because the sample is too small": sample size is not the cause; with a hundred days of +1% the result is still 0.')},
+ {q:window.L(`为什么对数正态区间往上伸得比往下远？什么情况下正态区间会给出荒谬的结果？`,`Why does the lognormal range reach further up than down? When does the normal range give an absurd result?`),
+  a:[window.L('对数正态按比例算：涨一个标准差是乘以 e<sup>σ√t</sup>，跌一个标准差是除以同一个数。','Lognormal works by proportion: up one standard deviation means multiplying by e<sup>σ√t</sup>, down one means dividing by the same number.'),
+     window.L('同一个比例，乘出来的美元距离比除出来的大，所以上沿离中心更远。','For the same proportion, multiplying gives a larger dollar distance than dividing, so the upper end is further from the center.'),
+     window.L('正态按美元算，上下对称。σ√t 大的时候下沿会跌破 0，比如 σ 46%、两年、两个标准差。','Normal works in dollars and is symmetric. When σ√t is large the lower end goes below 0, for example σ 46%, two years, two standard deviations.'),
+     window.L('股价不能是负数，按比例变化的价格也永远到不了 0，所以对数正态更接近真实的股价。','Stock prices cannot be negative, and a price that changes by proportion never reaches 0, so the lognormal is closer to real stock prices.')],
+  s:window.L('「因为股票长期会涨」：这是方向观点。F 和 σ 固定时，不对称完全来自按比例计算。','"Because stocks rise over time": that is a directional view. With F and σ fixed, the asymmetry comes entirely from working in proportions.')},
+ {q:window.L(`同一个 400 的行权价，离到期 32 天时和只剩 5 天时，哪个时候它离中心「更远」？为什么量距离要除以 σ√t？`,`Take the same 400 strike with 32 days to expiration and with only 5 days left. When is it "further" from the center? Why divide the distance by σ√t?`),
+  a:[window.L('美元距离几乎没变，都是 400 减去远期价。','The dollar distance has barely changed: in both cases it is 400 minus the forward price.'),
+     window.L('5 天里 TSLA 能走的典型幅度只有 32 天的 √(5/32)，约 0.4 倍。同样的美元距离，折成标准差个数变大了。','Over 5 days, TSLA\'s typical move is only √(5/32) of the 32-day move, about 0.4 times. The same dollar distance converts into more standard deviations.'),
+     window.L('所以到期越近，同一个虚值行权价越难到达，落在它外侧的概率越低。','So the closer to expiration, the harder it is to reach the same out-of-the-money strike, and the lower the probability of finishing beyond it.'),
+     window.L('除以 σ√t 是把距离换成「要走几个典型幅度」，不同股票、不同期限之间才能比较。','Dividing by σ√t turns distance into "how many typical moves it takes", so different stocks and different terms can be compared.')],
+  s:window.L('「越近到期期权越便宜」：说的是期权价格，没回答距离为什么变了。','"Options get cheaper closer to expiration": talks about the option price and does not answer why the distance changed.')},
+ {q:window.L(`入场时隐含波动率 46.3%，之后 24 天的实际波动率 ${f1(FUT)}%，这张 350 call 却赚了 244%。买方赚的是什么？如果之后 TSLA 实际波动只有 30%，但 5/15 同样收在 422.32，持有到期的买方还赚钱吗？`,`At entry the implied volatility was 46.3% and the actual volatility over the next 24 days was ${f1(FUT)}%, yet this 350 call made 244%. What did the buyer earn? If TSLA's actual volatility afterward had been only 30% but it still closed at 422.32 on 5/15, would the buyer holding to expiration still make money?`),
+  a:[window.L('持有到期的 call 只看到期价：422.32 − 350 = 72.32，减去成本 21.10。这笔钱与路上波动大小无关，实际波动 30% 时照样赚。','A call held to expiration only looks at the price at expiration: 422.32 − 350 = 72.32, minus the cost of 21.10. This money has nothing to do with how volatile the path was; at 30% actual volatility it still makes money.'),
+     window.L('赚的是方向：TSLA 走了 +1.29 个标准差，事前看大约 10 次里 1 次。','It earned direction: TSLA moved +1.29 standard deviations, about 1 time in 10 beforehand.'),
+     window.L('隐含 46.3% 是买方付出的价格，未来 ','The implied 46.3% is the price the buyer paid; the future ') + f1(FUT) + window.L('% 是事后体现的价值，两者几乎相等：按波动率算，这张期权定价公道。','% is the value realized afterward, and the two are almost equal: in volatility terms this option was fairly priced.'),
+     window.L('波动率本身的盈亏，要在把方向风险对冲掉之后才显出来，节点 4.1 讲。','The P&amp;L from volatility itself only shows up after the directional risk is hedged away; node 4.1 covers that.')],
+  s:window.L('「因为波动大所以赚钱」：实际波动比隐含还低一点，赚钱的原因不是波动率。','"It made money because volatility was high": actual volatility was slightly below implied, so volatility is not why it made money.')},
+ {q:window.L(`入场前一年 TSLA 的历史波动率是 ${f1(HIST)}%，比隐含的 46.3% 高。能不能据此说这张期权「便宜」？`,`In the year before entry, TSLA's historical volatility was ${f1(HIST)}%, higher than the implied 46.3%. Can you conclude from this that the option was "cheap"?`),
+  a:[window.L('不能直接这么说。期权的价值取决于从现在到到期的未来波动率，历史波动率只是过去。','Not directly. An option\'s value depends on future volatility from now to expiration; historical volatility is only the past.'),
+     window.L('历史是做预测的材料之一，但窗口选多长结果就不同：最近 1 年约 49%，全部 5.7 年约 62%。','History is one input to a forecast, but the result depends on the window: about 49% for the last year, about 62% for all 5.7 years.'),
+     window.L('该拿隐含去比的是你的预测。你预测未来波动高于 46.3%，才能说期权便宜。','What implied volatility should be compared with is your forecast. Only if you forecast future volatility above 46.3% can you say the option is cheap.'),
+     window.L('这一次事后看，未来波动是 ','Looking back this time, future volatility was ') + f1(FUT) + window.L('%，低于历史的 ','%, below the historical ') + f1(HIST) + window.L('%。按历史波动率判断会觉得占了便宜，其实没有。','%. Judging by historical volatility you would think you got a bargain, but you did not.')],
+  s:window.L('「历史比隐含高，所以便宜」：把过去当成了未来。','"Historical is above implied, so it is cheap": treats the past as the future.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>window.L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1530,7 +1532,21 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`
+    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-1-2-q'+i); if(v) t.value=v; }catch(e){}
@@ -1539,8 +1555,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? window.L('对照参考答案','Compare with the reference answer') : window.L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? window.L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 
@@ -1593,6 +1609,7 @@ MC.render();
 /* 滚到眼前才开始播放 */
 onView(GT.cv,GT.start); onView(BM.cv,BM.start); onView(PA.cv,PA.start); onView(PB.cv,PB.start); onView(RPATH.cv,RPATH.start); onView($('drag'),dgPlay);
 </script>
+<script>/* 英文模式：属性文字换成英文 */if(window.LANG==='en')document.querySelectorAll('[data-en-aria-label],[data-en-placeholder],[data-en-title],[data-en-alt]').forEach(function(e){['aria-label','placeholder','title','alt'].forEach(function(a){var v=e.getAttribute('data-en-'+a);if(v!=null)e.setAttribute(a,v);});});</script>
 <script src="course-nav.js"></script>
 </body>
 </html>

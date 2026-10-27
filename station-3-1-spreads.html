@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>价差家族</title>
+<script src="lang.js"></script><script>document.title=L('价差家族','The spread family');</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2022H12L20%2010H27'%20stroke='%23fdf6ec'%20stroke-width='2.8'%20fill='none'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -231,262 +232,263 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   .steps{grid-template-columns:1fr}
   .gridtb td:first-child{width:auto}
 }
+span.l-zh,span.l-en{display:contents}
 </style>
 </head>
 <body>
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 第二条腿</a><a href="#s1">一 四种价差</a><a href="#s2">二 手算成本</a><a href="#s3">三 波动率一变</a>
-  <a href="#s4">四 双判据</a><a href="#s5">五 逐日回放</a><a href="#s6">六 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 第二条腿</span><span class="l-en">0 The second leg</span></a><a href="#s1"><span class="l-zh">一 四种价差</span><span class="l-en">1 Four spreads</span></a><a href="#s2"><span class="l-zh">二 手算成本</span><span class="l-en">2 Pricing by hand</span></a><a href="#s3"><span class="l-zh">三 波动率一变</span><span class="l-en">3 When volatility moves</span></a>
+  <a href="#s4"><span class="l-zh">四 双判据</span><span class="l-en">4 Two criteria</span></a><a href="#s5"><span class="l-zh">五 逐日回放</span><span class="l-en">5 Daily replay</span></a><a href="#s6"><span class="l-zh">六 费曼检验</span><span class="l-en">6 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 3.1</p>
-  <h1>价差家族</h1>
-  <p class="lede">2.4 把买 350 call、卖 380 call 这个仓位压成了四个数，读出它剩下的几乎只有方向。这一节从这个仓位讲起：用同一到期日的两条腿表达看涨或看跌，把最大亏损和最大盈利都封住；再讲同样看涨的两个价差之间该选哪个。案例还是 <span class="nw">2026-04-13</span> 收盘的 TSLA 5/15 到期期权，5/15 收在 422.32。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 3.1</span><span class="l-en">FIN 580 review · Node 3.1</span></p>
+  <h1><span class="l-zh">价差家族</span><span class="l-en">The spread family</span></h1>
+  <p class="lede"><span class="l-zh">2.4 把买 350 call、卖 380 call 这个仓位压成了四个数，读出它剩下的几乎只有方向。这一节从这个仓位讲起：用同一到期日的两条腿表达看涨或看跌，把最大亏损和最大盈利都封住；再讲同样看涨的两个价差之间该选哪个。案例还是 <span class="nw">2026-04-13</span> 收盘的 TSLA 5/15 到期期权，5/15 收在 422.32。</span><span class="l-en">2.4 compressed the position "buy the 350 call, sell the 380 call" into four numbers and found that almost only direction was left. This node starts from that position: use two legs with the same expiration to express a bullish or bearish view, capping both the maximum loss and the maximum gain; then it covers how to choose between two spreads that are both bullish. The case is still TSLA options expiring 5/15 at the <span class="nw">2026-04-13</span> close; TSLA closed at 422.32 on 5/15.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>第二条腿</h2>
-  <p class="sub">1.1 按卖一 21.10 买入这张 350 call（中间价 21.05），TSLA 涨多少都归你。如果你的看法只是「到 5/15 会涨到 380 附近」，380 以上那一段上涨对你没用，可以卖给别人，换回一部分成本。本页的成本统一按买一卖一的中间价算。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>第二条腿</span><span class="l-en"><span class="n">0</span>The second leg</span></h2>
+  <p class="sub"><span class="l-zh">1.1 按卖一 21.10 买入这张 350 call（中间价 21.05），TSLA 涨多少都归你。如果你的看法只是「到 5/15 会涨到 380 附近」，380 以上那一段上涨对你没用，可以卖给别人，换回一部分成本。本页的成本统一按买一卖一的中间价算。</span><span class="l-en">1.1 bought this 350 call at the ask of 21.10 (mid 21.05), and however far TSLA rises, the gain is yours. If your view is only that TSLA "will rise to around 380 by 5/15", the part of the rise above 380 is no use to you, and you can sell it to someone else to get back part of the cost. Costs on this page are all at the bid-ask mid.</span></p>
 
-  <p>讲义给<b>价差</b>的定义是：在一个合约上持有头寸，同时在另一个合约上持有相反的头寸。最简单的一种只有两条腿：同一类型（都是 call 或都是 put）、同一到期日，只差行权价，一买一卖。报价单上同一到期日的行权价从上到下排成一列，两条腿在这一列里一上一下，所以叫<span class="sym" data-say="vertical spread。两条腿同一类型、同一到期日、不同行权价，一买一卖。到期日不同的叫日历价差（calendar spread，3.2 讲）。">垂直价差</span>。</p>
-  <p>4/13 收盘买 350 call，同时卖 380 call，就是一个垂直价差，写成 350/380：斜杠两边是两条腿的行权价，低的在前。这种买低行权价、卖高行权价的价差叫牛市价差（看涨时用），第一节讲全四种。卖出的 380 call 收 9.075，净付 21.05 − 9.075 ＝ 11.975。到期时它值多少：</p>
+  <p><span class="l-zh">讲义给<b>价差</b>的定义是：在一个合约上持有头寸，同时在另一个合约上持有相反的头寸。最简单的一种只有两条腿：同一类型（都是 call 或都是 put）、同一到期日，只差行权价，一买一卖。报价单上同一到期日的行权价从上到下排成一列，两条腿在这一列里一上一下，所以叫<span class="sym" data-say="vertical spread。两条腿同一类型、同一到期日、不同行权价，一买一卖。到期日不同的叫日历价差（calendar spread，3.2 讲）。">垂直价差</span>。</span><span class="l-en">The lecture notes define a <b>spread</b> as holding a position in one contract and, at the same time, an opposite position in another contract. The simplest kind has only two legs: the same type (both calls or both puts), the same expiration, differing only in strike, one bought and one sold. On a quote sheet the strikes of one expiration run down a single column, and the two legs sit one above the other in that column, which is why this is called a <span class="sym" data-say="Vertical spread: two legs of the same type and the same expiration at different strikes, one bought and one sold. When the expirations differ it is a calendar spread, covered in 3.2.">vertical spread</span>.</span></p>
+  <p><span class="l-zh">4/13 收盘买 350 call，同时卖 380 call，就是一个垂直价差，写成 350/380：斜杠两边是两条腿的行权价，低的在前。这种买低行权价、卖高行权价的价差叫牛市价差（看涨时用），第一节讲全四种。卖出的 380 call 收 9.075，净付 21.05 − 9.075 ＝ 11.975。到期时它值多少：</span><span class="l-en">Buying the 350 call at the 4/13 close while selling the 380 call is a vertical spread, written 350/380: the two sides of the slash are the two legs' strikes, the lower one first. This kind of spread, buying the lower strike and selling the higher strike, is called a bull spread (used when bullish); section 1 covers all four kinds. Selling the 380 call collects 9.075, for a net payment of 21.05 − 9.075 = 11.975. What it is worth at expiration:</span></p>
   <div class="formula">
-    <div class="math">到期价值 ＝ max(<span class="sym" data-say="5/15 到期时 TSLA 的价格。">S</span> − 350, 0) − max(S − 380, 0)</div>
-    <div class="gloss">买入的 350 call 到期值多少，减去卖出的 380 call 到期要赔多少。max(a, 0) 的意思是 a 为负时算 0（1.1）</div>
+    <div class="math"><span class="l-zh">到期价值 ＝ max(<span class="sym" data-say="5/15 到期时 TSLA 的价格。">S</span> − 350, 0) − max(S − 380, 0)</span><span class="l-en">Value at expiration = max(<span class="sym" data-say="TSLA's price at the 5/15 expiration.">S</span> − 350, 0) − max(S − 380, 0)</span></div>
+    <div class="gloss"><span class="l-zh">买入的 350 call 到期值多少，减去卖出的 380 call 到期要赔多少。max(a, 0) 的意思是 a 为负时算 0（1.1）</span><span class="l-en">What the bought 350 call is worth at expiration, minus what the sold 380 call owes at expiration. max(a, 0) means 0 when a is negative (1.1)</span></div>
   </div>
   <ul>
-    <li>TSLA 到期在 350 以下：两张都作废，价值 0，开仓付的 11.975 全亏。</li>
-    <li>在 350 和 380 之间：只有 350 call 有价值，价差值 S − 350。</li>
-    <li>在 380 以上：TSLA 每多涨 1 美元，买的那张多值 1 美元，卖的那张多赔 1 美元，互相抵掉，价值停在 30。</li>
+    <li><span class="l-zh">TSLA 到期在 350 以下：两张都作废，价值 0，开仓付的 11.975 全亏。</span><span class="l-en">TSLA below 350 at expiration: both calls expire worthless, the value is 0, and the 11.975 paid to open is all lost.</span></li>
+    <li><span class="l-zh">在 350 和 380 之间：只有 350 call 有价值，价差值 S − 350。</span><span class="l-en">Between 350 and 380: only the 350 call has value, and the spread is worth S − 350.</span></li>
+    <li><span class="l-zh">在 380 以上：TSLA 每多涨 1 美元，买的那张多值 1 美元，卖的那张多赔 1 美元，互相抵掉，价值停在 30。</span><span class="l-en">Above 380: for each further dollar TSLA rises, the bought call is worth 1 dollar more and the sold call owes 1 dollar more; they cancel, and the value stays at 30.</span></li>
   </ul>
 
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="bdPlay">再合成一遍</button></div>
-    <svg id="bd" viewBox="0 0 720 350" role="img" aria-label="买 350 call 与卖 380 call 两条腿的到期盈亏，逐点相加成价差"></svg>
+    <div class="bar"><button class="btn ghost" id="bdPlay"><span class="l-zh">再合成一遍</span><span class="l-en">Combine again</span></button></div>
+    <svg id="bd" viewBox="0 0 720 350" role="img" aria-label="买 350 call 与卖 380 call 两条腿的到期盈亏，逐点相加成价差" data-en-aria-label="Expiration P&amp;L of the two legs, long 350 call and short 380 call, added point by point into the spread"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--result)"></i>买 350 call，付 21.05</span>
-      <span><i class="ln" style="background:var(--good)"></i>卖 380 call，收 9.075</span>
-      <span><i class="ln" style="background:var(--control)"></i>两条相加：350/380 牛市 call 价差</span>
-      <span>虚线：5/15 收盘 422.32</span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--result)"></i>买 350 call，付 21.05</span><span class="l-en"><i class="ln" style="background:var(--result)"></i>Buy 350 call, pay 21.05</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--good)"></i>卖 380 call，收 9.075</span><span class="l-en"><i class="ln" style="background:var(--good)"></i>Sell 380 call, collect 9.075</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--control)"></i>两条相加：350/380 牛市 call 价差</span><span class="l-en"><i class="ln" style="background:var(--control)"></i>The two added: 350/380 bull call spread</span></span>
+      <span><span class="l-zh">虚线：5/15 收盘 422.32</span><span class="l-en">Dashed line: 5/15 close 422.32</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">到期价 S</div><div class="d" id="bdS"></div></div>
-      <div class="stat"><div class="k">买 350 call</div><div class="d" id="bd1" style="color:var(--result)"></div></div>
-      <div class="stat"><div class="k">卖 380 call</div><div class="d" id="bd2" style="color:var(--good)"></div></div>
-      <div class="stat"><div class="k">价差合计</div><div class="d" id="bd3" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">到期价 S</span><span class="l-en">Expiration price S</span></div><div class="d" id="bdS"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">买 350 call</span><span class="l-en">Buy 350 call</span></div><div class="d" id="bd1" style="color:var(--result)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">卖 380 call</span><span class="l-en">Sell 380 call</span></div><div class="d" id="bd2" style="color:var(--good)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">价差合计</span><span class="l-en">Spread total</span></div><div class="d" id="bd3" style="color:var(--control)"></div></div>
     </div>
     <div class="say plain" id="bdSay"></div>
   </div>
-  <p>开仓净付 11.975，是单买 350 call 的 57%。代价是 380 以上的上涨都归了买 380 call 的人：最多赚 30 − 11.975 ＝ 18.025。亏损和盈利两头都封住了。讲义把这写成价值的上下限：</p>
+  <p><span class="l-zh">开仓净付 11.975，是单买 350 call 的 57%。代价是 380 以上的上涨都归了买 380 call 的人：最多赚 30 − 11.975 ＝ 18.025。亏损和盈利两头都封住了。讲义把这写成价值的上下限：</span><span class="l-en">The net cost to open is 11.975, 57% of buying the 350 call alone. The price is that all the rise above 380 goes to whoever bought the 380 call: the most you can make is 30 − 11.975 = 18.025. Both the loss and the gain are capped. The lecture notes write this as bounds on the value:</span></p>
   <div class="formula">
-    <div class="math">0 ≤ 垂直价差的价值 ≤ <span class="sym" data-say="两条腿里较高的那个行权价，这里是 380。h 是 high。">X<sub>h</sub></span> − <span class="sym" data-say="两条腿里较低的那个行权价，这里是 350。l 是 low。">X<sub>l</sub></span></div>
-    <div class="gloss">到期时最少值 0，最多值两个行权价之差，这里是 30</div>
+    <div class="math"><span class="l-zh">0 ≤ 垂直价差的价值 ≤ <span class="sym" data-say="两条腿里较高的那个行权价，这里是 380。h 是 high。">X<sub>h</sub></span> − <span class="sym" data-say="两条腿里较低的那个行权价，这里是 350。l 是 low。">X<sub>l</sub></span></span><span class="l-en">0 ≤ value of a vertical spread ≤ <span class="sym" data-say="The higher of the two legs' strikes, here 380. h is for high.">X<sub>h</sub></span> − <span class="sym" data-say="The lower of the two legs' strikes, here 350. l is for low.">X<sub>l</sub></span></span></div>
+    <div class="gloss"><span class="l-zh">到期时最少值 0，最多值两个行权价之差，这里是 30</span><span class="l-en">At expiration it is worth at least 0 and at most the difference between the two strikes, here 30</span></div>
   </div>
 
-  <h3>和单买 350 call 比</h3>
-  <p>到期价在 380 以上时，单买 call 赚 S − 350 − 21.05，价差赚 18.025，两者在 S ＝ 389.075 处相等，正好是 380 加上卖出那张的价钱 9.075。到期价低于 389.075，价差都更好：少付的 9.075 在这一段一直留在手里。高于 389.075，单买 call 更好。</p>
-  <p>按入场时的隐含波动率 46.3%，用 1.2 的算法 <span class="sym" data-say="z 是离中心几个标准差（1.2）。X 是要比较的价格，F 是远期价 353.69，σ 是隐含波动率 46.3%，t 是 32/365 年。">z ＝ ln(X/F) ÷ (σ√t)</span>：σ√t ＝ 0.463 × √(32/365) ≈ 0.137，389.075 的 z ＝ ln(389.075 ÷ 353.69) ÷ 0.137 ≈ 0.70，钟形分布里 0.70 个标准差以下约占 76%。所以到期落在 389.075 以下的概率约 76%（1.2 的算法把中位数放在 F）。5/15 TSLA 收在 422.32，落在另外的 24% 里：单买 call 按中间价每股赚 51.27（1.1 按卖一买入是 51.22），价差赚 18.025。</p>
+  <h3><span class="l-zh">和单买 350 call 比</span><span class="l-en">Compared with buying the 350 call alone</span></h3>
+  <p><span class="l-zh">到期价在 380 以上时，单买 call 赚 S − 350 − 21.05，价差赚 18.025，两者在 S ＝ 389.075 处相等，正好是 380 加上卖出那张的价钱 9.075。到期价低于 389.075，价差都更好：少付的 9.075 在这一段一直留在手里。高于 389.075，单买 call 更好。</span><span class="l-en">With the expiration price above 380, the call alone makes S − 350 − 21.05 and the spread makes 18.025; the two are equal at S = 389.075, which is exactly 380 plus the 9.075 received for the sold call. Below an expiration price of 389.075 the spread is always better: the 9.075 not paid stays in your hand over that whole range. Above 389.075 the call alone is better.</span></p>
+  <p><span class="l-zh">按入场时的隐含波动率 46.3%，用 1.2 的算法 <span class="sym" data-say="z 是离中心几个标准差（1.2）。X 是要比较的价格，F 是远期价 353.69，σ 是隐含波动率 46.3%，t 是 32/365 年。">z ＝ ln(X/F) ÷ (σ√t)</span>：σ√t ＝ 0.463 × √(32/365) ≈ 0.137，389.075 的 z ＝ ln(389.075 ÷ 353.69) ÷ 0.137 ≈ 0.70，钟形分布里 0.70 个标准差以下约占 76%。所以到期落在 389.075 以下的概率约 76%（1.2 的算法把中位数放在 F）。5/15 TSLA 收在 422.32，落在另外的 24% 里：单买 call 按中间价每股赚 51.27（1.1 按卖一买入是 51.22），价差赚 18.025。</span><span class="l-en">At the entry implied volatility of 46.3%, using the method from 1.2, <span class="sym" data-say="z is how many standard deviations from the center (1.2). X is the price being compared, F the forward price 353.69, σ the implied volatility 46.3%, t is 32/365 of a year.">z = ln(X/F) ÷ (σ√t)</span>: σ√t = 0.463 × √(32/365) ≈ 0.137, and for 389.075, z = ln(389.075 ÷ 353.69) ÷ 0.137 ≈ 0.70; in a bell curve about 76% lies below 0.70 standard deviations. So the probability of expiring below 389.075 is about 76% (the method in 1.2 puts the median at F). On 5/15 TSLA closed at 422.32, in the other 24%: the call alone made 51.27 per share at the mid (51.22 bought at the ask in 1.1), and the spread made 18.025.</span></p>
 
-  <h3>600 种可能的到期价</h3>
-  <p>下面每一颗球是一个可能的 5/15 到期价，按 1.2 的对数正态分布抽出：中心 F ＝ 353.69，σ ＝ 46.3%。同一个价格同时落进左右两张图，左边记单买 350 call 的盈亏，右边记 350/380 价差的盈亏。</p>
+  <h3><span class="l-zh">600 种可能的到期价</span><span class="l-en">600 possible expiration prices</span></h3>
+  <p><span class="l-zh">下面每一颗球是一个可能的 5/15 到期价，按 1.2 的对数正态分布抽出：中心 F ＝ 353.69，σ ＝ 46.3%。同一个价格同时落进左右两张图，左边记单买 350 call 的盈亏，右边记 350/380 价差的盈亏。</span><span class="l-en">Each ball below is one possible 5/15 expiration price, drawn from the lognormal distribution of 1.2: centered at F = 353.69, σ = 46.3%. The same price drops into both charts at once; the left records the P&amp;L of buying the 350 call alone, the right the P&amp;L of the 350/380 spread.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="dpPlay">再落一遍</button></div>
-    <div class="stage"><canvas id="dp" width="264" height="130" aria-label="600 个可能的到期价分别落到单买 call 与价差的盈亏上"></canvas></div>
+    <div class="bar"><button class="btn ghost" id="dpPlay"><span class="l-zh">再落一遍</span><span class="l-en">Drop again</span></button></div>
+    <div class="stage"><canvas id="dp" width="264" height="130" aria-label="600 个可能的到期价分别落到单买 call 与价差的盈亏上" data-en-aria-label="600 possible expiration prices landing on the P&amp;L of the call alone and of the spread"></canvas></div>
     <div class="legend">
-      <span>左：单买 350 call　右：350/380 价差</span>
-      <span>横轴：每股盈亏，从 −25 到 +95，每格 3 美元，最右一格含 95 以上</span>
-      <span><i style="background:var(--control)"></i>亏钱</span>
-      <span><i style="background:var(--result)"></i>赚钱</span>
-      <span>竖点线：盈亏为 0</span>
+      <span><span class="l-zh">左：单买 350 call　右：350/380 价差</span><span class="l-en">Left: 350 call alone&emsp;Right: 350/380 spread</span></span>
+      <span><span class="l-zh">横轴：每股盈亏，从 −25 到 +95，每格 3 美元，最右一格含 95 以上</span><span class="l-en">Horizontal axis: P&amp;L per share, from −25 to +95, 3 dollars per bin; the rightmost bin includes everything above 95</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>亏钱</span><span class="l-en"><i style="background:var(--control)"></i>Loss</span></span>
+      <span><span class="l-zh"><i style="background:var(--result)"></i>赚钱</span><span class="l-en"><i style="background:var(--result)"></i>Gain</span></span>
+      <span><span class="l-zh">竖点线：盈亏为 0</span><span class="l-en">Dotted vertical line: P&amp;L of 0</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已落下</div><div class="d" id="dpN"></div><div class="d2">共 600 颗</div></div>
-      <div class="stat"><div class="k">价差亏满 11.975</div><div class="d" id="dpLo" style="color:var(--control)"></div><div class="d2">到期在 350 以下</div></div>
-      <div class="stat"><div class="k">价差赚满 18.025</div><div class="d" id="dpHi" style="color:var(--result)"></div><div class="d2">到期在 380 以上</div></div>
-      <div class="stat"><div class="k">单买 call 赚得比 18.025 多</div><div class="d" id="dpX"></div><div class="d2">到期在 389.075 以上</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已落下</span><span class="l-en">Dropped</span></div><div class="d" id="dpN"></div><div class="d2"><span class="l-zh">共 600 颗</span><span class="l-en">600 in all</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">价差亏满 11.975</span><span class="l-en">Spread loses the full 11.975</span></div><div class="d" id="dpLo" style="color:var(--control)"></div><div class="d2"><span class="l-zh">到期在 350 以下</span><span class="l-en">expiring below 350</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">价差赚满 18.025</span><span class="l-en">Spread makes the full 18.025</span></div><div class="d" id="dpHi" style="color:var(--result)"></div><div class="d2"><span class="l-zh">到期在 380 以上</span><span class="l-en">expiring above 380</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">单买 call 赚得比 18.025 多</span><span class="l-en">Call alone makes more than 18.025</span></div><div class="d" id="dpX"></div><div class="d2"><span class="l-zh">到期在 389.075 以上</span><span class="l-en">expiring above 389.075</span></div></div>
     </div>
   </div>
-  <p>价差的结果只有三种样子：亏满、赚满、中间一小段。按 1.2 的算法，350 的 z ＝ ln(350 ÷ 353.69) ÷ 0.137 ≈ −0.08，380 的 z ＝ ln(380 ÷ 353.69) ÷ 0.137 ≈ 0.52；钟形分布里 −0.08 以下占 47.0%，0.52 以上占 30.0%，中间占 23.0%，这就是亏满、赚满、中间三种情形的概率。单买 call 亏满的概率一样是 47.0%，只是亏得多（21.05）；赚的一边没有上限：600 颗里有 69 颗高于 5/15 实际的 422.32，单买 call 在这些价格上每股赚 51.27 以上。价差把 380 以上的上涨卖掉，换来更少的成本和更小的最大亏损。</p>
+  <p><span class="l-zh">价差的结果只有三种样子：亏满、赚满、中间一小段。按 1.2 的算法，350 的 z ＝ ln(350 ÷ 353.69) ÷ 0.137 ≈ −0.08，380 的 z ＝ ln(380 ÷ 353.69) ÷ 0.137 ≈ 0.52；钟形分布里 −0.08 以下占 47.0%，0.52 以上占 30.0%，中间占 23.0%，这就是亏满、赚满、中间三种情形的概率。单买 call 亏满的概率一样是 47.0%，只是亏得多（21.05）；赚的一边没有上限：600 颗里有 69 颗高于 5/15 实际的 422.32，单买 call 在这些价格上每股赚 51.27 以上。价差把 380 以上的上涨卖掉，换来更少的成本和更小的最大亏损。</span><span class="l-en">The spread has only three kinds of outcome: the full loss, the full gain, and a short stretch in between. By the method in 1.2, the z for 350 is ln(350 ÷ 353.69) ÷ 0.137 ≈ −0.08 and the z for 380 is ln(380 ÷ 353.69) ÷ 0.137 ≈ 0.52; in a bell curve 47.0% lies below −0.08, 30.0% above 0.52 and 23.0% in between, and these are the probabilities of the full loss, the full gain and the middle. The call alone also has a 47.0% probability of a full loss, only a bigger one (21.05); on the winning side it has no cap: 69 of the 600 balls are above the actual 5/15 close of 422.32, and at those prices the call alone makes 51.27 or more per share. The spread sells off the rise above 380 in exchange for a lower cost and a smaller maximum loss.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>四种垂直价差</h2>
-  <p class="sub">讲义的定义：牛市价差（bull spread）买低行权价、卖高行权价；熊市价差（bear spread）买高行权价、卖低行权价。两条腿必须同一类型、同一到期日。call 和 put 各能做一种，一共四种。</p>
-  <p>「买低卖高」为什么对 call 和 put 都是看涨？讲义有一句：行权价低的 call，delta 总是更大。put 也是行权价低的 delta 更大：4/13 的 350 put 是 −0.44，380 put 是 −0.68，350 那张负得少。买 delta 大的、卖 delta 小的，合起来是正 <span class="sym" data-say="delta。TSLA 涨 1 美元，价格变多少；放进仓位读成相当于持有多少股（2.1）。">Δ</span>，TSLA 涨就赚。四个价差都用 4/13 收盘的 350 和 380：</p>
+  <h2><span class="l-zh"><span class="n">一</span>四种垂直价差</span><span class="l-en"><span class="n">1</span>Four vertical spreads</span></h2>
+  <p class="sub"><span class="l-zh">讲义的定义：牛市价差（bull spread）买低行权价、卖高行权价；熊市价差（bear spread）买高行权价、卖低行权价。两条腿必须同一类型、同一到期日。call 和 put 各能做一种，一共四种。</span><span class="l-en">The lecture notes' definitions: a bull spread buys the lower strike and sells the higher strike; a bear spread buys the higher strike and sells the lower strike. Both legs must be the same type with the same expiration. Calls and puts can each make one of each, four in all.</span></p>
+  <p><span class="l-zh">「买低卖高」为什么对 call 和 put 都是看涨？讲义有一句：行权价低的 call，delta 总是更大。put 也是行权价低的 delta 更大：4/13 的 350 put 是 −0.44，380 put 是 −0.68，350 那张负得少。买 delta 大的、卖 delta 小的，合起来是正 <span class="sym" data-say="delta。TSLA 涨 1 美元，价格变多少；放进仓位读成相当于持有多少股（2.1）。">Δ</span>，TSLA 涨就赚。四个价差都用 4/13 收盘的 350 和 380：</span><span class="l-en">Why is "buy low, sell high" bullish for both calls and puts? The lecture notes have a line: the call with the lower strike always has the larger delta. For puts, the lower strike also has the larger delta: on 4/13 the 350 put was −0.44 and the 380 put −0.68, so the 350 is less negative. Buy the larger delta and sell the smaller one, and the combination has positive <span class="sym" data-say="Delta. When TSLA rises 1 dollar, how much the price changes; in a position it reads as how many shares you effectively hold (2.1).">Δ</span>, making money when TSLA rises. All four spreads use the 350 and 380 at the 4/13 close:</span></p>
   <table class="lt">
-    <thead><tr><th>价差</th><th>开仓，中间价<br><span style="font-weight:400">按买一卖一</span></th><th>最多赚</th><th>最多亏</th><th>5/15 盈亏</th></tr></thead>
+    <thead><tr><th><span class="l-zh">价差</span><span class="l-en">Spread</span></th><th><span class="l-zh">开仓，中间价<br><span style="font-weight:400">按买一卖一</span></span><span class="l-en">To open, at mid<br><span style="font-weight:400">at bid/ask</span></span></th><th><span class="l-zh">最多赚</span><span class="l-en">Max gain</span></th><th><span class="l-zh">最多亏</span><span class="l-en">Max loss</span></th><th><span class="l-zh">5/15 盈亏</span><span class="l-en">5/15 P&amp;L</span></th></tr></thead>
     <tbody>
-      <tr><td><b>牛市 call 价差</b><span class="sm">买 350 call，卖 380 call</span></td><td>付 11.975<span class="sm">付 12.05</span></td><td>18.025</td><td>−11.975</td><td>+18.025</td></tr>
-      <tr><td><b>牛市 put 价差</b><span class="sm">买 350 put，卖 380 put</span></td><td>收 18.075<span class="sm">收 17.90</span></td><td>18.075</td><td>−11.925</td><td>+18.075</td></tr>
-      <tr><td><b>熊市 call 价差</b><span class="sm">买 380 call，卖 350 call</span></td><td>收 11.975<span class="sm">收 11.90</span></td><td>11.975</td><td>−18.025</td><td>−18.025</td></tr>
-      <tr><td><b>熊市 put 价差</b><span class="sm">买 380 put，卖 350 put</span></td><td>付 18.075<span class="sm">付 18.25</span></td><td>11.925</td><td>−18.075</td><td>−18.075</td></tr>
+      <tr><td><b><span class="l-zh">牛市 call 价差</span><span class="l-en">Bull call spread</span></b><span class="sm"><span class="l-zh">买 350 call，卖 380 call</span><span class="l-en">Buy 350 call, sell 380 call</span></span></td><td><span class="l-zh">付 11.975<span class="sm">付 12.05</span></span><span class="l-en">pay 11.975<span class="sm">pay 12.05</span></span></td><td>18.025</td><td>−11.975</td><td>+18.025</td></tr>
+      <tr><td><b><span class="l-zh">牛市 put 价差</span><span class="l-en">Bull put spread</span></b><span class="sm"><span class="l-zh">买 350 put，卖 380 put</span><span class="l-en">Buy 350 put, sell 380 put</span></span></td><td><span class="l-zh">收 18.075<span class="sm">收 17.90</span></span><span class="l-en">collect 18.075<span class="sm">collect 17.90</span></span></td><td>18.075</td><td>−11.925</td><td>+18.075</td></tr>
+      <tr><td><b><span class="l-zh">熊市 call 价差</span><span class="l-en">Bear call spread</span></b><span class="sm"><span class="l-zh">买 380 call，卖 350 call</span><span class="l-en">Buy 380 call, sell 350 call</span></span></td><td><span class="l-zh">收 11.975<span class="sm">收 11.90</span></span><span class="l-en">collect 11.975<span class="sm">collect 11.90</span></span></td><td>11.975</td><td>−18.025</td><td>−18.025</td></tr>
+      <tr><td><b><span class="l-zh">熊市 put 价差</span><span class="l-en">Bear put spread</span></b><span class="sm"><span class="l-zh">买 380 put，卖 350 put</span><span class="l-en">Buy 380 put, sell 350 put</span></span></td><td><span class="l-zh">付 18.075<span class="sm">付 18.25</span></span><span class="l-en">pay 18.075<span class="sm">pay 18.25</span></span></td><td>11.925</td><td>−18.075</td><td>−18.075</td></tr>
     </tbody>
   </table>
-  <p class="tiny">每股美元，一张乘 100。4/13 收盘报价（买一 / 卖一）：350 call 21.00 / 21.10，380 call 9.05 / 9.10，350 put 17.35 / 17.45，380 put 35.35 / 35.60。</p>
+  <p class="tiny"><span class="l-zh">每股美元，一张乘 100。4/13 收盘报价（买一 / 卖一）：350 call 21.00 / 21.10，380 call 9.05 / 9.10，350 put 17.35 / 17.45，380 put 35.35 / 35.60。</span><span class="l-en">Dollars per share; multiply by 100 for one contract. 4/13 closing quotes (bid / ask): 350 call 21.00 / 21.10, 380 call 9.05 / 9.10, 350 put 17.35 / 17.45, 380 put 35.35 / 35.60.</span></p>
 
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="qdPlay">再并排合成一遍</button></div>
+    <div class="bar"><button class="btn ghost" id="qdPlay"><span class="l-zh">再并排合成一遍</span><span class="l-en">Combine side by side again</span></button></div>
     <div class="quad">
-      <figure><figcaption><b>牛市 call 价差</b><span class="cap2">买 350 call，卖 380 call　开仓付 11.975</span><span class="cap2 qv" id="qv0"></span></figcaption><svg id="q0" viewBox="0 0 360 232" role="img" aria-label="牛市 call 价差的到期盈亏"></svg></figure>
-      <figure><figcaption><b>牛市 put 价差</b><span class="cap2">买 350 put，卖 380 put　开仓收 18.075</span><span class="cap2 qv" id="qv1"></span></figcaption><svg id="q1" viewBox="0 0 360 232" role="img" aria-label="牛市 put 价差的到期盈亏"></svg></figure>
-      <figure><figcaption><b>熊市 call 价差</b><span class="cap2">买 380 call，卖 350 call　开仓收 11.975</span><span class="cap2 qv" id="qv2"></span></figcaption><svg id="q2" viewBox="0 0 360 232" role="img" aria-label="熊市 call 价差的到期盈亏"></svg></figure>
-      <figure><figcaption><b>熊市 put 价差</b><span class="cap2">买 380 put，卖 350 put　开仓付 18.075</span><span class="cap2 qv" id="qv3"></span></figcaption><svg id="q3" viewBox="0 0 360 232" role="img" aria-label="熊市 put 价差的到期盈亏"></svg></figure>
+      <figure><figcaption><b><span class="l-zh">牛市 call 价差</span><span class="l-en">Bull call spread</span></b><span class="cap2"><span class="l-zh">买 350 call，卖 380 call　开仓付 11.975</span><span class="l-en">Buy 350 call, sell 380 call&emsp;pay 11.975 to open</span></span><span class="cap2 qv" id="qv0"></span></figcaption><svg id="q0" viewBox="0 0 360 232" role="img" aria-label="牛市 call 价差的到期盈亏" data-en-aria-label="Expiration P&amp;L of the bull call spread"></svg></figure>
+      <figure><figcaption><b><span class="l-zh">牛市 put 价差</span><span class="l-en">Bull put spread</span></b><span class="cap2"><span class="l-zh">买 350 put，卖 380 put　开仓收 18.075</span><span class="l-en">Buy 350 put, sell 380 put&emsp;collect 18.075 to open</span></span><span class="cap2 qv" id="qv1"></span></figcaption><svg id="q1" viewBox="0 0 360 232" role="img" aria-label="牛市 put 价差的到期盈亏" data-en-aria-label="Expiration P&amp;L of the bull put spread"></svg></figure>
+      <figure><figcaption><b><span class="l-zh">熊市 call 价差</span><span class="l-en">Bear call spread</span></b><span class="cap2"><span class="l-zh">买 380 call，卖 350 call　开仓收 11.975</span><span class="l-en">Buy 380 call, sell 350 call&emsp;collect 11.975 to open</span></span><span class="cap2 qv" id="qv2"></span></figcaption><svg id="q2" viewBox="0 0 360 232" role="img" aria-label="熊市 call 价差的到期盈亏" data-en-aria-label="Expiration P&amp;L of the bear call spread"></svg></figure>
+      <figure><figcaption><b><span class="l-zh">熊市 put 价差</span><span class="l-en">Bear put spread</span></b><span class="cap2"><span class="l-zh">买 380 put，卖 350 put　开仓付 18.075</span><span class="l-en">Buy 380 put, sell 350 put&emsp;pay 18.075 to open</span></span><span class="cap2 qv" id="qv3"></span></figcaption><svg id="q3" viewBox="0 0 360 232" role="img" aria-label="熊市 put 价差的到期盈亏" data-en-aria-label="Expiration P&amp;L of the bear put spread"></svg></figure>
     </div>
     <div class="legend">
-      <span><i class="ln" style="background:var(--result)"></i>买入的那条腿</span>
-      <span><i class="ln" style="background:var(--good)"></i>卖出的那条腿</span>
-      <span><i class="ln" style="background:var(--control)"></i>价差</span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--result)"></i>买入的那条腿</span><span class="l-en"><i class="ln" style="background:var(--result)"></i>The leg bought</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--good)"></i>卖出的那条腿</span><span class="l-en"><i class="ln" style="background:var(--good)"></i>The leg sold</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--control)"></i>价差</span><span class="l-en"><i class="ln" style="background:var(--control)"></i>Spread</span></span>
     </div>
   </div>
-  <p>两个牛市价差的形状一样：350 以下亏满，380 以上赚满，盈亏平衡都在 362 附近（call 版 361.975，put 版 361.925）。区别在开仓时的现金。call 版买的那张贵，要付钱，叫<span class="sym" data-say="debit spread。开仓时净付钱的价差。">借方价差</span>；put 版卖的那张贵（380 put 已经是实值），开仓就收 18.075，叫<span class="sym" data-say="credit spread。开仓时净收钱的价差。收到的钱不是赚到的：TSLA 到期跌破 350 时要净赔 30。">贷方价差</span>。收钱不等于赚钱：TSLA 到期跌破 350，两张 put 都实值，要净赔 30，扣掉收的 18.075，亏 11.925。</p>
-  <p>5/15 TSLA 收在 422.32，两个牛市价差都赚满：call 版 +18.025，put 版 +18.075，每张约 1,800 美元，两者只差 0.05。两个熊市价差正好相反，亏满。同样两个行权价的 call 价差和 put 价差为什么几乎是同一个东西，5.1 用合成关系讲。</p>
-  <p>这里有一处对不上。第二节第三条会讲：同一对行权价的 call 价差加 put 价差，应当等于间距折回今天的钱，30 按 4.3% 折 32 天是 29.89。按中间价，11.975 ＋ 18.075 ＝ 30.05，反而比 30 多。一个原因是买卖价差：真按报价成交，两个都买要付 12.05 ＋ 18.25 ＝ 30.30，两个都卖只收 11.90 ＋ 17.90 ＝ 29.80，29.89 在这两个数中间。另一个原因在 380 put 上：它比按 1.1 的 put-call parity 算出的欧式价格贵 0.19，350 put 只贵 0.03。TSLA 期权是美式的，实值的 put 可以提前行权，所以比欧式的贵，节点 9 讲。</p>
-  <p>按买一卖一成交，每个价差都要多付两条腿各半个买卖价差。call 版两条腿的买卖价差是 0.10 和 0.05，多付 0.075；put 版是 0.10 和 0.25，多付 0.175。形状一样的两个版本，实际交易时挑买卖价差窄的那一个。</p>
+  <p><span class="l-zh">两个牛市价差的形状一样：350 以下亏满，380 以上赚满，盈亏平衡都在 362 附近（call 版 361.975，put 版 361.925）。区别在开仓时的现金。call 版买的那张贵，要付钱，叫<span class="sym" data-say="debit spread。开仓时净付钱的价差。">借方价差</span>；put 版卖的那张贵（380 put 已经是实值），开仓就收 18.075，叫<span class="sym" data-say="credit spread。开仓时净收钱的价差。收到的钱不是赚到的：TSLA 到期跌破 350 时要净赔 30。">贷方价差</span>。收钱不等于赚钱：TSLA 到期跌破 350，两张 put 都实值，要净赔 30，扣掉收的 18.075，亏 11.925。</span><span class="l-en">The two bull spreads have the same shape: the full loss below 350, the full gain above 380, and break-even near 362 for both (361.975 for the call version, 361.925 for the put version). The difference is the cash at opening. In the call version the leg bought is the more expensive one, so you pay, and it is called a <span class="sym" data-say="Debit spread: a spread that costs a net payment to open.">debit spread</span>; in the put version the leg sold is the more expensive one (the 380 put is already in the money), so opening collects 18.075, and it is called a <span class="sym" data-say="Credit spread: a spread that collects a net payment to open. Money collected is not money earned: if TSLA expires below 350, it owes a net 30.">credit spread</span>. Collecting money is not making money: if TSLA expires below 350, both puts are in the money and owe a net 30; minus the 18.075 collected, that is a loss of 11.925.</span></p>
+  <p><span class="l-zh">5/15 TSLA 收在 422.32，两个牛市价差都赚满：call 版 +18.025，put 版 +18.075，每张约 1,800 美元，两者只差 0.05。两个熊市价差正好相反，亏满。同样两个行权价的 call 价差和 put 价差为什么几乎是同一个东西，5.1 用合成关系讲。</span><span class="l-en">On 5/15 TSLA closed at 422.32, and both bull spreads made their full gain: +18.025 for the call version and +18.075 for the put version, about 1,800 dollars per contract, only 0.05 apart. The two bear spreads are exactly the opposite, with the full loss. Why a call spread and a put spread at the same two strikes are almost the same thing is covered in 5.1 with synthetic relationships.</span></p>
+  <p><span class="l-zh">这里有一处对不上。第二节第三条会讲：同一对行权价的 call 价差加 put 价差，应当等于间距折回今天的钱，30 按 4.3% 折 32 天是 29.89。按中间价，11.975 ＋ 18.075 ＝ 30.05，反而比 30 多。一个原因是买卖价差：真按报价成交，两个都买要付 12.05 ＋ 18.25 ＝ 30.30，两个都卖只收 11.90 ＋ 17.90 ＝ 29.80，29.89 在这两个数中间。另一个原因在 380 put 上：它比按 1.1 的 put-call parity 算出的欧式价格贵 0.19，350 put 只贵 0.03。TSLA 期权是美式的，实值的 put 可以提前行权，所以比欧式的贵，节点 9 讲。</span><span class="l-en">There is one thing here that does not line up. Section 2's third rule will say that a call spread plus a put spread at the same pair of strikes should equal the strike interval discounted back to today: 30 discounted for 32 days at 4.3% is 29.89. At mid prices, 11.975 + 18.075 = 30.05, more than 30. One reason is the bid-ask spread: actually trading at quotes, buying both costs 12.05 + 18.25 = 30.30, and selling both collects only 11.90 + 17.90 = 29.80, with 29.89 between the two. The other reason is in the 380 put: it is 0.19 more expensive than the European price from the put-call parity of 1.1, while the 350 put is only 0.03 more. TSLA options are American, and an in-the-money put can be exercised early, so it is worth more than a European one; node 9 covers this.</span></p>
+  <p><span class="l-zh">按买一卖一成交，每个价差都要多付两条腿各半个买卖价差。call 版两条腿的买卖价差是 0.10 和 0.05，多付 0.075；put 版是 0.10 和 0.25，多付 0.175。形状一样的两个版本，实际交易时挑买卖价差窄的那一个。</span><span class="l-en">Trading at the bid and ask, every spread costs an extra half bid-ask spread on each of its two legs. The call version's legs have bid-ask spreads of 0.10 and 0.05, an extra 0.075; the put version's are 0.10 and 0.25, an extra 0.175. Of two versions with the same shape, trade the one with the narrower bid-ask spreads.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>手算成本</h2>
-  <p class="sub">讲义给过一张报价表，标的 100，五个行权价，同一到期日。任何垂直价差的成本都是两个价格相减，用不到模型。</p>
+  <h2><span class="l-zh"><span class="n">二</span>手算成本</span><span class="l-en"><span class="n">2</span>Pricing by hand</span></h2>
+  <p class="sub"><span class="l-zh">讲义给过一张报价表，标的 100，五个行权价，同一到期日。任何垂直价差的成本都是两个价格相减，用不到模型。</span><span class="l-en">The lecture notes give a quote table: underlying at 100, five strikes, one expiration. The cost of any vertical spread is one price minus another; no model needed.</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>行权价</th><th>90</th><th>95</th><th>100</th><th>105</th><th>110</th></tr></thead>
+    <thead><tr><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th>90</th><th>95</th><th>100</th><th>105</th><th>110</th></tr></thead>
     <tbody>
       <tr><td>call</td><td>11.60</td><td>7.70</td><td>4.60</td><td>2.50</td><td>1.20</td></tr>
       <tr><td>put</td><td>0.60</td><td>1.60</td><td>3.40</td><td>6.20</td><td>9.80</td></tr>
     </tbody>
   </table>
-  <p>买 95 call、卖 100 call：7.70 − 4.60 ＝ 3.10。买 100 put、卖 95 put（熊市 put 价差）：3.40 − 1.60 ＝ 1.80。下表是五个行权价两两组合的全部垂直价差。每格上面一个数是牛市 call 价差（买低卖高），下面一个数是熊市 put 价差（买高卖低），都是开仓要付的钱。</p>
+  <p><span class="l-zh">买 95 call、卖 100 call：7.70 − 4.60 ＝ 3.10。买 100 put、卖 95 put（熊市 put 价差）：3.40 − 1.60 ＝ 1.80。下表是五个行权价两两组合的全部垂直价差。每格上面一个数是牛市 call 价差（买低卖高），下面一个数是熊市 put 价差（买高卖低），都是开仓要付的钱。</span><span class="l-en">Buy the 95 call, sell the 100 call: 7.70 − 4.60 = 3.10. Buy the 100 put, sell the 95 put (a bear put spread): 3.40 − 1.60 = 1.80. The table below shows every vertical spread from pairing the five strikes. In each cell the upper number is the bull call spread (buy low, sell high) and the lower number the bear put spread (buy high, sell low), both the amount paid to open.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="flPlay">逐格再算一遍</button></div>
+    <div class="bar"><button class="btn ghost" id="flPlay"><span class="l-zh">逐格再算一遍</span><span class="l-en">Recompute cell by cell</span></button></div>
     <table class="gridtb" id="flTb">
-      <thead><tr><th>低行权价 ＼ 高行权价</th><th>95</th><th>100</th><th>105</th><th>110</th></tr></thead>
+      <thead><tr><th><span class="l-zh">低行权价 ＼ 高行权价</span><span class="l-en">Lower strike \ higher strike</span></th><th>95</th><th>100</th><th>105</th><th>110</th></tr></thead>
       <tbody></tbody>
     </table>
     <div class="fillcap" id="flCap"></div>
     <div class="legend">
-      <span><i style="background:var(--result)"></i>牛市 call 价差</span>
-      <span><i style="background:var(--control)"></i>熊市 put 价差</span>
+      <span><span class="l-zh"><i style="background:var(--result)"></i>牛市 call 价差</span><span class="l-en"><i style="background:var(--result)"></i>Bull call spread</span></span>
+      <span><span class="l-zh"><i style="background:var(--control)"></i>熊市 put 价差</span><span class="l-en"><i style="background:var(--control)"></i>Bear put spread</span></span>
     </div>
   </div>
 
-  <h3>三条规律</h3>
+  <h3><span class="l-zh">三条规律</span><span class="l-en">Three rules</span></h3>
   <ol class="rules">
-    <li><b>每一格都不超过两个行权价之差。</b>90/95 的 call 价差 3.90，小于 5；90/110 是 10.40，小于 20。</li>
-    <li><b>间距相同，越靠实值越贵。</b>间距 5 的 call 价差：90/95 是 3.90，95/100 是 3.10，100/105 是 2.10，105/110 是 1.30。put 价差反过来，105/110 最贵，3.60。</li>
-    <li><b>同一对行权价，call 价差加 put 价差是个定数。</b>间距 5 的四对都是 4.90，间距 10 的三对都是 9.80，间距 20 的是 19.60，都是间距的 98%。</li>
+    <li><span class="l-zh"><b>每一格都不超过两个行权价之差。</b>90/95 的 call 价差 3.90，小于 5；90/110 是 10.40，小于 20。</span><span class="l-en"><b>No cell exceeds the difference between its two strikes.</b> The 90/95 call spread is 3.90, less than 5; 90/110 is 10.40, less than 20.</span></li>
+    <li><span class="l-zh"><b>间距相同，越靠实值越贵。</b>间距 5 的 call 价差：90/95 是 3.90，95/100 是 3.10，100/105 是 2.10，105/110 是 1.30。put 价差反过来，105/110 最贵，3.60。</span><span class="l-en"><b>For the same interval, the closer to in the money, the more expensive.</b> Call spreads with an interval of 5: 90/95 is 3.90, 95/100 is 3.10, 100/105 is 2.10, 105/110 is 1.30. Put spreads run the other way, with 105/110 the most expensive at 3.60.</span></li>
+    <li><span class="l-zh"><b>同一对行权价，call 价差加 put 价差是个定数。</b>间距 5 的四对都是 4.90，间距 10 的三对都是 9.80，间距 20 的是 19.60，都是间距的 98%。</span><span class="l-en"><b>For the same pair of strikes, the call spread plus the put spread is a fixed amount.</b> All four pairs with an interval of 5 total 4.90, all three with an interval of 10 total 9.80, and the one with 20 totals 19.60, each 98% of the interval.</span></li>
   </ol>
-  <p>第二条，讲义自己问过：为什么 95/100 永远比 100/105 贵？看到期时拿到多少：</p>
+  <p><span class="l-zh">第二条，讲义自己问过：为什么 95/100 永远比 100/105 贵？看到期时拿到多少：</span><span class="l-en">The second rule is a question the lecture notes ask themselves: why is 95/100 always more expensive than 100/105? Look at what each pays at expiration:</span></p>
   <table style="max-width:32rem">
-    <thead><tr><th>到期标的价</th><th>90</th><th>100</th><th>110</th></tr></thead>
+    <thead><tr><th><span class="l-zh">到期标的价</span><span class="l-en">Underlying at expiration</span></th><th>90</th><th>100</th><th>110</th></tr></thead>
     <tbody>
-      <tr><td>95/100 call 价差</td><td>0</td><td>5</td><td>5</td></tr>
-      <tr><td>100/105 call 价差</td><td>0</td><td>0</td><td>5</td></tr>
+      <tr><td><span class="l-zh">95/100 call 价差</span><span class="l-en">95/100 call spread</span></td><td>0</td><td>5</td><td>5</td></tr>
+      <tr><td><span class="l-zh">100/105 call 价差</span><span class="l-en">100/105 call spread</span></td><td>0</td><td>0</td><td>5</td></tr>
     </tbody>
   </table>
-  <p>到期在 105 以上，两个都拿满 5；在 95 以下，两个都是 0。中间这一段，95/100 拿到的总比 100/105 多，标的停在 100 时一个拿满 5、一个一分没有。能拿到钱的情形更多，所以更贵。</p>
-  <p>第三条：同一对行权价，比如 95/100，到期在 100 以上，call 价差值 5、put 价差值 0；在 95 以下反过来；在 95 和 100 之间，call 价差值 S − 95，put 价差值 100 − S，加起来还是 5。两个一起买，不管标的到期在哪都拿到 5 美元，所以两个价格之和就是「到期稳拿 5 美元」的价格。表里是 4.90 不是 5.00：这 5 美元要到期才拿到，这张表按约 2% 折了现。这个组合叫 box，5.3 讲。</p>
+  <p><span class="l-zh">到期在 105 以上，两个都拿满 5；在 95 以下，两个都是 0。中间这一段，95/100 拿到的总比 100/105 多，标的停在 100 时一个拿满 5、一个一分没有。能拿到钱的情形更多，所以更贵。</span><span class="l-en">Above 105 at expiration, both get the full 5; below 95, both get 0. In the stretch between, 95/100 always gets more than 100/105; with the underlying at 100, one gets the full 5 and the other nothing at all. More cases pay off, so it costs more.</span></p>
+  <p><span class="l-zh">第三条：同一对行权价，比如 95/100，到期在 100 以上，call 价差值 5、put 价差值 0；在 95 以下反过来；在 95 和 100 之间，call 价差值 S − 95，put 价差值 100 − S，加起来还是 5。两个一起买，不管标的到期在哪都拿到 5 美元，所以两个价格之和就是「到期稳拿 5 美元」的价格。表里是 4.90 不是 5.00：这 5 美元要到期才拿到，这张表按约 2% 折了现。这个组合叫 box，5.3 讲。</span><span class="l-en">The third rule: for one pair of strikes, say 95/100, above 100 at expiration the call spread is worth 5 and the put spread 0; below 95 it is the reverse; between 95 and 100 the call spread is worth S − 95 and the put spread 100 − S, which still add up to 5. Buy both, and wherever the underlying ends up you get 5 dollars, so the sum of the two prices is the price of "5 dollars for certain at expiration". The table shows 4.90, not 5.00: the 5 dollars arrive only at expiration, and this table discounts them by about 2%. This combination is called a box, covered in 5.3.</span></p>
 
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>波动率一变，两个牛市价差反着走</h2>
-  <p class="sub">讲义的另一张表：标的 100、离到期 6 周，同一组期权按 15%、20%、25% 三个波动率各算一遍。95/100 和 100/105 两个牛市 call 价差的 delta 都是 27，方向上是一样大的赌注；波动率一变，它们反着走。</p>
+  <h2><span class="l-zh"><span class="n">三</span>波动率一变，两个牛市价差反着走</span><span class="l-en"><span class="n">3</span>When volatility moves, two bull spreads go opposite ways</span></h2>
+  <p class="sub"><span class="l-zh">讲义的另一张表：标的 100、离到期 6 周，同一组期权按 15%、20%、25% 三个波动率各算一遍。95/100 和 100/105 两个牛市 call 价差的 delta 都是 27，方向上是一样大的赌注；波动率一变，它们反着走。</span><span class="l-en">Another table from the lecture notes: underlying at 100, 6 weeks to expiration, the same set of options priced at three volatilities, 15%, 20% and 25%. The 95/100 and 100/105 bull call spreads both have a delta of 27, an equally large directional bet; when volatility moves, they go opposite ways.</span></p>
   <table>
-    <thead><tr><th>讲义</th><th>delta<br>波动率 20%</th><th>波动率<br>15%</th><th>20%</th><th>25%</th></tr></thead>
+    <thead><tr><th><span class="l-zh">讲义</span><span class="l-en">Lecture notes</span></th><th><span class="l-zh">delta<br>波动率 20%</span><span class="l-en">delta<br>vol 20%</span></th><th><span class="l-zh">波动率<br>15%</span><span class="l-en">vol<br>15%</span></th><th>20%</th><th>25%</th></tr></thead>
     <tbody>
       <tr><td>95 call</td><td>78</td><td>5.41</td><td>5.86</td><td>6.38</td></tr>
-      <tr class="hot"><td><b>95/100 价差</b></td><td>27</td><td>3.38</td><td>3.15</td><td>3.00</td></tr>
+      <tr class="hot"><td><span class="l-zh"><b>95/100 价差</b></span><span class="l-en"><b>95/100 spread</b></span></td><td>27</td><td>3.38</td><td>3.15</td><td>3.00</td></tr>
       <tr><td>100 call</td><td>51</td><td>2.03</td><td>2.71</td><td>3.38</td></tr>
-      <tr class="hot"><td><b>100/105 价差</b></td><td>27</td><td>1.56</td><td>1.75</td><td>1.86</td></tr>
+      <tr class="hot"><td><span class="l-zh"><b>100/105 价差</b></span><span class="l-en"><b>100/105 spread</b></span></td><td>27</td><td>1.56</td><td>1.75</td><td>1.86</td></tr>
       <tr><td>105 call</td><td>24</td><td>0.47</td><td>0.96</td><td>1.52</td></tr>
     </tbody>
   </table>
-  <p class="tiny">讲义没写利率。同一行权价的 call 价格减 put 价格，等于标的现价减行权价（<span class="sym" data-say="call 的价格。">C</span> − <span class="sym" data-say="同一行权价、同一到期日的 put 的价格。">P</span> ＝ <span class="sym" data-say="现在的标的价，这张讲义表里是 100。和第〇节到期盈亏式里的 S（到期时的价格）不是同一个数。">S<sub>0</sub></span> − <span class="sym" data-say="行权价。">X</span>；95 那一行：5.86 − 0.86 ＝ 100 − 95 ＝ 5）。利率大于 0 时 C − P 会比 S<sub>0</sub> − X 大一点（1.1），这里正好相等，说明按利率 0 算。用 Black-Scholes（利率 0，6 周按 42 天）重算，18 个价格与讲义的差都不超过 0.005；delta 算出来是 78.5、51.4、24.7，讲义取了整数。</p>
+  <p class="tiny"><span class="l-zh">讲义没写利率。同一行权价的 call 价格减 put 价格，等于标的现价减行权价（<span class="sym" data-say="call 的价格。">C</span> − <span class="sym" data-say="同一行权价、同一到期日的 put 的价格。">P</span> ＝ <span class="sym" data-say="现在的标的价，这张讲义表里是 100。和第〇节到期盈亏式里的 S（到期时的价格）不是同一个数。">S<sub>0</sub></span> − <span class="sym" data-say="行权价。">X</span>；95 那一行：5.86 − 0.86 ＝ 100 − 95 ＝ 5）。利率大于 0 时 C − P 会比 S<sub>0</sub> − X 大一点（1.1），这里正好相等，说明按利率 0 算。用 Black-Scholes（利率 0，6 周按 42 天）重算，18 个价格与讲义的差都不超过 0.005；delta 算出来是 78.5、51.4、24.7，讲义取了整数。</span><span class="l-en">The lecture notes do not state an interest rate. A call's price minus the put's price at the same strike equals the current underlying price minus the strike (<span class="sym" data-say="Price of the call.">C</span> − <span class="sym" data-say="Price of the put with the same strike and the same expiration.">P</span> = <span class="sym" data-say="Current price of the underlying, 100 in this lecture-notes table. Not the same number as S in the expiration formula of section 0, which is the price at expiration.">S<sub>0</sub></span> − <span class="sym" data-say="Strike.">X</span>; on the 95 row: 5.86 − 0.86 = 100 − 95 = 5). With a rate above 0, C − P would be a bit larger than S<sub>0</sub> − X (1.1); here they are exactly equal, which means a rate of 0. Recomputed with Black-Scholes (rate 0, 6 weeks as 42 days), none of the 18 prices differs from the lecture notes by more than 0.005; the deltas come out at 78.5, 51.4 and 24.7, which the lecture notes rounded to whole numbers.</span></p>
 
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="ldPlay">再扫一遍波动率</button></div>
-    <svg id="ld" viewBox="0 0 720 320" role="img" aria-label="波动率从 10% 升到 30% 时三个 call 的价格与两个价差的宽度"></svg>
+    <div class="bar"><button class="btn ghost" id="ldPlay"><span class="l-zh">再扫一遍波动率</span><span class="l-en">Sweep volatility again</span></button></div>
+    <svg id="ld" viewBox="0 0 720 320" role="img" aria-label="波动率从 10% 升到 30% 时三个 call 的价格与两个价差的宽度" data-en-aria-label="Prices of three calls and the widths of two spreads as volatility rises from 10% to 30%"></svg>
     <div class="legend">
-      <span>三张 call 价格之间的两条色带，就是两个价差</span>
-      <span>空心圆：讲义 15%、20%、25% 三列</span>
+      <span><span class="l-zh">三张 call 价格之间的两条色带，就是两个价差</span><span class="l-en">The two colored bands between the three call prices are the two spreads</span></span>
+      <span><span class="l-zh">空心圆：讲义 15%、20%、25% 三列</span><span class="l-en">Open circles: the lecture notes' 15%, 20% and 25% columns</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">波动率 <span class="sym" data-say="年化波动率，这里是动画当前扫到的数（1.2）。">σ</span></div><div class="d" id="ldS"></div></div>
-      <div class="stat"><div class="k">95/100 价差</div><div class="d" id="ldA" style="color:var(--control)"></div><div class="d2">卖出 100 call</div></div>
-      <div class="stat"><div class="k">100/105 价差</div><div class="d" id="ldB" style="color:var(--result)"></div><div class="d2">买入 100 call</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">波动率 <span class="sym" data-say="年化波动率，这里是动画当前扫到的数（1.2）。">σ</span></span><span class="l-en">Volatility <span class="sym" data-say="Annualized volatility, here the value the animation has currently reached (1.2).">σ</span></span></div><div class="d" id="ldS"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">95/100 价差</span><span class="l-en">95/100 spread</span></div><div class="d" id="ldA" style="color:var(--control)"></div><div class="d2"><span class="l-zh">卖出 100 call</span><span class="l-en">sells the 100 call</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">100/105 价差</span><span class="l-en">100/105 spread</span></div><div class="d" id="ldB" style="color:var(--result)"></div><div class="d2"><span class="l-zh">买入 100 call</span><span class="l-en">buys the 100 call</span></div></div>
     </div>
   </div>
-  <p>三张 call 都随波动率变贵，但 100 call 涨得最多。讲义那三列里，波动率从 15% 到 25%，95 call 多 0.97，100 call 多 1.35，105 call 多 1.05。这是 2.3 讲的 <span class="sym" data-say="vega。隐含波动率涨 1 个百分点，期权价格变多少（2.3）。">vega</span> 第一条：按美元算，平值期权对波动率最敏感。这里标的 100，平值就是 100。</p>
-  <p>价差的价值是两条腿相减，它对波动率的反应也是两条腿的 vega 相减：</p>
+  <p><span class="l-zh">三张 call 都随波动率变贵，但 100 call 涨得最多。讲义那三列里，波动率从 15% 到 25%，95 call 多 0.97，100 call 多 1.35，105 call 多 1.05。这是 2.3 讲的 <span class="sym" data-say="vega。隐含波动率涨 1 个百分点，期权价格变多少（2.3）。">vega</span> 第一条：按美元算，平值期权对波动率最敏感。这里标的 100，平值就是 100。</span><span class="l-en">All three calls get more expensive as volatility rises, but the 100 call rises most. In the lecture notes' three columns, from 15% to 25% volatility, the 95 call gains 0.97, the 100 call 1.35 and the 105 call 1.05. This is the first <span class="sym" data-say="Vega. When implied volatility rises 1 percentage point, how much the option price changes (2.3).">vega</span> rule from 2.3: in dollar terms, at-the-money options are the most sensitive to volatility. Here the underlying is at 100, so at the money is 100.</span></p>
+  <p><span class="l-zh">价差的价值是两条腿相减，它对波动率的反应也是两条腿的 vega 相减：</span><span class="l-en">A spread's value is one leg minus the other, so its response to volatility is also one leg's vega minus the other's:</span></p>
   <div class="formula">
-    <div class="math">价差的 <span class="sym" data-say="vega，读作「维加」，常借用希腊字母 ν（「纽」）来写。">ν</span> ＝ ν(买入的腿) − ν(卖出的腿)</div>
-    <div class="gloss">哪条腿的 vega 大，价差的 vega 就跟它的正负号</div>
+    <div class="math"><span class="l-zh">价差的 <span class="sym" data-say="vega，读作「维加」，常借用希腊字母 ν（「纽」）来写。">ν</span> ＝ ν(买入的腿) − ν(卖出的腿)</span><span class="l-en">Spread <span class="sym" data-say="Vega, often written with the borrowed Greek letter ν (nu).">ν</span> = ν(leg bought) − ν(leg sold)</span></div>
+    <div class="gloss"><span class="l-zh">哪条腿的 vega 大，价差的 vega 就跟它的正负号</span><span class="l-en">The spread's vega takes the sign of whichever leg has the larger vega</span></div>
   </div>
-  <p>95/100 卖出了 100 call：每个波动率点 0.0991 − 0.1353 ＝ −0.036，波动率涨，价差变便宜（15% 时 3.38，25% 时 3.00）。100/105 买入了 100 call：0.1353 − 0.1070 ＝ +0.028，波动率涨，价差变贵（1.56 到 1.86）。</p>
+  <p><span class="l-zh">95/100 卖出了 100 call：每个波动率点 0.0991 − 0.1353 ＝ −0.036，波动率涨，价差变便宜（15% 时 3.38，25% 时 3.00）。100/105 买入了 100 call：0.1353 − 0.1070 ＝ +0.028，波动率涨，价差变贵（1.56 到 1.86）。</span><span class="l-en">95/100 sells the 100 call: 0.0991 − 0.1353 = −0.036 per volatility point, so when volatility rises the spread gets cheaper (3.38 at 15%, 3.00 at 25%). 100/105 buys the 100 call: 0.1353 − 0.1070 = +0.028, so when volatility rises the spread gets more expensive (1.56 to 1.86).</span></p>
 
-  <h3>平值腿在买方还是卖方</h3>
-  <p>讲义这一页的要点就是这句话。<b>平值腿</b>指两条腿里行权价离标的价最近的那一条。它的 vega 最大，<span class="sym" data-say="gamma。TSLA 涨 1 美元，delta 变多少，也就是 delta 变得多快（2.2）。">gamma</span>、<span class="sym" data-say="theta。别的不变，过一天期权价格变多少，一般为负，就是每天流失的时间价值（2.2）。">theta</span> 的绝对值也最大（2.2、2.3），整个价差的这三个数跟着它的正负号走：</p>
+  <h3><span class="l-zh">平值腿在买方还是卖方</span><span class="l-en">Is the at-the-money leg bought or sold?</span></h3>
+  <p><span class="l-zh">讲义这一页的要点就是这句话。<b>平值腿</b>指两条腿里行权价离标的价最近的那一条。它的 vega 最大，<span class="sym" data-say="gamma。TSLA 涨 1 美元，delta 变多少，也就是 delta 变得多快（2.2）。">gamma</span>、<span class="sym" data-say="theta。别的不变，过一天期权价格变多少，一般为负，就是每天流失的时间价值（2.2）。">theta</span> 的绝对值也最大（2.2、2.3），整个价差的这三个数跟着它的正负号走：</span><span class="l-en">This sentence is the point of this page of the lecture notes. The <b>at-the-money leg</b> is whichever of the two legs has its strike closest to the underlying price. It has the largest vega, and also the largest <span class="sym" data-say="Gamma. When TSLA rises 1 dollar, how much delta changes, that is, how fast delta changes (2.2).">gamma</span> and <span class="sym" data-say="Theta. With everything else unchanged, how much the option price changes when a day passes; usually negative, it is the time value lost each day (2.2).">theta</span> in absolute value (2.2, 2.3), so these three numbers of the whole spread follow its sign:</span></p>
   <table style="max-width:40rem">
-    <thead><tr><th>平值腿</th><th>gamma</th><th>theta</th><th>vega</th><th class="txt">这个价差希望</th></tr></thead>
+    <thead><tr><th><span class="l-zh">平值腿</span><span class="l-en">At-the-money leg</span></th><th>gamma</th><th>theta</th><th>vega</th><th class="txt"><span class="l-zh">这个价差希望</span><span class="l-en">This spread hopes for</span></th></tr></thead>
     <tbody>
-      <tr><td>在买方</td><td>＋</td><td>−</td><td>＋</td><td class="txt">隐含波动率涨；标的动得快</td></tr>
-      <tr><td>在卖方</td><td>−</td><td>＋</td><td>−</td><td class="txt">隐含波动率跌；时间慢慢过去</td></tr>
+      <tr><td><span class="l-zh">在买方</span><span class="l-en">Bought</span></td><td><span class="l-zh">＋</span><span class="l-en">+</span></td><td>−</td><td><span class="l-zh">＋</span><span class="l-en">+</span></td><td class="txt"><span class="l-zh">隐含波动率涨；标的动得快</span><span class="l-en">Implied volatility to rise; the underlying to move fast</span></td></tr>
+      <tr><td><span class="l-zh">在卖方</span><span class="l-en">Sold</span></td><td>−</td><td><span class="l-zh">＋</span><span class="l-en">+</span></td><td>−</td><td class="txt"><span class="l-zh">隐含波动率跌；时间慢慢过去</span><span class="l-en">Implied volatility to fall; time to pass quietly</span></td></tr>
     </tbody>
   </table>
-  <p>put 版一样。讲义的 put 表：95/100 put 价差（买 100 put、卖 95 put，熊市）买入了平值腿，波动率从 15% 到 25%，从 1.62 涨到 2.00；100/105 put 价差（买 105 put、卖 100 put）卖出了平值腿，从 3.44 降到 3.14。同一列里 call 价差加 put 价差都是 5.00：利率为 0，不用折现，这就是上一节的第三条。</p>
-  <p>这条规则要求平值腿明显比另一条腿靠近标的价。同一天 vega 最大的行权价略高于标的价（4/13 TSLA 352.36，vega 最大的是 355），gamma 也是这样。标的走到两腿中点附近时，上方那条腿的 vega 会先超过下方那条，价差的 vega 在标的越过中点之前就翻号（第五节的 4/14）。这时要直接比两条腿的 vega。</p>
+  <p><span class="l-zh">put 版一样。讲义的 put 表：95/100 put 价差（买 100 put、卖 95 put，熊市）买入了平值腿，波动率从 15% 到 25%，从 1.62 涨到 2.00；100/105 put 价差（买 105 put、卖 100 put）卖出了平值腿，从 3.44 降到 3.14。同一列里 call 价差加 put 价差都是 5.00：利率为 0，不用折现，这就是上一节的第三条。</span><span class="l-en">Puts work the same way. In the lecture notes' put table, the 95/100 put spread (buy the 100 put, sell the 95 put, bearish) buys the at-the-money leg, and as volatility goes from 15% to 25% it rises from 1.62 to 2.00; the 100/105 put spread (buy the 105 put, sell the 100 put) sells the at-the-money leg and falls from 3.44 to 3.14. In each column the call spread plus the put spread is 5.00: with a rate of 0 there is no discounting, and this is the third rule from the previous section.</span></p>
+  <p><span class="l-zh">这条规则要求平值腿明显比另一条腿靠近标的价。同一天 vega 最大的行权价略高于标的价（4/13 TSLA 352.36，vega 最大的是 355），gamma 也是这样。标的走到两腿中点附近时，上方那条腿的 vega 会先超过下方那条，价差的 vega 在标的越过中点之前就翻号（第五节的 4/14）。这时要直接比两条腿的 vega。</span><span class="l-en">This rule requires the at-the-money leg to be clearly closer to the underlying price than the other leg. On a given day the strike with the largest vega is slightly above the underlying price (on 4/13 TSLA was 352.36 and the largest vega was at 355), and the same goes for gamma. When the underlying gets near the midpoint between the two legs, the upper leg's vega overtakes the lower leg's first, and the spread's vega flips sign before the underlying crosses the midpoint (4/14 in section 5). Then compare the two legs' vegas directly.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>双判据：先定方向，再看平值腿</h2>
-  <p class="sub">讲义作业里有一类题：给出标的价、方向看法和对隐含波动率的看法，从四个价差里挑一个。挑法分两步，方向先筛掉一半，vega 再从剩下的里挑。</p>
+  <h2><span class="l-zh"><span class="n">四</span>双判据：先定方向，再看平值腿</span><span class="l-en"><span class="n">4</span>Two criteria: direction first, then the at-the-money leg</span></h2>
+  <p class="sub"><span class="l-zh">讲义作业里有一类题：给出标的价、方向看法和对隐含波动率的看法，从四个价差里挑一个。挑法分两步，方向先筛掉一半，vega 再从剩下的里挑。</span><span class="l-en">The lecture notes' homework has a type of question: given the underlying price, a directional view and a view on implied volatility, choose one of four spreads. The choice takes two steps: direction removes half, and vega picks from what is left.</span></p>
   <div class="steps">
-    <div class="st"><div class="h">第一步　方向</div><p>看涨选牛市价差（买低卖高），看跌选熊市价差（买高卖低）。call 版、put 版都算。</p></div>
-    <div class="st"><div class="h">第二步　平值腿</div><p>认为隐含波动率偏高，要负 vega，选平值腿在卖方的那个；认为偏低，要正 vega，选平值腿在买方的那个。</p></div>
+    <div class="st"><div class="h"><span class="l-zh">第一步　方向</span><span class="l-en">Step 1&emsp;Direction</span></div><p><span class="l-zh">看涨选牛市价差（买低卖高），看跌选熊市价差（买高卖低）。call 版、put 版都算。</span><span class="l-en">If bullish, choose a bull spread (buy low, sell high); if bearish, a bear spread (buy high, sell low). Call and put versions both count.</span></p></div>
+    <div class="st"><div class="h"><span class="l-zh">第二步　平值腿</span><span class="l-en">Step 2&emsp;At-the-money leg</span></div><p><span class="l-zh">认为隐含波动率偏高，要负 vega，选平值腿在卖方的那个；认为偏低，要正 vega，选平值腿在买方的那个。</span><span class="l-en">If you think implied volatility is too high, you want negative vega: choose the one with the at-the-money leg sold. If you think it is too low, you want positive vega: choose the one with the at-the-money leg bought.</span></p></div>
   </div>
-  <p>第二步问的是隐含波动率偏高还是偏低，这要靠你对未来波动率的判断（1.2：隐含波动率是价格，未来波动率是价值），数据本身给不出答案。例如 4/13 这天，5/15 到期的期权里包含了 4/22 收盘后的财报（2.3），隐含波动率里有一部分是在为财报那一下跳动付钱。财报之后隐含波动率会降，这一点市场事先就知道，已经算进了价格；认为那一下跳动会比市场定价的小的人，才会认为隐含波动率偏高。财报公布后，4/23 那天 350 call 的隐含波动率从 48.55% 降到 43.16%（这是 350 call 自己的；2.3 用离标的最近的行权价上 call 与 put 的平均，是 48.1% 降到 41.9%）。</p>
-  <p>用 4/13 收盘的真实报价搭四个候选。TSLA 352.36，离它最近的行权价是 350，平值腿就是 350 那条。下面每张卡片的数都是一张价差的：</p>
+  <p><span class="l-zh">第二步问的是隐含波动率偏高还是偏低，这要靠你对未来波动率的判断（1.2：隐含波动率是价格，未来波动率是价值），数据本身给不出答案。例如 4/13 这天，5/15 到期的期权里包含了 4/22 收盘后的财报（2.3），隐含波动率里有一部分是在为财报那一下跳动付钱。财报之后隐含波动率会降，这一点市场事先就知道，已经算进了价格；认为那一下跳动会比市场定价的小的人，才会认为隐含波动率偏高。财报公布后，4/23 那天 350 call 的隐含波动率从 48.55% 降到 43.16%（这是 350 call 自己的；2.3 用离标的最近的行权价上 call 与 put 的平均，是 48.1% 降到 41.9%）。</span><span class="l-en">Step 2 asks whether implied volatility is too high or too low, which depends on your judgment of future volatility (1.2: implied volatility is the price, future volatility is the value); the data alone cannot answer it. For example, on 4/13 the options expiring 5/15 included the earnings release after the 4/22 close (2.3), and part of the implied volatility was paying for the jump at earnings. That implied volatility would fall after earnings was known to the market in advance and already in the price; only someone who thinks the jump will be smaller than the market has priced would consider implied volatility too high. After the release, on 4/23 the 350 call's implied volatility fell from 48.55% to 43.16% (this is the 350 call's own; 2.3 used the average of the call and put at the strike nearest the underlying, which fell from 48.1% to 41.9%).</span></p>
+  <p><span class="l-zh">用 4/13 收盘的真实报价搭四个候选。TSLA 352.36，离它最近的行权价是 350，平值腿就是 350 那条。下面每张卡片的数都是一张价差的：</span><span class="l-en">Build the four candidates from real quotes at the 4/13 close. TSLA was 352.36, the nearest strike was 350, so the at-the-money leg is the 350 leg. The numbers on each card below are for one spread:</span></p>
 
   <div class="panel">
     <div class="bar">
       <div class="seg" id="fvSeg">
-        <button data-v="uh" aria-pressed="true">看涨，隐含偏高</button>
-        <button data-v="ul" aria-pressed="false">看涨，隐含偏低</button>
-        <button data-v="dh" aria-pressed="false">看跌，隐含偏高</button>
-        <button data-v="dl" aria-pressed="false">看跌，隐含偏低</button>
+        <button data-v="uh" aria-pressed="true"><span class="l-zh">看涨，隐含偏高</span><span class="l-en">Bullish, implied vol high</span></button>
+        <button data-v="ul" aria-pressed="false"><span class="l-zh">看涨，隐含偏低</span><span class="l-en">Bullish, implied vol low</span></button>
+        <button data-v="dh" aria-pressed="false"><span class="l-zh">看跌，隐含偏高</span><span class="l-en">Bearish, implied vol high</span></button>
+        <button data-v="dl" aria-pressed="false"><span class="l-zh">看跌，隐含偏低</span><span class="l-en">Bearish, implied vol low</span></button>
       </div>
-      <button class="btn ghost" id="fvPlay">再筛一遍</button>
+      <button class="btn ghost" id="fvPlay"><span class="l-zh">再筛一遍</span><span class="l-en">Filter again</span></button>
     </div>
     <div class="cands" id="cands">
-      <div class="cd" data-k="A"><div class="top"><span class="no">①</span><span class="nm">买 350 call，卖 380 call</span><span class="kind">牛市 · 350 在买方 · 付 11.975</span></div>
-        <div class="gk"><span class="nw">delta <b>+23.91</b></span>　<span class="nw">vega <b>+3.59</b></span>　<span class="nw">gamma +0.058</span>　<span class="nw">theta −4.32</span>　<span class="nw">隐含波动率 −5 点 <b>−22.9</b></span>　<span class="nw">+5 点 <b>+17.0</b></span></div><div class="why"></div></div>
-      <div class="cd" data-k="B"><div class="top"><span class="no">②</span><span class="nm">买 320 call，卖 350 call</span><span class="kind">牛市 · 350 在卖方 · 付 19.50</span></div>
-        <div class="gk"><span class="nw">delta <b>+22.14</b></span>　<span class="nw">vega <b>−9.75</b></span>　<span class="nw">gamma −0.235</span>　<span class="nw">theta +5.60</span>　<span class="nw">隐含波动率 −5 点 <b>+54.8</b></span>　<span class="nw">+5 点 <b>−47.2</b></span></div><div class="why"></div></div>
-      <div class="cd" data-k="C"><div class="top"><span class="no">③</span><span class="nm">买 380 put，卖 350 put</span><span class="kind">熊市 · 350 在卖方 · 付 18.075</span></div>
-        <div class="gk"><span class="nw">delta <b>−23.91</b></span>　<span class="nw">vega <b>−3.59</b></span>　<span class="nw">gamma −0.058</span>　<span class="nw">theta +4.67</span>　<span class="nw">隐含波动率 −5 点 <b>+23.2</b></span>　<span class="nw">+5 点 <b>−17.2</b></span></div><div class="why"></div></div>
-      <div class="cd" data-k="D"><div class="top"><span class="no">④</span><span class="nm">买 350 put，卖 320 put</span><span class="kind">熊市 · 350 在买方 · 付 10.45</span></div>
-        <div class="gk"><span class="nw">delta <b>−22.14</b></span>　<span class="nw">vega <b>+9.75</b></span>　<span class="nw">gamma +0.235</span>　<span class="nw">theta −5.25</span>　<span class="nw">隐含波动率 −5 点 <b>−55.2</b></span>　<span class="nw">+5 点 <b>+47.5</b></span></div><div class="why"></div></div>
+      <div class="cd" data-k="A"><div class="top"><span class="no">①</span><span class="nm"><span class="l-zh">买 350 call，卖 380 call</span><span class="l-en">Buy 350 call, sell 380 call</span></span><span class="kind"><span class="l-zh">牛市 · 350 在买方 · 付 11.975</span><span class="l-en">Bull · 350 bought · pay 11.975</span></span></div>
+        <div class="gk"><span class="l-zh"><span class="nw">delta <b>+23.91</b></span>　<span class="nw">vega <b>+3.59</b></span>　<span class="nw">gamma +0.058</span>　<span class="nw">theta −4.32</span>　<span class="nw">隐含波动率 −5 点 <b>−22.9</b></span>　<span class="nw">+5 点 <b>+17.0</b></span></span><span class="l-en"><span class="nw">delta <b>+23.91</b></span>&emsp;<span class="nw">vega <b>+3.59</b></span>&emsp;<span class="nw">gamma +0.058</span>&emsp;<span class="nw">theta −4.32</span>&emsp;<span class="nw">implied vol −5 pts <b>−22.9</b></span>&emsp;<span class="nw">+5 pts <b>+17.0</b></span></span></div><div class="why"></div></div>
+      <div class="cd" data-k="B"><div class="top"><span class="no">②</span><span class="nm"><span class="l-zh">买 320 call，卖 350 call</span><span class="l-en">Buy 320 call, sell 350 call</span></span><span class="kind"><span class="l-zh">牛市 · 350 在卖方 · 付 19.50</span><span class="l-en">Bull · 350 sold · pay 19.50</span></span></div>
+        <div class="gk"><span class="l-zh"><span class="nw">delta <b>+22.14</b></span>　<span class="nw">vega <b>−9.75</b></span>　<span class="nw">gamma −0.235</span>　<span class="nw">theta +5.60</span>　<span class="nw">隐含波动率 −5 点 <b>+54.8</b></span>　<span class="nw">+5 点 <b>−47.2</b></span></span><span class="l-en"><span class="nw">delta <b>+22.14</b></span>&emsp;<span class="nw">vega <b>−9.75</b></span>&emsp;<span class="nw">gamma −0.235</span>&emsp;<span class="nw">theta +5.60</span>&emsp;<span class="nw">implied vol −5 pts <b>+54.8</b></span>&emsp;<span class="nw">+5 pts <b>−47.2</b></span></span></div><div class="why"></div></div>
+      <div class="cd" data-k="C"><div class="top"><span class="no">③</span><span class="nm"><span class="l-zh">买 380 put，卖 350 put</span><span class="l-en">Buy 380 put, sell 350 put</span></span><span class="kind"><span class="l-zh">熊市 · 350 在卖方 · 付 18.075</span><span class="l-en">Bear · 350 sold · pay 18.075</span></span></div>
+        <div class="gk"><span class="l-zh"><span class="nw">delta <b>−23.91</b></span>　<span class="nw">vega <b>−3.59</b></span>　<span class="nw">gamma −0.058</span>　<span class="nw">theta +4.67</span>　<span class="nw">隐含波动率 −5 点 <b>+23.2</b></span>　<span class="nw">+5 点 <b>−17.2</b></span></span><span class="l-en"><span class="nw">delta <b>−23.91</b></span>&emsp;<span class="nw">vega <b>−3.59</b></span>&emsp;<span class="nw">gamma −0.058</span>&emsp;<span class="nw">theta +4.67</span>&emsp;<span class="nw">implied vol −5 pts <b>+23.2</b></span>&emsp;<span class="nw">+5 pts <b>−17.2</b></span></span></div><div class="why"></div></div>
+      <div class="cd" data-k="D"><div class="top"><span class="no">④</span><span class="nm"><span class="l-zh">买 350 put，卖 320 put</span><span class="l-en">Buy 350 put, sell 320 put</span></span><span class="kind"><span class="l-zh">熊市 · 350 在买方 · 付 10.45</span><span class="l-en">Bear · 350 bought · pay 10.45</span></span></div>
+        <div class="gk"><span class="l-zh"><span class="nw">delta <b>−22.14</b></span>　<span class="nw">vega <b>+9.75</b></span>　<span class="nw">gamma +0.235</span>　<span class="nw">theta −5.25</span>　<span class="nw">隐含波动率 −5 点 <b>−55.2</b></span>　<span class="nw">+5 点 <b>+47.5</b></span></span><span class="l-en"><span class="nw">delta <b>−22.14</b></span>&emsp;<span class="nw">vega <b>+9.75</b></span>&emsp;<span class="nw">gamma +0.235</span>&emsp;<span class="nw">theta −5.25</span>&emsp;<span class="nw">implied vol −5 pts <b>−55.2</b></span>&emsp;<span class="nw">+5 pts <b>+47.5</b></span></span></div><div class="why"></div></div>
     </div>
     <div class="say plain" id="fvSay"></div>
   </div>
-  <p class="tiny">delta 按股、vega 按每个波动率点美元、gamma 按每 1 美元股数、theta 按每天美元，都是一张价差（4/13 收盘报价，put 的 theta 按 put-call parity 从 call 换算，同 2.4）。「隐含波动率 −5 点 / +5 点」是 Black-Scholes 模型值：TSLA 停在 352.36，每条腿用自己的隐含波动率，全部同时降或升 5 个点，一张价差的价值变多少美元。两边不对称，也不正好是 5 × vega：vega 本身随隐含波动率变，同一个模型里 ① 每张的 vega 在降 5 点后是 +5.30，升 5 点后是 +2.92，所以降 5 点亏的（22.9）比升 5 点赚的（17.0）多。</p>
-  <p>平值腿决定 vega 的正负，是因为两条腿里它的 vega 最大。4/13 这天每股 vega：350 是 0.4125，380 是 0.3766，320 是 0.3150。① 的 vega 只有 +3.59，② 却有 −9.75，差在另一条腿上。离现价差不多远的两个行权价，在上方的 vega 更大：325 在现价下方 27.36，vega 0.3378；380 在上方 27.64，vega 0.3766。原因是第三节末尾说的，vega 最大的行权价（355，0.4167）在现价上方。所以 ① 卖出的 380 抵掉了 350 的大半；② 买入的 320 在下方，又更远（32.36），抵得少。</p>
-  <p>第二步也可以反过来读成一句话：平值腿在卖方的价差，是「看涨（或看跌），同时做空波动率」；在买方的，是「看涨（或看跌），同时做多波动率」。② 每张 theta +5.60、vega −9.75，时间过去和隐含波动率下降都对它有利；代价是贵（19.50 对 11.975），最多只赚 10.50。</p>
+  <p class="tiny"><span class="l-zh">delta 按股、vega 按每个波动率点美元、gamma 按每 1 美元股数、theta 按每天美元，都是一张价差（4/13 收盘报价，put 的 theta 按 put-call parity 从 call 换算，同 2.4）。「隐含波动率 −5 点 / +5 点」是 Black-Scholes 模型值：TSLA 停在 352.36，每条腿用自己的隐含波动率，全部同时降或升 5 个点，一张价差的价值变多少美元。两边不对称，也不正好是 5 × vega：vega 本身随隐含波动率变，同一个模型里 ① 每张的 vega 在降 5 点后是 +5.30，升 5 点后是 +2.92，所以降 5 点亏的（22.9）比升 5 点赚的（17.0）多。</span><span class="l-en">Delta is in shares, vega in dollars per volatility point, gamma in shares per 1 dollar and theta in dollars per day, all for one spread (4/13 closing quotes; put theta is converted from the call via put-call parity, as in 2.4). "Implied vol −5 pts / +5 pts" are Black-Scholes model values: with TSLA held at 352.36 and each leg at its own implied volatility, all lowered or raised by 5 points together, how many dollars one spread's value changes. The two sides are not symmetric, nor exactly 5 × vega: vega itself changes with implied volatility; in the same model, ①'s vega per spread is +5.30 after a 5-point fall and +2.92 after a 5-point rise, so a 5-point fall loses more (22.9) than a 5-point rise gains (17.0).</span></p>
+  <p><span class="l-zh">平值腿决定 vega 的正负，是因为两条腿里它的 vega 最大。4/13 这天每股 vega：350 是 0.4125，380 是 0.3766，320 是 0.3150。① 的 vega 只有 +3.59，② 却有 −9.75，差在另一条腿上。离现价差不多远的两个行权价，在上方的 vega 更大：325 在现价下方 27.36，vega 0.3378；380 在上方 27.64，vega 0.3766。原因是第三节末尾说的，vega 最大的行权价（355，0.4167）在现价上方。所以 ① 卖出的 380 抵掉了 350 的大半；② 买入的 320 在下方，又更远（32.36），抵得少。</span><span class="l-en">The at-the-money leg sets the sign of vega because it has the larger vega of the two legs. Vega per share on 4/13: 0.4125 at 350, 0.3766 at 380, 0.3150 at 320. ①'s vega is only +3.59 while ②'s is −9.75; the difference lies in the other leg. Of two strikes about equally far from the current price, the one above has the larger vega: 325 is 27.36 below the current price with vega 0.3378, and 380 is 27.64 above with vega 0.3766. The reason is the one at the end of section 3: the strike with the largest vega (355, 0.4167) is above the current price. So in ① the 380 sold cancels most of the 350, while in ② the 320 bought is below and further away (32.36), and cancels less.</span></p>
+  <p><span class="l-zh">第二步也可以反过来读成一句话：平值腿在卖方的价差，是「看涨（或看跌），同时做空波动率」；在买方的，是「看涨（或看跌），同时做多波动率」。② 每张 theta +5.60、vega −9.75，时间过去和隐含波动率下降都对它有利；代价是贵（19.50 对 11.975），最多只赚 10.50。</span><span class="l-en">Step 2 can also be read the other way, as one sentence: a spread with the at-the-money leg sold is "bullish (or bearish) and short volatility at the same time"; one with it bought is "bullish (or bearish) and long volatility at the same time". ② has theta +5.60 and vega −9.75 per spread, so time passing and implied volatility falling both help it; the price is that it is expensive (19.50 against 11.975) and makes at most 10.50.</span></p>
 
-  <h3>第三个选择：仓位多大</h3>
-  <p>方向和 vega 定了，还要定仓位多大。讲义的例子：100/105 call 价差的 delta 是 25，100/110 是 50，95/110 是 75；想要 1000 个 delta，分别要做 40 次、20 次、约 13 次。拉大行权价间距，或者多做几张，都能放大方向。TSLA 4/13 的 call 价差：</p>
+  <h3><span class="l-zh">第三个选择：仓位多大</span><span class="l-en">The third choice: how big a position</span></h3>
+  <p><span class="l-zh">方向和 vega 定了，还要定仓位多大。讲义的例子：100/105 call 价差的 delta 是 25，100/110 是 50，95/110 是 75；想要 1000 个 delta，分别要做 40 次、20 次、约 13 次。拉大行权价间距，或者多做几张，都能放大方向。TSLA 4/13 的 call 价差：</span><span class="l-en">With direction and vega decided, you still have to decide how big the position is. The lecture notes' example: the 100/105 call spread has a delta of 25, the 100/110 has 50 and the 95/110 has 75; to get 1000 deltas, you would trade 40, 20 and about 13 of them. Widening the strikes or trading more spreads both enlarge the directional bet. TSLA call spreads on 4/13:</span></p>
   <table style="max-width:36rem">
-    <thead><tr><th>牛市 call 价差</th><th>每张 delta</th><th>凑 1000 股要几张</th><th>每张成本（美元）</th></tr></thead>
+    <thead><tr><th><span class="l-zh">牛市 call 价差</span><span class="l-en">Bull call spread</span></th><th><span class="l-zh">每张 delta</span><span class="l-en">delta per spread</span></th><th><span class="l-zh">凑 1000 股要几张</span><span class="l-en">Spreads for 1000 shares</span></th><th><span class="l-zh">每张成本（美元）</span><span class="l-en">Cost per spread (dollars)</span></th></tr></thead>
     <tbody>
       <tr><td>350/365</td><td>12.40</td><td>80.6</td><td>690.0</td></tr>
       <tr><td>350/380</td><td>23.91</td><td>41.8</td><td>1,197.5</td></tr>
@@ -494,80 +496,80 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <tr><td>320/380</td><td>46.05</td><td>21.7</td><td>3,147.5</td></tr>
     </tbody>
   </table>
-  <p>间距拉得越大，价差越像单买一张 call：delta 更大，成本更高，封顶也更高。讲义还提醒先想清楚预期的涨跌什么时候发生，这决定用哪个到期日。</p>
+  <p><span class="l-zh">间距拉得越大，价差越像单买一张 call：delta 更大，成本更高，封顶也更高。讲义还提醒先想清楚预期的涨跌什么时候发生，这决定用哪个到期日。</span><span class="l-en">The wider the strikes, the more the spread resembles buying a single call: larger delta, higher cost, higher cap. The lecture notes also remind you to think first about when the expected move will happen, which decides the expiration to use.</span></p>
 
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>逐日回放：离标的最近的腿会变</h2>
-  <p class="sub">① 和 ② 都是 4/13 收盘建的牛市 call 价差，建仓时一个平值腿在买方，一个在卖方。逐日回放到 5/15，看它们的价值和 vega 怎么变。</p>
+  <h2><span class="l-zh"><span class="n">五</span>逐日回放：离标的最近的腿会变</span><span class="l-en"><span class="n">5</span>Daily replay: the leg nearest the underlying changes</span></h2>
+  <p class="sub"><span class="l-zh">① 和 ② 都是 4/13 收盘建的牛市 call 价差，建仓时一个平值腿在买方，一个在卖方。逐日回放到 5/15，看它们的价值和 vega 怎么变。</span><span class="l-en">① and ② are both bull call spreads built at the 4/13 close; at entry one has the at-the-money leg bought and the other has it sold. Replay day by day to 5/15 and see how their values and vegas change.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="rpPlay">重播</button></div>
-    <svg id="rp" viewBox="0 0 720 484" role="img" aria-label="TSLA 收盘价、两个价差每天的 vega 与价值"></svg>
+    <div class="bar"><button class="btn ghost" id="rpPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <svg id="rp" viewBox="0 0 720 484" role="img" aria-label="TSLA 收盘价、两个价差每天的 vega 与价值" data-en-aria-label="TSLA's close, and each day's vega and value of the two spreads"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink)"></i>TSLA 收盘</span>
-      <span><i class="ln" style="background:var(--result)"></i>① 买 350 call，卖 380 call</span>
-      <span><i class="ln" style="background:var(--control)"></i>② 买 320 call，卖 350 call</span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--ink)"></i>TSLA 收盘</span><span class="l-en"><i class="ln" style="background:var(--ink)"></i>TSLA close</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--result)"></i>① 买 350 call，卖 380 call</span><span class="l-en"><i class="ln" style="background:var(--result)"></i>① Buy 350 call, sell 380 call</span></span>
+      <span><span class="l-zh"><i class="ln" style="background:var(--control)"></i>② 买 320 call，卖 350 call</span><span class="l-en"><i class="ln" style="background:var(--control)"></i>② Buy 320 call, sell 350 call</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
-      <div class="stat"><div class="k">TSLA 收盘</div><div class="d" id="rpU"></div><div class="d2" id="rpUb"></div></div>
-      <div class="stat"><div class="k">① 价值</div><div class="d" id="rpA" style="color:var(--result)"></div><div class="d2" id="rpAb"></div></div>
-      <div class="stat"><div class="k">② 价值</div><div class="d" id="rpB" style="color:var(--control)"></div><div class="d2" id="rpBb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="rpD"></div><div class="d2" id="rpDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">TSLA 收盘</span><span class="l-en">TSLA close</span></div><div class="d" id="rpU"></div><div class="d2" id="rpUb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">① 价值</span><span class="l-en">① value</span></div><div class="d" id="rpA" style="color:var(--result)"></div><div class="d2" id="rpAb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">② 价值</span><span class="l-en">② value</span></div><div class="d" id="rpB" style="color:var(--control)"></div><div class="d2" id="rpBb"></div></div>
     </div>
     <div class="say plain" id="rpSay"></div>
   </div>
-  <p>4/14 TSLA 涨到 364.32，离 350 和 380 的中点 365 只差 0.68。离它最近的还是买入的 350，但 380 的 vega（0.4091）已经超过 350（0.3979），① 的 vega 从 +3.59 变成 −1.12：vega 最大的行权价略高于标的价（这天是 365），所以标的还没越过中点，vega 就先翻了号（第三节末尾）。4/15 涨到 391.93，两条腿里离它最近的换成了 380，① 卖出的那条腿成了平值腿，vega 到了 −11.10。建仓时平值腿在买方，两天后在卖方，这中间没有做任何交易。② 两条腿都在 TSLA 下方，离现价近的一直是卖出的 350，vega 一路为负。</p>
-  <p>所以双判据读的是建仓那一刻。标的一动，离它最近的腿就可能变成另一条，持有期间要按当天的价格重新读一遍四个数（2.4）。</p>
-  <p>4/23 财报之后，TSLA 从 387.61 跌到 373.69，350 call 的隐含波动率从 48.55% 降到 43.16%。这时两个价差的 vega 都是负的（每张 ① −12.55，② −14.97），隐含波动率下降对两者都有利；可是 ① 的 delta 大（22.43 对 12.77），价格下跌伤它更多：① 从 20.35 跌到 17.575，② 只从 26.525 跌到 25.725。</p>
-  <p>5/15 两个都赚满，价值 30。① 付 11.975，每股赚 18.025（+150.5%）；② 付 19.50，赚 10.50（+53.8%）；单买 350 call 按中间价赚 51.27（+243.6%；1.1 按卖一 21.10 买入是 +51.22）。4/30 以后 TSLA 每天都收在 380 以上，① 在 5/8 就到了 29.55，之后几乎不动：5/13 350 call 到了最高的 95.375，① 是 29.80。</p>
-  <p class="tiny">价值用每天 16:00 的买一卖一中间价，vega 是报价快照里的每股 vega 乘 100。5/8、5/11、5/12 用中间价算出的价差略高于 30（最多 30.125）：两条腿都是深度实值，每条腿的买卖价差有 0.80 到 3.00 美元宽（5/8 320 call 107.90 / 109.45），中间价不精确。5/15 按结算价 422.32 算到期价值。</p>
+  <p><span class="l-zh">4/14 TSLA 涨到 364.32，离 350 和 380 的中点 365 只差 0.68。离它最近的还是买入的 350，但 380 的 vega（0.4091）已经超过 350（0.3979），① 的 vega 从 +3.59 变成 −1.12：vega 最大的行权价略高于标的价（这天是 365），所以标的还没越过中点，vega 就先翻了号（第三节末尾）。4/15 涨到 391.93，两条腿里离它最近的换成了 380，① 卖出的那条腿成了平值腿，vega 到了 −11.10。建仓时平值腿在买方，两天后在卖方，这中间没有做任何交易。② 两条腿都在 TSLA 下方，离现价近的一直是卖出的 350，vega 一路为负。</span><span class="l-en">On 4/14 TSLA rose to 364.32, only 0.68 from 365, the midpoint between 350 and 380. The nearest leg was still the 350 bought, but the 380's vega (0.4091) had already overtaken the 350's (0.3979), and ①'s vega went from +3.59 to −1.12: the strike with the largest vega was slightly above the underlying price (365 that day), so vega flipped sign before the underlying crossed the midpoint (end of section 3). On 4/15 it rose to 391.93, the nearer of the two legs became the 380, the leg ① sold became the at-the-money leg, and vega reached −11.10. At entry the at-the-money leg was bought; two days later it was sold, with no trades in between. Both of ②'s legs were below TSLA, the leg nearer the current price was always the 350 sold, and its vega stayed negative throughout.</span></p>
+  <p><span class="l-zh">所以双判据读的是建仓那一刻。标的一动，离它最近的腿就可能变成另一条，持有期间要按当天的价格重新读一遍四个数（2.4）。</span><span class="l-en">So the two criteria read the moment the position is built. Once the underlying moves, the nearest leg can become the other one, and while holding you need to reread the four numbers at that day's price (2.4).</span></p>
+  <p><span class="l-zh">4/23 财报之后，TSLA 从 387.61 跌到 373.69，350 call 的隐含波动率从 48.55% 降到 43.16%。这时两个价差的 vega 都是负的（每张 ① −12.55，② −14.97），隐含波动率下降对两者都有利；可是 ① 的 delta 大（22.43 对 12.77），价格下跌伤它更多：① 从 20.35 跌到 17.575，② 只从 26.525 跌到 25.725。</span><span class="l-en">After earnings on 4/23, TSLA fell from 387.61 to 373.69 and the 350 call's implied volatility fell from 48.55% to 43.16%. By then both spreads had negative vega (per spread ① −12.55, ② −14.97), so the fall in implied volatility helped both; but ① had the larger delta (22.43 against 12.77), and the price drop hurt it more: ① fell from 20.35 to 17.575, ② only from 26.525 to 25.725.</span></p>
+  <p><span class="l-zh">5/15 两个都赚满，价值 30。① 付 11.975，每股赚 18.025（+150.5%）；② 付 19.50，赚 10.50（+53.8%）；单买 350 call 按中间价赚 51.27（+243.6%；1.1 按卖一 21.10 买入是 +51.22）。4/30 以后 TSLA 每天都收在 380 以上，① 在 5/8 就到了 29.55，之后几乎不动：5/13 350 call 到了最高的 95.375，① 是 29.80。</span><span class="l-en">On 5/15 both made their full gain, worth 30. ① paid 11.975 and made 18.025 per share (+150.5%); ② paid 19.50 and made 10.50 (+53.8%); the 350 call alone made 51.27 at the mid (+243.6%; +51.22 bought at the ask of 21.10 in 1.1). After 4/30 TSLA closed above 380 every day; ① reached 29.55 on 5/8 and barely moved after that: on 5/13 the 350 call reached its high of 95.375, and ① was 29.80.</span></p>
+  <p class="tiny"><span class="l-zh">价值用每天 16:00 的买一卖一中间价，vega 是报价快照里的每股 vega 乘 100。5/8、5/11、5/12 用中间价算出的价差略高于 30（最多 30.125）：两条腿都是深度实值，每条腿的买卖价差有 0.80 到 3.00 美元宽（5/8 320 call 107.90 / 109.45），中间价不精确。5/15 按结算价 422.32 算到期价值。</span><span class="l-en">Values use the bid-ask mid at 16:00 each day, and vega is the quote snapshot's per-share vega times 100. On 5/8, 5/11 and 5/12 the spread computed from mids is slightly above 30 (at most 30.125): both legs are deep in the money, each leg's bid-ask spread is 0.80 to 3.00 dollars wide (5/8 320 call 107.90 / 109.45), and the mid is imprecise. On 5/15 the expiration value is computed at the settlement price of 422.32.</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">六</span>费曼检验</span><span class="l-en"><span class="n">6</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">价差</div><div class="t">spread。在一个合约上持有头寸，同时在另一个合约上持有相反的头寸。</div></div>
-      <div class="gl"><div class="s">垂直价差</div><div class="t">vertical spread。两条腿同一类型、同一到期日、不同行权价，一买一卖。</div></div>
-      <div class="gl"><div class="s">牛市价差</div><div class="t">bull spread。买低行权价、卖高行权价，delta 为正，看涨。call 版付钱，put 版收钱。</div></div>
-      <div class="gl"><div class="s">熊市价差</div><div class="t">bear spread。买高行权价、卖低行权价，delta 为负，看跌。</div></div>
-      <div class="gl"><div class="s">借方价差 / 贷方价差</div><div class="t">debit / credit spread。开仓时净付钱 / 净收钱。收到的钱不等于赚到的钱。</div></div>
-      <div class="gl"><div class="s">X<sub>l</sub>, X<sub>h</sub></div><div class="t">两条腿里较低、较高的行权价。垂直价差的价值在 0 和 X<sub>h</sub> − X<sub>l</sub> 之间。</div></div>
-      <div class="gl"><div class="s">S</div><div class="t">到期时标的的价格。</div></div>
-      <div class="gl"><div class="s">S<sub>0</sub></div><div class="t">现在的标的价。讲义表里是 100，TSLA 4/13 收盘是 352.36。</div></div>
-      <div class="gl"><div class="s">X</div><div class="t">行权价。</div></div>
-      <div class="gl"><div class="s">C, P</div><div class="t">call、put 的价格。利率为 0 时，同一行权价满足 C − P ＝ S<sub>0</sub> − X（1.1）。</div></div>
-      <div class="gl"><div class="s">t</div><div class="t">离到期的时间，按年算。4/13 到 5/15 是 32/365。</div></div>
-      <div class="gl"><div class="s">ln</div><div class="t">自然对数，e 的反运算。ln(X/F) 是 X 比 F 高出的比例（1.2）。</div></div>
-      <div class="gl"><div class="s">max(a, 0)</div><div class="t">a 为负时取 0。期权到期的价值写成 max(S − X, 0)（1.1）。</div></div>
-      <div class="gl"><div class="s">平值腿</div><div class="t">两条腿里行权价离标的价最近的那一条。一般它的 vega、gamma、theta 最大，价差的这三个数跟着它的正负号走。vega 最大的行权价略高于标的价，标的走到两腿中点附近时要直接比两条腿的 vega。</div></div>
-      <div class="gl"><div class="s">Δ</div><div class="t">delta，TSLA 涨 1 美元价格变多少；一张价差按股计（2.1、2.4）。</div></div>
-      <div class="gl"><div class="s">ν, vega</div><div class="t">隐含波动率涨 1 个点，价格变多少（2.3）。价差的 vega ＝ 买入腿的 vega − 卖出腿的 vega。</div></div>
-      <div class="gl"><div class="s">gamma, theta</div><div class="t">delta 变得多快、每天的时间价值流失（2.2）。</div></div>
-      <div class="gl"><div class="s">σ</div><div class="t">年化波动率；隐含波动率是从期权价格反推出来的 σ（1.2）。</div></div>
-      <div class="gl"><div class="s">F</div><div class="t">远期价，分布的中心（1.1）。TSLA 本例 353.69。</div></div>
-      <div class="gl"><div class="s">z</div><div class="t">离中心几个标准差，z ＝ ln(X/F) ÷ (σ√t)（1.2）。</div></div>
-      <div class="gl"><div class="s">中间价</div><div class="t">买一与卖一的平均。实际成交时买在卖一、卖在买一，每条腿多付半个买卖价差。</div></div>
-      <div class="gl"><div class="s">盈亏平衡</div><div class="t">到期盈亏正好为 0 的标的价。350/380 牛市 call 价差是 350 ＋ 11.975 ＝ 361.975。</div></div>
-      <div class="gl"><div class="s">box</div><div class="t">同一对行权价的 call 价差加 put 价差，到期稳拿间距那么多钱（5.3）。</div></div>
+      <div class="gl"><div class="s"><span class="l-zh">价差</span><span class="l-en">Spread</span></div><div class="t"><span class="l-zh">spread。在一个合约上持有头寸，同时在另一个合约上持有相反的头寸。</span><span class="l-en">Holding a position in one contract and, at the same time, an opposite position in another contract.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">垂直价差</span><span class="l-en">Vertical spread</span></div><div class="t"><span class="l-zh">vertical spread。两条腿同一类型、同一到期日、不同行权价，一买一卖。</span><span class="l-en">Two legs of the same type and the same expiration at different strikes, one bought and one sold.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">牛市价差</span><span class="l-en">Bull spread</span></div><div class="t"><span class="l-zh">bull spread。买低行权价、卖高行权价，delta 为正，看涨。call 版付钱，put 版收钱。</span><span class="l-en">Buy the lower strike, sell the higher strike; positive delta, bullish. The call version costs money, the put version collects money.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">熊市价差</span><span class="l-en">Bear spread</span></div><div class="t"><span class="l-zh">bear spread。买高行权价、卖低行权价，delta 为负，看跌。</span><span class="l-en">Buy the higher strike, sell the lower strike; negative delta, bearish.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">借方价差 / 贷方价差</span><span class="l-en">Debit spread / credit spread</span></div><div class="t"><span class="l-zh">debit / credit spread。开仓时净付钱 / 净收钱。收到的钱不等于赚到的钱。</span><span class="l-en">Net payment / net receipt at opening. Money collected is not money earned.</span></div></div>
+      <div class="gl"><div class="s">X<sub>l</sub>, X<sub>h</sub></div><div class="t"><span class="l-zh">两条腿里较低、较高的行权价。垂直价差的价值在 0 和 X<sub>h</sub> − X<sub>l</sub> 之间。</span><span class="l-en">The lower and higher strikes of the two legs. A vertical spread's value is between 0 and X<sub>h</sub> − X<sub>l</sub>.</span></div></div>
+      <div class="gl"><div class="s">S</div><div class="t"><span class="l-zh">到期时标的的价格。</span><span class="l-en">The underlying's price at expiration.</span></div></div>
+      <div class="gl"><div class="s">S<sub>0</sub></div><div class="t"><span class="l-zh">现在的标的价。讲义表里是 100，TSLA 4/13 收盘是 352.36。</span><span class="l-en">The current underlying price. 100 in the lecture notes' table; TSLA closed at 352.36 on 4/13.</span></div></div>
+      <div class="gl"><div class="s">X</div><div class="t"><span class="l-zh">行权价。</span><span class="l-en">Strike.</span></div></div>
+      <div class="gl"><div class="s">C, P</div><div class="t"><span class="l-zh">call、put 的价格。利率为 0 时，同一行权价满足 C − P ＝ S<sub>0</sub> − X（1.1）。</span><span class="l-en">Prices of the call and the put. With a rate of 0, the same strike satisfies C − P = S<sub>0</sub> − X (1.1).</span></div></div>
+      <div class="gl"><div class="s">t</div><div class="t"><span class="l-zh">离到期的时间，按年算。4/13 到 5/15 是 32/365。</span><span class="l-en">Time to expiration in years. 4/13 to 5/15 is 32/365.</span></div></div>
+      <div class="gl"><div class="s">ln</div><div class="t"><span class="l-zh">自然对数，e 的反运算。ln(X/F) 是 X 比 F 高出的比例（1.2）。</span><span class="l-en">Natural logarithm, the inverse of e. ln(X/F) is the proportion by which X is above F (1.2).</span></div></div>
+      <div class="gl"><div class="s">max(a, 0)</div><div class="t"><span class="l-zh">a 为负时取 0。期权到期的价值写成 max(S − X, 0)（1.1）。</span><span class="l-en">0 when a is negative. An option's value at expiration is written max(S − X, 0) (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">平值腿</span><span class="l-en">At-the-money leg</span></div><div class="t"><span class="l-zh">两条腿里行权价离标的价最近的那一条。一般它的 vega、gamma、theta 最大，价差的这三个数跟着它的正负号走。vega 最大的行权价略高于标的价，标的走到两腿中点附近时要直接比两条腿的 vega。</span><span class="l-en">Whichever of the two legs has its strike closest to the underlying price. It usually has the largest vega, gamma and theta, and these three numbers of the spread follow its sign. The strike with the largest vega is slightly above the underlying price, so when the underlying is near the midpoint of the two legs, compare the two legs' vegas directly.</span></div></div>
+      <div class="gl"><div class="s">Δ</div><div class="t"><span class="l-zh">delta，TSLA 涨 1 美元价格变多少；一张价差按股计（2.1、2.4）。</span><span class="l-en">Delta: when TSLA rises 1 dollar, how much the price changes; for one spread, in shares (2.1, 2.4).</span></div></div>
+      <div class="gl"><div class="s">ν, vega</div><div class="t"><span class="l-zh">隐含波动率涨 1 个点，价格变多少（2.3）。价差的 vega ＝ 买入腿的 vega − 卖出腿的 vega。</span><span class="l-en">When implied volatility rises 1 point, how much the price changes (2.3). Spread vega = vega of the leg bought − vega of the leg sold.</span></div></div>
+      <div class="gl"><div class="s">gamma, theta</div><div class="t"><span class="l-zh">delta 变得多快、每天的时间价值流失（2.2）。</span><span class="l-en">How fast delta changes, and the time value lost each day (2.2).</span></div></div>
+      <div class="gl"><div class="s">σ</div><div class="t"><span class="l-zh">年化波动率；隐含波动率是从期权价格反推出来的 σ（1.2）。</span><span class="l-en">Annualized volatility; implied volatility is the σ backed out from option prices (1.2).</span></div></div>
+      <div class="gl"><div class="s">F</div><div class="t"><span class="l-zh">远期价，分布的中心（1.1）。TSLA 本例 353.69。</span><span class="l-en">Forward price, the center of the distribution (1.1). 353.69 for TSLA in this case.</span></div></div>
+      <div class="gl"><div class="s">z</div><div class="t"><span class="l-zh">离中心几个标准差，z ＝ ln(X/F) ÷ (σ√t)（1.2）。</span><span class="l-en">How many standard deviations from the center, z = ln(X/F) ÷ (σ√t) (1.2).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">中间价</span><span class="l-en">Mid</span></div><div class="t"><span class="l-zh">买一与卖一的平均。实际成交时买在卖一、卖在买一，每条腿多付半个买卖价差。</span><span class="l-en">The average of the bid and the ask. In actual trading you buy at the ask and sell at the bid, paying an extra half bid-ask spread on each leg.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">盈亏平衡</span><span class="l-en">Break-even</span></div><div class="t"><span class="l-zh">到期盈亏正好为 0 的标的价。350/380 牛市 call 价差是 350 ＋ 11.975 ＝ 361.975。</span><span class="l-en">The underlying price at which the P&amp;L at expiration is exactly 0. For the 350/380 bull call spread it is 350 + 11.975 = 361.975.</span></div></div>
+      <div class="gl"><div class="s">box</div><div class="t"><span class="l-zh">同一对行权价的 call 价差加 put 价差，到期稳拿间距那么多钱（5.3）。</span><span class="l-en">A call spread plus a put spread at the same pair of strikes pays exactly the strike interval at expiration (5.3).</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-3-2-vol-structures.html"><b>3.2 波动率结构</b></a>：straddle、strangle、butterfly 这些不押方向、只押波动大小的组合。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-3-2-vol-structures.html"><b>3.2 波动率结构</b></a>：straddle、strangle、butterfly 这些不押方向、只押波动大小的组合。</span><span class="l-en">Next: <a href="station-3-2-vol-structures.html"><b>3.2 Volatility structures</b></a>: straddles, strangles, butterflies, combinations that bet not on direction but only on how big the moves are.</span></p>
+  <p><span class="l-zh"><a href="./">← 回到课程路线图</a></span><span class="l-en"><a href="./">← Back to the course roadmap</a></span></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
@@ -670,13 +672,13 @@ const BUILD=(()=>{
     }
     [300,350,380,400,450].forEach(s=>g+=lab(X(s),B+18,s,'var(--ink-faint)','middle',11));
     KN.forEach(k=>g+=`<line x1="${X(k)}" y1="${T}" x2="${X(k)}" y2="${B}" stroke="var(--ink-faint)" stroke-width=".8" stroke-dasharray="2 4"/>`);
-    g+=lab((L+R)/2,B+40,'5/15 到期时 TSLA 的价格','var(--ink-soft)','middle',12);
-    g+= nw ? lab(L,T-12,'每股盈亏（美元）','var(--ink-soft)','start',11.5) : vAxis(16,(T+B)/2,'每股盈亏（美元）');
+    g+=lab((L+R)/2,B+40,window.L('5/15 到期时 TSLA 的价格','TSLA price at the 5/15 expiration'),'var(--ink-soft)','middle',12);
+    g+= nw ? lab(L,T-12,window.L('每股盈亏（美元）','P/L per share (dollars)'),'var(--ink-soft)','start',11.5) : vAxis(16,(T+B)/2,window.L('每股盈亏（美元）','P/L per share (dollars)'));
     const fade=d>0?1-.35*d:1;
     if(a>0){ g+=`<polyline points="${polyPts(g1,XA,XA+(XB-XA)*a,X,Y,KN)}" fill="none" stroke="var(--result)" stroke-width="2.4" stroke-opacity="${fade}"/>`;
-      g+=lab(X(302),Y(-c1)+19,'买 350 call：付 21.05','var(--result)','start',12); }
+      g+=lab(X(302),Y(-c1)+19,window.L('买 350 call：付 21.05','Buy 350 call: pay 21.05'),'var(--result)','start',12); }
     if(b>0){ g+=`<polyline points="${polyPts(g2,XA,XA+(XB-XA)*b,X,Y,KN)}" fill="none" stroke="var(--good)" stroke-width="2.4" stroke-opacity="${fade}"/>`;
-      g+=lab(X(302),Y(c2)-(nw?15:9),'卖 380 call：收 9.075','var(--good)','start',12); }
+      g+=lab(X(302),Y(c2)-(nw?15:9),window.L('卖 380 call：收 9.075','Sell 380 call: collect 9.075'),'var(--good)','start',12); }
     if(c>0){
       const e=XA+(XB-XA)*c;
       g+=`<polyline points="${polyPts(gs,XA,e,X,Y,KN)}" fill="none" stroke="var(--control)" stroke-width="3.2" stroke-linejoin="round"/>`;
@@ -690,18 +692,18 @@ const BUILD=(()=>{
     if(d>0){
       g+=`<g opacity="${d.toFixed(2)}">`;
       g+=`<line x1="${X(SETTLE)}" y1="${T}" x2="${X(SETTLE)}" y2="${B}" stroke="var(--ink-soft)" stroke-width="1.4" stroke-dasharray="5 4"/>`;
-      g+=lab(X(SETTLE)-6,T+12,'5/15 收盘 422.32','var(--ink-soft)','end',11.5);
+      g+=lab(X(SETTLE)-6,T+12,window.L('5/15 收盘 422.32','5/15 close 422.32'),'var(--ink-soft)','end',11.5);
       g+=`<circle cx="${X(SETTLE)}" cy="${Y(gs(SETTLE))}" r="5" fill="var(--control)"/>`;
-      g+=lab(X(446),Y(18.025)-9,'最多赚 18.025','var(--control)','end',12);
-      g+=lab(X(302),Y(-11.975)-9,'最多亏 11.975','var(--control)','start',12);
+      g+=lab(X(446),Y(18.025)-9,window.L('最多赚 18.025','Max gain 18.025'),'var(--control)','end',12);
+      g+=lab(X(302),Y(-11.975)-9,window.L('最多亏 11.975','Max loss 11.975'),'var(--control)','start',12);
       const be=350+D.sp.bc.mid;
       g+=`<circle cx="${X(be)}" cy="${Y(0)}" r="4.5" fill="var(--paper)" stroke="var(--control)" stroke-width="2"/>`;
       const yb=nw?-45:-28;
       g+=`<line x1="${X(be)}" y1="${Y(0)+5}" x2="${X(be)}" y2="${Y(yb)}" stroke="var(--control)" stroke-width=".8"/>`;
-      g+=lab(X(be),Y(yb)+14,'盈亏平衡 361.975','var(--control)','middle',11.5);
+      g+=lab(X(be),Y(yb)+14,window.L('盈亏平衡 361.975','Break-even 361.975'),'var(--control)','middle',11.5);
       const cx=D.cmp.cross;
       g+=`<circle cx="${X(cx)}" cy="${Y(gs(cx))}" r="4.5" fill="var(--paper)" stroke="var(--result)" stroke-width="2"/>`;
-      g+=lab(X(cx)-8,Y(gs(cx))-26,'389.075 以上单买 call 赚得多','var(--result)','end',11.5);
+      g+=lab(X(cx)-8,Y(gs(cx))-26,window.L('389.075 以上单买 call 赚得多','Call alone pays more above 389.075'),'var(--result)','end',11.5);
       g+='</g>';
     }
     el.innerHTML=g;
@@ -711,7 +713,7 @@ const BUILD=(()=>{
     $('bd2').textContent= s===null||b<1?'':sgn(g2(s),3);
     $('bd3').textContent= s===null||c<=0?'':sgn(gs(s),3);
     $('bdSay').textContent= p<DUR.length ? '' :
-      `开仓净付 11.975。TSLA 到期在 350 以下亏满 11.975，在 380 以上赚满 18.025，盈亏平衡 361.975。5/15 收在 422.32：买的 350 call 赚 ${f2(g1(SETTLE))}，卖的 380 call 亏 ${f3(-g2(SETTLE))}，合计 +18.025。`;
+      window.L(`开仓净付 11.975。TSLA 到期在 350 以下亏满 11.975，在 380 以上赚满 18.025，盈亏平衡 361.975。5/15 收在 422.32：买的 350 call 赚 ${f2(g1(SETTLE))}，卖的 380 call 亏 ${f3(-g2(SETTLE))}，合计 +18.025。`,`Net cost to open 11.975. With TSLA below 350 at expiration it loses the full 11.975; above 380 it makes the full 18.025; break-even is 361.975. On 5/15 TSLA closed at 422.32: the 350 call bought made ${f2(g1(SETTLE))}, the 380 call sold lost ${f3(-g2(SETTLE))}, total +18.025.`);
   }
   function start(){
     st.playing=false;
@@ -761,8 +763,8 @@ const DROP=(()=>{
     });
     s.stacks.forEach(st=>st.forEach(([x,y,neg])=>{ c.fillStyle=neg?C.ctl:C.res; c.fillRect(x,y,1,1); }));
     s.balls.forEach(o=>{ c.fillStyle=o.pl<0?C.ctl:C.res; c.fillRect(o.x,Math.round(o.y),1,1); });
-    $('dpN').textContent=s.landed+' 颗';
-    $('dpLo').textContent=s.lo+' 颗'; $('dpHi').textContent=s.hi+' 颗'; $('dpX').textContent=s.x+' 颗';
+    $('dpN').textContent=s.landed+window.L(' 颗',s.landed===1?' ball':' balls');
+    $('dpLo').textContent=s.lo+window.L(' 颗',s.lo===1?' ball':' balls'); $('dpHi').textContent=s.hi+window.L(' 颗',s.hi===1?' ball':' balls'); $('dpX').textContent=s.x+window.L(' 颗',s.x===1?' ball':' balls');
   }
   function start(){
     if(s) s.playing=false;
@@ -804,7 +806,7 @@ const QUAD=(()=>{
       const s=XA+(SETTLE-XA)*d, v=fs(s);
       g+=`<line x1="${X(s)}" y1="${T}" x2="${X(s)}" y2="${B}" stroke="var(--ink-soft)" stroke-width="1.2" stroke-dasharray="4 3"/>`;
       g+=`<circle cx="${X(s)}" cy="${Y(v)}" r="4.5" fill="var(--control)"/>`;
-      $('qv'+i).textContent= d>=1 ? `5/15 收在 422.32：${sgn(v,3)}` : `到期价 ${f2(s)}：${sgn(v,3)}`;
+      $('qv'+i).textContent= d>=1 ? window.L(`5/15 收在 422.32：${sgn(v,3)}`,`5/15 close at 422.32: ${sgn(v,3)}`) : window.L(`到期价 ${f2(s)}：${sgn(v,3)}`,`Expiration at ${f2(s)}: ${sgn(v,3)}`);
     } else $('qv'+i).textContent='';
     $('q'+i).innerHTML=g;
   }
@@ -829,9 +831,9 @@ const FILL=(()=>{
   const st={k:order.length,playing:false};
   function draw(){
     order.forEach(([i,j],n)=>{ const el=$('fl'+i+j); el.classList.toggle('hid',n>=st.k); el.classList.toggle('cur',n===st.k-1&&st.k<order.length); });
-    if(st.k<=0||st.k>=order.length){ $('flCap').textContent= st.k>=order.length?'10 对行权价全部算完。':''; return; }
+    if(st.k<=0||st.k>=order.length){ $('flCap').textContent= st.k>=order.length?window.L('10 对行权价全部算完。','All 10 strike pairs computed.'):''; return; }
     const [i,j]=order[st.k-1];
-    $('flCap').textContent=`买 ${K[i]} call、卖 ${K[j]} call：${f2(CC[i])} − ${f2(CC[j])} ＝ ${f2(CC[i]-CC[j])}　｜　买 ${K[j]} put、卖 ${K[i]} put：${f2(PP[j])} − ${f2(PP[i])} ＝ ${f2(PP[j]-PP[i])}`;
+    $('flCap').textContent=window.L(`买 ${K[i]} call、卖 ${K[j]} call：${f2(CC[i])} − ${f2(CC[j])} ＝ ${f2(CC[i]-CC[j])}　｜　买 ${K[j]} put、卖 ${K[i]} put：${f2(PP[j])} − ${f2(PP[i])} ＝ ${f2(PP[j]-PP[i])}`,`Buy ${K[i]} call, sell ${K[j]} call: ${f2(CC[i])} − ${f2(CC[j])} = ${f2(CC[i]-CC[j])}  |  Buy ${K[j]} put, sell ${K[i]} put: ${f2(PP[j])} − ${f2(PP[i])} = ${f2(PP[j]-PP[i])}`);
   }
   let timer=null;
   function start(){
@@ -863,7 +865,7 @@ const LADDER=(()=>{
     let g='';
     // 价格阶梯
     for(let v=0;v<=7;v++){ g+=`<line x1="${G.L1}" y1="${YP(v)}" x2="${G.R1}" y2="${YP(v)}" stroke="var(--rule)" stroke-width="${v===0?1.2:.6}"/>`; g+=lab(G.L1-8,YP(v)+4,v,'var(--ink-faint)','end',11); }
-    g+=lab(G.L1,G.T-8,'三张 call 的价格','var(--ink-soft)','start',11.5);
+    g+=lab(G.L1,G.T-8,window.L('三张 call 的价格','Prices of the three calls'),'var(--ink-soft)','start',11.5);
     const x0=G.L1+44, x1=G.R1-70;
     g+=`<rect x="${x0}" y="${YP(c95)}" width="${x1-x0}" height="${YP(c100)-YP(c95)}" fill="var(--control-bg)"/>`;
     g+=`<rect x="${x0}" y="${YP(c100)}" width="${x1-x0}" height="${YP(c105)-YP(c100)}" fill="var(--result-bg)"/>`;
@@ -872,14 +874,14 @@ const LADDER=(()=>{
       g+=lab(x1+6,YP(v)+4,f2(v),'var(--ink)','start',11.5);
       g+=lab(x0-6,YP(v)+4,t,'var(--ink-soft)','end',11);
     });
-    g+=lab((x0+x1)/2,(YP(c95)+YP(c100))/2+4,`95/100　${f2(c95-c100)}`,'var(--control)','middle',12);
-    if(YP(c105)-YP(c100)>14) g+=lab((x0+x1)/2,(YP(c100)+YP(c105))/2+4,`100/105　${f2(c100-c105)}`,'var(--result)','middle',12);
-    g+=lab((G.L1+G.R1)/2,G.B+30,`σ ＝ ${f1(sig)}%`,'var(--ink-soft)','middle',12);
+    g+=lab((x0+x1)/2,(YP(c95)+YP(c100))/2+4,window.L(`95/100　${f2(c95-c100)}`,`95/100 ${f2(c95-c100)}`),'var(--control)','middle',12);
+    if(YP(c105)-YP(c100)>14) g+=lab((x0+x1)/2,(YP(c100)+YP(c105))/2+4,window.L(`100/105　${f2(c100-c105)}`,`100/105 ${f2(c100-c105)}`),'var(--result)','middle',12);
+    g+=lab((G.L1+G.R1)/2,G.B+30,window.L(`σ ＝ ${f1(sig)}%`,`σ = ${f1(sig)}%`),'var(--ink-soft)','middle',12);
     // 两个价差随 σ
     for(let v=0;v<=4;v++){ g+=`<line x1="${G.L2}" y1="${Y2(v)}" x2="${G.R2}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v===0?1.2:.6}"/>`; g+=lab(G.L2-8,Y2(v)+4,v,'var(--ink-faint)','end',11); }
-    g+=lab(G.L2,G.T2-8,'两个价差的价值','var(--ink-soft)','start',11.5);
+    g+=lab(G.L2,G.T2-8,window.L('两个价差的价值','Values of the two spreads'),'var(--ink-soft)','start',11.5);
     [10,15,20,25,30].forEach(v=>g+=lab(X2(v),G.B2+18,v+'%','var(--ink-faint)','middle',11));
-    g+=lab((G.L2+G.R2)/2,G.B2+36,'波动率','var(--ink-soft)','middle',12);
+    g+=lab((G.L2+G.R2)/2,G.B2+36,window.L('波动率','Volatility'),'var(--ink-soft)','middle',12);
     const pa=[],pb=[];
     for(let i=0;i<=Math.floor(k);i++){ pa.push(X2(SW.v[i])+','+Y2(SW.c95[i]-SW.c100[i])); pb.push(X2(SW.v[i])+','+Y2(SW.c100[i]-SW.c105[i])); }
     pa.push(X2(sig)+','+Y2(c95-c100)); pb.push(X2(sig)+','+Y2(c100-c105));
@@ -887,8 +889,8 @@ const LADDER=(()=>{
     g+=`<polyline points="${pb.join(' ')}" fill="none" stroke="var(--result)" stroke-width="2.6"/>`;
     Object.entries(LEC).forEach(([v,[a,b]])=>{ g+=`<circle cx="${X2(+v)}" cy="${Y2(a)}" r="4.5" fill="var(--panel)" stroke="var(--control)" stroke-width="1.8"/><circle cx="${X2(+v)}" cy="${Y2(b)}" r="4.5" fill="var(--panel)" stroke="var(--result)" stroke-width="1.8"/>`; });
     g+=`<circle cx="${X2(sig)}" cy="${Y2(c95-c100)}" r="4" fill="var(--control)"/><circle cx="${X2(sig)}" cy="${Y2(c100-c105)}" r="4" fill="var(--result)"/>`;
-    g+=lab(G.R2,Y2(SW.c95[0]-SW.c100[0])-10,'95/100：卖出平值','var(--control)','end',11.5);
-    g+=lab(G.R2,Y2(SW.c100[n]-SW.c105[n])+22,'100/105：买入平值','var(--result)','end',11.5);
+    g+=lab(G.R2,Y2(SW.c95[0]-SW.c100[0])-10,window.L('95/100：卖出平值','95/100: sells ATM'),'var(--control)','end',11.5);
+    g+=lab(G.R2,Y2(SW.c100[n]-SW.c105[n])+22,window.L('100/105：买入平值','100/105: buys ATM'),'var(--result)','end',11.5);
     el.innerHTML=g;
     $('ldS').textContent=f1(sig)+'%'; $('ldA').textContent=f2(c95-c100); $('ldB').textContent=f2(c100-c105);
   }
@@ -904,28 +906,28 @@ const LADDER=(()=>{
 /* ══════════ 四 · 两步筛选：方向先去掉两个，平值腿再去掉一个 ══════════ */
 const FILTER=(()=>{
   const cards=[...document.querySelectorAll('#cands .cd')];
-  const DIR={A:'up',B:'up',C:'dn',D:'dn'}, ATM={A:'买方',B:'卖方',C:'卖方',D:'买方'};
+  const DIR={A:'up',B:'up',C:'dn',D:'dn'}, ATM={A:window.L('买方','bought'),B:window.L('卖方','sold'),C:window.L('卖方','sold'),D:window.L('买方','bought')};
   const NO={A:'①',B:'②',C:'③',D:'④'};
   let view='uh', timers=[];
   function reset(){ timers.forEach(clearTimeout); timers=[]; cards.forEach(c=>{ c.classList.remove('out','win'); c.querySelector('.why').textContent=''; }); $('fvSay').textContent=''; }
   function plan(v){
-    const up=v[0]==='u', hi=v[1]==='h', want=hi?'卖方':'买方';
+    const up=v[0]==='u', hi=v[1]==='h', want=hi?window.L('卖方','sold'):window.L('买方','bought');
     const dirOut=Object.keys(DIR).filter(k=>DIR[k]!==(up?'up':'dn'));
     const rest=Object.keys(DIR).filter(k=>DIR[k]===(up?'up':'dn'));
     const vegaOut=rest.filter(k=>ATM[k]!==want), win=rest.find(k=>ATM[k]===want);
     return {up,hi,want,dirOut,vegaOut,win};
   }
   const card=k=>cards.find(c=>c.dataset.k===k);
-  function stage1(P){ P.dirOut.forEach(k=>{ const c=card(k); c.classList.add('out'); c.querySelector('.why').textContent=`第一步去掉：${P.up?'看涨':'看跌'}要${P.up?'买低卖高':'买高卖低'}，这是${P.up?'熊市':'牛市'}价差。`; }); }
-  function stage2(P){ P.vegaOut.forEach(k=>{ const c=card(k); c.classList.add('out'); c.querySelector('.why').textContent=`第二步去掉：平值腿 350 在${ATM[k]}，vega 为${ATM[k]==='买方'?'正':'负'}，和「隐含${P.hi?'偏高':'偏低'}」相反。`; }); }
+  function stage1(P){ P.dirOut.forEach(k=>{ const c=card(k); c.classList.add('out'); c.querySelector('.why').textContent=window.L(`第一步去掉：${P.up?'看涨':'看跌'}要${P.up?'买低卖高':'买高卖低'}，这是${P.up?'熊市':'牛市'}价差。`,`Removed in step 1: ${P.up?'bullish':'bearish'} calls for ${P.up?'buying low and selling high':'buying high and selling low'}, and this is a ${P.up?'bear':'bull'} spread.`); }); }
+  function stage2(P){ P.vegaOut.forEach(k=>{ const c=card(k); c.classList.add('out'); c.querySelector('.why').textContent=window.L(`第二步去掉：平值腿 350 在${ATM[k]}，vega 为${ATM[k]==='买方'?'正':'负'}，和「隐含${P.hi?'偏高':'偏低'}」相反。`,`Removed in step 2: the at-the-money leg 350 is ${ATM[k]}, so vega is ${ATM[k]==='bought'?'positive':'negative'}, the opposite of "implied vol ${P.hi?'too high':'too low'}".`); }); }
   function stage3(P){
     const c=card(P.win); c.classList.add('win');
-    c.querySelector('.why').textContent=`选它：方向对，平值腿 350 在${P.want}，vega 为${P.want==='买方'?'正':'负'}。`;
+    c.querySelector('.why').textContent=window.L(`选它：方向对，平值腿 350 在${P.want}，vega 为${P.want==='买方'?'正':'负'}。`,`Chosen: the direction is right, and the at-the-money leg 350 is ${P.want}, so vega is ${P.want==='bought'?'positive':'negative'}.`);
     const txt={
-      uh:'看涨、隐含偏高：选 ②。它卖出平值的 350 call，每张 vega −9.75、theta +5.60，隐含波动率降 5 点时模型上每张多 54.8 美元。代价是贵：付 19.50，最多赚 10.50。',
-      ul:'看涨、隐含偏低：选 ①。它买入平值的 350 call，vega +3.59，隐含波动率升 5 点时模型上每张多 17.0 美元。卖出的 380 在现价上方，vega 也不小（0.3766），抵掉了 350 的大半。',
-      dh:'看跌、隐含偏高：选 ③。它卖出平值的 350 put，vega −3.59、theta +4.67。它和 ① 是同一对行权价、方向相反，所以四个数正好和 ① 反号（theta 差一点，put 的 theta 从 call 换算）。',
-      dl:'看跌、隐含偏低：选 ④。它买入平值的 350 put，vega +9.75，隐含波动率升 5 点时模型上每张多 47.5 美元；gamma +0.235，TSLA 大跌时 delta 变得更负。'
+      uh:window.L('看涨、隐含偏高：选 ②。它卖出平值的 350 call，每张 vega −9.75、theta +5.60，隐含波动率降 5 点时模型上每张多 54.8 美元。代价是贵：付 19.50，最多赚 10.50。','Bullish, implied vol high: choose ②. It sells the at-the-money 350 call, with vega −9.75 and theta +5.60 per spread, and in the model a 5-point fall in implied volatility adds 54.8 dollars per spread. The price is that it is expensive: it costs 19.50 and makes at most 10.50.'),
+      ul:window.L('看涨、隐含偏低：选 ①。它买入平值的 350 call，vega +3.59，隐含波动率升 5 点时模型上每张多 17.0 美元。卖出的 380 在现价上方，vega 也不小（0.3766），抵掉了 350 的大半。','Bullish, implied vol low: choose ①. It buys the at-the-money 350 call, with vega +3.59, and in the model a 5-point rise in implied volatility adds 17.0 dollars per spread. The 380 sold is above the current price and its vega is not small either (0.3766), canceling most of the 350\'s.'),
+      dh:window.L('看跌、隐含偏高：选 ③。它卖出平值的 350 put，vega −3.59、theta +4.67。它和 ① 是同一对行权价、方向相反，所以四个数正好和 ① 反号（theta 差一点，put 的 theta 从 call 换算）。','Bearish, implied vol high: choose ③. It sells the at-the-money 350 put, with vega −3.59 and theta +4.67. It uses the same pair of strikes as ① in the opposite direction, so its four numbers are exactly ①\'s with the signs flipped (theta differs slightly, since put theta is converted from the call).'),
+      dl:window.L('看跌、隐含偏低：选 ④。它买入平值的 350 put，vega +9.75，隐含波动率升 5 点时模型上每张多 47.5 美元；gamma +0.235，TSLA 大跌时 delta 变得更负。','Bearish, implied vol low: choose ④. It buys the at-the-money 350 put, with vega +9.75, and in the model a 5-point rise in implied volatility adds 47.5 dollars per spread; gamma is +0.235, so when TSLA falls sharply its delta gets more negative.')
     }[view];
     $('fvSay').textContent=txt;
   }
@@ -961,9 +963,9 @@ const REPLAY=(()=>{
     const pts=[]; for(let q=0;q<=i;q++) pts.push(X(q)+','+Y1(R[q][0])); if(f>0) pts.push(X(k)+','+Y1(S));
     g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ink)" stroke-width="2.2"/>`;
     g+=`<circle cx="${X(k)}" cy="${Y1(S)}" r="4" fill="var(--ink)"/>`;
-    g+=lab(L,T1-8,nw?'TSLA 收盘；三个行权价里离收盘最近的标亮':'TSLA 收盘；虚线：三个行权价，离收盘最近的那条标亮','var(--ink-soft)','start',11.5);
+    g+=lab(L,T1-8,nw?window.L('TSLA 收盘；三个行权价里离收盘最近的标亮','TSLA close; nearest strike highlighted'):window.L('TSLA 收盘；虚线：三个行权价，离收盘最近的那条标亮','TSLA close; dashed lines: three strikes, the one nearest the close highlighted'),'var(--ink-soft)','start',11.5);
     // 中：vega 柱
-    g+=lab(L,V1-34,nw?'每张价差的 vega，向上为正':'每张价差的 vega：柱向上为正、向下为负','var(--ink-soft)','start',11.5);
+    g+=lab(L,V1-34,nw?window.L('每张价差的 vega，向上为正','Vega per spread, up is positive'):window.L('每张价差的 vega：柱向上为正、向下为负','Vega per spread: bars up are positive, down negative'),'var(--ink-soft)','start',11.5);
     [[V1,5,'var(--result)','① vega'],[V2,4,'var(--control)','② vega']].forEach(([y0,c,col,t])=>{
       const w=(RR-L)/n*.56;
       g+=`<line x1="${L}" y1="${y0}" x2="${RR}" y2="${y0}" stroke="var(--rule)" stroke-width="1"/>`;
@@ -973,8 +975,8 @@ const REPLAY=(()=>{
     });
     // 下：价值
     [0,10,20,30].forEach(v=>{ g+=`<line x1="${L}" y1="${Y3(v)}" x2="${RR}" y2="${Y3(v)}" stroke="var(--rule)" stroke-width="${v===30?1.2:.6}" ${v===30?'stroke-dasharray="6 4"':''}/>`; g+=lab(L-8,Y3(v)+4,v,'var(--ink-faint)','end',11); });
-    g+=lab(RR,Y3(30)-6,'上限 30','var(--ink-faint)','end',11);
-    g+=lab(L,T3-22,'每股价值（美元）','var(--ink-soft)','start',11.5);
+    g+=lab(RR,Y3(30)-6,window.L('上限 30','Cap 30'),'var(--ink-faint)','end',11);
+    g+=lab(L,T3-22,window.L('每股价值（美元）','Value per share (dollars)'),'var(--ink-soft)','start',11.5);
     [[2,'var(--result)'],[1,'var(--control)']].forEach(([c,col])=>{
       const p=[]; for(let q=0;q<=i;q++) p.push(X(q)+','+Y3(R[q][c])); if(f>0) p.push(X(k)+','+Y3(lerp(c)));
       g+=`<polyline points="${p.join(' ')}" fill="none" stroke="${col}" stroke-width="2.4"/><circle cx="${X(k)}" cy="${Y3(lerp(c))}" r="4" fill="${col}"/>`;
@@ -982,12 +984,12 @@ const REPLAY=(()=>{
     [0,5,10,15,20,24].forEach(q=>g+=lab(X(q),B3+18,md(days[q]),'var(--ink-faint)','middle',11));
     el.innerHTML=g;
     const ki=Math.round(k), r=R[ki];
-    $('rpD').textContent=md(days[ki]); $('rpDb').textContent=`第 ${ki} 个交易日`;
-    $('rpU').textContent=f2(r[0]); $('rpUb').textContent=`三个行权价里最近的 ${near}`;
-    $('rpA').textContent=f3(r[2]); $('rpAb').textContent= ki===n ? '到期，按结算价' : `vega ${sgn(r[5])}`;
-    $('rpB').textContent=f3(r[1]); $('rpBb').textContent= ki===n ? '到期，按结算价' : `vega ${sgn(r[4])}`;
+    $('rpD').textContent=md(days[ki]); $('rpDb').textContent=window.L(`第 ${ki} 个交易日`,`Trading day ${ki}`);
+    $('rpU').textContent=f2(r[0]); $('rpUb').textContent=window.L(`三个行权价里最近的 ${near}`,`Nearest of the three strikes: ${near}`);
+    $('rpA').textContent=f3(r[2]); $('rpAb').textContent= ki===n ? window.L('到期，按结算价','Expiration, at settlement') : `vega ${sgn(r[5])}`;
+    $('rpB').textContent=f3(r[1]); $('rpBb').textContent= ki===n ? window.L('到期，按结算价','Expiration, at settlement') : `vega ${sgn(r[4])}`;
     $('rpSay').textContent= k<n ? '' :
-      `5/15 收在 422.32，两个价差都值 30。① 付 11.975，每股赚 18.025；② 付 19.50，赚 10.50。① 的 vega 从 4/14 起就是负的：4/14 TSLA 364.32，离 350 和 380 的中点 365 只差 0.68，380 的 vega（0.4091）已经超过 350（0.3979）；4/15 起离 TSLA 更近的是卖出的 380。`;
+      window.L(`5/15 收在 422.32，两个价差都值 30。① 付 11.975，每股赚 18.025；② 付 19.50，赚 10.50。① 的 vega 从 4/14 起就是负的：4/14 TSLA 364.32，离 350 和 380 的中点 365 只差 0.68，380 的 vega（0.4091）已经超过 350（0.3979）；4/15 起离 TSLA 更近的是卖出的 380。`,`On 5/15 TSLA closed at 422.32, and both spreads were worth 30. ① paid 11.975 and made 18.025 per share; ② paid 19.50 and made 10.50. ①'s vega was negative from 4/14 on: on 4/14 TSLA was 364.32, only 0.68 from 365, the midpoint between 350 and 380, and the 380's vega (0.4091) had already overtaken the 350's (0.3979); from 4/15 on, the leg nearer TSLA was the 380 sold.`);
   }
   function start(){
     st.playing=false;
@@ -1000,53 +1002,53 @@ const REPLAY=(()=>{
 
 /* ══════════ 六 · 费曼检验 ══════════ */
 const QS=[
- {q:`牛市 put 价差（买 350 put、卖 380 put）开仓时收钱，为什么还算看涨？说出 TSLA 到期在 350 以下、350 到 380 之间、380 以上三种情况各发生什么。`,
-  a:['卖出的 380 put 离实值更近，比买入的 350 put 贵，所以开仓净收 18.075。',
-     '到期在 380 以上：两张 put 都作废，收的钱全部留下，赚 18.075。',
-     '在 350 以下：两张都实值，买的那张赚 350 − S，卖的那张赔 380 − S，净赔 30，扣掉收的 18.075，亏 11.925。',
-     '中间一段只有卖出的 380 put 要赔，TSLA 越高赔得越少。价格越高越好，所以是看涨；用 delta 看也一样，买的那张 delta 负得少，合起来为正。'],
-  s:'「收钱的一方是卖方，所以看跌」：开仓收钱还是付钱是现金流，方向要看到期图或 delta。'},
- {q:`为什么任何垂直价差到期都只值 0 到两个行权价之差之间？如果有人愿意出 5.20 买讲义表里的 95/100 call 价差，你卖给他，最坏会怎样？`,
-  a:['到期两张都作废时价差值 0，这是下限。',
-     '两张都实值时，买的赚 S − 95，卖的赔 S − 100，差正好是 5，再涨也不变，这是上限；中间一段在 0 和 5 之间。',
-     '卖给他收 5.20，到期最坏赔 5，稳赚至少 0.20。所以市场上这种价格站不住，价差的价格不会超过间距（考虑利息，上限是间距折回今天）。',
-     '同理价格也不会低于 0：一个到期最少值 0 的东西，白送都有人要。'],
-  s:'「因为 call 的价格随行权价升高而下降」：这只说明价差是正的，没说明为什么不超过 5。'},
- {q:`讲义表里 95/100 call 价差 3.10，100/105 是 2.10，间距都是 5。不许用「更实值」三个字，说明为什么前一个更贵。`,
-  a:['到期在 105 以上，两个都拿满 5，一样。',
-     '到期在 95 以下，两个都是 0，一样。',
-     '在 95 到 105 之间，95/100 拿到的总比 100/105 多；到期正好 100 时，前一个拿满 5，后一个一分没有。',
-     '能拿到钱的情形更多、拿得也更多，所以更贵。'],
-  s:'「因为 95 call 比 100 call 贵」：价差是两个价格的差，两边都贵，差不一定大。'},
- {q:`讲义里 95/100 和 100/105 两个牛市 call 价差的 delta 都是 27。波动率从 20% 升到 25%，一个变便宜、一个变贵。为什么？「平值腿在买方还是卖方」这句话指的是什么？`,
-  a:['标的 100，两条腿里离标的最近的是 100 那条，就是平值腿。2.3 的 vega 第一条：按美元算，平值期权的 vega 最大。',
-     '价差的 vega 是买入腿的 vega 减卖出腿的 vega，谁的 vega 大，价差就跟谁的正负号。',
-     '95/100 卖出了 100 call，净 vega 为负，波动率升就变便宜（3.15 到 3.00）；100/105 买入了 100 call，净 vega 为正，变贵（1.75 到 1.86）。',
-     '这句话问的就是离现价最近的那条腿是买的还是卖的。买的：vega、gamma 为正，theta 为负；卖的：全反过来。'],
-  s:'「波动率升，期权都变贵，所以两个价差都变贵」：两条腿都变贵，价差看的是哪条涨得多。'},
- {q:`4/13 你看涨 TSLA，又认为 5/15 期权的隐含波动率偏高（里面含着 4/22 的财报）。候选：① 买 350 call 卖 380 call；② 买 320 call 卖 350 call；③ 买 380 put 卖 350 put；④ 买 350 put 卖 320 put。选哪个？分两步说理由。`,
-  a:['第一步，方向：看涨要买低卖高。① ② 是牛市；③ ④ 买高卖低，是熊市，去掉。',
-     '第二步，vega：TSLA 352.36，平值腿是 350。认为隐含偏高，要负 vega，选平值腿在卖方的那个，就是 ②。',
-     '② 每张 vega −9.75、theta +5.60：隐含波动率下降、时间过去都对它有利。',
-     '代价是贵：付 19.50，最多赚 10.50；① 付 11.975，最多赚 18.025，但它的 vega 为正，赌的是隐含波动率不降。'],
-  s:'「选 ①，因为它便宜、赚得多」：只用了方向这一个判据，没有用上对隐含波动率的看法。'},
- {q:`4/13 你买了 350/380 牛市 call 价差。5/15 TSLA 收在 422.32，单买 350 call 按中间价每股赚 51.27（1.1 按卖一买入是 51.22），价差只赚 18.025。你是不是选错了？`,
-  a:['价差少付 9.075，代价是 380 以上的上涨归了别人。到期价在 389.075 以下，价差更好；在它以上，单买 call 更好。',
-     '按入场时的隐含波动率 46.3%（1.2 的算法），到期落在 389.075 以下的概率约 76%。事前看，大多数情形价差更好。',
-     '这一次 TSLA 走到了 +1.29 个标准差（1.2），落在少数情形里。',
-     '判断选得对不对，要看它是否表达了事前的观点「会涨，但到 380 左右就够」，以及最大亏损从 21.05 降到 11.975 这件事，不看一次的结果。'],
-  s:'「赚得少就是选错了」：拿一次结果评判，没有看事前的分布。'},
- {q:`同一个 350/380 牛市 call 价差，4/13 每张 vega 是 +3.59，4/15 变成 −11.10，中间没做任何交易。为什么？这对「用双判据选价差」有什么提醒？`,
-  a:['4/15 TSLA 涨到 391.93，两条腿里离它最近的从 350 换成了 380。',
-     '380 这条腿是卖出的：平值腿从买方换到了卖方，价差的 vega 从正变负，gamma、theta 也跟着翻。',
-     '其实 4/14 TSLA 364.32 还没越过中点 365，vega 已经先翻成 −1.12：vega 最大的行权价略高于标的价，380 的 vega 先超过了 350。',
-     '双判据判断的是建仓那一刻的平值腿。标的一动，离它最近的腿就可能变成另一条，持有期间要按当天的价格重新读四个数（2.4）。',
-     '想一直保持同一个 vega 方向，要在标的走远之后调整行权价。'],
-  s:'「vega 变了是因为隐含波动率变了」：隐含波动率变化改变的是大小，正负号翻过来是因为 TSLA 的位置变了。'}
+ {q:window.L(`牛市 put 价差（买 350 put、卖 380 put）开仓时收钱，为什么还算看涨？说出 TSLA 到期在 350 以下、350 到 380 之间、380 以上三种情况各发生什么。`,`A bull put spread (buy the 350 put, sell the 380 put) collects money to open. Why is it still bullish? Say what happens in each of three cases: TSLA expiring below 350, between 350 and 380, and above 380.`),
+  a:[window.L('卖出的 380 put 离实值更近，比买入的 350 put 贵，所以开仓净收 18.075。','The 380 put sold is closer to in the money and more expensive than the 350 put bought, so opening collects a net 18.075.'),
+     window.L('到期在 380 以上：两张 put 都作废，收的钱全部留下，赚 18.075。','Above 380 at expiration: both puts expire worthless, all the money collected is kept, and it makes 18.075.'),
+     window.L('在 350 以下：两张都实值，买的那张赚 350 − S，卖的那张赔 380 − S，净赔 30，扣掉收的 18.075，亏 11.925。','Below 350: both are in the money; the one bought makes 350 − S and the one sold owes 380 − S, a net 30 owed; minus the 18.075 collected, it loses 11.925.'),
+     window.L('中间一段只有卖出的 380 put 要赔，TSLA 越高赔得越少。价格越高越好，所以是看涨；用 delta 看也一样，买的那张 delta 负得少，合起来为正。','In between, only the 380 put sold owes anything, and the higher TSLA is, the less it owes. A higher price is better, so it is bullish; delta says the same, since the put bought is less negative, making the total positive.')],
+  s:window.L('「收钱的一方是卖方，所以看跌」：开仓收钱还是付钱是现金流，方向要看到期图或 delta。','"Whoever collects money is the seller, so it is bearish": collecting or paying to open is cash flow; direction comes from the expiration chart or delta.')},
+ {q:window.L(`为什么任何垂直价差到期都只值 0 到两个行权价之差之间？如果有人愿意出 5.20 买讲义表里的 95/100 call 价差，你卖给他，最坏会怎样？`,`Why is any vertical spread worth only between 0 and the difference between its two strikes at expiration? If someone offered 5.20 for the lecture notes' 95/100 call spread and you sold it to them, what is the worst that could happen?`),
+  a:[window.L('到期两张都作废时价差值 0，这是下限。','When both calls expire worthless the spread is worth 0; that is the lower bound.'),
+     window.L('两张都实值时，买的赚 S − 95，卖的赔 S − 100，差正好是 5，再涨也不变，这是上限；中间一段在 0 和 5 之间。','When both are in the money, the one bought makes S − 95 and the one sold owes S − 100; the difference is exactly 5 and does not change with further rises; that is the upper bound. In between, it is between 0 and 5.'),
+     window.L('卖给他收 5.20，到期最坏赔 5，稳赚至少 0.20。所以市场上这种价格站不住，价差的价格不会超过间距（考虑利息，上限是间距折回今天）。','Selling to them collects 5.20, and at worst you owe 5 at expiration, a sure gain of at least 0.20. So such a price cannot last in the market: a spread\'s price will not exceed the strike interval (with interest, the cap is the interval discounted back to today).'),
+     window.L('同理价格也不会低于 0：一个到期最少值 0 的东西，白送都有人要。','Likewise the price cannot go below 0: something worth at least 0 at expiration would be taken even if given away free.')],
+  s:window.L('「因为 call 的价格随行权价升高而下降」：这只说明价差是正的，没说明为什么不超过 5。','"Because call prices fall as strikes rise": that only shows the spread is positive, not why it cannot exceed 5.')},
+ {q:window.L(`讲义表里 95/100 call 价差 3.10，100/105 是 2.10，间距都是 5。不许用「更实值」三个字，说明为什么前一个更贵。`,`In the lecture notes' table the 95/100 call spread is 3.10 and the 100/105 is 2.10, both with an interval of 5. Without the words "more in the money", explain why the first is more expensive.`),
+  a:[window.L('到期在 105 以上，两个都拿满 5，一样。','Above 105 at expiration, both get the full 5, the same.'),
+     window.L('到期在 95 以下，两个都是 0，一样。','Below 95 at expiration, both are 0, the same.'),
+     window.L('在 95 到 105 之间，95/100 拿到的总比 100/105 多；到期正好 100 时，前一个拿满 5，后一个一分没有。','Between 95 and 105, 95/100 always gets more than 100/105; at exactly 100 at expiration, the first gets the full 5 and the second nothing at all.'),
+     window.L('能拿到钱的情形更多、拿得也更多，所以更贵。','More cases pay off, and they pay more, so it costs more.')],
+  s:window.L('「因为 95 call 比 100 call 贵」：价差是两个价格的差，两边都贵，差不一定大。','"Because the 95 call is more expensive than the 100 call": a spread is the difference of two prices; both sides being expensive does not make the difference large.')},
+ {q:window.L(`讲义里 95/100 和 100/105 两个牛市 call 价差的 delta 都是 27。波动率从 20% 升到 25%，一个变便宜、一个变贵。为什么？「平值腿在买方还是卖方」这句话指的是什么？`,`In the lecture notes, the 95/100 and 100/105 bull call spreads both have a delta of 27. When volatility rises from 20% to 25%, one gets cheaper and the other more expensive. Why? What does "is the at-the-money leg bought or sold" refer to?`),
+  a:[window.L('标的 100，两条腿里离标的最近的是 100 那条，就是平值腿。2.3 的 vega 第一条：按美元算，平值期权的 vega 最大。','With the underlying at 100, the leg nearest the underlying is the 100 leg; that is the at-the-money leg. The first vega rule from 2.3: in dollar terms, at-the-money options have the largest vega.'),
+     window.L('价差的 vega 是买入腿的 vega 减卖出腿的 vega，谁的 vega 大，价差就跟谁的正负号。','A spread\'s vega is the vega of the leg bought minus that of the leg sold, so the spread takes the sign of whichever has the larger vega.'),
+     window.L('95/100 卖出了 100 call，净 vega 为负，波动率升就变便宜（3.15 到 3.00）；100/105 买入了 100 call，净 vega 为正，变贵（1.75 到 1.86）。','95/100 sells the 100 call, so its net vega is negative and it gets cheaper as volatility rises (3.15 to 3.00); 100/105 buys the 100 call, so its net vega is positive and it gets more expensive (1.75 to 1.86).'),
+     window.L('这句话问的就是离现价最近的那条腿是买的还是卖的。买的：vega、gamma 为正，theta 为负；卖的：全反过来。','The sentence asks whether the leg nearest the current price was bought or sold. Bought: vega and gamma positive, theta negative; sold: all reversed.')],
+  s:window.L('「波动率升，期权都变贵，所以两个价差都变贵」：两条腿都变贵，价差看的是哪条涨得多。','"When volatility rises all options get more expensive, so both spreads get more expensive": both legs do get more expensive, but a spread depends on which leg rises more.')},
+ {q:window.L(`4/13 你看涨 TSLA，又认为 5/15 期权的隐含波动率偏高（里面含着 4/22 的财报）。候选：① 买 350 call 卖 380 call；② 买 320 call 卖 350 call；③ 买 380 put 卖 350 put；④ 买 350 put 卖 320 put。选哪个？分两步说理由。`,`On 4/13 you are bullish on TSLA and also think the implied volatility of options expiring 5/15 is too high (it includes the 4/22 earnings). The candidates: ① buy 350 call, sell 380 call; ② buy 320 call, sell 350 call; ③ buy 380 put, sell 350 put; ④ buy 350 put, sell 320 put. Which do you choose? Give the reasons in two steps.`),
+  a:[window.L('第一步，方向：看涨要买低卖高。① ② 是牛市；③ ④ 买高卖低，是熊市，去掉。','Step 1, direction: bullish means buy low, sell high. ① and ② are bull spreads; ③ and ④ buy high and sell low, so they are bear spreads and are removed.'),
+     window.L('第二步，vega：TSLA 352.36，平值腿是 350。认为隐含偏高，要负 vega，选平值腿在卖方的那个，就是 ②。','Step 2, vega: TSLA is 352.36, so the at-the-money leg is 350. If implied volatility is too high you want negative vega, so choose the one with the at-the-money leg sold, which is ②.'),
+     window.L('② 每张 vega −9.75、theta +5.60：隐含波动率下降、时间过去都对它有利。','② has vega −9.75 and theta +5.60 per spread: a fall in implied volatility and the passage of time both help it.'),
+     window.L('代价是贵：付 19.50，最多赚 10.50；① 付 11.975，最多赚 18.025，但它的 vega 为正，赌的是隐含波动率不降。','The price is that it is expensive: it costs 19.50 and makes at most 10.50; ① costs 11.975 and makes up to 18.025, but its vega is positive, a bet that implied volatility will not fall.')],
+  s:window.L('「选 ①，因为它便宜、赚得多」：只用了方向这一个判据，没有用上对隐含波动率的看法。','"Choose ① because it is cheap and makes more": that uses only the direction criterion and ignores the view on implied volatility.')},
+ {q:window.L(`4/13 你买了 350/380 牛市 call 价差。5/15 TSLA 收在 422.32，单买 350 call 按中间价每股赚 51.27（1.1 按卖一买入是 51.22），价差只赚 18.025。你是不是选错了？`,`On 4/13 you bought the 350/380 bull call spread. On 5/15 TSLA closed at 422.32; the 350 call alone made 51.27 per share at the mid (51.22 bought at the ask in 1.1), and the spread made only 18.025. Did you choose wrong?`),
+  a:[window.L('价差少付 9.075，代价是 380 以上的上涨归了别人。到期价在 389.075 以下，价差更好；在它以上，单买 call 更好。','The spread paid 9.075 less, at the price of giving the rise above 380 to someone else. With the expiration price below 389.075 the spread is better; above it, the call alone is better.'),
+     window.L('按入场时的隐含波动率 46.3%（1.2 的算法），到期落在 389.075 以下的概率约 76%。事前看，大多数情形价差更好。','At the entry implied volatility of 46.3% (by the method in 1.2), the probability of expiring below 389.075 is about 76%. Looking ahead, the spread is better in most cases.'),
+     window.L('这一次 TSLA 走到了 +1.29 个标准差（1.2），落在少数情形里。','This time TSLA went +1.29 standard deviations (1.2), landing among the minority of cases.'),
+     window.L('判断选得对不对，要看它是否表达了事前的观点「会涨，但到 380 左右就够」，以及最大亏损从 21.05 降到 11.975 这件事，不看一次的结果。','Whether the choice was right depends on whether it expressed the view held in advance, "it will rise, but around 380 is enough", and on the maximum loss falling from 21.05 to 11.975, not on one outcome.')],
+  s:window.L('「赚得少就是选错了」：拿一次结果评判，没有看事前的分布。','"Making less means choosing wrong": that judges by one outcome and ignores the distribution looking ahead.')},
+ {q:window.L(`同一个 350/380 牛市 call 价差，4/13 每张 vega 是 +3.59，4/15 变成 −11.10，中间没做任何交易。为什么？这对「用双判据选价差」有什么提醒？`,`For the same 350/380 bull call spread, vega per spread was +3.59 on 4/13 and −11.10 on 4/15, with no trades in between. Why? What does this warn about choosing spreads with the two criteria?`),
+  a:[window.L('4/15 TSLA 涨到 391.93，两条腿里离它最近的从 350 换成了 380。','On 4/15 TSLA rose to 391.93, and the nearer of the two legs changed from 350 to 380.'),
+     window.L('380 这条腿是卖出的：平值腿从买方换到了卖方，价差的 vega 从正变负，gamma、theta 也跟着翻。','The 380 leg was sold: the at-the-money leg moved from bought to sold, the spread\'s vega went from positive to negative, and gamma and theta flipped with it.'),
+     window.L('其实 4/14 TSLA 364.32 还没越过中点 365，vega 已经先翻成 −1.12：vega 最大的行权价略高于标的价，380 的 vega 先超过了 350。','In fact, on 4/14 TSLA at 364.32 had not yet crossed the midpoint of 365, yet vega had already flipped to −1.12: the strike with the largest vega is slightly above the underlying price, and the 380\'s vega overtook the 350\'s first.'),
+     window.L('双判据判断的是建仓那一刻的平值腿。标的一动，离它最近的腿就可能变成另一条，持有期间要按当天的价格重新读四个数（2.4）。','The two criteria judge the at-the-money leg at the moment the position is built. Once the underlying moves, the nearest leg can become the other one, and while holding you need to reread the four numbers at that day\'s price (2.4).'),
+     window.L('想一直保持同一个 vega 方向，要在标的走远之后调整行权价。','To keep the same vega direction throughout, adjust the strikes after the underlying has moved far.')],
+  s:window.L('「vega 变了是因为隐含波动率变了」：隐含波动率变化改变的是大小，正负号翻过来是因为 TSLA 的位置变了。','"Vega changed because implied volatility changed": a change in implied volatility changes the size; the sign flipped because TSLA\'s position changed.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>window.L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1060,7 +1062,21 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`
+    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-3-1-q'+i); if(v) t.value=v; }catch(e){}
@@ -1069,8 +1085,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? window.L('对照参考答案','Compare with the reference answer') : window.L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? window.L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 
@@ -1108,6 +1124,7 @@ FILTER.show();
 onView(BUILD.el,BUILD.start); onView(DROP.cv,DROP.start); onView(QUAD.el,QUAD.start); onView(FILL.el,FILL.start);
 onView(LADDER.el,LADDER.start); onView(FILTER.el,FILTER.start); onView(REPLAY.el,REPLAY.start);
 </script>
+<script>/* 英文模式：属性文字换成英文 */if(window.LANG==='en')document.querySelectorAll('[data-en-aria-label],[data-en-placeholder],[data-en-title],[data-en-alt]').forEach(function(e){['aria-label','placeholder','title','alt'].forEach(function(a){var v=e.getAttribute('data-en-'+a);if(v!=null)e.setAttribute(a,v);});});</script>
 <script src="course-nav.js"></script>
 </body>
 </html>

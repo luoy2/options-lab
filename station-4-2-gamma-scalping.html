@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="lang.js"></script>
 <title>gamma scalping</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M4%2019L9%2012L14%2020L19%2010L24%2018L28%2013'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -214,301 +215,301 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 两个名字</a><a href="#s1">一 每天要动多少</a><a href="#s2">二 现金从哪来</a><a href="#s3">三 24 天账本</a>
-  <a href="#s4">四 盈亏平衡线</a><a href="#s5">五 买方与卖方</a><a href="#s6">六 贵还是便宜</a><a href="#s7">七 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 两个名字</span><span class="l-en">0 Two names</span></a><a href="#s1"><span class="l-zh">一 每天要动多少</span><span class="l-en">1 How much it must move each day</span></a><a href="#s2"><span class="l-zh">二 现金从哪来</span><span class="l-en">2 Where the cash comes from</span></a><a href="#s3"><span class="l-zh">三 24 天账本</span><span class="l-en">3 The 24-day ledger</span></a>
+  <a href="#s4"><span class="l-zh">四 盈亏平衡线</span><span class="l-en">4 The break-even line</span></a><a href="#s5"><span class="l-zh">五 买方与卖方</span><span class="l-en">5 Buyers and sellers</span></a><a href="#s6"><span class="l-zh">六 贵还是便宜</span><span class="l-en">6 Expensive or cheap</span></a><a href="#s7"><span class="l-zh">七 费曼检验</span><span class="l-en">7 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 4.2</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 4.2</span><span class="l-en">FIN 580 review · Node 4.2</span></p>
   <h1>gamma scalping</h1>
-  <p class="lede">4.1 讲了买到低于理论值的期权以后，差价怎样通过对冲变成现金。这一节把问题反过来问：按市价买入一张期权，标的实际要动多大才不亏；对冲挣的钱具体来自哪几笔买卖。案例还是 2026-04-13 收盘买入的 TSLA 5/15 到期 350 call。</p>
+  <p class="lede"><span class="l-zh">4.1 讲了买到低于理论值的期权以后，差价怎样通过对冲变成现金。这一节把问题反过来问：按市价买入一张期权，标的实际要动多大才不亏；对冲挣的钱具体来自哪几笔买卖。案例还是 2026-04-13 收盘买入的 TSLA 5/15 到期 350 call。</span><span class="l-en">4.1 showed how, after you buy an option below its theoretical value, hedging turns the difference into cash. This node turns the question around: if you buy an option at the market price, how much does the underlying actually have to move for you not to lose money, and which trades does the hedging money come from? The case is still the TSLA 5/15 350 call bought at the close on 2026-04-13.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>两个名字，一个数</h2>
-  <p class="sub">讲义里有两行字上下排着：break-even volatility = 36.40%，implied volatility = 36.40%。这一节讲为什么是同一个数。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>两个名字，一个数</span><span class="l-en"><span class="n">0</span>Two names, one number</span></h2>
+  <p class="sub"><span class="l-zh">讲义里有两行字上下排着：break-even volatility = 36.40%，implied volatility = 36.40%。这一节讲为什么是同一个数。</span><span class="l-en">The lecture notes have two lines one under the other: break-even volatility = 36.40%, implied volatility = 36.40%. This section explains why they are the same number.</span></p>
 
-  <p>先把前面两节的结论放在一起：</p>
+  <p><span class="l-zh">先把前面两节的结论放在一起：</span><span class="l-en">First, put the conclusions of the two earlier nodes side by side:</span></p>
   <ul>
-    <li>1.2：<b>隐含波动率</b>是从市场价格反推出来的 <span class="sym" data-say="读作「西格玛」，年化波动率：一年里股价涨跌的一个标准差，按百分比算（1.2）。">σ</span>。把它填进定价模型（本页都用 <span class="sym" data-say="Black-Scholes。1973 年提出的期权定价公式：用股价、行权价、波动率、离到期的时间和利率算出期权价值和 delta（2.1）。本页都按不派息算。">Black-Scholes</span>），模型算出的价值正好等于市价。</li>
-    <li>4.1：买入期权后每天按 <span class="sym" data-say="股价动 1 美元，期权价格变多少（2.1）。一张合约要卖出 100 × delta 股，才能抵掉股价小涨小跌带来的盈亏。">delta</span> <span class="sym" data-say="hedge。买入期权后卖出 delta 股标的，股价涨跌带来的盈亏被这些股票抵掉，仓位的 delta 是 0（叫 delta 中性），剩下的只有波动大小的输赢（2.1、4.1）。">对冲</span>：卖出 delta 股标的，把股价涨跌带来的盈亏抵掉。如果标的实际的波动率是 σ，对冲挣回来的现金加上到期的<span class="sym" data-say="到期时期权本身值的钱：call 是股价减行权价，股价不到行权价就是 0（1.1）。">内在价值</span>，平均就等于模型按 σ 算出的价值。讲义的十周例子里，按 42.56% 算的理论值 6.55 比市价 5.50 高 1.05，100 张对冲下来实现了 105.75，预测是 105.00。</li>
+    <li><span class="l-zh">1.2：<b>隐含波动率</b>是从市场价格反推出来的 <span class="sym" data-say="读作「西格玛」，年化波动率：一年里股价涨跌的一个标准差，按百分比算（1.2）。">σ</span>。把它填进定价模型（本页都用 <span class="sym" data-say="Black-Scholes。1973 年提出的期权定价公式：用股价、行权价、波动率、离到期的时间和利率算出期权价值和 delta（2.1）。本页都按不派息算。">Black-Scholes</span>），模型算出的价值正好等于市价。</span><span class="l-en">1.2: <b>Implied volatility</b> is the <span class="sym" data-say="Read &quot;sigma&quot;. Annualized volatility: one standard deviation of the stock's move over a year, in percent (1.2).">σ</span> backed out of the market price. Put it into the pricing model (this page always uses <span class="sym" data-say="Black-Scholes. The option pricing formula published in 1973: from stock price, strike, volatility, time to expiration and interest rate it computes the option value and delta (2.1). This page always assumes no dividend.">Black-Scholes</span>) and the model value equals the market price exactly.</span></li>
+    <li><span class="l-zh">4.1：买入期权后每天按 <span class="sym" data-say="股价动 1 美元，期权价格变多少（2.1）。一张合约要卖出 100 × delta 股，才能抵掉股价小涨小跌带来的盈亏。">delta</span> <span class="sym" data-say="hedge。买入期权后卖出 delta 股标的，股价涨跌带来的盈亏被这些股票抵掉，仓位的 delta 是 0（叫 delta 中性），剩下的只有波动大小的输赢（2.1、4.1）。">对冲</span>：卖出 delta 股标的，把股价涨跌带来的盈亏抵掉。如果标的实际的波动率是 σ，对冲挣回来的现金加上到期的<span class="sym" data-say="到期时期权本身值的钱：call 是股价减行权价，股价不到行权价就是 0（1.1）。">内在价值</span>，平均就等于模型按 σ 算出的价值。讲义的十周例子里，按 42.56% 算的理论值 6.55 比市价 5.50 高 1.05，100 张对冲下来实现了 105.75，预测是 105.00。</span><span class="l-en">4.1: After buying an option, <span class="sym" data-say="Hedge. After buying an option, sell delta shares of the underlying; the gains and losses from stock moves are offset by those shares, the position's delta is 0 (called delta neutral), and what remains is only the bet on the size of the moves (2.1, 4.1).">hedge</span> by <span class="sym" data-say="How much the option price changes when the stock moves $1 (2.1). One contract needs 100 × delta shares sold to offset the gains and losses from small stock moves.">delta</span> each day: sell delta shares of the underlying to offset the gains and losses from stock moves. If the underlying's realized volatility is σ, the cash collected by hedging plus the <span class="sym" data-say="What the option itself is worth at expiration: for a call, the stock price minus the strike, or 0 if the stock is below the strike (1.1).">intrinsic value</span> at expiration equals, on average, the model value computed at σ. In the lecture's ten-week example, the theoretical value at 42.56% is 6.55, 1.05 above the market price of 5.50; hedging 100 contracts realized 105.75 against a prediction of 105.00.</span></li>
   </ul>
-  <p>本页说的<b>模型价值</b>，和 4.1 说的<span class="sym" data-say="theoretical value。把一个 σ 填进定价模型算出来的期权价值，不是市场报价。本页叫模型价值，指的是同一个东西（2.2、4.1）。">理论值</span>是同一个东西：把某个 σ 填进定价模型算出来的价格。</p>
-  <p>现在按市价买入一张期权，对冲到到期。能挣回多少，取决于之后实际来了多大的波动：实际是 σ，平均挣回按 σ 算的模型价值。不赚不赔的条件是这个价值正好等于买入价。满足这个条件的 σ 叫<span class="sym" data-say="break-even volatility。按某个价格买入期权并对冲到到期，标的实际的波动率正好是它时，不赚不赔。">盈亏平衡波动率</span>。</p>
+  <p><span class="l-zh">本页说的<b>模型价值</b>，和 4.1 说的<span class="sym" data-say="theoretical value。把一个 σ 填进定价模型算出来的期权价值，不是市场报价。本页叫模型价值，指的是同一个东西（2.2、4.1）。">理论值</span>是同一个东西：把某个 σ 填进定价模型算出来的价格。</span><span class="l-en">The <b>model value</b> on this page is the same thing as the <span class="sym" data-say="Theoretical value. The option value computed by putting a σ into the pricing model, not a market quote. This page calls it model value; it is the same thing (2.2, 4.1).">theoretical value</span> in 4.1: the price computed by putting some σ into the pricing model.</span></p>
+  <p><span class="l-zh">现在按市价买入一张期权，对冲到到期。能挣回多少，取决于之后实际来了多大的波动：实际是 σ，平均挣回按 σ 算的模型价值。不赚不赔的条件是这个价值正好等于买入价。满足这个条件的 σ 叫<span class="sym" data-say="break-even volatility。按某个价格买入期权并对冲到到期，标的实际的波动率正好是它时，不赚不赔。">盈亏平衡波动率</span>。</span><span class="l-en">Now buy an option at the market price and hedge it to expiration. How much you collect depends on how large the realized moves turn out to be: if realized volatility is σ, on average you collect the model value at σ. You break even when that value exactly equals the purchase price. The σ that meets this condition is called the <span class="sym" data-say="Break-even volatility. If you buy an option at a given price and hedge it to expiration, you break even when the underlying's realized volatility is exactly this number.">break-even volatility</span>.</span></p>
   <div class="pair">
     <div class="formula">
-      <div class="math">模型价值(<span class="sym" data-say="隐含波动率：让模型价值等于市价的那个 σ。">σ<sub>隐含</sub></span>) ＝ 市价</div>
-      <div class="gloss"><b>隐含波动率</b>：市场价格里含着多大的波动率</div>
+      <div class="math"><span class="l-zh">模型价值(<span class="sym" data-say="隐含波动率：让模型价值等于市价的那个 σ。">σ<sub>隐含</sub></span>) ＝ 市价</span><span class="l-en">Model value(<span class="sym" data-say="Implied volatility: the σ that makes the model value equal the market price.">σ<sub>implied</sub></span>) = market price</span></div>
+      <div class="gloss"><span class="l-zh"><b>隐含波动率</b>：市场价格里含着多大的波动率</span><span class="l-en"><b>Implied volatility</b>: how much volatility the market price contains</span></div>
     </div>
     <div class="formula">
-      <div class="math">模型价值(<span class="sym" data-say="盈亏平衡波动率：实际来了这么大的波动，按这个价格买入并对冲的人正好不赚不赔。">σ<sub>平衡</sub></span>) ＝ 买入价</div>
-      <div class="gloss"><b>盈亏平衡波动率</b>：实际要来多大的波动，买方才不亏</div>
+      <div class="math"><span class="l-zh">模型价值(<span class="sym" data-say="盈亏平衡波动率：实际来了这么大的波动，按这个价格买入并对冲的人正好不赚不赔。">σ<sub>平衡</sub></span>) ＝ 买入价</span><span class="l-en">Model value(<span class="sym" data-say="Break-even volatility: if realized moves are this large, someone who buys at this price and hedges exactly breaks even.">σ<sub>break-even</sub></span>) = purchase price</span></div>
+      <div class="gloss"><span class="l-zh"><b>盈亏平衡波动率</b>：实际要来多大的波动，买方才不亏</span><span class="l-en"><b>Break-even volatility</b>: how much the underlying must actually move for the buyer not to lose</span></div>
     </div>
   </div>
-  <p>按市价买，买入价就是市价，两个等式一模一样，解出来是同一个 σ。两个名字问的是两个问题：一个问市场在报什么，一个问自己需要什么才不亏。</p>
+  <p><span class="l-zh">按市价买，买入价就是市价，两个等式一模一样，解出来是同一个 σ。两个名字问的是两个问题：一个问市场在报什么，一个问自己需要什么才不亏。</span><span class="l-en">When you buy at the market price, the purchase price is the market price, the two equations are identical, and they solve to the same σ. The two names ask two different questions: one asks what the market is quoting, the other asks what you need in order not to lose.</span></p>
 
   <div class="panel">
     <div class="bar">
       <div class="seg" id="beSeg">
-        <button data-m="lec" aria-pressed="true">讲义例子</button>
+        <button data-m="lec" aria-pressed="true"><span class="l-zh">讲义例子</span><span class="l-en">Lecture example</span></button>
         <button data-m="tsla" aria-pressed="false">TSLA 350 call</button>
       </div>
-      <button class="btn ghost" id="bePlay">再画一遍</button>
+      <button class="btn ghost" id="bePlay"><span class="l-zh">再画一遍</span><span class="l-en">Redraw</span></button>
     </div>
-    <svg id="beC" viewBox="0 0 720 300" role="img" aria-label="期权的模型价值随波动率变化的曲线，与市价的交点"></svg>
+    <svg id="beC" viewBox="0 0 720 300" role="img" aria-label="期权的模型价值随波动率变化的曲线，与市价的交点" data-en-aria-label="The option's model value as a function of volatility, and where it crosses the market price"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink-soft)"></i>模型价值，随 σ 变</span>
-      <span style="color:var(--control)"><i class="dash"></i>市价</span>
-      <span style="color:var(--control)"><i class="dot" style="background:var(--control)"></i>两者相等的 σ</span>
+      <span><i class="ln" style="background:var(--ink-soft)"></i><span class="l-zh">模型价值，随 σ 变</span><span class="l-en">Model value as σ changes</span></span>
+      <span style="color:var(--control)"><i class="dash"></i><span class="l-zh">市价</span><span class="l-en">Market price</span></span>
+      <span style="color:var(--control)"><i class="dot" style="background:var(--control)"></i><span class="l-zh">两者相等的 σ</span><span class="l-en">σ where they are equal</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">波动率 σ</div><div class="d" id="beS"></div></div>
-      <div class="stat"><div class="k">模型价值（每股）</div><div class="d" id="beV"></div></div>
-      <div class="stat"><div class="k">市价（每股）</div><div class="d" id="beP" style="color:var(--control)"></div><div class="d2" id="bePb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">波动率 σ</span><span class="l-en">Volatility σ</span></div><div class="d" id="beS"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">模型价值（每股）</span><span class="l-en">Model value (per share)</span></div><div class="d" id="beV"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">市价（每股）</span><span class="l-en">Market price (per share)</span></div><div class="d" id="beP" style="color:var(--control)"></div><div class="d2" id="bePb"></div></div>
     </div>
     <div class="say plain" id="beSay"></div>
   </div>
-  <p>讲义的例子：June 100 call，股价 97.50，离到期 10 周（70 天），利率 5%，不派息。按 42.56% 算理论值 6.55；市价只有 5.50，σ 要降到 36.40%，模型价值才等于 5.50。所以按 5.50 买入并对冲，之后实际波动率高于 36.40% 就赚，低于就亏。用 Black-Scholes 复算是 6.5496 和 36.398%，和讲义一致。</p>
-  <p>TSLA 350 call，4/13 收盘：买一 21.00、卖一 21.10、中间价 21.05。按 t ＝ 32/365 年、利率 4.3%、不派息反解，中间价对应 46.30%（报价快照给的是 46.29%），卖一对应 46.42%，买一对应 46.18%。按卖一买入的人，盈亏平衡是 46.42%；按买一卖出的人，盈亏平衡是 46.18%。买卖价差 0.10 美元折成波动率约 0.24 个点：这张期权的 <span class="sym" data-say="隐含波动率变 1 个百分点，期权价格变多少美元（2.3）。这张 350 call 入场时是 0.4125。">vega</span> 是 0.4125，每个波动率点值 0.41 美元（2.3）。</p>
-  <p>所以判断一张期权贵不贵，比的不是价格有几美元，是它的盈亏平衡波动率和自己认为之后会来的波动率。第六节用六只股票做一遍。</p>
+  <p><span class="l-zh">讲义的例子：June 100 call，股价 97.50，离到期 10 周（70 天），利率 5%，不派息。按 42.56% 算理论值 6.55；市价只有 5.50，σ 要降到 36.40%，模型价值才等于 5.50。所以按 5.50 买入并对冲，之后实际波动率高于 36.40% 就赚，低于就亏。用 Black-Scholes 复算是 6.5496 和 36.398%，和讲义一致。</span><span class="l-en">The lecture example: June 100 call, stock 97.50, 10 weeks (70 days) to expiration, 5% interest, no dividend. At 42.56% the theoretical value is 6.55; the market price is only 5.50, and σ has to fall to 36.40% for the model value to equal 5.50. So if you buy at 5.50 and hedge, you make money if realized volatility afterward is above 36.40% and lose if it is below. Recomputed with Black-Scholes: 6.5496 and 36.398%, matching the lecture notes.</span></p>
+  <p><span class="l-zh">TSLA 350 call，4/13 收盘：买一 21.00、卖一 21.10、中间价 21.05。按 t ＝ 32/365 年、利率 4.3%、不派息反解，中间价对应 46.30%（报价快照给的是 46.29%），卖一对应 46.42%，买一对应 46.18%。按卖一买入的人，盈亏平衡是 46.42%；按买一卖出的人，盈亏平衡是 46.18%。买卖价差 0.10 美元折成波动率约 0.24 个点：这张期权的 <span class="sym" data-say="隐含波动率变 1 个百分点，期权价格变多少美元（2.3）。这张 350 call 入场时是 0.4125。">vega</span> 是 0.4125，每个波动率点值 0.41 美元（2.3）。</span><span class="l-en">TSLA 350 call at the 4/13 close: bid 21.00, ask 21.10, mid 21.05. Solving with t = 32/365 years, 4.3% interest and no dividend, the mid corresponds to 46.30% (the quote snapshot gives 46.29%), the ask to 46.42% and the bid to 46.18%. Someone who buys at the ask breaks even at 46.42%; someone who sells at the bid breaks even at 46.18%. The bid-ask spread of $0.10 is about 0.24 volatility points: this option's <span class="sym" data-say="How many dollars the option price changes when implied volatility changes 1 percentage point (2.3). For this 350 call at entry it is 0.4125.">vega</span> is 0.4125, so each volatility point is worth $0.41 (2.3).</span></p>
+  <p><span class="l-zh">所以判断一张期权贵不贵，比的不是价格有几美元，是它的盈亏平衡波动率和自己认为之后会来的波动率。第六节用六只股票做一遍。</span><span class="l-en">So to judge whether an option is expensive, you don't compare how many dollars it costs; you compare its break-even volatility with the volatility you expect to come. Section 6 does this for six stocks.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>每天要动多少才回本</h2>
-  <p class="sub">盈亏平衡波动率是按一年说的。落到每一天，就是标的当天至少要动多少。</p>
-  <p>2.2 算过：对冲好的仓位，股价从上一个收盘到这一个收盘动了 <span class="sym" data-say="这一天标的涨跌了多少美元，从上一个收盘算到这一个收盘。">ΔS</span>，gamma 带来的收入约是 ½ × <span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。">Γ</span> × (ΔS)²；同时要付掉这段时间的租金。本页的<span class="sym" data-say="对冲好的仓位因为时间流逝付掉的钱：期权价值的衰减（theta），扣掉手里现金赚的利息。现金从哪来：买 call 付出权利金，卖空 delta 股标的收进来的钱比权利金多，多出来的现金按利率生息。">租金</span>指 <span class="sym" data-say="theta：标的不动时，期权每过一天变便宜多少（2.2）。">theta</span> 扣掉手里现金的利息，在模型里一年是 ½ × σ² × <span class="sym" data-say="上一个收盘的股价。">S</span>² × Γ，一段时间就按天数 ÷ 365 摊。收入正好抵掉租金的那一天：</p>
+  <h2><span class="l-zh"><span class="n">一</span>每天要动多少才回本</span><span class="l-en"><span class="n">1</span>How much it must move each day to pay for itself</span></h2>
+  <p class="sub"><span class="l-zh">盈亏平衡波动率是按一年说的。落到每一天，就是标的当天至少要动多少。</span><span class="l-en">Break-even volatility is stated per year. Brought down to a single day, it is the minimum the underlying has to move that day.</span></p>
+  <p><span class="l-zh">2.2 算过：对冲好的仓位，股价从上一个收盘到这一个收盘动了 <span class="sym" data-say="这一天标的涨跌了多少美元，从上一个收盘算到这一个收盘。">ΔS</span>，gamma 带来的收入约是 ½ × <span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。">Γ</span> × (ΔS)²；同时要付掉这段时间的租金。本页的<span class="sym" data-say="对冲好的仓位因为时间流逝付掉的钱：期权价值的衰减（theta），扣掉手里现金赚的利息。现金从哪来：买 call 付出权利金，卖空 delta 股标的收进来的钱比权利金多，多出来的现金按利率生息。">租金</span>指 <span class="sym" data-say="theta：标的不动时，期权每过一天变便宜多少（2.2）。">theta</span> 扣掉手里现金的利息，在模型里一年是 ½ × σ² × <span class="sym" data-say="上一个收盘的股价。">S</span>² × Γ，一段时间就按天数 ÷ 365 摊。收入正好抵掉租金的那一天：</span><span class="l-en">2.2 worked this out: for a hedged position, when the stock moves <span class="sym" data-say="How many dollars the underlying moved this day, from the previous close to this close.">ΔS</span> from one close to the next, gamma brings in about ½ × <span class="sym" data-say="Gamma: how much delta changes when the stock moves $1 (2.2).">Γ</span> × (ΔS)²; at the same time you pay rent for that period. <span class="sym" data-say="What a hedged position pays as time passes: the option's value decay (theta) minus the interest earned on the cash you hold. Where the cash comes from: buying the call costs the premium, and selling delta shares of the underlying short brings in more than the premium; the extra cash earns interest.">Rent</span> on this page means <span class="sym" data-say="Theta: how much cheaper the option gets each day if the underlying doesn't move (2.2).">theta</span> minus the interest on the cash you hold. In the model it is ½ × σ² × <span class="sym" data-say="The stock price at the previous close.">S</span>² × Γ per year, spread over a period by days ÷ 365. The day on which income exactly offsets rent:</span></p>
   <div class="formula">
-    <div class="math">½ × <span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。">Γ</span> × (<span class="sym" data-say="这一天标的涨跌了多少美元。">ΔS</span>)² ＝ ½ × <span class="sym" data-say="盈亏平衡波动率，按市价买入时就是隐含波动率。">σ</span>² × <span class="sym" data-say="上一个收盘的股价。">S</span>² × Γ × 天数 ÷ 365</div>
-    <div class="gloss">左边是这一天股价动了 ΔS 带来的收入，右边是这段时间的租金。两边都乘着 Γ，消掉，再开根号：</div>
+    <div class="math">½ × <span class="l-zh"><span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。">Γ</span> × (<span class="sym" data-say="这一天标的涨跌了多少美元。">ΔS</span>)² ＝ ½ × <span class="sym" data-say="盈亏平衡波动率，按市价买入时就是隐含波动率。">σ</span>² × <span class="sym" data-say="上一个收盘的股价。">S</span>² × Γ × 天数 ÷ 365</span><span class="l-en"><span class="sym" data-say="Gamma: how much delta changes when the stock moves $1 (2.2).">Γ</span> × (<span class="sym" data-say="How many dollars the underlying moved this day.">ΔS</span>)² = ½ × <span class="sym" data-say="Break-even volatility; when you buy at the market price it is the implied volatility.">σ</span>² × <span class="sym" data-say="The stock price at the previous close.">S</span>² × Γ × days ÷ 365</span></div>
+    <div class="gloss"><span class="l-zh">左边是这一天股价动了 ΔS 带来的收入，右边是这段时间的租金。两边都乘着 Γ，消掉，再开根号：</span><span class="l-en">The left side is the income from the stock moving ΔS that day; the right side is the rent for the period. Both sides are multiplied by Γ, which cancels; then take the square root:</span></div>
   </div>
   <div class="formula">
-    <div class="math">回本的一天：|<span class="sym" data-say="这一天标的涨跌了多少美元，从上一个收盘算到这一个收盘。">ΔS</span>| ＝ <span class="sym" data-say="上一个收盘的股价。">S</span> × <span class="sym" data-say="盈亏平衡波动率，按市价买入时就是隐含波动率。TSLA 350 call 是 46.3%。">σ</span> × √(<span class="sym" data-say="从上一个收盘到这一个收盘隔了几个日历日：平时是 1，周五到周一是 3。">天数</span> ÷ 365)</div>
-    <div class="gloss">当天涨跌的美元数 ＝ 股价 × 盈亏平衡波动率 × 这段时间占一年比例的平方根</div>
-    <div class="note">TSLA 4/13：352.36 × 46.3% ÷ √365 ＝ 352.36 × 46.3% ÷ 19.105 ≈ 8.54 美元，即 2.42%</div>
+    <div class="math"><span class="l-zh">回本的一天：|<span class="sym" data-say="这一天标的涨跌了多少美元，从上一个收盘算到这一个收盘。">ΔS</span>| ＝ <span class="sym" data-say="上一个收盘的股价。">S</span> × <span class="sym" data-say="盈亏平衡波动率，按市价买入时就是隐含波动率。TSLA 350 call 是 46.3%。">σ</span> × √(<span class="sym" data-say="从上一个收盘到这一个收盘隔了几个日历日：平时是 1，周五到周一是 3。">天数</span></span><span class="l-en">A day that pays for itself: |<span class="sym" data-say="How many dollars the underlying moved this day, from the previous close to this close.">ΔS</span>| = <span class="sym" data-say="The stock price at the previous close.">S</span> × <span class="sym" data-say="Break-even volatility; when you buy at the market price it is the implied volatility. For the TSLA 350 call it is 46.3%.">σ</span> × √(<span class="sym" data-say="How many calendar days from the previous close to this close: usually 1, and 3 from Friday to Monday.">days</span></span> ÷ 365)</div>
+    <div class="gloss"><span class="l-zh">当天涨跌的美元数 ＝ 股价 × 盈亏平衡波动率 × 这段时间占一年比例的平方根</span><span class="l-en">The day's move in dollars = stock price × break-even volatility × square root of the period's share of a year</span></div>
+    <div class="note"><span class="l-zh">TSLA 4/13：352.36 × 46.3% ÷ √365 ＝ 352.36 × 46.3% ÷ 19.105 ≈ 8.54 美元，即 2.42%</span><span class="l-en">TSLA 4/13: 352.36 × 46.3% ÷ √365 = 352.36 × 46.3% ÷ 19.105 ≈ $8.54, or 2.42%</span></div>
   </div>
-  <p>右边就是按盈亏平衡波动率算的、这段时间的一个标准差（1.2）。讲义（S8）问过同一个问题：买一个 delta 中性的 <span class="sym" data-say="同一个行权价、同一个到期日的 call 和 put 各买一张。3.2 讲。">straddle</span>，或者买一张期权再用标的对冲，希望标的动还是不动？不动，theta 让你亏；动得够多，gamma 让你赚。要动多少才刚好打平？上下一个标准差。</p>
+  <p><span class="l-zh">右边就是按盈亏平衡波动率算的、这段时间的一个标准差（1.2）。讲义（S8）问过同一个问题：买一个 delta 中性的 <span class="sym" data-say="同一个行权价、同一个到期日的 call 和 put 各买一张。3.2 讲。">straddle</span>，或者买一张期权再用标的对冲，希望标的动还是不动？不动，theta 让你亏；动得够多，gamma 让你赚。要动多少才刚好打平？上下一个标准差。</span><span class="l-en">The right side is one standard deviation for the period at the break-even volatility (1.2). The lecture notes (S8) ask the same question: if you buy a delta-neutral <span class="sym" data-say="Buy one call and one put with the same strike and the same expiration. Covered in 3.2.">straddle</span>, or buy an option and hedge it with the underlying, do you want the underlying to move or not? If it doesn't move, theta makes you lose; if it moves enough, gamma makes you money. How much must it move to break exactly even? One standard deviation up or down.</span></p>
 
-  <h3>为什么按日历日算</h3>
-  <p>公式里的「天数」是从上一个收盘到这一个收盘隔了几个日历日。报价快照里的 theta 按日历日收，周末也收（2.2）。周五收盘到周一收盘隔 3 天，周一要背 3 天的租金，门槛乘 √3。</p>
+  <h3><span class="l-zh">为什么按日历日算</span><span class="l-en">Why calendar days</span></h3>
+  <p><span class="l-zh">公式里的「天数」是从上一个收盘到这一个收盘隔了几个日历日。报价快照里的 theta 按日历日收，周末也收（2.2）。周五收盘到周一收盘隔 3 天，周一要背 3 天的租金，门槛乘 √3。</span><span class="l-en">"Days" in the formula is the number of calendar days from the previous close to this close. The theta in the quote snapshot is charged by calendar day, weekends included (2.2). From Friday's close to Monday's close is 3 days, so Monday carries 3 days of rent and its threshold is multiplied by √3.</span></p>
   <div class="tscroll">
   <table>
-    <thead><tr><th>哪种日子</th><th>这 24 个交易日里</th><th>隔几个日历日</th><th>门槛</th><th>按 352.36 折成美元</th></tr></thead>
+    <thead><tr><th><span class="l-zh">哪种日子</span><span class="l-en">Type of day</span></th><th><span class="l-zh">这 24 个交易日里</span><span class="l-en">Among these 24 trading days</span></th><th><span class="l-zh">隔几个日历日</span><span class="l-en">Calendar days since last close</span></th><th><span class="l-zh">门槛</span><span class="l-en">Threshold</span></th><th><span class="l-zh">按 352.36 折成美元</span><span class="l-en">In dollars at 352.36</span></th></tr></thead>
     <tbody>
-      <tr><td>周二到周五</td><td>20 天</td><td>1</td><td>2.42%</td><td>8.54</td></tr>
-      <tr><td>周一</td><td>4 天</td><td>3</td><td>4.20%</td><td>14.79</td></tr>
-      <tr><td>按交易日平均（1.2 的 ÷ 16）</td><td></td><td>约 1.43</td><td>2.89%</td><td>10.20</td></tr>
+      <tr><td><span class="l-zh">周二到周五</span><span class="l-en">Tuesday to Friday</span></td><td><span class="l-zh">20 天</span><span class="l-en">20 days</span></td><td>1</td><td>2.42%</td><td>8.54</td></tr>
+      <tr><td><span class="l-zh">周一</span><span class="l-en">Monday</span></td><td><span class="l-zh">4 天</span><span class="l-en">4 days</span></td><td>3</td><td>4.20%</td><td>14.79</td></tr>
+      <tr><td><span class="l-zh">按交易日平均（1.2 的 ÷ 16）</span><span class="l-en">Trading-day average (÷ 16, from 1.2)</span></td><td></td><td><span class="l-zh">约 1.43</span><span class="l-en">about 1.43</span></td><td>2.89%</td><td>10.20</td></tr>
     </tbody>
   </table>
   </div>
-  <p>1.2 和 2.2 说一天的门槛是 2.89%（46.3% ÷ 16），那是把一年 365 天的租金摊到约 256 个交易日上：每个交易日平均背 1.43 天的租金，2.42% × √1.43 ≈ 2.89%。按日历日分还是按交易日分，一年的总租金一样，只是分法不同。</p>
+  <p><span class="l-zh">1.2 和 2.2 说一天的门槛是 2.89%（46.3% ÷ 16），那是把一年 365 天的租金摊到约 256 个交易日上：每个交易日平均背 1.43 天的租金，2.42% × √1.43 ≈ 2.89%。按日历日分还是按交易日分，一年的总租金一样，只是分法不同。</span><span class="l-en">1.2 and 2.2 put the daily threshold at 2.89% (46.3% ÷ 16). That spreads a year's 365 days of rent over about 256 trading days: each trading day carries 1.43 days of rent on average, and 2.42% × √1.43 ≈ 2.89%. Whether you split by calendar day or by trading day, the total rent for the year is the same; only the split differs.</span></p>
 
-  <h3>整段看：平方加起来</h3>
-  <p>2.2 讲过，gamma 只看每一天动多大，不看累计走了多远。所以整段回本，看的是每天涨跌的平方加起来，够不够每天门槛的平方加起来：</p>
+  <h3><span class="l-zh">整段看：平方加起来</span><span class="l-en">The whole period: add up the squares</span></h3>
+  <p><span class="l-zh">2.2 讲过，gamma 只看每一天动多大，不看累计走了多远。所以整段回本，看的是每天涨跌的平方加起来，够不够每天门槛的平方加起来：</span><span class="l-en">As 2.2 explained, gamma only cares how large each day's move is, not how far the price has traveled in total. So whether the whole period pays for itself depends on whether the sum of the squared daily moves is enough to cover the sum of the squared daily thresholds:</span></p>
   <div class="formula">
-    <div class="math">Σ (每天涨跌)² ＝ σ² × 32/365</div>
-    <div class="gloss">24 个日涨跌的平方加起来，等于 24 个门槛的平方加起来（假定 gamma 乘股价的平方每天一样）</div>
-    <div class="note">开根号比：TSLA 这 24 天是 14.03%；46.3% × √(32/365) ＝ 13.71%</div>
+    <div class="math"><span class="l-zh">Σ (每天涨跌)² ＝ σ² × 32/365</span><span class="l-en">Σ (daily move)² = σ² × 32/365</span></div>
+    <div class="gloss"><span class="l-zh">24 个日涨跌的平方加起来，等于 24 个门槛的平方加起来（假定 gamma 乘股价的平方每天一样）</span><span class="l-en">The sum of the squares of the 24 daily moves equals the sum of the squares of the 24 thresholds (assuming gamma times the squared stock price is the same every day)</span></div>
+    <div class="note"><span class="l-zh">开根号比：TSLA 这 24 天是 14.03%；46.3% × √(32/365) ＝ 13.71%</span><span class="l-en">Square roots compared: 14.03% for TSLA over these 24 days; 46.3% × √(32/365) = 13.71%</span></div>
   </div>
-  <p>TSLA 这 24 天是 14.03%，比 13.71% 高出约 2.4%，折成年化是 47.4%。1.2 量出的 45.8% 用的是 × 16，按一年 256 个交易日折算。一年里 32 个日历日平均只有 22.4 个交易日，这 32 天有 24 个，比平常密，同样 24 个涨跌，两种折法差 1.6 个点。和隐含波动率比，要用它自己的日历折法：47.4% 对 46.3%。4.1 拿 45.83% 和 46.29% 比，是把 × 16 的实际和日历折法的隐含放在了一起；换成同一种折法，是 47.4% 对 46.3%，或者 45.83% 对 44.8%（46.3% × √(22.4 ÷ 24)）。可是第三节会看到，这笔交易最后是小亏，原因在「gamma 乘股价的平方每天一样」这个假定上。</p>
+  <p><span class="l-zh">TSLA 这 24 天是 14.03%，比 13.71% 高出约 2.4%，折成年化是 47.4%。1.2 量出的 45.8% 用的是 × 16，按一年 256 个交易日折算。一年里 32 个日历日平均只有 22.4 个交易日，这 32 天有 24 个，比平常密，同样 24 个涨跌，两种折法差 1.6 个点。和隐含波动率比，要用它自己的日历折法：47.4% 对 46.3%。4.1 拿 45.83% 和 46.29% 比，是把 × 16 的实际和日历折法的隐含放在了一起；换成同一种折法，是 47.4% 对 46.3%，或者 45.83% 对 44.8%（46.3% × √(22.4 ÷ 24)）。可是第三节会看到，这笔交易最后是小亏，原因在「gamma 乘股价的平方每天一样」这个假定上。</span><span class="l-en">TSLA's 14.03% over these 24 days is about 2.4% above 13.71%, which annualizes to 47.4%. The 45.8% measured in 1.2 uses × 16, scaling by 256 trading days a year. In a year, 32 calendar days hold only 22.4 trading days on average; these 32 days hold 24, more than usual, so the same 24 moves give results 1.6 points apart under the two scalings. To compare with implied volatility you have to use its own calendar scaling: 47.4% against 46.3%. 4.1 compared 45.83% with 46.29%, which puts realized volatility at × 16 next to implied volatility on the calendar scaling; with the same scaling for both, it is 47.4% against 46.3%, or 45.83% against 44.8% (46.3% × √(22.4 ÷ 24)). Yet section 3 will show that this trade ended with a small loss, and the reason lies in the assumption that gamma times the squared stock price is the same every day.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>现金从哪来</h2>
-  <p class="sub">对冲本身就是一连串股票买卖。gamma 为正，这些买卖自动成了低买高卖。</p>
-  <p>买入 call、卖出 delta 股以后，仓位的 delta 是 0（2.1）。股价一涨，call 的 delta 变大（gamma 为正，2.2），仓位变成净多头，要回到 0 就再卖一些股票：卖在涨上去的价位。股价一跌，delta 变小，仓位变成净空头，要回到 0 就买回一些：买在跌下来的价位。所以每次调仓都是涨了卖、跌了买，股价涨上去再跌回来，就完成一笔低买高卖。这叫 <span class="sym" data-say="gamma scalping。持有 gamma 为正的仓位并按 delta 对冲，靠「涨了卖、跌了买」的差价挣钱，用来抵每天的租金。scalp 是「一小笔一小笔地赚」。">gamma scalping</span>。</p>
+  <h2><span class="l-zh"><span class="n">二</span>现金从哪来</span><span class="l-en"><span class="n">2</span>Where the cash comes from</span></h2>
+  <p class="sub"><span class="l-zh">对冲本身就是一连串股票买卖。gamma 为正，这些买卖自动成了低买高卖。</span><span class="l-en">Hedging itself is a string of stock trades. With positive gamma, these trades automatically become buy-low, sell-high.</span></p>
+  <p><span class="l-zh">买入 call、卖出 delta 股以后，仓位的 delta 是 0（2.1）。股价一涨，call 的 delta 变大（gamma 为正，2.2），仓位变成净多头，要回到 0 就再卖一些股票：卖在涨上去的价位。股价一跌，delta 变小，仓位变成净空头，要回到 0 就买回一些：买在跌下来的价位。所以每次调仓都是涨了卖、跌了买，股价涨上去再跌回来，就完成一笔低买高卖。这叫 <span class="sym" data-say="gamma scalping。持有 gamma 为正的仓位并按 delta 对冲，靠「涨了卖、跌了买」的差价挣钱，用来抵每天的租金。scalp 是「一小笔一小笔地赚」。">gamma scalping</span>。</span><span class="l-en">After buying a call and selling delta shares, the position's delta is 0 (2.1). When the stock rises, the call's delta grows (gamma is positive, 2.2), the position becomes net long, and to get back to 0 you sell more stock: selling at the higher price. When the stock falls, delta shrinks, the position becomes net short, and to get back to 0 you buy some back: buying at the lower price. So every adjustment sells after a rise and buys after a drop, and when the stock goes up and comes back down, one buy-low, sell-high round trip is complete. This is called <span class="sym" data-say="Gamma scalping. Holding a positive-gamma position and hedging it by delta, earning the difference from selling after rises and buying after drops, to pay the daily rent. To scalp means to earn in many small amounts.">gamma scalping</span>.</span></p>
   <div class="formula">
-    <div class="math">来回一趟赚 ＝ 100 × <span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。乘 100 是一张合约要多卖或买回的股数。">Γ</span> × <span class="sym" data-say="股价这一趟来回的幅度，美元。">m</span>²</div>
-    <div class="gloss">一张合约：股价涨 m 美元时多卖 100 × Γ × m 股，跌回原价时把它们买回来，每股赚 m</div>
-    <div class="note">4/23 开盘：Γ ＝ 0.00771，m ＝ 2 美元：100 × 0.00771 × 2² ≈ 3.08 美元</div>
+    <div class="math"><span class="l-zh">来回一趟赚 ＝ 100 × <span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。乘 100 是一张合约要多卖或买回的股数。">Γ</span> × <span class="sym" data-say="股价这一趟来回的幅度，美元。">m</span></span><span class="l-en">One round trip earns = 100 × <span class="sym" data-say="Gamma: how much delta changes when the stock moves $1 (2.2). Times 100 is the number of shares one contract has to sell or buy back.">Γ</span> × <span class="sym" data-say="The size of this round trip in the stock price, in dollars.">m</span></span>²</div>
+    <div class="gloss"><span class="l-zh">一张合约：股价涨 m 美元时多卖 100 × Γ × m 股，跌回原价时把它们买回来，每股赚 m</span><span class="l-en">One contract: when the stock rises m dollars, sell 100 × Γ × m more shares; when it falls back to the starting price, buy them back, earning m per share</span></div>
+    <div class="note"><span class="l-zh">4/23 开盘：Γ ＝ 0.00771，m ＝ 2 美元：100 × 0.00771 × 2² ≈ 3.08 美元</span><span class="l-en">4/23 open: Γ = 0.00771, m = $2: 100 × 0.00771 × 2² ≈ $3.08</span></div>
   </div>
-  <p>4/22 收盘到 4/23 收盘，这张期权的租金是 24.71 美元一张（按 46.3% 算，扣掉现金利息）。靠 2 美元的来回挣回来，要走 8 趟。</p>
+  <p><span class="l-zh">4/22 收盘到 4/23 收盘，这张期权的租金是 24.71 美元一张（按 46.3% 算，扣掉现金利息）。靠 2 美元的来回挣回来，要走 8 趟。</span><span class="l-en">From the 4/22 close to the 4/23 close, this option's rent is $24.71 per contract (at 46.3%, net of interest on cash). Earning it back with $2 round trips takes 8 of them.</span></p>
 
-  <h3>4/23，一分钟一分钟看</h3>
-  <p>4/22 收盘 387.61，手里是 1 张 350 call、空 83.14 股。TSLA 在 4/22 收盘后发了第一季度财报，4/23 开盘跳空：第一分钟收在 372.68，比前一天收盘低 14.93；盘中涨到 384.91，又跌到 368.74，收在 373.69。调仓的规则：股价离上一次调仓的价格超过 2 美元，就按新的 delta 调一次。delta 按买入时的 46.3% 算。</p>
+  <h3><span class="l-zh">4/23，一分钟一分钟看</span><span class="l-en">4/23, minute by minute</span></h3>
+  <p><span class="l-zh">4/22 收盘 387.61，手里是 1 张 350 call、空 83.14 股。TSLA 在 4/22 收盘后发了第一季度财报，4/23 开盘跳空：第一分钟收在 372.68，比前一天收盘低 14.93；盘中涨到 384.91，又跌到 368.74，收在 373.69。调仓的规则：股价离上一次调仓的价格超过 2 美元，就按新的 delta 调一次。delta 按买入时的 46.3% 算。</span><span class="l-en">At the 4/22 close, TSLA is at 387.61 and the position is 1 long 350 call and 83.14 shares short. TSLA reported first-quarter earnings after the 4/22 close and gapped at the 4/23 open: the first minute closed at 372.68, 14.93 below the previous close; during the day it rose to 384.91, fell to 368.74, and closed at 373.69. The adjustment rule: whenever the stock moves more than $2 away from the price of the last adjustment, adjust to the new delta. Delta is computed at the 46.3% from the purchase.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="inSeg">
-        <button data-b="1" aria-pressed="false">每 1 美元</button>
-        <button data-b="2" aria-pressed="true">每 2 美元</button>
-        <button data-b="4" aria-pressed="false">每 4 美元</button>
+        <button data-b="1" aria-pressed="false"><span class="l-zh">每 1 美元</span><span class="l-en">Every $1</span></button>
+        <button data-b="2" aria-pressed="true"><span class="l-zh">每 2 美元</span><span class="l-en">Every $2</span></button>
+        <button data-b="4" aria-pressed="false"><span class="l-zh">每 4 美元</span><span class="l-en">Every $4</span></button>
       </div>
-      <button class="btn ghost" id="inPlay">重播</button>
+      <button class="btn ghost" id="inPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button>
     </div>
-    <svg id="inC" viewBox="0 0 720 440" role="img" aria-label="4/23 TSLA 每分钟价格、每次调仓的买卖，以及这一天累计的收入与租金"></svg>
+    <svg id="inC" viewBox="0 0 720 440" role="img" aria-label="4/23 TSLA 每分钟价格、每次调仓的买卖，以及这一天累计的收入与租金" data-en-aria-label="TSLA price each minute on 4/23, each adjustment trade, and the day's cumulative income and rent"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink)"></i>股价（每分钟）</span>
-      <span style="color:var(--result)"><i class="dot" style="background:var(--result)"></i>卖出股票</span>
-      <span style="color:var(--control)"><i class="dot" style="background:var(--control)"></i>买回股票</span>
-      <span style="color:var(--ink-faint)"><i class="dash"></i>上次调仓价 ± 间隔</span>
-      <span style="color:var(--result)"><i class="ln" style="background:var(--result)"></i>下图：这一天的收入</span>
-      <span style="color:var(--ink-faint)"><i class="dash"></i>下图：只在收盘调一次的收入</span>
-      <span style="color:var(--control)"><i class="dash"></i>下图：租金 24.71</span>
+      <span><i class="ln" style="background:var(--ink)"></i><span class="l-zh">股价（每分钟）</span><span class="l-en">Stock price (each minute)</span></span>
+      <span style="color:var(--result)"><i class="dot" style="background:var(--result)"></i><span class="l-zh">卖出股票</span><span class="l-en">Sell stock</span></span>
+      <span style="color:var(--control)"><i class="dot" style="background:var(--control)"></i><span class="l-zh">买回股票</span><span class="l-en">Buy back stock</span></span>
+      <span style="color:var(--ink-faint)"><i class="dash"></i><span class="l-zh">上次调仓价 ± 间隔</span><span class="l-en">Last adjustment price ± interval</span></span>
+      <span style="color:var(--result)"><i class="ln" style="background:var(--result)"></i><span class="l-zh">下图：这一天的收入</span><span class="l-en">Lower chart: income for the day</span></span>
+      <span style="color:var(--ink-faint)"><i class="dash"></i><span class="l-zh">下图：只在收盘调一次的收入</span><span class="l-en">Lower chart: income from adjusting only at the close</span></span>
+      <span style="color:var(--control)"><i class="dash"></i><span class="l-zh">下图：租金 24.71</span><span class="l-en">Lower chart: rent 24.71</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">时刻</div><div class="d" id="inT"></div><div class="d2" id="inTb"></div></div>
-      <div class="stat"><div class="k">手里的股票</div><div class="d" id="inH"></div><div class="d2">每张 call 对应</div></div>
-      <div class="stat"><div class="k">调仓次数</div><div class="d" id="inN"></div><div class="d2" id="inNb"></div></div>
-      <div class="stat"><div class="k">这一天的收入（美元一张）</div><div class="d" id="inI" style="color:var(--result)"></div><div class="d2" id="inIb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">时刻</span><span class="l-en">Time</span></div><div class="d" id="inT"></div><div class="d2" id="inTb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">手里的股票</span><span class="l-en">Shares held</span></div><div class="d" id="inH"></div><div class="d2"><span class="l-zh">每张 call 对应</span><span class="l-en">Per call</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">调仓次数</span><span class="l-en">Adjustments</span></div><div class="d" id="inN"></div><div class="d2" id="inNb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这一天的收入（美元一张）</span><span class="l-en">Income for the day ($ per contract)</span></div><div class="d" id="inI" style="color:var(--result)"></div><div class="d2" id="inIb"></div></div>
     </div>
     <div class="say plain" id="inSay"></div>
   </div>
-  <p>按每 2 美元调，这一天调了 26 次：卖 13 次，买 13 次，收入 134.33 美元，是租金的 5.4 倍。只在收盘调一次的人，收入 54.50：收盘比前一天跌了 3.59%，超过 2.42% 的门槛，也赚了，但盘中那些来回，它一笔也没做。间隔换成 1 美元或 4 美元，收入是 127.33 和 124.85。这一天多挣的钱来自盘中调了仓，间隔大小是次要的。</p>
-  <p>这一天股价来回走，调得勤占了便宜。单边走的日子相反：4.1 看过 4/15，TSLA 一路涨了 7.58%，按小时调仓一路卖在半路，没有跌回来买的机会，比收盘调一次少赚。4.1 用这笔交易的数字模拟了 10 万条路径：每天调一次，结果的一个标准差是 ±333 美元一张；每小时调一次是 ±129；两种的平均都接近 0。</p>
+  <p><span class="l-zh">按每 2 美元调，这一天调了 26 次：卖 13 次，买 13 次，收入 134.33 美元，是租金的 5.4 倍。只在收盘调一次的人，收入 54.50：收盘比前一天跌了 3.59%，超过 2.42% 的门槛，也赚了，但盘中那些来回，它一笔也没做。间隔换成 1 美元或 4 美元，收入是 127.33 和 124.85。这一天多挣的钱来自盘中调了仓，间隔大小是次要的。</span><span class="l-en">Adjusting every $2, there were 26 adjustments that day: 13 sales and 13 purchases, for income of $134.33, 5.4 times the rent. Someone who adjusted only once at the close earned 54.50: the close was 3.59% below the previous day, beyond the 2.42% threshold, so that also made money, but it captured none of the intraday back-and-forth. With a $1 or $4 interval, the income is 127.33 and 124.85. The extra money that day came from adjusting intraday; the size of the interval matters less.</span></p>
+  <p><span class="l-zh">这一天股价来回走，调得勤占了便宜。单边走的日子相反：4.1 看过 4/15，TSLA 一路涨了 7.58%，按小时调仓一路卖在半路，没有跌回来买的机会，比收盘调一次少赚。4.1 用这笔交易的数字模拟了 10 万条路径：每天调一次，结果的一个标准差是 ±333 美元一张；每小时调一次是 ±129；两种的平均都接近 0。</span><span class="l-en">On this day the stock went back and forth, which favored frequent adjustment. On one-way days it is the opposite: 4.1 looked at 4/15, when TSLA rose 7.58% in a steady climb; hourly adjustments kept selling partway up, never got a pullback to buy on, and made less than adjusting once at the close. 4.1 simulated 100,000 paths with this trade's numbers: adjusting once a day, one standard deviation of the result is ±$333 per contract; adjusting hourly, ±129; both average close to 0.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>24 天账本</h2>
-  <p class="sub">把 4/23 这样的日子连起来：4/13 收盘按中间价 21.05 买 1 张 350 call，卖出 55.77 股（按 46.3% 算 delta 是 0.5577，报价快照里是 0.5574）；之后每个收盘按新的 delta 调一次；5/15 <span class="sym" data-say="期权的买方使用权利：call 按行权价买入标的（2.1）。到期时实值的 call 会被行权，拿到股价减行权价。">行权</span>。</p>
-  <p>4.1 用每天报价快照里的 delta 对冲，那个 delta 随当天的隐含波动率变，同一笔交易到期是 +6.92（整股），允许<span class="sym" data-say="不到 1 股的股数，例如 55.77 股里的 0.77 股（4.1）。">零碎股</span>是 +1.18。这里 delta 和每天的期权价值都固定按买入时的 46.3% 算，每天的账就只剩两笔：股价变动带来的<b>收入</b>，和时间流逝付掉的<b>租金</b>。到期那天，模型价值就是内在价值，所以 24 天的总账是真实的现金。股数保留两位小数，结果是 −34.53；按整股取整是 −46.19。同样按零碎股，这里比 4.1 少约 36 美元，差别来自每天卖空的股数：两种 delta 每天最多差 0.03（4/24），也就是 3 股。</p>
+  <h2><span class="l-zh"><span class="n">三</span>24 天账本</span><span class="l-en"><span class="n">3</span>The 24-day ledger</span></h2>
+  <p class="sub"><span class="l-zh">把 4/23 这样的日子连起来：4/13 收盘按中间价 21.05 买 1 张 350 call，卖出 55.77 股（按 46.3% 算 delta 是 0.5577，报价快照里是 0.5574）；之后每个收盘按新的 delta 调一次；5/15 <span class="sym" data-say="期权的买方使用权利：call 按行权价买入标的（2.1）。到期时实值的 call 会被行权，拿到股价减行权价。">行权</span>。</span><span class="l-en">String days like 4/23 together: at the 4/13 close, buy 1 contract of the 350 call at the mid price of 21.05 and sell 55.77 shares (delta at 46.3% is 0.5577; the quote snapshot has 0.5574); after that, adjust once at each close to the new delta; on 5/15, <span class="sym" data-say="The option buyer uses the right: a call buys the underlying at the strike (2.1). An in-the-money call is exercised at expiration and pays the stock price minus the strike.">exercise</span>.</span></p>
+  <p><span class="l-zh">4.1 用每天报价快照里的 delta 对冲，那个 delta 随当天的隐含波动率变，同一笔交易到期是 +6.92（整股），允许<span class="sym" data-say="不到 1 股的股数，例如 55.77 股里的 0.77 股（4.1）。">零碎股</span>是 +1.18。这里 delta 和每天的期权价值都固定按买入时的 46.3% 算，每天的账就只剩两笔：股价变动带来的<b>收入</b>，和时间流逝付掉的<b>租金</b>。到期那天，模型价值就是内在价值，所以 24 天的总账是真实的现金。股数保留两位小数，结果是 −34.53；按整股取整是 −46.19。同样按零碎股，这里比 4.1 少约 36 美元，差别来自每天卖空的股数：两种 delta 每天最多差 0.03（4/24），也就是 3 股。</span><span class="l-en">4.1 hedged with the delta from each day's quote snapshot, which moves with that day's implied volatility; the same trade ended at +6.92 at expiration (whole shares), or +1.18 with <span class="sym" data-say="A number of shares below 1, for example the 0.77 in 55.77 shares (4.1).">fractional shares</span>. Here delta and the daily option value are both fixed at the 46.3% from the purchase, so each day's books have just two items: <b>income</b> from the stock's move, and <b>rent</b> paid for the passage of time. On expiration day the model value equals the intrinsic value, so the 24-day total is real cash. With shares kept to two decimal places the result is −34.53; rounded to whole shares it is −46.19. Comparing fractional shares in both, this is about $36 less than 4.1, and the difference comes from the number of shares short each day: the two deltas differ by at most 0.03 on any day (4/24), which is 3 shares.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="ldPlay">逐天播放</button></div>
-    <svg id="ldC" viewBox="0 0 720 470" role="img" aria-label="TSLA 24 个交易日的收盘、每天回本的门槛，以及累计收入与累计租金"></svg>
+    <div class="bar"><button class="btn ghost" id="ldPlay"><span class="l-zh">逐天播放</span><span class="l-en">Play day by day</span></button></div>
+    <svg id="ldC" viewBox="0 0 720 470" role="img" aria-label="TSLA 24 个交易日的收盘、每天回本的门槛，以及累计收入与累计租金" data-en-aria-label="TSLA closes over the 24 trading days, each day's break-even threshold, and cumulative income and cumulative rent"></svg>
     <div class="legend">
-      <span><i class="band"></i>竖条：这一天的门槛，前一天收盘 ± 一个标准差</span>
-      <span style="color:var(--result)"><i class="dot" style="background:var(--result)"></i>这一天赚</span>
-      <span style="color:var(--control)"><i class="dot" style="background:var(--control)"></i>这一天亏</span>
-      <span style="color:var(--ink-faint)"><i class="ring"></i>不到 1 美元</span>
-      <span>下图：累计收入与累计租金</span>
+      <span><i class="band"></i><span class="l-zh">竖条：这一天的门槛，前一天收盘 ± 一个标准差</span><span class="l-en">Vertical bar: the day's threshold, previous close ± one standard deviation</span></span>
+      <span style="color:var(--result)"><i class="dot" style="background:var(--result)"></i><span class="l-zh">这一天赚</span><span class="l-en">Gain that day</span></span>
+      <span style="color:var(--control)"><i class="dot" style="background:var(--control)"></i><span class="l-zh">这一天亏</span><span class="l-en">Loss that day</span></span>
+      <span style="color:var(--ink-faint)"><i class="ring"></i><span class="l-zh">不到 1 美元</span><span class="l-en">Under $1</span></span>
+      <span><span class="l-zh">下图：累计收入与累计租金</span><span class="l-en">Lower chart: cumulative income and cumulative rent</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="ldD"></div><div class="d2" id="ldDb"></div></div>
-      <div class="stat"><div class="k">当天涨跌</div><div class="d" id="ldM"></div><div class="d2" id="ldMb"></div></div>
-      <div class="stat"><div class="k">收盘调仓</div><div class="d" id="ldT"></div><div class="d2" id="ldTb"></div></div>
-      <div class="stat"><div class="k">当天（美元一张）</div><div class="d" id="ldP"></div><div class="d2" id="ldPb"></div></div>
-      <div class="stat"><div class="k">累计收入 − 租金</div><div class="d" id="ldC2"></div><div class="d2" id="ldCb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="ldD"></div><div class="d2" id="ldDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">当天涨跌</span><span class="l-en">Day's move</span></div><div class="d" id="ldM"></div><div class="d2" id="ldMb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">收盘调仓</span><span class="l-en">Close adjustment</span></div><div class="d" id="ldT"></div><div class="d2" id="ldTb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">当天（美元一张）</span><span class="l-en">That day ($ per contract)</span></div><div class="d" id="ldP"></div><div class="d2" id="ldPb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">累计收入 − 租金</span><span class="l-en">Cumulative income − rent</span></div><div class="d" id="ldC2"></div><div class="d2" id="ldCb"></div></div>
     </div>
     <div class="say plain" id="ldSay"></div>
   </div>
-  <p>落在门槛外的 9 天里，6 天赚；另外 3 天（5/12、5/13、5/15）call 已经<span class="sym" data-say="call 的行权价远低于股价。delta 接近 1，gamma 接近 0，和 100 股股票几乎一样（2.1、2.2）。实值是行权价低于股价，虚值是高于股价。">深度实值</span>，delta 到了 1，gamma 是 0，不赚不亏。落在门槛内的 15 天里，10 天亏，3 天不到 1 美元；5/1 和 5/6 涨了 2.37% 和 2.34%，只差门槛不到 0.1 个百分点，反而赚了 2.77 和 3.88 美元。原因是实值 call 的 delta 会随时间自己往 1 走，前一天收盘调好的股数到第二天已经略少，上涨的日子因此多赚一点，节点 6 讲这种漂移。</p>
+  <p><span class="l-zh">落在门槛外的 9 天里，6 天赚；另外 3 天（5/12、5/13、5/15）call 已经<span class="sym" data-say="call 的行权价远低于股价。delta 接近 1，gamma 接近 0，和 100 股股票几乎一样（2.1、2.2）。实值是行权价低于股价，虚值是高于股价。">深度实值</span>，delta 到了 1，gamma 是 0，不赚不亏。落在门槛内的 15 天里，10 天亏，3 天不到 1 美元；5/1 和 5/6 涨了 2.37% 和 2.34%，只差门槛不到 0.1 个百分点，反而赚了 2.77 和 3.88 美元。原因是实值 call 的 delta 会随时间自己往 1 走，前一天收盘调好的股数到第二天已经略少，上涨的日子因此多赚一点，节点 6 讲这种漂移。</span><span class="l-en">Of the 9 days that landed outside the threshold, 6 made money; on the other 3 (5/12, 5/13, 5/15) the call was already <span class="sym" data-say="A call whose strike is far below the stock price. Delta is close to 1 and gamma close to 0, so it behaves almost exactly like 100 shares of stock (2.1, 2.2). In the money means the strike is below the stock price; out of the money means above.">deep in the money</span>, delta had reached 1 and gamma was 0, so they neither gained nor lost. Of the 15 days inside the threshold, 10 lost money and 3 moved less than $1; 5/1 and 5/6 rose 2.37% and 2.34%, less than 0.1 percentage point short of the threshold, yet made $2.77 and $3.88. The reason is that an in-the-money call's delta drifts toward 1 by itself over time, so the shares adjusted at the previous close are slightly too few by the next day, and up days earn a little extra. Node 6 covers this drift.</span></p>
   <div class="tscroll">
   <table style="max-width:36rem">
-    <thead><tr><th>项目</th><th>美元一张</th></tr></thead>
+    <thead><tr><th><span class="l-zh">项目</span><span class="l-en">Item</span></th><th><span class="l-zh">美元一张</span><span class="l-en">$ per contract</span></th></tr></thead>
     <tbody>
-      <tr><td>期权：21.05 买入，5/15 按内在价值 72.32 结算</td><td class="pos">+5,127.00</td></tr>
-      <tr><td>股票：先卖 55.77 股，之后收盘调仓 20 次（卖 13 次、买 7 次）</td><td class="neg">−5,273.02</td></tr>
-      <tr><td>手里现金的利息（4.3%）</td><td class="pos">+111.48</td></tr>
-      <tr class="tot"><td>合计</td><td>−34.53</td></tr>
-      <tr class="sub"><td>其中：24 天的收入合计</td><td>+570.05</td></tr>
-      <tr class="sub"><td>其中：24 天的租金合计</td><td>−604.58</td></tr>
+      <tr><td><span class="l-zh">期权：21.05 买入，5/15 按内在价值 72.32 结算</span><span class="l-en">Option: bought at 21.05, settled at intrinsic value 72.32 on 5/15</span></td><td class="pos">+5,127.00</td></tr>
+      <tr><td><span class="l-zh">股票：先卖 55.77 股，之后收盘调仓 20 次（卖 13 次、买 7 次）</span><span class="l-en">Stock: sell 55.77 shares first, then 20 adjustments at the close (13 sales, 7 purchases)</span></td><td class="neg">−5,273.02</td></tr>
+      <tr><td><span class="l-zh">手里现金的利息（4.3%）</span><span class="l-en">Interest on cash held (4.3%)</span></td><td class="pos">+111.48</td></tr>
+      <tr class="tot"><td><span class="l-zh">合计</span><span class="l-en">Total</span></td><td>−34.53</td></tr>
+      <tr class="sub"><td><span class="l-zh">其中：24 天的收入合计</span><span class="l-en">Of which: total income over 24 days</span></td><td>+570.05</td></tr>
+      <tr class="sub"><td><span class="l-zh">其中：24 天的租金合计</span><span class="l-en">Of which: total rent over 24 days</span></td><td>−604.58</td></tr>
     </tbody>
   </table>
   </div>
-  <p>讲义把这件事叫一场赛跑：一边是期权价值随时间衰减，一边是动态对冲产生的现金。市价高于理论值，衰减赢；低于理论值，对冲赢；相等，打平。这一次按 46.3% 的市价买入，事后接近打平：−34.53，是<span class="sym" data-say="买期权付出的钱。这张 350 call 按中间价是 21.05 × 100 ＝ 2,105 美元一张（1.1）。">权利金</span> 2,105 的 1.6%。</p>
+  <p><span class="l-zh">讲义把这件事叫一场赛跑：一边是期权价值随时间衰减，一边是动态对冲产生的现金。市价高于理论值，衰减赢；低于理论值，对冲赢；相等，打平。这一次按 46.3% 的市价买入，事后接近打平：−34.53，是<span class="sym" data-say="买期权付出的钱。这张 350 call 按中间价是 21.05 × 100 ＝ 2,105 美元一张（1.1）。">权利金</span> 2,105 的 1.6%。</span><span class="l-en">The lecture notes call this a race: on one side the option's value decays with time, on the other side dynamic hedging generates cash. If the market price is above theoretical value, decay wins; below it, hedging wins; equal, a tie. This time the option was bought at the market price of 46.3%, and after the fact it came close to a tie: −34.53, 1.6% of the <span class="sym" data-say="The money paid to buy the option. For this 350 call at the mid price it is 21.05 × 100 = $2,105 per contract (1.1).">premium</span> of 2,105.</span></p>
 
-  <h3>实际波动略高，为什么还是小亏</h3>
-  <p>按第一节的日历折法，这 24 天的实际波动是 47.4%，比 46.3% 还高一点，账本却是 −34.53。收入只在 gamma 大的日子进账：</p>
+  <h3><span class="l-zh">实际波动略高，为什么还是小亏</span><span class="l-en">Realized volatility was slightly higher, so why a small loss?</span></h3>
+  <p><span class="l-zh">按第一节的日历折法，这 24 天的实际波动是 47.4%，比 46.3% 还高一点，账本却是 −34.53。收入只在 gamma 大的日子进账：</span><span class="l-en">On section 1's calendar scaling, realized volatility over these 24 days is 47.4%, a bit above 46.3%, yet the ledger shows −34.53. Income only comes in on days when gamma is large:</span></p>
   <ul>
-    <li>4/14、4/15 两天，期权离<span class="sym" data-say="at the money。行权价约等于股价。gamma 在这里最大（2.1、2.2）。">平值</span>近，gamma 大。这两天的涨跌平方占全程的 35.0%，收入占全部收入的 55.9%。</li>
-    <li>5/7 到 5/15 这 7 天，delta 从 5/6 收盘的 0.97 走到 1，call 和 100 股股票几乎一样，再大的涨跌也收不到多少钱。这 7 天的涨跌平方占全程的 39.9%，收入只占 5.9%。</li>
+    <li><span class="l-zh">4/14、4/15 两天，期权离<span class="sym" data-say="at the money。行权价约等于股价。gamma 在这里最大（2.1、2.2）。">平值</span>近，gamma 大。这两天的涨跌平方占全程的 35.0%，收入占全部收入的 55.9%。</span><span class="l-en">On 4/14 and 4/15 the option was close to <span class="sym" data-say="At the money. The strike is about equal to the stock price. Gamma is largest here (2.1, 2.2).">at the money</span> and gamma was large. These two days account for 35.0% of the squared moves over the whole period and 55.9% of all income.</span></li>
+    <li><span class="l-zh">5/7 到 5/15 这 7 天，delta 从 5/6 收盘的 0.97 走到 1，call 和 100 股股票几乎一样，再大的涨跌也收不到多少钱。这 7 天的涨跌平方占全程的 39.9%，收入只占 5.9%。</span><span class="l-en">Over the 7 days from 5/7 to 5/15, delta went from 0.97 at the 5/6 close to 1, the call behaved almost exactly like 100 shares, and even large moves brought in little money. These 7 days account for 39.9% of the squared moves but only 5.9% of the income.</span></li>
   </ul>
-  <p>第一节的「平方加起来」假定 gamma 乘股价的平方每天一样：每天的收入和租金都乘着这个数，它不变，才能只比涨跌的平方。这 24 天期权从平值附近走到深度实值，gamma 一路掉到 0，这个乘积变了很多，要比的是乘积大的那些天动得够不够。事后倒推，这条路径自己的盈亏平衡波动率是 45.07%：当初如果按 45.07% 的价格 20.54 买入，同样按 45.07% 对冲，到期正好打平。买在 46.3%，多付了约 1.2 个点。</p>
+  <p><span class="l-zh">第一节的「平方加起来」假定 gamma 乘股价的平方每天一样：每天的收入和租金都乘着这个数，它不变，才能只比涨跌的平方。这 24 天期权从平值附近走到深度实值，gamma 一路掉到 0，这个乘积变了很多，要比的是乘积大的那些天动得够不够。事后倒推，这条路径自己的盈亏平衡波动率是 45.07%：当初如果按 45.07% 的价格 20.54 买入，同样按 45.07% 对冲，到期正好打平。买在 46.3%，多付了约 1.2 个点。</span><span class="l-en">Section 1's "add up the squares" assumes gamma times the squared stock price is the same every day: both daily income and daily rent are multiplied by this number, and only if it stays constant can you compare the squared moves alone. Over these 24 days the option went from near the money to deep in the money and gamma fell all the way to 0, so this product changed a lot; what matters is whether the price moved enough on the days when the product was large. Worked backward after the fact, this path's own break-even volatility is 45.07%: had the option been bought at the 45.07% price of 20.54 and hedged at 45.07%, it would have broken exactly even at expiration. Buying at 46.3% overpaid by about 1.2 points.</span></p>
 
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>盈亏平衡线</h2>
-  <p class="sub">一条路径只是一次。把 TSLA 过去 5.7 年里每一段连续 24 个交易日的真实涨跌，按原来的顺序套到这笔交易上，看赚亏和实际波动率的关系。</p>
-  <p>每一段都从 352.36 出发，照那 24 天的涨跌依次走；4/13 按 21.05 买入 350 call，每个收盘按 46.3% 的 delta 调仓，5/15 结算，周末放在和这笔交易一样的位置。第一段从 2020-08-03 收盘开始，最后一段从 2026-03-09 开始，共 1406 段。相邻两段有 23 天重叠，所以这些点不是互相独立的。每一段的实际波动率按第一节的日历折法算：24 个涨跌的平方加起来，按 32/365 年折成一年。</p>
+  <h2><span class="l-zh"><span class="n">四</span>盈亏平衡线</span><span class="l-en"><span class="n">4</span>The break-even line</span></h2>
+  <p class="sub"><span class="l-zh">一条路径只是一次。把 TSLA 过去 5.7 年里每一段连续 24 个交易日的真实涨跌，按原来的顺序套到这笔交易上，看赚亏和实际波动率的关系。</span><span class="l-en">One path is only one try. Take every run of 24 consecutive trading days of real TSLA moves over the past 5.7 years, apply them in their original order to this trade, and look at how the P&amp;L relates to realized volatility.</span></p>
+  <p><span class="l-zh">每一段都从 352.36 出发，照那 24 天的涨跌依次走；4/13 按 21.05 买入 350 call，每个收盘按 46.3% 的 delta 调仓，5/15 结算，周末放在和这笔交易一样的位置。第一段从 2020-08-03 收盘开始，最后一段从 2026-03-09 开始，共 1406 段。相邻两段有 23 天重叠，所以这些点不是互相独立的。每一段的实际波动率按第一节的日历折法算：24 个涨跌的平方加起来，按 32/365 年折成一年。</span><span class="l-en">Each run starts from 352.36 and follows those 24 days of moves in order; buy the 350 call at 21.05 on 4/13, adjust at each close with the delta at 46.3%, settle on 5/15, and put the weekends in the same places as in this trade. The first run starts at the close on 2020-08-03 and the last starts on 2026-03-09, 1406 runs in all. Neighboring runs share 23 days, so the dots are not independent of each other. Each run's realized volatility uses section 1's calendar scaling: add up the squares of the 24 moves and scale from 32/365 of a year to a full year.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="wnPlay">再放一遍</button></div>
-    <div class="stage"><div class="cvw"><canvas id="wn" width="264" height="190" aria-label="1406 段历史行情：横轴实际波动率，纵轴对冲到期的盈亏"></canvas><div class="cvax" id="wnax" aria-hidden="true"></div></div></div>
+    <div class="bar"><button class="btn ghost" id="wnPlay"><span class="l-zh">再放一遍</span><span class="l-en">Replay</span></button></div>
+    <div class="stage"><div class="cvw"><canvas id="wn" width="264" height="190" aria-label="1406 段历史行情：横轴实际波动率，纵轴对冲到期的盈亏" data-en-aria-label="1406 historical runs: realized volatility across, P&amp;L after hedging to expiration up"></canvas><div class="cvax" id="wnax" aria-hidden="true"></div></div></div>
     <div class="legend">
-      <span style="color:var(--result)"><i style="background:var(--result)"></i>这一段赚</span>
-      <span style="color:var(--control)"><i style="background:var(--control)"></i>这一段亏</span>
-      <span>竖点线：买入时的隐含波动率 46.3%</span>
-      <span><i class="ln" style="background:var(--ink)"></i>实际波动率相近的各段，盈亏的中位数</span>
-      <span><i style="background:var(--ink);width:.55rem;height:.55rem"></i>方块：这一次（47.4%，−34.53）</span>
-      <span>超出上下边的点画在边上</span>
+      <span style="color:var(--result)"><i style="background:var(--result)"></i><span class="l-zh">这一段赚</span><span class="l-en">Run made money</span></span>
+      <span style="color:var(--control)"><i style="background:var(--control)"></i><span class="l-zh">这一段亏</span><span class="l-en">Run lost money</span></span>
+      <span><span class="l-zh">竖点线：买入时的隐含波动率 46.3%</span><span class="l-en">Vertical dotted line: implied volatility at purchase, 46.3%</span></span>
+      <span><i class="ln" style="background:var(--ink)"></i><span class="l-zh">实际波动率相近的各段，盈亏的中位数</span><span class="l-en">Median P&amp;L of runs with similar realized volatility</span></span>
+      <span><i style="background:var(--ink);width:.55rem;height:.55rem"></i><span class="l-zh">方块：这一次（47.4%，−34.53）</span><span class="l-en">Square: this trade (47.4%, −34.53)</span></span>
+      <span><span class="l-zh">超出上下边的点画在边上</span><span class="l-en">Dots beyond the top or bottom are drawn at the edge</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已套用</div><div class="d" id="wnN"></div><div class="d2">共 1406 段</div></div>
-      <div class="stat"><div class="k">实际高于 46.3% 的段里，赚钱的</div><div class="d" id="wnU" style="color:var(--result)"></div><div class="d2" id="wnUb"></div></div>
-      <div class="stat"><div class="k">实际低于 46.3% 的段里，亏钱的</div><div class="d" id="wnD" style="color:var(--control)"></div><div class="d2" id="wnDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已套用</span><span class="l-en">Applied</span></div><div class="d" id="wnN"></div><div class="d2"><span class="l-zh">共 1406 段</span><span class="l-en">of 1406 runs</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">实际高于 46.3% 的段里，赚钱的</span><span class="l-en">Runs with realized above 46.3% that made money</span></div><div class="d" id="wnU" style="color:var(--result)"></div><div class="d2" id="wnUb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">实际低于 46.3% 的段里，亏钱的</span><span class="l-en">Runs with realized below 46.3% that lost money</span></div><div class="d" id="wnD" style="color:var(--control)"></div><div class="d2" id="wnDb"></div></div>
     </div>
     <div class="say plain" id="wnSay"></div>
   </div>
-  <p>实际波动率高于 46.3% 的 1090 段里，92.8% 赚钱；低于 46.3% 的 316 段里，94.3% 亏钱。图里的实线是<span class="sym" data-say="median。把实际波动率相近（前后 2 个点以内）的各段盈亏从低到高排开，取正中间的那个：一半比它低，一半比它高（2.1）。">中位数</span>线，它在 44% 到 46% 之间穿过 0。只看实际波动率在 36% 到 58% 之间的 588 段，用一条直线去贴这些点，直线在 46.79% 处穿过 0，比买入时的 46.3% 高约半个点。46.79% 就是这批历史行情给出的盈亏平衡点：实际波动率高于它，对冲的买方大多赚；低于它，大多亏。</p>
-  <p>盈亏平衡点附近的点上下都有。实际波动率在 44% 到 48% 的 76 段里，赚钱的占 57%。离盈亏平衡点近的时候，赚亏由路径决定：大的涨跌落在 gamma 大的日子就赚，落在期权已经深度实值或<span class="sym" data-say="out of the money。call 的行权价高于股价，现在行权没用。离得越远，gamma 越小（2.1、2.2）。">虚值</span>的日子就收不到钱。第三节的这一次属于后一种。</p>
+  <p><span class="l-zh">实际波动率高于 46.3% 的 1090 段里，92.8% 赚钱；低于 46.3% 的 316 段里，94.3% 亏钱。图里的实线是<span class="sym" data-say="median。把实际波动率相近（前后 2 个点以内）的各段盈亏从低到高排开，取正中间的那个：一半比它低，一半比它高（2.1）。">中位数</span>线，它在 44% 到 46% 之间穿过 0。只看实际波动率在 36% 到 58% 之间的 588 段，用一条直线去贴这些点，直线在 46.79% 处穿过 0，比买入时的 46.3% 高约半个点。46.79% 就是这批历史行情给出的盈亏平衡点：实际波动率高于它，对冲的买方大多赚；低于它，大多亏。</span><span class="l-en">Of the 1090 runs with realized volatility above 46.3%, 92.8% made money; of the 316 runs below 46.3%, 94.3% lost money. The solid line in the chart is the <span class="sym" data-say="Median. Sort the P&amp;L of runs with similar realized volatility (within 2 points either side) from low to high and take the one in the middle: half are below it and half above (2.1).">median</span> line, and it crosses 0 between 44% and 46%. Taking only the 588 runs with realized volatility between 36% and 58% and fitting a straight line to them, the line crosses 0 at 46.79%, about half a point above the 46.3% at purchase. 46.79% is the break-even point these historical runs give: with realized volatility above it, a hedged buyer mostly makes money; below it, mostly loses.</span></p>
+  <p><span class="l-zh">盈亏平衡点附近的点上下都有。实际波动率在 44% 到 48% 的 76 段里，赚钱的占 57%。离盈亏平衡点近的时候，赚亏由路径决定：大的涨跌落在 gamma 大的日子就赚，落在期权已经深度实值或<span class="sym" data-say="out of the money。call 的行权价高于股价，现在行权没用。离得越远，gamma 越小（2.1、2.2）。">虚值</span>的日子就收不到钱。第三节的这一次属于后一种。</span><span class="l-en">Near the break-even point there are dots both above and below. Of the 76 runs with realized volatility between 44% and 48%, 57% made money. Close to break-even, the path decides: if the big moves land on days when gamma is large, you make money; if they land on days when the option is already deep in the money or <span class="sym" data-say="Out of the money. The call's strike is above the stock price, so exercising now is worthless. The farther away, the smaller the gamma (2.1, 2.2).">out of the money</span>, you collect nothing. The trade in section 3 is the second kind.</span></p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>买方与卖方各自在赌什么</h2>
-  <p class="sub">对冲以后，方向不再算数。买方和卖方赌的是同一件事的两边：到期前实际来多大的波动。</p>
+  <h2><span class="l-zh"><span class="n">五</span>买方与卖方各自在赌什么</span><span class="l-en"><span class="n">5</span>What buyers and sellers each bet on</span></h2>
+  <p class="sub"><span class="l-zh">对冲以后，方向不再算数。买方和卖方赌的是同一件事的两边：到期前实际来多大的波动。</span><span class="l-en">After hedging, direction no longer counts. The buyer and the seller bet on two sides of the same thing: how large the realized moves are before expiration.</span></p>
   <div class="tscroll">
   <table>
-    <thead><tr><th></th><th class="txt">买方：买期权，每天对冲</th><th class="txt">卖方：卖期权，每天对冲</th></tr></thead>
+    <thead><tr><th></th><th class="txt"><span class="l-zh">买方：买期权，每天对冲</span><span class="l-en">Buyer: buys the option, hedges daily</span></th><th class="txt"><span class="l-zh">卖方：卖期权，每天对冲</span><span class="l-en">Seller: sells the option, hedges daily</span></th></tr></thead>
     <tbody>
-      <tr><td>gamma 与 theta</td><td class="txt">gamma 为正，theta 为负：付租</td><td class="txt">gamma 为负，theta 为正：收租</td></tr>
-      <tr><td>赌的是</td><td class="txt">实际波动率高于自己的盈亏平衡波动率</td><td class="txt">实际波动率低于自己的盈亏平衡波动率</td></tr>
-      <tr><td>每一天</td><td class="txt">动过门槛的日子赚，没动过的日子亏</td><td class="txt">反过来</td></tr>
-      <tr><td>对冲时的买卖</td><td class="txt">涨了卖、跌了买：低买高卖</td><td class="txt">涨了买、跌了卖：高买低卖</td></tr>
-      <tr><td>TSLA 350 call，按中间价 21.05 成交</td><td class="txt">−34.53 美元一张</td><td class="txt">+34.53 美元一张</td></tr>
-      <tr><td>按对自己不利的一边成交</td><td class="txt">卖一 21.10 买入：盈亏平衡 46.42%，结果 −39.55</td><td class="txt">买一 21.00 卖出：盈亏平衡 46.18%，结果 +29.52</td></tr>
+      <tr><td><span class="l-zh">gamma 与 theta</span><span class="l-en">Gamma and theta</span></td><td class="txt"><span class="l-zh">gamma 为正，theta 为负：付租</span><span class="l-en">Positive gamma, negative theta: pays rent</span></td><td class="txt"><span class="l-zh">gamma 为负，theta 为正：收租</span><span class="l-en">Negative gamma, positive theta: collects rent</span></td></tr>
+      <tr><td><span class="l-zh">赌的是</span><span class="l-en">Bets that</span></td><td class="txt"><span class="l-zh">实际波动率高于自己的盈亏平衡波动率</span><span class="l-en">Realized volatility is above their break-even volatility</span></td><td class="txt"><span class="l-zh">实际波动率低于自己的盈亏平衡波动率</span><span class="l-en">Realized volatility is below their break-even volatility</span></td></tr>
+      <tr><td><span class="l-zh">每一天</span><span class="l-en">Each day</span></td><td class="txt"><span class="l-zh">动过门槛的日子赚，没动过的日子亏</span><span class="l-en">Gains on days that move past the threshold, loses on days that don't</span></td><td class="txt"><span class="l-zh">反过来</span><span class="l-en">The reverse</span></td></tr>
+      <tr><td><span class="l-zh">对冲时的买卖</span><span class="l-en">Trades while hedging</span></td><td class="txt"><span class="l-zh">涨了卖、跌了买：低买高卖</span><span class="l-en">Sell after a rise, buy after a drop: buy low, sell high</span></td><td class="txt"><span class="l-zh">涨了买、跌了卖：高买低卖</span><span class="l-en">Buy after a rise, sell after a drop: buy high, sell low</span></td></tr>
+      <tr><td><span class="l-zh">TSLA 350 call，按中间价 21.05 成交</span><span class="l-en">TSLA 350 call, filled at the mid price of 21.05</span></td><td class="txt"><span class="l-zh">−34.53 美元一张</span><span class="l-en">−$34.53 per contract</span></td><td class="txt"><span class="l-zh">+34.53 美元一张</span><span class="l-en">+$34.53 per contract</span></td></tr>
+      <tr><td><span class="l-zh">按对自己不利的一边成交</span><span class="l-en">Filled on the side that works against you</span></td><td class="txt"><span class="l-zh">卖一 21.10 买入：盈亏平衡 46.42%，结果 −39.55</span><span class="l-en">Buy at the 21.10 ask: break-even 46.42%, result −39.55</span></td><td class="txt"><span class="l-zh">买一 21.00 卖出：盈亏平衡 46.18%，结果 +29.52</span><span class="l-en">Sell at the 21.00 bid: break-even 46.18%, result +29.52</span></td></tr>
     </tbody>
   </table>
   </div>
-  <p>卖方的对冲正好反过来：卖出 call 以后要买入 delta 股，股价涨了 delta 变大，要再买；跌了要卖。每次调仓都是追涨杀跌，这就是它收租的代价。表的最后一行：实际波动率落在 46.18% 和 46.42% 之间时，两个人都亏，这段差价给了报价的<span class="sym" data-say="market maker。同时挂出买价和卖价、靠两者之差赚钱的人。21.00 买进、21.10 卖出，一来一回赚 0.10（支线 M）。">做市商</span>（支线 M 讲）。</p>
+  <p><span class="l-zh">卖方的对冲正好反过来：卖出 call 以后要买入 delta 股，股价涨了 delta 变大，要再买；跌了要卖。每次调仓都是追涨杀跌，这就是它收租的代价。表的最后一行：实际波动率落在 46.18% 和 46.42% 之间时，两个人都亏，这段差价给了报价的<span class="sym" data-say="market maker。同时挂出买价和卖价、靠两者之差赚钱的人。21.00 买进、21.10 卖出，一来一回赚 0.10（支线 M）。">做市商</span>（支线 M 讲）。</span><span class="l-en">The seller's hedge is exactly the reverse: after selling a call you buy delta shares; when the stock rises delta grows and you buy more; when it falls you sell. Every adjustment chases the move, and that is the cost of collecting rent. The last row of the table: when realized volatility lands between 46.18% and 46.42%, both of them lose, and that spread goes to the <span class="sym" data-say="Market maker. Someone who posts a bid and an ask at the same time and earns the difference. Buying at 21.00 and selling at 21.10 earns 0.10 per round trip (side track M).">market maker</span> posting the quotes (covered in side track M).</span></p>
 
-  <h3>两种账本的样子</h3>
+  <h3><span class="l-zh">两种账本的样子</span><span class="l-en">What the two ledgers look like</span></h3>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="bsSeg">
-        <button data-s="1" aria-pressed="true">买方</button>
-        <button data-s="-1" aria-pressed="false">卖方</button>
+        <button data-s="1" aria-pressed="true"><span class="l-zh">买方</span><span class="l-en">Buyer</span></button>
+        <button data-s="-1" aria-pressed="false"><span class="l-zh">卖方</span><span class="l-en">Seller</span></button>
       </div>
     </div>
-    <svg id="bsC" viewBox="0 0 720 250" role="img" aria-label="24 个交易日每天的盈亏，从大到小排列"></svg>
+    <svg id="bsC" viewBox="0 0 720 250" role="img" aria-label="24 个交易日每天的盈亏，从大到小排列" data-en-aria-label="Daily P&amp;L over the 24 trading days, sorted from largest to smallest"></svg>
   </div>
-  <p>买方的 24 天：10 天亏，最多的一天 −86.65（4/27，周一，背了三天的租金）；8 天赚，最多的一天 +231.90（4/15，涨了 7.58%），是 4/14 那天租金 30.04 的 7.7 倍。多数日子小亏，少数日子大赚。卖方正好反过来：多数日子小赚，怕的是 4/15 这样的一天。</p>
+  <p><span class="l-zh">买方的 24 天：10 天亏，最多的一天 −86.65（4/27，周一，背了三天的租金）；8 天赚，最多的一天 +231.90（4/15，涨了 7.58%），是 4/14 那天租金 30.04 的 7.7 倍。多数日子小亏，少数日子大赚。卖方正好反过来：多数日子小赚，怕的是 4/15 这样的一天。</span><span class="l-en">The buyer's 24 days: 10 losing days, the worst −86.65 (4/27, a Monday carrying three days of rent); 8 winning days, the best +231.90 (4/15, up 7.58%), 7.7 times the 30.04 rent on 4/14. Small losses on most days, large gains on a few. The seller is exactly the reverse: small gains on most days, and the fear is a day like 4/15.</span></p>
 
-  <h3>讲义的判据</h3>
-  <p>讲义（S4）的判据：按自己认为的未来波动率算出理论值。市价高于理论值，时间衰减会赢，做卖方；市价低于理论值，对冲产生的现金会赢，做买方；相等，打平。讲义收尾的一句是：期权的价格是隐含波动率，价值是未来的实际波动率；价高值低做卖方，价低值高做买方。</p>
-  <p>不对冲的买方另当别论：持有到期的 call 只看到期价，赌的是方向加波动（1.2、4.1）。本节说的买方和卖方都每天对冲。</p>
+  <h3><span class="l-zh">讲义的判据</span><span class="l-en">The lecture's rule</span></h3>
+  <p><span class="l-zh">讲义（S4）的判据：按自己认为的未来波动率算出理论值。市价高于理论值，时间衰减会赢，做卖方；市价低于理论值，对冲产生的现金会赢，做买方；相等，打平。讲义收尾的一句是：期权的价格是隐含波动率，价值是未来的实际波动率；价高值低做卖方，价低值高做买方。</span><span class="l-en">The lecture's rule (S4): compute the theoretical value using your own estimate of future volatility. If the market price is above theoretical value, time decay will win, so be the seller; if it is below, the cash from hedging will win, so be the buyer; if equal, it is a tie. The lecture closes with: an option's price is its implied volatility, its value is the future realized volatility; when price is high and value low, sell; when price is low and value high, buy.</span></p>
+  <p><span class="l-zh">不对冲的买方另当别论：持有到期的 call 只看到期价，赌的是方向加波动（1.2、4.1）。本节说的买方和卖方都每天对冲。</span><span class="l-en">An unhedged buyer is a different matter: a call held to expiration depends only on the price at expiration and is a bet on direction plus volatility (1.2, 4.1). The buyers and sellers in this section all hedge daily.</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>买贵了还是买便宜了</h2>
-  <p class="sub">判断的方法：拿盈亏平衡波动率，和自己对「从现在到到期」实际波动的预测比。预测高于它，期权便宜，买入并对冲；预测低于它，期权贵，卖出并对冲。</p>
-  <p>2026-04-13 收盘，六只股票最接近平值的 5/15 到期 call，都按中间价买入，按各自的隐含波动率每天对冲到 5/15。先看买的时候知道的：</p>
+  <h2><span class="l-zh"><span class="n">六</span>买贵了还是买便宜了</span><span class="l-en"><span class="n">6</span>Bought expensive or bought cheap?</span></h2>
+  <p class="sub"><span class="l-zh">判断的方法：拿盈亏平衡波动率，和自己对「从现在到到期」实际波动的预测比。预测高于它，期权便宜，买入并对冲；预测低于它，期权贵，卖出并对冲。</span><span class="l-en">How to judge: compare the break-even volatility with your own forecast of realized volatility from now to expiration. If the forecast is higher, the option is cheap: buy and hedge. If the forecast is lower, the option is expensive: sell and hedge.</span></p>
+  <p><span class="l-zh">2026-04-13 收盘，六只股票最接近平值的 5/15 到期 call，都按中间价买入，按各自的隐含波动率每天对冲到 5/15。先看买的时候知道的：</span><span class="l-en">At the close on 2026-04-13, take the 5/15 call closest to the money on six stocks, buy each at the mid price, and hedge daily to 5/15 at its own implied volatility. First, what was known at the time of purchase:</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>标的</th><th>收盘</th><th>行权价</th><th>中间价</th><th>盈亏平衡波动率</th><th>回本一天要动</th><th>历史：前一年</th><th>历史：前一个月</th></tr></thead>
+    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th><span class="l-zh">收盘</span><span class="l-en">Close</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">中间价</span><span class="l-en">Mid</span></th><th><span class="l-zh">盈亏平衡波动率</span><span class="l-en">Break-even volatility</span></th><th><span class="l-zh">回本一天要动</span><span class="l-en">Daily move to pay for itself</span></th><th><span class="l-zh">历史：前一年</span><span class="l-en">Historical: prior year</span></th><th><span class="l-zh">历史：前一个月</span><span class="l-en">Historical: prior month</span></th></tr></thead>
     <tbody id="tkA"></tbody>
   </table>
   </div>
-  <p class="tiny">盈亏平衡波动率由中间价反解（t ＝ 32/365，利率 4.3%，不派息），和报价快照自己给的隐含波动率差不到 0.2 个点。「回本一天要动」是一个日历日的门槛：收盘价 × 盈亏平衡波动率 ÷ √365。历史波动率的算法同 1.2（对数涨跌，零均值，× 16）：前一年是 2025-04-14 收盘以来的 249 个交易日，前一个月是最后 21 个交易日。AMD、INTC、META、NVDA、PLTR 的分钟线在前一年里各有 6 到 9 天在收盘前就断了，这几天没有收盘价，跨过去的涨跌算两天，平方加起来以后仍除以 249。前一年的历史高于盈亏平衡的标蓝，低于的标橙。</p>
-  <p>再看事后：</p>
+  <p class="tiny"><span class="l-zh">盈亏平衡波动率由中间价反解（t ＝ 32/365，利率 4.3%，不派息），和报价快照自己给的隐含波动率差不到 0.2 个点。「回本一天要动」是一个日历日的门槛：收盘价 × 盈亏平衡波动率 ÷ √365。历史波动率的算法同 1.2（对数涨跌，零均值，× 16）：前一年是 2025-04-14 收盘以来的 249 个交易日，前一个月是最后 21 个交易日。AMD、INTC、META、NVDA、PLTR 的分钟线在前一年里各有 6 到 9 天在收盘前就断了，这几天没有收盘价，跨过去的涨跌算两天，平方加起来以后仍除以 249。前一年的历史高于盈亏平衡的标蓝，低于的标橙。</span><span class="l-en">Break-even volatility is solved from the mid price (t = 32/365, 4.3% interest, no dividend) and differs from the quote snapshot's own implied volatility by less than 0.2 points. "Daily move to pay for itself" is the threshold for one calendar day: close × break-even volatility ÷ √365. Historical volatility is computed as in 1.2 (log returns, zero mean, × 16): the prior year is the 249 trading days since the 2025-04-14 close, the prior month is the last 21 trading days. For AMD, INTC, META, NVDA and PLTR, the minute bars over the prior year each stop before the close on 6 to 9 days; those days have no closing price, the move across them counts as two days, and after adding up the squares the total is still divided by 249. Prior-year historical above break-even is marked blue; below, orange.</span></p>
+  <p><span class="l-zh">再看事后：</span><span class="l-en">Then, after the fact:</span></p>
   <div class="tscroll">
   <table class="wide2">
-    <thead><tr><th>标的</th><th>5/15 收盘</th><th>之后 32 天实际波动</th><th>减盈亏平衡（个点）</th><th>对冲的买方（美元一张）</th><th>占权利金</th></tr></thead>
+    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th><span class="l-zh">5/15 收盘</span><span class="l-en">5/15 close</span></th><th><span class="l-zh">之后 32 天实际波动</span><span class="l-en">Realized volatility over the next 32 days</span></th><th><span class="l-zh">减盈亏平衡（个点）</span><span class="l-en">Minus break-even (points)</span></th><th><span class="l-zh">对冲的买方（美元一张）</span><span class="l-en">Hedged buyer ($ per contract)</span></th><th><span class="l-zh">占权利金</span><span class="l-en">Share of premium</span></th></tr></thead>
     <tbody id="tkB"></tbody>
   </table>
   </div>
-  <p class="tiny">实际波动按第一节的日历折法：之后 24 个日涨跌的平方加起来，按 32/365 年折成一年。</p>
-  <p>事后看，AMD、INTC、NVDA 的实际波动远高于盈亏平衡，这三张买便宜了，对冲的买方赚了权利金的 17.5%、42.9%、22.8%。PLTR 的实际波动比盈亏平衡低 14.5 个点，买贵了，对冲的买方亏掉权利金的 28.3%，卖方赚这么多。TSLA 和 META 的实际波动离盈亏平衡只差 1 个多点，对冲下来都是 −1.6%，接近打平。</p>
-  <p>可是买的时候只看得到历史。拿前一年的历史波动率当预测：TSLA、AMD、NVDA 的历史高于盈亏平衡，看起来便宜；INTC、META、PLTR 的历史低于盈亏平衡，看起来贵。事后，AMD、NVDA、PLTR 猜对了；INTC 猜错了：前一年的历史 63.5% 说它贵，之后的实际波动是 123.6%，卖出的人亏掉权利金的 42.9%；TSLA 和 META 的结果都在权利金的 ±2% 以内，接近打平。AMD 和 INTC 这一个月分别涨了 71.9% 和 66.9%，这样的行情从历史里看不出来。判断的方法没有问题，难在预测：1.2 讲过，历史波动率只是过去。</p>
+  <p class="tiny"><span class="l-zh">实际波动按第一节的日历折法：之后 24 个日涨跌的平方加起来，按 32/365 年折成一年。</span><span class="l-en">Realized volatility uses section 1's calendar scaling: add up the squares of the next 24 daily moves and scale from 32/365 of a year to a full year.</span></p>
+  <p><span class="l-zh">事后看，AMD、INTC、NVDA 的实际波动远高于盈亏平衡，这三张买便宜了，对冲的买方赚了权利金的 17.5%、42.9%、22.8%。PLTR 的实际波动比盈亏平衡低 14.5 个点，买贵了，对冲的买方亏掉权利金的 28.3%，卖方赚这么多。TSLA 和 META 的实际波动离盈亏平衡只差 1 个多点，对冲下来都是 −1.6%，接近打平。</span><span class="l-en">After the fact, realized volatility for AMD, INTC and NVDA was far above break-even. These three were bought cheap, and the hedged buyer made 17.5%, 42.9% and 22.8% of the premium. PLTR's realized volatility was 14.5 points below break-even: it was bought expensive, the hedged buyer lost 28.3% of the premium, and the seller made that much. For TSLA and META, realized volatility was only a little over 1 point from break-even, and both hedged results were −1.6%, close to a tie.</span></p>
+  <p><span class="l-zh">可是买的时候只看得到历史。拿前一年的历史波动率当预测：TSLA、AMD、NVDA 的历史高于盈亏平衡，看起来便宜；INTC、META、PLTR 的历史低于盈亏平衡，看起来贵。事后，AMD、NVDA、PLTR 猜对了；INTC 猜错了：前一年的历史 63.5% 说它贵，之后的实际波动是 123.6%，卖出的人亏掉权利金的 42.9%；TSLA 和 META 的结果都在权利金的 ±2% 以内，接近打平。AMD 和 INTC 这一个月分别涨了 71.9% 和 66.9%，这样的行情从历史里看不出来。判断的方法没有问题，难在预测：1.2 讲过，历史波动率只是过去。</span><span class="l-en">But at the time of purchase only history is visible. Use prior-year historical volatility as the forecast: for TSLA, AMD and NVDA, history is above break-even, so they look cheap; for INTC, META and PLTR, history is below break-even, so they look expensive. After the fact, AMD, NVDA and PLTR were called correctly. INTC was called wrong: its prior-year history of 63.5% said it was expensive, realized volatility afterward was 123.6%, and whoever sold it lost 42.9% of the premium. TSLA and META both ended within ±2% of the premium, close to a tie. AMD and INTC rose 71.9% and 66.9% that month, a move that history gave no sign of. The method of judging is fine; the hard part is the forecast. As 1.2 explained, historical volatility is only the past.</span></p>
 
-  <h3>按自己的预测算一张</h3>
-  <p>给定一个对之后实际波动的预测，按它算这张 call 值多少，再和中间价比。默认的预测是前一年的历史波动率。</p>
+  <h3><span class="l-zh">按自己的预测算一张</span><span class="l-en">Price one with your own forecast</span></h3>
+  <p><span class="l-zh">给定一个对之后实际波动的预测，按它算这张 call 值多少，再和中间价比。默认的预测是前一年的历史波动率。</span><span class="l-en">Given a forecast of realized volatility from here on, compute what this call is worth at that forecast and compare it with the mid price. The default forecast is the prior year's historical volatility.</span></p>
   <div class="panel">
     <div class="bar"><div class="seg" id="fcSeg"></div></div>
-    <div class="ctl"><label><span>预测的实际波动率</span><span class="v" id="fcV"></span></label>
+    <div class="ctl"><label><span><span class="l-zh">预测的实际波动率</span><span class="l-en">Forecast realized volatility</span></span><span class="v" id="fcV"></span></label>
       <input type="range" id="fcR" min="20" max="130" step="0.1" value="49.3"></div>
     <div class="stats">
-      <div class="stat"><div class="k">盈亏平衡波动率</div><div class="d" id="fcB" style="color:var(--control)"></div><div class="d2" id="fcBb"></div></div>
-      <div class="stat"><div class="k">按预测，这张 call 值（每股）</div><div class="d" id="fcW"></div><div class="d2" id="fcWb"></div></div>
-      <div class="stat"><div class="k">和中间价比（美元一张）</div><div class="d" id="fcG"></div><div class="d2" id="fcGb"></div></div>
-      <div class="stat"><div class="k">回本一天要动</div><div class="d" id="fcM"></div><div class="d2" id="fcMb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">盈亏平衡波动率</span><span class="l-en">Break-even volatility</span></div><div class="d" id="fcB" style="color:var(--control)"></div><div class="d2" id="fcBb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">按预测，这张 call 值（每股）</span><span class="l-en">Value of this call at the forecast (per share)</span></div><div class="d" id="fcW"></div><div class="d2" id="fcWb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">和中间价比（美元一张）</span><span class="l-en">Versus the mid price ($ per contract)</span></div><div class="d" id="fcG"></div><div class="d2" id="fcGb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">回本一天要动</span><span class="l-en">Daily move to pay for itself</span></div><div class="d" id="fcM"></div><div class="d2" id="fcMb"></div></div>
     </div>
     <div class="say plain" id="fcSay"></div>
   </div>
@@ -516,59 +517,64 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">七</span>费曼检验</span><span class="l-en"><span class="n">7</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section id="glo-sec" style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">盈亏平衡波动率</div><div class="t">break-even volatility。按某个价格买入期权并对冲到到期，实际波动率正好是它时不赚不赔。按市价买时，就是隐含波动率。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">让模型价值等于市价的 σ（1.2）。</div></div>
-      <div class="gl"><div class="s">σ<sub>隐含</sub>, σ<sub>平衡</sub></div><div class="t">隐含波动率、盈亏平衡波动率的代号。按市价买入时两者相等。</div></div>
-      <div class="gl"><div class="s">实际波动率</div><div class="t">事后按真实涨跌量出的波动率。本页按日历时间折算：涨跌的平方加起来，乘 365 ÷ 天数，再开根号。</div></div>
-      <div class="gl"><div class="s">历史波动率</div><div class="t">用过去真实的日涨跌算出的波动率。算法同 1.2：对数涨跌，零均值，× 16。TSLA 入场前一年是 49.3%（1.2）。</div></div>
-      <div class="gl"><div class="s">σ</div><div class="t">读作「西格玛」，年化波动率。本页多数时候指盈亏平衡波动率 46.3%。</div></div>
-      <div class="gl"><div class="s">模型价值 / 理论值</div><div class="t">把某个 σ 填进定价模型算出来的期权价值。本页叫模型价值，4.1 叫理论值，是同一个东西（2.2、4.1）。</div></div>
-      <div class="gl"><div class="s">Black-Scholes</div><div class="t">本页用的定价模型：用股价、行权价、波动率、离到期的时间和利率算出期权价值和 delta，都按不派息算（2.1）。</div></div>
-      <div class="gl"><div class="s">delta</div><div class="t">股价动 1 美元，期权价格变多少。一张合约要卖出 100 × delta 股才对冲得住（2.1）。</div></div>
-      <div class="gl"><div class="s">对冲 / delta 中性</div><div class="t">买入期权后卖出 delta 股标的，股价涨跌带来的盈亏被抵掉，仓位的 delta 是 0，叫 delta 中性（2.1、4.1）。</div></div>
-      <div class="gl"><div class="s">gamma（Γ）</div><div class="t">股价动 1 美元，delta 变多少（2.2）。平值附近最大，深度实值和虚值时接近 0。</div></div>
-      <div class="gl"><div class="s">theta</div><div class="t">标的不动时，期权每过一天变便宜多少（2.2）。</div></div>
-      <div class="gl"><div class="s">内在价值</div><div class="t">到期时期权本身值的钱：call 是股价减行权价，股价不到行权价就是 0（1.1）。</div></div>
-      <div class="gl"><div class="s">权利金</div><div class="t">买期权付出的钱。TSLA 350 call 按中间价是 21.05 × 100 ＝ 2,105 美元一张（1.1）。</div></div>
-      <div class="gl"><div class="s">一张</div><div class="t">一张期权合约对应 100 股。报价是每股的价，乘 100 是一张的钱（1.1）。</div></div>
-      <div class="gl"><div class="s">行权 / 行权价</div><div class="t">行权是期权的买方使用权利：call 按行权价买入标的。行权价是合约里约定的那个价，本页的 TSLA 是 350（2.1）。</div></div>
-      <div class="gl"><div class="s">平值 / 实值 / 深度实值 / 虚值</div><div class="t">call 的行权价约等于股价是平值，低于股价是实值，低得多是深度实值（delta 接近 1），高于股价是虚值（2.1）。</div></div>
-      <div class="gl"><div class="s">gamma scalping</div><div class="t">持有 gamma 为正的仓位并按 delta 对冲，靠「涨了卖、跌了买」的差价挣钱，用来抵每天的租金。</div></div>
-      <div class="gl"><div class="s">收入</div><div class="t">股价变动给对冲好的仓位带来的钱，一天约 ½ × Γ × (ΔS)²。</div></div>
-      <div class="gl"><div class="s">租金</div><div class="t">对冲好的仓位因为时间流逝付掉的钱：theta 扣掉手里现金的利息。卖空股票收到的钱比权利金多，多出来的现金按利率生息。</div></div>
-      <div class="gl"><div class="s">门槛</div><div class="t">一天回本要动的幅度：S × σ × √(天数 ÷ 365)，就是这一天的一个标准差。</div></div>
-      <div class="gl"><div class="s">S, ΔS</div><div class="t">股价；一天里股价涨跌了多少美元。</div></div>
-      <div class="gl"><div class="s">m</div><div class="t">股价一趟来回的幅度，美元。一张合约来回一趟赚 100 × Γ × m²。</div></div>
-      <div class="gl"><div class="s">天数</div><div class="t">上一个收盘到这一个收盘隔几个日历日：平时 1，周一 3。</div></div>
-      <div class="gl"><div class="s">零碎股</div><div class="t">不到 1 股的股数，例如 55.77 股里的 0.77 股（4.1）。本页的账本按零碎股算。</div></div>
-      <div class="gl"><div class="s">straddle</div><div class="t">同一行权价、同一到期日的 call 和 put 各买一张（3.2）。</div></div>
-      <div class="gl"><div class="s">vega</div><div class="t">隐含波动率变 1 个百分点，期权价格变多少（2.3）。</div></div>
-      <div class="gl"><div class="s">买一 / 卖一 / 中间价</div><div class="t">市场上最高的买价、最低的卖价、两者的平均（1.1）。</div></div>
-      <div class="gl"><div class="s">做市商</div><div class="t">同时挂出买价和卖价、靠两者之差赚钱的人（支线 M）。</div></div>
-      <div class="gl"><div class="s">中位数</div><div class="t">把一组数从低到高排开，正中间的那个：一半比它低，一半比它高（2.1）。</div></div>
-      <div class="gl"><div class="s">赛跑</div><div class="t">讲义的说法：时间衰减和对冲现金之间的比赛。市价高于理论值衰减赢，低于理论值对冲赢。</div></div>
+      <div class="gl"><div class="s"><span class="l-zh">盈亏平衡波动率</span><span class="l-en">Break-even volatility</span></div><div class="t"><span class="l-zh">break-even volatility。按某个价格买入期权并对冲到到期，实际波动率正好是它时不赚不赔。按市价买时，就是隐含波动率。</span><span class="l-en">Break-even volatility. If you buy an option at a given price and hedge it to expiration, you break even when realized volatility is exactly this number. When you buy at the market price, it is the implied volatility.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></div><div class="t"><span class="l-zh">让模型价值等于市价的 σ（1.2）。</span><span class="l-en">The σ that makes the model value equal the market price (1.2).</span></div></div>
+      <div class="gl"><div class="s">σ<span class="l-zh"><sub>隐含</sub>, σ<sub>平衡</sub></span><span class="l-en"><sub>implied</sub>, σ<sub>break-even</sub></span></div><div class="t"><span class="l-zh">隐含波动率、盈亏平衡波动率的代号。按市价买入时两者相等。</span><span class="l-en">Symbols for implied volatility and break-even volatility. They are equal when you buy at the market price.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">实际波动率</span><span class="l-en">Realized volatility</span></div><div class="t"><span class="l-zh">事后按真实涨跌量出的波动率。本页按日历时间折算：涨跌的平方加起来，乘 365 ÷ 天数，再开根号。</span><span class="l-en">Volatility measured after the fact from the real moves. This page scales by calendar time: add up the squared moves, multiply by 365 ÷ days, then take the square root.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">历史波动率</span><span class="l-en">Historical volatility</span></div><div class="t"><span class="l-zh">用过去真实的日涨跌算出的波动率。算法同 1.2：对数涨跌，零均值，× 16。TSLA 入场前一年是 49.3%（1.2）。</span><span class="l-en">Volatility computed from past real daily moves. Same method as 1.2: log returns, zero mean, × 16. For TSLA, the year before entry was 49.3% (1.2).</span></div></div>
+      <div class="gl"><div class="s">σ</div><div class="t"><span class="l-zh">读作「西格玛」，年化波动率。本页多数时候指盈亏平衡波动率 46.3%。</span><span class="l-en">Read "sigma"; annualized volatility. On this page it mostly means the break-even volatility of 46.3%.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">模型价值 / 理论值</span><span class="l-en">Model value / theoretical value</span></div><div class="t"><span class="l-zh">把某个 σ 填进定价模型算出来的期权价值。本页叫模型价值，4.1 叫理论值，是同一个东西（2.2、4.1）。</span><span class="l-en">The option value computed by putting some σ into the pricing model. This page calls it model value and 4.1 calls it theoretical value; it is the same thing (2.2, 4.1).</span></div></div>
+      <div class="gl"><div class="s">Black-Scholes</div><div class="t"><span class="l-zh">本页用的定价模型：用股价、行权价、波动率、离到期的时间和利率算出期权价值和 delta，都按不派息算（2.1）。</span><span class="l-en">The pricing model used on this page: from stock price, strike, volatility, time to expiration and interest rate it computes the option value and delta, always with no dividend (2.1).</span></div></div>
+      <div class="gl"><div class="s">delta</div><div class="t"><span class="l-zh">股价动 1 美元，期权价格变多少。一张合约要卖出 100 × delta 股才对冲得住（2.1）。</span><span class="l-en">How much the option price changes when the stock moves $1. One contract needs 100 × delta shares sold to be hedged (2.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">对冲 / delta 中性</span><span class="l-en">Hedge / delta neutral</span></div><div class="t"><span class="l-zh">买入期权后卖出 delta 股标的，股价涨跌带来的盈亏被抵掉，仓位的 delta 是 0，叫 delta 中性（2.1、4.1）。</span><span class="l-en">After buying an option, sell delta shares of the underlying; the gains and losses from stock moves are offset, and the position's delta is 0, called delta neutral (2.1, 4.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">gamma（Γ）</span><span class="l-en">Gamma (Γ)</span></div><div class="t"><span class="l-zh">股价动 1 美元，delta 变多少（2.2）。平值附近最大，深度实值和虚值时接近 0。</span><span class="l-en">How much delta changes when the stock moves $1 (2.2). Largest near the money; close to 0 when deep in the money or out of the money.</span></div></div>
+      <div class="gl"><div class="s">theta</div><div class="t"><span class="l-zh">标的不动时，期权每过一天变便宜多少（2.2）。</span><span class="l-en">How much cheaper the option gets each day if the underlying doesn't move (2.2).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">内在价值</span><span class="l-en">Intrinsic value</span></div><div class="t"><span class="l-zh">到期时期权本身值的钱：call 是股价减行权价，股价不到行权价就是 0（1.1）。</span><span class="l-en">What the option itself is worth at expiration: for a call, the stock price minus the strike, or 0 if the stock is below the strike (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">权利金</span><span class="l-en">Premium</span></div><div class="t"><span class="l-zh">买期权付出的钱。TSLA 350 call 按中间价是 21.05 × 100 ＝ 2,105 美元一张（1.1）。</span><span class="l-en">The money paid to buy the option. For the TSLA 350 call at the mid price it is 21.05 × 100 = $2,105 per contract (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">一张</span><span class="l-en">Contract</span></div><div class="t"><span class="l-zh">一张期权合约对应 100 股。报价是每股的价，乘 100 是一张的钱（1.1）。</span><span class="l-en">One option contract covers 100 shares. Quotes are per share; multiply by 100 for one contract (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">行权 / 行权价</span><span class="l-en">Exercise / strike</span></div><div class="t"><span class="l-zh">行权是期权的买方使用权利：call 按行权价买入标的。行权价是合约里约定的那个价，本页的 TSLA 是 350（2.1）。</span><span class="l-en">Exercise is the option buyer using the right: a call buys the underlying at the strike. The strike is the price set in the contract; for the TSLA option on this page it is 350 (2.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">平值 / 实值 / 深度实值 / 虚值</span><span class="l-en">At the money / in the money / deep in the money / out of the money</span></div><div class="t"><span class="l-zh">call 的行权价约等于股价是平值，低于股价是实值，低得多是深度实值（delta 接近 1），高于股价是虚值（2.1）。</span><span class="l-en">A call is at the money when the strike is about equal to the stock price, in the money when the strike is below it, deep in the money when far below (delta close to 1), and out of the money when the strike is above it (2.1).</span></div></div>
+      <div class="gl"><div class="s">gamma scalping</div><div class="t"><span class="l-zh">持有 gamma 为正的仓位并按 delta 对冲，靠「涨了卖、跌了买」的差价挣钱，用来抵每天的租金。</span><span class="l-en">Holding a positive-gamma position and hedging it by delta, earning the difference from selling after rises and buying after drops, to pay the daily rent.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">收入</span><span class="l-en">Income</span></div><div class="t"><span class="l-zh">股价变动给对冲好的仓位带来的钱，一天约 ½ × Γ × (ΔS)²。</span><span class="l-en">The money a hedged position earns from the stock's move, about ½ × Γ × (ΔS)² per day.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">租金</span><span class="l-en">Rent</span></div><div class="t"><span class="l-zh">对冲好的仓位因为时间流逝付掉的钱：theta 扣掉手里现金的利息。卖空股票收到的钱比权利金多，多出来的现金按利率生息。</span><span class="l-en">What a hedged position pays as time passes: theta minus the interest on the cash you hold. Selling stock short brings in more than the premium, and the extra cash earns interest.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">门槛</span><span class="l-en">Threshold</span></div><div class="t"><span class="l-zh">一天回本要动的幅度：S × σ × √(天数 ÷ 365)，就是这一天的一个标准差。</span><span class="l-en">The move needed for a day to pay for itself: S × σ × √(days ÷ 365), which is one standard deviation for that day.</span></div></div>
+      <div class="gl"><div class="s">S, ΔS</div><div class="t"><span class="l-zh">股价；一天里股价涨跌了多少美元。</span><span class="l-en">Stock price; how many dollars the stock moved in a day.</span></div></div>
+      <div class="gl"><div class="s">m</div><div class="t"><span class="l-zh">股价一趟来回的幅度，美元。一张合约来回一趟赚 100 × Γ × m²。</span><span class="l-en">The size of one round trip in the stock price, in dollars. One contract earns 100 × Γ × m² per round trip.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">天数</span><span class="l-en">Days</span></div><div class="t"><span class="l-zh">上一个收盘到这一个收盘隔几个日历日：平时 1，周一 3。</span><span class="l-en">Calendar days from the previous close to this close: usually 1, and 3 on Monday.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">零碎股</span><span class="l-en">Fractional shares</span></div><div class="t"><span class="l-zh">不到 1 股的股数，例如 55.77 股里的 0.77 股（4.1）。本页的账本按零碎股算。</span><span class="l-en">A number of shares below 1, for example the 0.77 in 55.77 shares (4.1). The ledger on this page uses fractional shares.</span></div></div>
+      <div class="gl"><div class="s">straddle</div><div class="t"><span class="l-zh">同一行权价、同一到期日的 call 和 put 各买一张（3.2）。</span><span class="l-en">Buy one call and one put with the same strike and the same expiration (3.2).</span></div></div>
+      <div class="gl"><div class="s">vega</div><div class="t"><span class="l-zh">隐含波动率变 1 个百分点，期权价格变多少（2.3）。</span><span class="l-en">How much the option price changes when implied volatility changes 1 percentage point (2.3).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">买一 / 卖一 / 中间价</span><span class="l-en">Bid / ask / mid</span></div><div class="t"><span class="l-zh">市场上最高的买价、最低的卖价、两者的平均（1.1）。</span><span class="l-en">The highest bid in the market, the lowest ask, and the average of the two (1.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">做市商</span><span class="l-en">Market maker</span></div><div class="t"><span class="l-zh">同时挂出买价和卖价、靠两者之差赚钱的人（支线 M）。</span><span class="l-en">Someone who posts a bid and an ask at the same time and earns the difference (side track M).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">中位数</span><span class="l-en">Median</span></div><div class="t"><span class="l-zh">把一组数从低到高排开，正中间的那个：一半比它低，一半比它高（2.1）。</span><span class="l-en">Sort a set of numbers from low to high and take the one in the middle: half are below it and half above (2.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">赛跑</span><span class="l-en">Race</span></div><div class="t"><span class="l-zh">讲义的说法：时间衰减和对冲现金之间的比赛。市价高于理论值衰减赢，低于理论值对冲赢。</span><span class="l-en">The lecture's term for the contest between time decay and hedging cash. If the market price is above theoretical value, decay wins; below it, hedging wins.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-6-risk-dynamics.html"><b>6 风险的动态演化</b></a>：今天对冲好的仓位，明天为什么会偏离；delta 和 gamma 会自己往哪边漂。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-6-risk-dynamics.html"><b>6 风险的动态演化</b></a>：今天对冲好的仓位，明天为什么会偏离；delta 和 gamma 会自己往哪边漂。</span><span class="l-en">Next: <a href="station-6-risk-dynamics.html"><b>6 How risk evolves</b></a>: why a position hedged today drifts away by tomorrow, and which way delta and gamma drift on their own.</span></p>
+  <p><a href="./"><span class="l-zh">← 回到课程路线图</span><span class="l-en">← Back to the course roadmap</span></a></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
 <script>
+/* 英文模式（lang.js）：页面标题，以及带 data-en-* 的悬停说明、title、aria-label 换成英文 */
+document.title=L(document.title,'Gamma Scalping');
+if(LANG==='en') document.querySelectorAll('[data-en-say],[data-en-title],[data-en-aria-label],[data-en-placeholder]').forEach(e=>{
+  for(const a of ['say','title','aria-label','placeholder']){ const v=e.getAttribute('data-en-'+a); if(v!=null) e.setAttribute(a==='say'?'data-say':a,v); }
+});
 const $ = id => document.getElementById(id);
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const sgn = (n,d=2) => { const r=+n.toFixed(d); return (r>0?'+':r<0?'−':'')+Math.abs(n).toFixed(d); };   // 四舍五入后是 0 就不带正负号
@@ -670,8 +676,8 @@ function runLoop(s,ms,step,draw,done){
 /* ══════════ 〇 · 模型价值随 σ 变，和市价的交点 ══════════ */
 const BEC=(()=>{
   const MODE={
-    lec:{pts:BE.lec, px:5.50, be:36.40, lo:10, hi:70, ymax:12, step:2, pxTxt:'5.50', pxSub:'讲义：June 100 call 的市价'},
-    tsla:{pts:BE.tsla, px:21.05, be:BE.iv[1], lo:20, hi:80, ymax:36, step:5, pxTxt:'21.05', pxSub:`买一 21.00 · 卖一 21.10`}
+    lec:{pts:BE.lec, px:5.50, be:36.40, lo:10, hi:70, ymax:12, step:2, pxTxt:'5.50', pxSub:L('讲义：June 100 call 的市价','Lecture notes: market price of the June 100 call')},
+    tsla:{pts:BE.tsla, px:21.05, be:BE.iv[1], lo:20, hi:80, ymax:36, step:5, pxTxt:'21.05', pxSub:L(`买一 21.00 · 卖一 21.10`,`Bid 21.00 · ask 21.10`)}
   };
   let mode='lec'; const s={p:1, playing:false};
   const val=(m,x)=>{ const p=m.pts, i=Math.min(p.length-2,Math.max(0,Math.floor((x-p[0][0])/2))); const f=(x-p[i][0])/2; return p[i][1]+(p[i+1][1]-p[i][1])*f; };
@@ -685,24 +691,26 @@ const BEC=(()=>{
       g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10.5);
     }
     for(let x=m.lo; x<=m.hi; x+=10) g+=lab(X(x),B+18,x+'%','var(--ink-faint)','middle',10.5);
-    g+=lab((L+R)/2,B+38,'波动率 σ','var(--ink-soft)','middle',11.5);
+    g+=lab((L+R)/2,B+38,window.L('波动率 σ','Volatility σ'),'var(--ink-soft)','middle',11.5);
     const sp=m.lo+s.p*(m.hi-m.lo);
     // 市价横线
     g+=`<line x1="${L}" y1="${Y(m.px)}" x2="${R}" y2="${Y(m.px)}" stroke="var(--control)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
-    g+=lab(R,Y(m.px)-7,'市价 '+m.pxTxt,'var(--control)','end',11.5);
+    g+=lab(R,Y(m.px)-7,window.L('市价 ','Market')+m.pxTxt,'var(--control)','end',11.5);
     // 曲线，画到 sp
     let pts=[]; for(let x=m.lo; x<=sp+1e-9; x+=0.5) pts.push(X(x).toFixed(1)+','+Y(val(m,Math.min(x,m.hi))).toFixed(1));
     pts.push(X(sp).toFixed(1)+','+Y(val(m,sp)).toFixed(1));
     g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ink-soft)" stroke-width="2.4"/>`;
     if(mode==='lec' && sp>=42.56){
       g+=`<circle cx="${X(42.56)}" cy="${Y(6.55)}" r="5" fill="var(--result)"/>`;
-      g+=lab(X(42.56)-10*FS,Y(6.55)-10,'按 42.56% 算的理论值 6.55','var(--result)','end',11);
+      g+= window.LANG==='en'   // 英文太长，手机上分两行
+        ? lab(X(42.56)-10*FS,Y(6.55)-10-14*FS,'Theoretical value','var(--result)','end',11)+lab(X(42.56)-10*FS,Y(6.55)-10,'6.55 at 42.56%','var(--result)','end',11)
+        : lab(X(42.56)-10*FS,Y(6.55)-10,'按 42.56% 算的理论值 6.55','var(--result)','end',11);
     }
     if(sp>=m.be){
       g+=`<line x1="${X(m.be)}" y1="${Y(m.px)}" x2="${X(m.be)}" y2="${B}" stroke="var(--control)" stroke-width="1.6"/>`;
       g+=`<circle cx="${X(m.be)}" cy="${Y(m.px)}" r="5.5" fill="var(--control)"/>`;
       g+=lab(X(m.be)+8,B-8,m.be.toFixed(2)+'%','var(--control)','start',12,'600');
-      g+=lab(X(m.be)+8,Y(m.px)+20,'盈亏平衡 ＝ 隐含','var(--control)','start',11);
+      g+=lab(X(m.be)+8,Y(m.px)+20,window.L('盈亏平衡 ＝ 隐含','Break-even = implied'),'var(--control)','start',11);
     }
     g+=`<circle cx="${X(sp)}" cy="${Y(val(m,sp))}" r="3.5" fill="var(--ink)"/>`;
     $('beC').innerHTML=g;
@@ -712,8 +720,8 @@ const BEC=(()=>{
     const say=$('beSay');
     if(s.p<1){ say.textContent=''; return; }
     say.textContent= mode==='lec'
-      ? `σ 为 36.40% 时，模型价值等于市价 5.50。按 5.50 买入并对冲，之后的实际波动率高于 36.40% 就赚，低于就亏。按 42.56% 算的理论值 6.55 比市价高 1.05，乘 100 张就是 4.1 那笔对冲预测挣到的 105.00。`
-      : `σ 为 ${f2(m.be)}% 时，模型价值等于中间价 21.05。σ 每高 1 个点，这张 call 的模型价值约多 0.41 美元，所以 21.00 到 21.10 的买卖价差只对应 ${f2(BE.iv[0])}% 到 ${f2(BE.iv[2])}%。`;
+      ? window.L(`σ 为 36.40% 时，模型价值等于市价 5.50。按 5.50 买入并对冲，之后的实际波动率高于 36.40% 就赚，低于就亏。按 42.56% 算的理论值 6.55 比市价高 1.05，乘 100 张就是 4.1 那笔对冲预测挣到的 105.00。`,`At σ = 36.40%, the model value equals the market price of 5.50. If you buy at 5.50 and hedge, you make money if realized volatility afterward is above 36.40% and lose if it is below. The theoretical value of 6.55 at 42.56% is 1.05 above the market price; times 100 contracts, that is the 105.00 the hedge in 4.1 was predicted to earn.`)
+      : window.L(`σ 为 ${f2(m.be)}% 时，模型价值等于中间价 21.05。σ 每高 1 个点，这张 call 的模型价值约多 0.41 美元，所以 21.00 到 21.10 的买卖价差只对应 ${f2(BE.iv[0])}% 到 ${f2(BE.iv[2])}%。`,`At σ = ${f2(m.be)}%, the model value equals the 21.05 mid price. Each point of σ adds about $0.41 to this call's model value, so the 21.00 to 21.10 bid-ask spread covers only ${f2(BE.iv[0])}% to ${f2(BE.iv[2])}%.`);
   }
   function start(){
     s.playing=false; s.p=0;
@@ -757,14 +765,14 @@ const IN=(()=>{
     let g='';
     for(let v=370; v<=390; v+=5){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width=".7"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10.5); }
     for(let v=0; v<=iMax*1.05; v+=50){ g+=`<line x1="${L}" y1="${Y2(v)}" x2="${R}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v===0?1.1:.7}"/>`; g+=lab(L-7,Y2(v)+4,v,'var(--ink-faint)','end',10.5); }
-    [[-1,'前收'],[89,'11:00'],[179,'12:30'],[269,'14:00'],[389,'16:00']].forEach(([k,t])=>{
+    [[-1,window.L('前收','Prev close')],[89,'11:00'],[179,'12:30'],[269,'14:00'],[389,'16:00']].forEach(([k,t])=>{
       g+=lab(X(k),H-14,t,'var(--ink-faint)',k<0?'start':k===389?'end':'middle',10.5);
       g+=`<line x1="${X(k)}" y1="${B2}" x2="${X(k)}" y2="${B2+5}" stroke="var(--ink-faint)"/>`;
     });
-    g+=lab(L,T2-10,'收入，美元一张','var(--ink-soft)','start',11);
+    g+=lab(L,T2-10,window.L('收入，美元一张','Income, $ per contract'),'var(--ink-soft)','start',11);
     // 租金线
     g+=`<line x1="${L}" y1="${Y2(RENT)}" x2="${R}" y2="${Y2(RENT)}" stroke="var(--control)" stroke-width="1.5" stroke-dasharray="6 5"/>`;
-    g+=lab(R,Y2(RENT)-6,'租金 '+f2(RENT),'var(--control)','end',11);
+    g+=lab(R,Y2(RENT)-6,window.L('租金 ','Rent')+f2(RENT),'var(--control)','end',11);
     if(kc>=0){
       // 调仓间隔带：从上次调仓的时刻画到现在
       const lt=sim.tr.filter(t=>t[0]<=kc), k0=lt.length?lt[lt.length-1][0]:-1, la=sim.LA[kc];
@@ -781,18 +789,18 @@ const IN=(()=>{
     } else {
       g+=`<circle cx="${X(-1)}" cy="${Y(P0)}" r="3" fill="var(--ink)"/>`;
     }
-    g+=lab(X(-1)+4,Y(P0)-8,'4/22 收盘 387.61','var(--ink-soft)','start',10.5);
+    g+=lab(X(-1)+4,Y(P0)-8,window.L('4/22 收盘 387.61','4/22 close 387.61'),'var(--ink-soft)','start',10.5);
     $('inC').innerHTML=g;
     // 数字
     const k=kc, sells=sim.tr.filter(t=>t[0]<=k&&t[2]>0).length, buys=sim.tr.filter(t=>t[0]<=k&&t[2]<0).length;
-    $('inT').textContent= k<0?'4/22 16:00':tm(k); $('inTb').textContent= k<0?'前一天收盘':'股价 '+f2(px[k]);
-    $('inH').textContent='空 '+f2((k<0?d0:sim.H[k])*100)+' 股';
-    $('inN').textContent=(sells+buys)+' 次'; $('inNb').textContent=`卖 ${sells} · 买 ${buys}`;
-    $('inI').textContent= k<0?'0.00':fm(sim.I[k]); $('inIb').textContent= k<0?'':'只在收盘调一次：'+fm(CLOSE[k]);
+    $('inT').textContent= k<0?'4/22 16:00':tm(k); $('inTb').textContent= k<0?window.L('前一天收盘','Previous close'):window.L('股价 ','Stock')+f2(px[k]);
+    $('inH').textContent=window.L('空 ','Short')+f2((k<0?d0:sim.H[k])*100)+window.L(' 股',' shares');
+    $('inN').textContent=(sells+buys)+window.L(' 次',' adjustments'); $('inNb').textContent=window.L(`卖 ${sells} · 买 ${buys}`,`Sell ${sells} · buy ${buys}`);
+    $('inI').textContent= k<0?'0.00':fm(sim.I[k]); $('inIb').textContent= k<0?'':window.L('只在收盘调一次：','Close-only adjustment:')+fm(CLOSE[k]);
     const say=$('inSay');
     if(k<n-1){ say.textContent=''; return; }
     const Ie=sim.I[n-1];
-    say.textContent=`每走 ${band} 美元调一次：调了 ${sim.tr.length} 次（卖 ${sells} 次、买 ${buys} 次），收入 ${f2(Ie)} 美元，是租金 ${f2(RENT)} 的 ${(Ie/RENT).toFixed(1)} 倍，减掉租金 ${sgn(Ie-RENT)}。只在收盘调一次：收入 ${f2(CLOSE[n-1])}，减掉租金 ${sgn(CLOSE[n-1]-RENT)}。`;
+    say.textContent=window.L(`每走 ${band} 美元调一次：调了 ${sim.tr.length} 次（卖 ${sells} 次、买 ${buys} 次），收入 ${f2(Ie)} 美元，是租金 ${f2(RENT)} 的 ${(Ie/RENT).toFixed(1)} 倍，减掉租金 ${sgn(Ie-RENT)}。只在收盘调一次：收入 ${f2(CLOSE[n-1])}，减掉租金 ${sgn(CLOSE[n-1]-RENT)}。`,`Adjusting every $${band}: ${sim.tr.length} adjustments (${sells} sales, ${buys} purchases), income $${f2(Ie)}, ${(Ie/RENT).toFixed(1)} times the rent of ${f2(RENT)}, ${sgn(Ie-RENT)} after rent. Adjusting only at the close: income ${f2(CLOSE[n-1])}, ${sgn(CLOSE[n-1]-RENT)} after rent.`);
   }
   function start(){
     s.playing=false; s.k=-1;
@@ -822,7 +830,7 @@ const LD=(()=>{
     for(let v=350; v<=460; v+=25){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width=".7"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10.5); }
     for(let v=0; v<=600; v+=200){ g+=`<line x1="${L}" y1="${Y2(v)}" x2="${R}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v===0?1.1:.7}"/>`; g+=lab(L-7,Y2(v)+4,v,'var(--ink-faint)','end',10.5); }
     [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),H-14,md(DAYS[i]),'var(--ink-faint)','middle',10.5));
-    g+=lab(L,T2-12,'累计，美元一张','var(--ink-soft)','start',11);
+    g+=lab(L,T2-12,window.L('累计，美元一张','Cumulative, $ per contract'),'var(--ink-soft)','start',11);
     const bw=Math.max(5,(R-L)/N*0.5);
     // 门槛竖条
     for(let i=1;i<=Math.min(N,k+ (pe>k?1:0));i++){
@@ -839,7 +847,7 @@ const LD=(()=>{
       const r=rows[i-1], c=kind(r);
       g+= c ? `<circle cx="${X(i)}" cy="${Y(U[i])}" r="4.6" fill="${c}"/>` : `<circle cx="${X(i)}" cy="${Y(U[i])}" r="4" fill="var(--panel)" stroke="var(--ink-faint)" stroke-width="1.5"/>`;
     }
-    if(k>=21) g+=lab(X(22.5),Y(392),'delta 已到 1','var(--ink-faint)','middle',10.5);
+    if(k>=21) g+=lab(X(22.5),Y(392),window.L('delta 已到 1','Delta hit 1'),'var(--ink-faint)','middle',10.5);
     // 赛跑：累计收入、累计租金
     const line=(arr,col,w)=>{ let q=[]; for(let i=0;i<=Math.min(N,k);i++) q.push(X(i).toFixed(1)+','+Y2(arr[i]).toFixed(1));
       if(k<N && pe>k){ const f=pe-k; q.push((X(k)+(X(k+1)-X(k))*f).toFixed(1)+','+Y2(arr[k]+(arr[k+1]-arr[k])*f).toFixed(1)); }
@@ -847,31 +855,31 @@ const LD=(()=>{
     g+=line(cr,'var(--control)',2.2)+line(ci,'var(--result)',2.2);
     const kk=Math.min(N,k);
     const lx=kk>18?X(kk)-6:X(kk)+6, la=kk>18?'end':'start';
-    g+=lab(lx,Y2(ci[kk])+(ci[kk]>cr[kk]?-8:16),'收入 '+f2(ci[kk]),'var(--result)',la,11);
-    g+=lab(lx,Y2(cr[kk])+(ci[kk]>cr[kk]?16:-8),'租金 '+f2(cr[kk]),'var(--control)',la,11);
+    g+=lab(lx,Y2(ci[kk])+(ci[kk]>cr[kk]?-8:16),window.L('收入 ','Income')+f2(ci[kk]),'var(--result)',la,11);
+    g+=lab(lx,Y2(cr[kk])+(ci[kk]>cr[kk]?16:-8),window.L('租金 ','Rent')+f2(cr[kk]),'var(--control)',la,11);
     $('ldC').innerHTML=g;
     // 数字
     if(kk===0){
-      $('ldD').textContent='4/13'; $('ldDb').textContent='入场，收盘 352.36';
-      $('ldM').textContent='入场'; $('ldM').style.color='var(--ink)'; $('ldMb').textContent='';
-      $('ldT').textContent='卖 '+f2(LEDT.d0*100)+' 股'; $('ldTb').textContent='@ 352.36，delta '+LEDT.d0.toFixed(4);
+      $('ldD').textContent='4/13'; $('ldDb').textContent=window.L('入场，收盘 352.36','Entry, close 352.36');
+      $('ldM').textContent=window.L('入场','Entry'); $('ldM').style.color='var(--ink)'; $('ldMb').textContent='';
+      $('ldT').textContent=window.L('卖 ','Sell')+f2(LEDT.d0*100)+window.L(' 股',' shares'); $('ldTb').textContent=window.L('@ 352.36，delta ','@ 352.36, delta')+LEDT.d0.toFixed(4);
       $('ldP').textContent='0.00'; $('ldPb').textContent='';
       $('ldC2').textContent='0.00'; $('ldCb').textContent='';
     } else {
       const r=rows[kk-1];
-      $('ldD').textContent=md(DAYS[kk]); $('ldDb').textContent=`第 ${kk} 个交易日，收盘 ${f2(U[kk])}`;
+      $('ldD').textContent=md(DAYS[kk]); $('ldDb').textContent=window.L(`第 ${kk} 个交易日，收盘 ${f2(U[kk])}`,`Trading day ${kk}, close ${f2(U[kk])}`);
       $('ldM').textContent=sgn(r.mv*100)+'%'; $('ldM').style.color= Math.abs(r.mv)>r.thr?'var(--result)':'var(--ink)';
-      $('ldMb').textContent=`门槛 ±${(r.thr*100).toFixed(2)}%${r.gap>1?'（周一）':''}`;
-      $('ldT').textContent= Math.abs(r.tr)<0.005 ? '不调' : (r.tr>0?'卖 ':'买 ')+f2(Math.abs(r.tr))+' 股';
-      $('ldTb').textContent= `新 delta ${r.d.toFixed(4)}`;
+      $('ldMb').textContent=window.L(`门槛 ±${(r.thr*100).toFixed(2)}%${r.gap>1?'（周一）':''}`,`Threshold ±${(r.thr*100).toFixed(2)}%${r.gap>1?' (Monday)':''}`);
+      $('ldT').textContent= Math.abs(r.tr)<0.005 ? window.L('不调','No trade') : (r.tr>0?window.L('卖 ','Sell'):window.L('买 ','Buy'))+f2(Math.abs(r.tr))+window.L(' 股',' shares');
+      $('ldTb').textContent= window.L(`新 delta ${r.d.toFixed(4)}`,`New delta ${r.d.toFixed(4)}`);
       $('ldP').textContent=sgn(r.pnl); $('ldP').style.color= r.pnl>=1?'var(--result)':r.pnl<=-1?'var(--control)':'var(--ink)';
-      $('ldPb').textContent=`收入 ${f2(r.inc)} · 租金 ${f2(r.rent)}`;
-      $('ldC2').textContent=sgn(ci[kk]-cr[kk]); $('ldCb').textContent=`收入 ${f2(ci[kk])} · 租金 ${f2(cr[kk])}`;
+      $('ldPb').textContent=window.L(`收入 ${f2(r.inc)} · 租金 ${f2(r.rent)}`,`Income ${f2(r.inc)} · rent ${f2(r.rent)}`);
+      $('ldC2').textContent=sgn(ci[kk]-cr[kk]); $('ldCb').textContent=window.L(`收入 ${f2(ci[kk])} · 租金 ${f2(cr[kk])}`,`Income ${f2(ci[kk])} · rent ${f2(cr[kk])}`);
     }
     const say=$('ldSay');
     if(pe<N){ say.textContent=''; return; }
     const out=rows.filter(r=>Math.abs(r.mv)>r.thr).length;
-    say.textContent=`24 天的收入合计 ${f2(LEDT.inc)}，租金合计 ${f2(LEDT.rent)}，相差 ${fm(LEDT.pnl)} 美元一张。收盘落在门槛外的 ${out} 天，落在门槛内的 ${N-out} 天。`;
+    say.textContent=window.L(`24 天的收入合计 ${f2(LEDT.inc)}，租金合计 ${f2(LEDT.rent)}，相差 ${fm(LEDT.pnl)} 美元一张。收盘落在门槛外的 ${out} 天，落在门槛内的 ${N-out} 天。`,`Total income over 24 days ${f2(LEDT.inc)}, total rent ${f2(LEDT.rent)}, a difference of ${fm(LEDT.pnl)} dollars per contract. ${out} closes landed outside the threshold and ${N-out} inside.`);
   }
   function start(){
     s.playing=false; s.p=0;
@@ -892,9 +900,9 @@ const WN=(()=>{
   const pc=(v,d)=>(v/d*100).toFixed(2)+'%';
   $('wnax').innerHTML=[20,40,60,80,100,120].map(v=>`<span style="left:${pc(X(v),W)};top:${pc(PB+5,H)}">${v}%</span>`).join('')+
     [[2000,'+2000'],[1000,'+1000'],[0,'0'],[-1000,'−1000']].map(([v,t])=>`<span style="left:auto;right:${pc(W-PL+3,W)};transform:translateY(-50%);top:${pc(Y(v),H)}">${t}</span>`).join('')+
-    `<span style="left:${pc((PL+PR)/2,W)};top:${pc(PB+19,H)};color:var(--ink-soft)">实际波动率</span>`+
-    `<span style="left:0;transform:none;top:0;color:var(--ink-soft)">美元一张</span>`+
-    `<span style="left:${pc(X(46.3)+2,W)};transform:none;top:0">隐含 46.3%</span>`;
+    L(`<span style="left:${pc((PL+PR)/2,W)};top:${pc(PB+19,H)};color:var(--ink-soft)">实际波动率</span>`,`<span style="left:${pc((PL+PR)/2,W)};top:${pc(PB+19,H)};color:var(--ink-soft)">Realized volatility</span>`)+
+    L(`<span style="left:0;transform:none;top:0;color:var(--ink-soft)">美元一张</span>`,`<span style="left:0;transform:none;top:0;color:var(--ink-soft)">$ per contract</span>`)+
+    L(`<span style="left:${pc(X(46.3)+2,W)};transform:none;top:0">隐含 46.3%</span>`,`<span style="left:${pc(X(46.3)+2,W)};transform:none;top:0">Implied 46.3%</span>`);
   const s={n:N, playing:false};
   function draw(){
     c.fillStyle=C.bg; c.fillRect(0,0,W,H);
@@ -922,11 +930,11 @@ const WN=(()=>{
       c.fillStyle=C.bg; c.fillRect(hx-3,hy-3,7,7);
       c.fillStyle=C.ink; c.fillRect(hx-2,hy-2,5,5);
     }
-    $('wnN').textContent=s.n+' 段';
-    $('wnU').textContent= up? (upW/up*100).toFixed(1)+'%':'0%'; $('wnUb').textContent=`${up} 段里 ${upW} 段`;
-    $('wnD').textContent= dn? (dnL/dn*100).toFixed(1)+'%':'0%'; $('wnDb').textContent=`${dn} 段里 ${dnL} 段`;
+    $('wnN').textContent=s.n+L(' 段',' runs');
+    $('wnU').textContent= up? (upW/up*100).toFixed(1)+'%':'0%'; $('wnUb').textContent=L(`${up} 段里 ${upW} 段`,`${upW} of ${up} runs`);
+    $('wnD').textContent= dn? (dnL/dn*100).toFixed(1)+'%':'0%'; $('wnDb').textContent=L(`${dn} 段里 ${dnL} 段`,`${dnL} of ${dn} runs`);
     const say=$('wnSay');
-    say.textContent= s.n<N ? '' : `在 36% 到 58% 之间用一条直线去贴这些点，直线在 ${f2(WINS.cross)}% 处穿过 0，比买入时的 46.3% 高约半个点。方块是这一次：实际 ${f1(LEDT.rvcal)}%，结果 ${fm(LEDT.pnl)}，落在中位数线附近，偏下。`;
+    say.textContent= s.n<N ? '' : L(`在 36% 到 58% 之间用一条直线去贴这些点，直线在 ${f2(WINS.cross)}% 处穿过 0，比买入时的 46.3% 高约半个点。方块是这一次：实际 ${f1(LEDT.rvcal)}%，结果 ${fm(LEDT.pnl)}，落在中位数线附近，偏下。`,`Fitting a straight line to the points between 36% and 58%, the line crosses 0 at ${f2(WINS.cross)}%, about half a point above the 46.3% at purchase. The square is this trade: realized ${f1(LEDT.rvcal)}%, result ${fm(LEDT.pnl)}, near the median line and slightly below it.`);
   }
   function start(){
     s.playing=false; s.n=0;
@@ -944,7 +952,7 @@ function drawBS(){
   const L=50*FS, R=CW-12, T=24, B=210;
   const v=LD.rows.map(r=>({d:DAYS[r.i], p:r.pnl*bsSide})).sort((a,b)=>b.p-a.p);
   const lo=-240, hi=240, Y=x=>T+(hi-x)/(hi-lo)*(B-T), bw=(R-L)/v.length;
-  let g=lab(L,10,'每天的盈亏，美元一张（按中间价 21.05 成交）','var(--ink-soft)','start',11);
+  let g=lab(L,10,window.L('每天的盈亏，美元一张（按中间价 21.05 成交）','Daily P&amp;L, $ per contract (21.05 mid fill)'),'var(--ink-soft)','start',11);
   [-200,-100,0,100,200].forEach(x=>{ g+=`<line x1="${L}" y1="${Y(x)}" x2="${R}" y2="${Y(x)}" stroke="var(--rule)" stroke-width="${x===0?1.2:.7}"/>`; g+=lab(L-7,Y(x)+4,x>0?'+'+x:fm(x,0),'var(--ink-faint)','end',10.5); });
   v.forEach((d,j)=>{
     const y0=Y(0), y1=Y(d.p), col= d.p>=1?'var(--result)':d.p<=-1?'var(--control)':'var(--ink-faint)';
@@ -954,7 +962,7 @@ function drawBS(){
   g+=lab(L+bw*1.1,Y(top.p)+12,`${md(top.d)} ${sgn(top.p)}`,'var(--result)','start',11);
   g+=lab(R-bw*.5,Y(bot.p)+16,`${md(bot.d)} ${sgn(bot.p)}`,'var(--control)','end',11);
   const nw=v.filter(d=>d.p>=1).length, nl=v.filter(d=>d.p<=-1).length;
-  g+=lab((L+R)/2,H-8,`赚 ${nw} 天 · 不到 1 美元 ${v.length-nw-nl} 天 · 亏 ${nl} 天`,'var(--ink-soft)','middle',11);
+  g+=lab((L+R)/2,H-8,window.L(`赚 ${nw} 天 · 不到 1 美元 ${v.length-nw-nl} 天 · 亏 ${nl} 天`,`Gain ${nw} days · under $1 ${v.length-nw-nl} days · loss ${nl} days`),'var(--ink-soft)','middle',11);
   $('bsC').innerHTML=g;
 }
 segOn('bsSeg',d=>{ bsSide=+d.s; drawBS(); });
@@ -975,12 +983,12 @@ const FC=(()=>{
     const t=TK[j], f=+$('fcR').value, be=t[4], S=t[1], Kx=t[2], mid=t[3];
     const v=bsC(S,Kx,T0,f/100)[0], gap=(v-mid)*100;
     $('fcV').textContent=f1(f)+'%';
-    $('fcB').textContent=f2(be)+'%'; $('fcBb').textContent=`${t[0]} ${Kx} call，中间价 ${f2(mid)}`;
-    $('fcW').textContent=f2(v); $('fcWb').textContent='中间价 '+f2(mid);
-    $('fcG').textContent=sgn(gap); $('fcG').style.color= gap>=0?'var(--result)':'var(--control)'; $('fcGb').textContent= gap>=0?'按预测，便宜':'按预测，贵';
-    $('fcM').textContent=f2(t[5])+' 美元'; $('fcMb').textContent=(be/Math.sqrt(365)).toFixed(2)+'%，一个日历日';
+    $('fcB').textContent=f2(be)+'%'; $('fcBb').textContent=L(`${t[0]} ${Kx} call，中间价 ${f2(mid)}`,`${t[0]} ${Kx} call, mid ${f2(mid)}`);
+    $('fcW').textContent=f2(v); $('fcWb').textContent=L('中间价 ','Mid')+f2(mid);
+    $('fcG').textContent=sgn(gap); $('fcG').style.color= gap>=0?'var(--result)':'var(--control)'; $('fcGb').textContent= gap>=0?L('按预测，便宜','Cheap by the forecast'):L('按预测，贵','Expensive by the forecast');
+    $('fcM').textContent=f2(t[5])+L(' 美元',' dollars'); $('fcMb').textContent=(be/Math.sqrt(365)).toFixed(2)+L('%，一个日历日','%, one calendar day');
     const cheap=f>be;
-    $('fcSay').textContent=`预测 ${f1(f)}% ${cheap?'高于':'低于'}盈亏平衡 ${f2(be)}%：按这个预测，这张 call ${cheap?'便宜':'贵'} ${f2(Math.abs(gap))} 美元一张，${cheap?'买入':'卖出'}并每天对冲，预测准的话平均挣到这个差（4.1，不算买卖价差）。事后 ${t[0]} 的实际波动是 ${f1(t[8])}%，对冲的买方${t[10]>=0?'赚了':'亏了'} ${Math.abs(t[10]).toFixed(0)} 美元一张。`;
+    $('fcSay').textContent=L(`预测 ${f1(f)}% ${cheap?'高于':'低于'}盈亏平衡 ${f2(be)}%：按这个预测，这张 call ${cheap?'便宜':'贵'} ${f2(Math.abs(gap))} 美元一张，${cheap?'买入':'卖出'}并每天对冲，预测准的话平均挣到这个差（4.1，不算买卖价差）。事后 ${t[0]} 的实际波动是 ${f1(t[8])}%，对冲的买方${t[10]>=0?'赚了':'亏了'} ${Math.abs(t[10]).toFixed(0)} 美元一张。`,`Forecast ${f1(f)}% is ${cheap?'above':'below'} the break-even of ${f2(be)}%: by this forecast the call is ${cheap?'cheap':'expensive'} by $${f2(Math.abs(gap))} per contract; ${cheap?'buy':'sell'} it and hedge daily, and if the forecast is right you collect this difference on average (4.1, ignoring the bid-ask spread). After the fact, ${t[0]}'s realized volatility was ${f1(t[8])}%, and the hedged buyer ${t[10]>=0?'made':'lost'} $${Math.abs(t[10]).toFixed(0)} per contract.`);
   }
   segOn('fcSeg',d=>{ j=+d.j; $('fcR').value=TK[j][6]; render(); });
   $('fcR').addEventListener('input',render);
@@ -991,52 +999,52 @@ const FC=(()=>{
 
 /* ══════════ 七 · 费曼检验 ══════════ */
 const QS=[
- {q:`不许用「隐含」「模型」这两个词，向一个没学过期权的人解释：为什么「盈亏平衡波动率」和「隐含波动率」是同一个数。`,
-  a:['买一张期权再每天对冲，方向就不算数了，赚亏只看之后股价实际晃得多厉害。',
-     '晃得越厉害，对冲挣回来的钱越多。晃到某个程度时，对冲挣回来的现金加上到期时期权本身值的钱，正好等于买入价，这个程度就是盈亏平衡波动率。',
-     '市场报的价格也可以反过来问：这个价格相当于假定股价会晃多厉害？答出来的是隐含波动率。',
-     '两个问题都是「多大的晃动对应这个价格」，所以答案相同。讲义的例子里，5.50 对应 36.40%，两个名字都指它。'],
-  s:'「因为讲义上两个都写着 36.40%」：只说了结果，没说为什么两个问题是同一个等式。'},
- {q:`买入 TSLA 350 call 并每天对冲。某个星期二 TSLA 涨了 2%，某个星期一涨了 3.5%。这两天各是赚还是亏？`,
-  a:['对冲以后，一天赚不赚看当天的涨跌有没有超过门槛：股价 × 盈亏平衡波动率 × √(天数 ÷ 365)。',
-     '星期二只背一天的租金，门槛约 2.42%，涨 2% 不够，亏。',
-     '星期一背周末三天的租金，门槛乘 √3，约 4.20%，涨 3.5% 也不够，亏。',
-     '方向不重要，跌 2% 和涨 2% 差不多一样亏；差别只来自 delta 随时间的漂移，很小（节点 6）。'],
-  s:'「涨了就赚」：对冲以后方向的钱被股票抵掉了，剩下的只看幅度。'},
- {q:`gamma scalping 的钱具体是从哪几笔买卖里来的？用「涨了卖、跌了买」讲清楚。`,
-  a:['买入 call 再卖出 delta 股，仓位的 delta 是 0。',
-     '股价涨，call 的 delta 变大，仓位变成净多头，要多卖股票：卖在高处。股价跌，delta 变小，要买回股票：买在低处。',
-     '股价涨 m 美元再跌回来，就完成一笔低买高卖，一张合约赚 100 × Γ × m²。',
-     '这些钱要抵掉每天的租金。来回的次数和幅度够大，才赚。'],
-  s:'「因为期权涨价了」：对冲以后，期权涨的钱被卖空的股票亏掉，赚的是来回买卖的差价。'},
- {q:`4/23 只在收盘调一次的人收入 54.50，每走 2 美元调一次的人收入 134.33。是不是调得越勤越好？`,
-  a:['那天股价来回走：跳空低开，涨了十几美元，又跌回去。调得勤，每个来回都做成了低买高卖。',
-     '单边走的日子相反：4/15 一路涨，调得勤就一路卖在半路，没有跌回来买的机会，比收盘调一次少赚（4.1）。',
-     '按模型，调仓频率不改变平均收入，只改变每一次结果散得多开：4.1 的模拟里平均一样，调得越勤标准差越小。',
-     '现实里每次调仓都有交易成本，讲义把它列在现实约束的第一条，调得太勤会被成本吃掉。'],
-  s:'「越勤越好，因为这天收入多」：拿一天的结果当规律。'},
- {q:`这 24 天 TSLA 按日历折算的实际波动率是 47.4%，比买入时的 46.3% 还高，对冲到期却亏了 34.53 美元一张。为什么？`,
-  a:['收入只在 gamma 大的日子进账。期权接近平值时 gamma 大，深度实值时接近 0。',
-     '4/14、4/15 期权接近平值，那两天的涨跌平方占全程的 35%，收入占 56%。',
-     '5/7 以后 delta 在 0.97 到 1 之间，这 7 天的涨跌平方占 40%，收入只占 6%。',
-     '所以要比的是 gamma 大的日子动得够不够。事后倒推，这条路径的盈亏平衡波动率是 45.07%，买在 46.3%，多付了约 1.2 个点。'],
-  s:'「数据有误差」或「运气不好」：没说出是哪几天、为什么那几天的涨跌收不到钱。'},
- {q:`同一张 350 call，按卖一 21.10 买入的人和按买一 21.00 卖出的人，各自在赌什么？实际波动率落在哪个范围时两个人都亏？`,
-  a:['两个人都对冲，所以都不赌方向，赌的是之后实际来多大的波动。',
-     '买方的盈亏平衡是 21.10 对应的 46.42%，要实际波动高于它；卖方的盈亏平衡是 21.00 对应的 46.18%，要实际波动低于它。',
-     '实际落在 46.18% 和 46.42% 之间，两个人都亏，差价归报价的做市商。',
-     '两人的账本形状也相反：买方多数日子小亏、少数日子大赚；卖方多数日子小赚、少数日子大亏。'],
-  s:'「买方看涨，卖方看跌」：那是不对冲的情形。'},
- {q:`4/13，PLTR 平值 call 的盈亏平衡波动率是 63.8%，它前一年的历史波动率是 54.2%。你会买还是卖？事后它的实际波动是 49.3%，这能不能证明你的判断方法对？`,
-  a:['方法：拿盈亏平衡波动率和自己对之后实际波动的预测比。拿历史当预测，54.2% 低于 63.8%，期权看起来贵，卖出并对冲。',
-     '事后 49.3% 低于 63.8%，卖方赢：对冲的买方亏掉权利金的 28.3%，卖方赚这么多。',
-     '一次对了不能证明预测可靠。同一天 INTC 的历史 63.5% 低于盈亏平衡 75.0%，也像是贵，之后的实际波动却是 123.6%，卖出的人亏掉权利金的 42.9%。',
-     '比较价格和价值这个方法没错，难在预测未来的波动，所以要准备好预测错的时候怎么办。'],
-  s:'「这次赚了，所以方法对」：拿一次结果证明一个预测方法。'}
+ {q:L(`不许用「隐含」「模型」这两个词，向一个没学过期权的人解释：为什么「盈亏平衡波动率」和「隐含波动率」是同一个数。`,`Without using the words "implied" or "model", explain to someone who has never studied options why "break-even volatility" and "implied volatility" are the same number.`),
+  a:[L('买一张期权再每天对冲，方向就不算数了，赚亏只看之后股价实际晃得多厉害。','Buy an option and hedge it every day, and direction no longer counts; gain or loss depends only on how much the stock actually swings afterward.'),
+     L('晃得越厉害，对冲挣回来的钱越多。晃到某个程度时，对冲挣回来的现金加上到期时期权本身值的钱，正好等于买入价，这个程度就是盈亏平衡波动率。','The more it swings, the more money hedging collects. At some level of swinging, the cash collected by hedging plus what the option itself is worth at expiration exactly equals the purchase price; that level is the break-even volatility.'),
+     L('市场报的价格也可以反过来问：这个价格相当于假定股价会晃多厉害？答出来的是隐含波动率。','The market\'s price can also be asked the reverse question: how much swinging does this price assume? The answer is the implied volatility.'),
+     L('两个问题都是「多大的晃动对应这个价格」，所以答案相同。讲义的例子里，5.50 对应 36.40%，两个名字都指它。','Both questions ask "what size of swings corresponds to this price", so the answers are the same. In the lecture example, 5.50 corresponds to 36.40%, and both names refer to it.')],
+  s:L('「因为讲义上两个都写着 36.40%」：只说了结果，没说为什么两个问题是同一个等式。','"Because the lecture notes write 36.40% for both": this states the result without saying why the two questions are the same equation.')},
+ {q:L(`买入 TSLA 350 call 并每天对冲。某个星期二 TSLA 涨了 2%，某个星期一涨了 3.5%。这两天各是赚还是亏？`,`You buy the TSLA 350 call and hedge it every day. One Tuesday TSLA rises 2%, and one Monday it rises 3.5%. Does each of these days make or lose money?`),
+  a:[L('对冲以后，一天赚不赚看当天的涨跌有没有超过门槛：股价 × 盈亏平衡波动率 × √(天数 ÷ 365)。','After hedging, whether a day makes money depends on whether that day\'s move exceeds the threshold: stock price × break-even volatility × √(days ÷ 365).'),
+     L('星期二只背一天的租金，门槛约 2.42%，涨 2% 不够，亏。','Tuesday carries one day of rent, the threshold is about 2.42%, a 2% rise is not enough: a loss.'),
+     L('星期一背周末三天的租金，门槛乘 √3，约 4.20%，涨 3.5% 也不够，亏。','Monday carries the weekend\'s three days of rent, the threshold is multiplied by √3 to about 4.20%, and a 3.5% rise is not enough either: a loss.'),
+     L('方向不重要，跌 2% 和涨 2% 差不多一样亏；差别只来自 delta 随时间的漂移，很小（节点 6）。','Direction doesn\'t matter: a 2% drop loses about as much as a 2% rise; the only difference comes from delta drifting over time, which is small (node 6).')],
+  s:L('「涨了就赚」：对冲以后方向的钱被股票抵掉了，剩下的只看幅度。','"It went up, so it made money": after hedging, the directional money is offset by the stock, and only the size of the move is left.')},
+ {q:L(`gamma scalping 的钱具体是从哪几笔买卖里来的？用「涨了卖、跌了买」讲清楚。`,`Which trades does gamma scalping money actually come from? Explain it with "sell after a rise, buy after a drop".`),
+  a:[L('买入 call 再卖出 delta 股，仓位的 delta 是 0。','Buy a call and sell delta shares, and the position\'s delta is 0.'),
+     L('股价涨，call 的 delta 变大，仓位变成净多头，要多卖股票：卖在高处。股价跌，delta 变小，要买回股票：买在低处。','When the stock rises, the call\'s delta grows, the position becomes net long, and you sell more stock: selling high. When the stock falls, delta shrinks and you buy stock back: buying low.'),
+     L('股价涨 m 美元再跌回来，就完成一笔低买高卖，一张合约赚 100 × Γ × m²。','When the stock rises m dollars and comes back, one buy-low, sell-high round trip is complete, and one contract earns 100 × Γ × m².'),
+     L('这些钱要抵掉每天的租金。来回的次数和幅度够大，才赚。','This money has to cover the daily rent. You make money only if the round trips are frequent and large enough.')],
+  s:L('「因为期权涨价了」：对冲以后，期权涨的钱被卖空的股票亏掉，赚的是来回买卖的差价。','"Because the option went up in price": after hedging, the option\'s gain is lost on the short stock; what you earn is the difference from trading back and forth.')},
+ {q:L(`4/23 只在收盘调一次的人收入 54.50，每走 2 美元调一次的人收入 134.33。是不是调得越勤越好？`,`On 4/23, someone who adjusted only at the close earned 54.50, and someone who adjusted every $2 earned 134.33. Is it always better to adjust more often?`),
+  a:[L('那天股价来回走：跳空低开，涨了十几美元，又跌回去。调得勤，每个来回都做成了低买高卖。','That day the stock went back and forth: it gapped down at the open, rose more than ten dollars, and fell back. Frequent adjustment turned each round trip into a buy-low, sell-high trade.'),
+     L('单边走的日子相反：4/15 一路涨，调得勤就一路卖在半路，没有跌回来买的机会，比收盘调一次少赚（4.1）。','One-way days are the opposite: on 4/15 the stock climbed steadily, frequent adjustment kept selling partway up, never got a pullback to buy on, and made less than adjusting once at the close (4.1).'),
+     L('按模型，调仓频率不改变平均收入，只改变每一次结果散得多开：4.1 的模拟里平均一样，调得越勤标准差越小。','Under the model, adjustment frequency does not change average income, only how widely each result spreads: in the 4.1 simulation the average is the same, and the more often you adjust, the smaller the standard deviation.'),
+     L('现实里每次调仓都有交易成本，讲义把它列在现实约束的第一条，调得太勤会被成本吃掉。','In reality every adjustment has transaction costs; the lecture notes put them first among real-world constraints, and adjusting too often gets eaten by costs.')],
+  s:L('「越勤越好，因为这天收入多」：拿一天的结果当规律。','"More often is better, because income was higher that day": this treats one day\'s result as a rule.')},
+ {q:L(`这 24 天 TSLA 按日历折算的实际波动率是 47.4%，比买入时的 46.3% 还高，对冲到期却亏了 34.53 美元一张。为什么？`,`Over these 24 days, TSLA's realized volatility on calendar scaling was 47.4%, above the 46.3% at purchase, yet hedging to expiration lost $34.53 per contract. Why?`),
+  a:[L('收入只在 gamma 大的日子进账。期权接近平值时 gamma 大，深度实值时接近 0。','Income only comes in on days when gamma is large. Gamma is large when the option is near the money and close to 0 when it is deep in the money.'),
+     L('4/14、4/15 期权接近平值，那两天的涨跌平方占全程的 35%，收入占 56%。','On 4/14 and 4/15 the option was near the money; those two days account for 35% of the squared moves over the whole period and 56% of the income.'),
+     L('5/7 以后 delta 在 0.97 到 1 之间，这 7 天的涨跌平方占 40%，收入只占 6%。','After 5/7, delta was between 0.97 and 1; these 7 days account for 40% of the squared moves but only 6% of the income.'),
+     L('所以要比的是 gamma 大的日子动得够不够。事后倒推，这条路径的盈亏平衡波动率是 45.07%，买在 46.3%，多付了约 1.2 个点。','So what matters is whether the price moved enough on the days when gamma was large. Worked backward after the fact, this path\'s break-even volatility is 45.07%; buying at 46.3% overpaid by about 1.2 points.')],
+  s:L('「数据有误差」或「运气不好」：没说出是哪几天、为什么那几天的涨跌收不到钱。','"The data has errors" or "bad luck": this doesn\'t say which days or why the moves on those days brought in no money.')},
+ {q:L(`同一张 350 call，按卖一 21.10 买入的人和按买一 21.00 卖出的人，各自在赌什么？实际波动率落在哪个范围时两个人都亏？`,`For the same 350 call, what is the person who buys at the 21.10 ask betting on, and what is the person who sells at the 21.00 bid betting on? In what range of realized volatility do both lose?`),
+  a:[L('两个人都对冲，所以都不赌方向，赌的是之后实际来多大的波动。','Both hedge, so neither bets on direction; they bet on how large the realized moves are afterward.'),
+     L('买方的盈亏平衡是 21.10 对应的 46.42%，要实际波动高于它；卖方的盈亏平衡是 21.00 对应的 46.18%，要实际波动低于它。','The buyer\'s break-even is the 46.42% of 21.10, and the buyer needs realized volatility above it; the seller\'s break-even is the 46.18% of 21.00, and the seller needs realized volatility below it.'),
+     L('实际落在 46.18% 和 46.42% 之间，两个人都亏，差价归报价的做市商。','If realized volatility lands between 46.18% and 46.42%, both lose, and the spread goes to the market maker posting the quotes.'),
+     L('两人的账本形状也相反：买方多数日子小亏、少数日子大赚；卖方多数日子小赚、少数日子大亏。','Their ledgers also have opposite shapes: the buyer has small losses on most days and large gains on a few; the seller has small gains on most days and large losses on a few.')],
+  s:L('「买方看涨，卖方看跌」：那是不对冲的情形。','"The buyer is bullish and the seller is bearish": that is the unhedged case.')},
+ {q:L(`4/13，PLTR 平值 call 的盈亏平衡波动率是 63.8%，它前一年的历史波动率是 54.2%。你会买还是卖？事后它的实际波动是 49.3%，这能不能证明你的判断方法对？`,`On 4/13, PLTR's at-the-money call has a break-even volatility of 63.8%, and its prior-year historical volatility is 54.2%. Would you buy or sell? After the fact its realized volatility was 49.3%. Does this prove your method of judging is right?`),
+  a:[L('方法：拿盈亏平衡波动率和自己对之后实际波动的预测比。拿历史当预测，54.2% 低于 63.8%，期权看起来贵，卖出并对冲。','The method: compare the break-even volatility with your own forecast of realized volatility. Using history as the forecast, 54.2% is below 63.8%, the option looks expensive, so sell and hedge.'),
+     L('事后 49.3% 低于 63.8%，卖方赢：对冲的买方亏掉权利金的 28.3%，卖方赚这么多。','After the fact 49.3% is below 63.8%, and the seller wins: the hedged buyer loses 28.3% of the premium and the seller makes that much.'),
+     L('一次对了不能证明预测可靠。同一天 INTC 的历史 63.5% 低于盈亏平衡 75.0%，也像是贵，之后的实际波动却是 123.6%，卖出的人亏掉权利金的 42.9%。','Being right once does not prove the forecast is reliable. On the same day INTC\'s history of 63.5% was below its break-even of 75.0%, so it also looked expensive, yet realized volatility afterward was 123.6%, and whoever sold it lost 42.9% of the premium.'),
+     L('比较价格和价值这个方法没错，难在预测未来的波动，所以要准备好预测错的时候怎么办。','Comparing price with value is the right method; the hard part is forecasting future volatility, so you need a plan for when the forecast is wrong.')],
+  s:L('「这次赚了，所以方法对」：拿一次结果证明一个预测方法。','"It made money this time, so the method is right": this uses one result to prove a forecasting method.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1050,7 +1058,20 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-4-2-q'+i); if(v) t.value=v; }catch(e){}
@@ -1059,8 +1080,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? L('对照参考答案','Compare with the reference answer') : L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 

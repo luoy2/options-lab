@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="lang.js"></script>
 <title>模型假设怎么崩</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2022C9%2022%2011%2019%2015%2018M17%2010C21%2010%2023%2012%2027%2011'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'/%3E%3Cpath%20d='M15%2018L17%2010'%20stroke='%23fdf6ec'%20stroke-width='1.4'%20stroke-dasharray='1.6%202'%20fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -203,438 +204,443 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 模型会错在哪</a><a href="#s1">一 钟形</a><a href="#s2">二 波动率在变</a><a href="#s3">三 跳空</a>
-  <a href="#s4">四 跌得更快</a><a href="#s5">五 替代模型</a><a href="#s6">六 skew 从哪来</a><a href="#s7">七 40% 规则</a><a href="#s8">八 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 模型会错在哪</span><span class="l-en">0 Where the model can be wrong</span></a><a href="#s1"><span class="l-zh">一 钟形</span><span class="l-en">1 Bell shape</span></a><a href="#s2"><span class="l-zh">二 波动率在变</span><span class="l-en">2 Volatility changes</span></a><a href="#s3"><span class="l-zh">三 跳空</span><span class="l-en">3 Gaps</span></a>
+  <a href="#s4"><span class="l-zh">四 跌得更快</span><span class="l-en">4 Falling faster</span></a><a href="#s5"><span class="l-zh">五 替代模型</span><span class="l-en">5 Alternative models</span></a><a href="#s6"><span class="l-zh">六 skew 从哪来</span><span class="l-en">6 Where skew comes from</span></a><a href="#s7"><span class="l-zh">七 40% 规则</span><span class="l-en">7 The 40% rule</span></a><a href="#s8"><span class="l-zh">八 费曼检验</span><span class="l-en">8 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 7</p>
-  <h1>模型假设怎么崩</h1>
-  <p class="lede">前面各节的理论值和希腊字母都来自 Black-Scholes 模型。风险与对冲、策略与组合两条路在这里合流：把模型的四条假设放到真实数据上逐条检验，看它们在哪里不成立、会让哪些期权的模型值偏低，以及市场怎样用隐含波动率曲线把这些偏差写进价格。数据是标普 500 指数（SPX）和 VIX 六年的日收盘，以及 TSLA 350 call 存续期里 4/22 那一晚的财报跳空。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 7</span><span class="l-en">FIN 580 review · Node 7</span></p>
+  <h1><span class="l-zh">模型假设怎么崩</span><span class="l-en">Where model assumptions break</span></h1>
+  <p class="lede"><span class="l-zh">前面各节的理论值和希腊字母都来自 Black-Scholes 模型。风险与对冲、策略与组合两条路在这里合流：把模型的四条假设放到真实数据上逐条检验，看它们在哪里不成立、会让哪些期权的模型值偏低，以及市场怎样用隐含波动率曲线把这些偏差写进价格。数据是标普 500 指数（SPX）和 VIX 六年的日收盘，以及 TSLA 350 call 存续期里 4/22 那一晚的财报跳空。</span><span class="l-en">The theoretical values and Greeks in the earlier nodes all come from the Black-Scholes model. The two paths, risk and hedging, and strategies and combinations, meet here: the model's four assumptions are tested one by one on real data, to see where they fail, which options' model values they make too low, and how the market writes these errors into prices through the implied volatility curve. The data are six years of daily closes for the S&amp;P 500 index (SPX) and VIX, and the earnings gap on the night of 4/22 during the life of the TSLA 350 call.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>模型会错在哪</h2>
-  <p class="sub">讲义把期权的风险分成两种。第一种是输入错：模型没问题，填进去的数不对。第二种是模型错：模型本身建立在不符合现实的假设上。</p>
-  <p>Black-Scholes 要五个输入：标的价、行权价、离到期的时间、利率、波动率 <span class="sym" data-say="sigma，年化波动率（1.2）。五个输入里只有它看不见，要靠估计。">σ</span>。前四个都能直接看到，只有 σ 要估计。σ 估错属于第一种风险，换一个更好的估计就能改善，1.2 讲过历史、预测、隐含三种估法。</p>
-  <p>第二种风险换输入修不掉。模型除了五个输入，还默认了价格怎么动。讲义列了四条：</p>
+  <h2><span class="l-zh"><span class="n">〇</span>模型会错在哪</span><span class="l-en"><span class="n">0</span>Where the model can be wrong</span></h2>
+  <p class="sub"><span class="l-zh">讲义把期权的风险分成两种。第一种是输入错：模型没问题，填进去的数不对。第二种是模型错：模型本身建立在不符合现实的假设上。</span><span class="l-en">The lecture notes split an option's risk into two kinds. The first is wrong inputs: the model is fine, but the numbers fed in are wrong. The second is a wrong model: the model itself rests on assumptions that do not match reality.</span></p>
+  <p><span class="l-zh">Black-Scholes 要五个输入：标的价、行权价、离到期的时间、利率、波动率 <span class="sym" data-say="sigma，年化波动率（1.2）。五个输入里只有它看不见，要靠估计。">σ</span>。前四个都能直接看到，只有 σ 要估计。σ 估错属于第一种风险，换一个更好的估计就能改善，1.2 讲过历史、预测、隐含三种估法。</span><span class="l-en">Black-Scholes needs five inputs: underlying price, strike, time to expiration, interest rate and volatility <span class="sym" data-say="Sigma, annualized volatility (1.2). The only one of the five inputs that cannot be seen and has to be estimated.">σ</span>. The first four can be seen directly; only σ has to be estimated. Estimating σ wrong is the first kind of risk, and a better estimate improves it; 1.2 covered three ways to estimate it: historical, forecast and implied.</span></p>
+  <p><span class="l-zh">第二种风险换输入修不掉。模型除了五个输入，还默认了价格怎么动。讲义列了四条：</span><span class="l-en">The second kind of risk cannot be fixed by changing inputs. Besides the five inputs, the model takes for granted how prices move. The lecture notes list four assumptions:</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>假设</th><th class="txt">说的是什么</th><th class="txt">本页用什么数据检验</th></tr></thead>
+    <thead><tr><th><span class="l-zh">假设</span><span class="l-en">Assumption</span></th><th class="txt"><span class="l-zh">说的是什么</span><span class="l-en">What it says</span></th><th class="txt"><span class="l-zh">本页用什么数据检验</span><span class="l-en">Data used on this page to test it</span></th></tr></thead>
     <tbody>
-      <tr><td>① 涨跌是钟形</td><td class="txt">每天的百分比涨跌来自同一个钟形分布，到期价格因此是对数正态（1.2 第五节）</td><td class="txt">第一节：SPX 六年 1505 个日涨跌，对照讲义的标普 500 与德国国债期货 Bund</td></tr>
-      <tr><td>② 波动率不变</td><td class="txt">期权存续期内，σ 是一个常数</td><td class="txt">第二节：SPX 的 50、100、250 日历史波动率与 VIX 六年的走势</td></tr>
-      <tr><td>③ 交易连续，不跳空</td><td class="txt">价格一点一点地走，对冲随时可以跟上</td><td class="txt">第三节：TSLA 4/22 财报夜的分钟线；七次财报</td></tr>
-      <tr><td>④ 波动率与方向无关</td><td class="txt">涨 5% 之后和跌 5% 之后，波动率一样大</td><td class="txt">第四节：SPX 每天的涨跌与 VIX 的变化</td></tr>
+      <tr><td><span class="l-zh">① 涨跌是钟形</span><span class="l-en">① Moves are bell-shaped</span></td><td class="txt"><span class="l-zh">每天的百分比涨跌来自同一个钟形分布，到期价格因此是对数正态（1.2 第五节）</span><span class="l-en">Each day's percentage move comes from the same bell-shaped distribution, so the price at expiration is lognormal (1.2, section 5)</span></td><td class="txt"><span class="l-zh">第一节：SPX 六年 1505 个日涨跌，对照讲义的标普 500 与德国国债期货 Bund</span><span class="l-en">Section 1: 1505 daily SPX moves over six years, against the lecture's S&amp;P 500 and German Bund futures</span></td></tr>
+      <tr><td><span class="l-zh">② 波动率不变</span><span class="l-en">② Volatility is constant</span></td><td class="txt"><span class="l-zh">期权存续期内，σ 是一个常数</span><span class="l-en">Over the life of the option, σ is a constant</span></td><td class="txt"><span class="l-zh">第二节：SPX 的 50、100、250 日历史波动率与 VIX 六年的走势</span><span class="l-en">Section 2: SPX 50-, 100- and 250-day historical volatility and VIX over six years</span></td></tr>
+      <tr><td><span class="l-zh">③ 交易连续，不跳空</span><span class="l-en">③ Trading is continuous, no gaps</span></td><td class="txt"><span class="l-zh">价格一点一点地走，对冲随时可以跟上</span><span class="l-en">Prices move a little at a time, and the hedge can always keep up</span></td><td class="txt"><span class="l-zh">第三节：TSLA 4/22 财报夜的分钟线；七次财报</span><span class="l-en">Section 3: TSLA minute bars on the 4/22 earnings night; seven earnings reports</span></td></tr>
+      <tr><td><span class="l-zh">④ 波动率与方向无关</span><span class="l-en">④ Volatility does not depend on direction</span></td><td class="txt"><span class="l-zh">涨 5% 之后和跌 5% 之后，波动率一样大</span><span class="l-en">After a 5% rise and after a 5% fall, volatility is the same</span></td><td class="txt"><span class="l-zh">第四节：SPX 每天的涨跌与 VIX 的变化</span><span class="l-en">Section 4: SPX's daily moves against changes in VIX</span></td></tr>
     </tbody>
   </table>
   </div>
-  <p>1.2 用 TSLA 的日涨跌检验过另一组相近的假设，结论是：每天独立、按比例涨跌基本成立；宽度每天一样、形状是钟形这两条不成立，波动会扎堆，极端的日子比钟形多。本页不重复那些检验，重点放在这些偏差对期权价格的后果。第五节看讲义给的两个修补模型，第六节把四条偏差和隐含波动率曲线的形状对上，第七节是一个心算公式：40% 规则。</p>
+  <p><span class="l-zh">1.2 用 TSLA 的日涨跌检验过另一组相近的假设，结论是：每天独立、按比例涨跌基本成立；宽度每天一样、形状是钟形这两条不成立，波动会扎堆，极端的日子比钟形多。本页不重复那些检验，重点放在这些偏差对期权价格的后果。第五节看讲义给的两个修补模型，第六节把四条偏差和隐含波动率曲线的形状对上，第七节是一个心算公式：40% 规则。</span><span class="l-en">1.2 tested a similar set of assumptions with TSLA's daily moves and concluded that independent days and proportional moves roughly hold, while the same width every day and a bell shape do not: volatility clusters, and extreme days are more common than the bell shape allows. This page does not repeat those tests; it focuses on what the errors do to option prices. Section 5 looks at the two patched models the lecture notes offer, section 6 matches the four errors to the shape of the implied volatility curve, and section 7 is a mental-math formula: the 40% rule.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>假设 ①：涨跌是钟形</h2>
-  <p class="sub">如果每天的涨跌来自同一个钟形，离平均值 3 个<span class="sym" data-say="standard deviation。一组数离中心的典型距离（1.2〇节）。钟形分布里三分之二的数落在一个标准差以内。">标准差</span>以外的日子只该有千分之 2.7。</p>
-  <p>下面是 SPX 从 2020-08-04 到 2026-07-31 的 1505 个交易日。每一天的涨跌先换算成离平均值几个标准差，再按先后落进对应的格子，一格宽半个标准差。平均每天 +0.06%，一天的标准差 1.05%，乘 16 年化是 16.7%。</p>
+  <h2><span class="l-zh"><span class="n">一</span>假设 ①：涨跌是钟形</span><span class="l-en"><span class="n">1</span>Assumption ①: moves are bell-shaped</span></h2>
+  <p class="sub"><span class="l-zh">如果每天的涨跌来自同一个钟形，离平均值 3 个<span class="sym" data-say="standard deviation。一组数离中心的典型距离（1.2〇节）。钟形分布里三分之二的数落在一个标准差以内。">标准差</span>以外的日子只该有千分之 2.7。</span><span class="l-en">If each day's move came from the same bell shape, days more than 3 <span class="sym" data-say="Standard deviation. The typical distance of a set of numbers from the center (1.2, section 0). In a bell-shaped distribution two thirds of the numbers are within one standard deviation.">standard deviations</span> from the average should be only 2.7 per thousand.</span></p>
+  <p><span class="l-zh">下面是 SPX 从 2020-08-04 到 2026-07-31 的 1505 个交易日。每一天的涨跌先换算成离平均值几个标准差，再按先后落进对应的格子，一格宽半个标准差。平均每天 +0.06%，一天的标准差 1.05%，乘 16 年化是 16.7%。</span><span class="l-en">Below are SPX's 1505 trading days from 2020-08-04 to 2026-07-31. Each day's move is first converted into how many standard deviations it is from the average, then dropped in date order into its bin, each half a standard deviation wide. The average is +0.06% a day and one day's standard deviation 1.05%, which times 16 annualizes to 16.7%.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="hcPlay">再落一遍</button></div>
-    <div class="stage"><canvas id="hc" width="204" height="112" aria-label="SPX 1505 个日涨跌按先后落进直方图，每格半个标准差"></canvas></div>
+    <div class="bar"><button class="btn ghost" id="hcPlay"><span class="l-zh">再落一遍</span><span class="l-en">Drop them again</span></button></div>
+    <div class="stage"><canvas id="hc" width="204" height="112" aria-label="SPX 1505 个日涨跌按先后落进直方图，每格半个标准差" data-en-aria-label="1505 daily SPX moves dropping in date order into a histogram, each bin half a standard deviation"></canvas></div>
     <div class="legend">
-      <span><i style="background:var(--ink)"></i>±1 个标准差以内</span>
-      <span><i class="rp" data-k="2"></i>1 到 3 个标准差</span>
-      <span><i style="background:var(--control)"></i>3 个标准差以外</span>
-      <span>点线：钟形预测的高度；两条竖点线：±3 个标准差；底部刻度每格 1 个标准差，从 −6 到 +9</span>
+      <span><i style="background:var(--ink)"></i><span class="l-zh">±1 个标准差以内</span><span class="l-en">Within ±1 standard deviation</span></span>
+      <span><i class="rp" data-k="2"></i><span class="l-zh">1 到 3 个标准差</span><span class="l-en">1 to 3 standard deviations</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">3 个标准差以外</span><span class="l-en">Beyond 3 standard deviations</span></span>
+      <span><span class="l-zh">点线：钟形预测的高度；两条竖点线：±3 个标准差；底部刻度每格 1 个标准差，从 −6 到 +9</span><span class="l-en">Dotted line: height the bell shape predicts; two dotted verticals: ±3 standard deviations; bottom ticks every 1 standard deviation, from −6 to +9</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">落到了哪一天</div><div class="d" id="hcD"></div><div class="d2" id="hcN"></div></div>
-      <div class="stat"><div class="k">3 个标准差以外，真实</div><div class="d" id="hcF" style="color:var(--control)"></div><div class="d2" id="hcFb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">落到了哪一天</span><span class="l-en">Date reached</span></div><div class="d" id="hcD"></div><div class="d2" id="hcN"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">3 个标准差以外，真实</span><span class="l-en">Beyond 3 standard deviations, actual</span></div><div class="d" id="hcF" style="color:var(--control)"></div><div class="d2" id="hcFb"></div></div>
     </div>
   </div>
-  <p>中间那几格比钟形高，1 到 3 个标准差的格子比钟形矮，最外面零星落着钟形几乎不该有的日子。按幅度分成三档数一数：</p>
+  <p><span class="l-zh">中间那几格比钟形高，1 到 3 个标准差的格子比钟形矮，最外面零星落着钟形几乎不该有的日子。按幅度分成三档数一数：</span><span class="l-en">The middle bins are taller than the bell, the bins at 1 to 3 standard deviations are shorter, and out at the edges lie scattered days the bell shape should hardly have at all. Counted in three bands by size:</span></p>
   <table style="max-width:36rem">
-    <thead><tr><th>离平均值</th><th>真实天数</th><th>钟形预测</th><th>真实比钟形</th></tr></thead>
+    <thead><tr><th><span class="l-zh">离平均值</span><span class="l-en">From the average</span></th><th><span class="l-zh">真实天数</span><span class="l-en">Actual days</span></th><th><span class="l-zh">钟形预测</span><span class="l-en">Bell-shape prediction</span></th><th><span class="l-zh">真实比钟形</span><span class="l-en">Actual vs bell shape</span></th></tr></thead>
     <tbody id="buckTb"></tbody>
   </table>
-  <p>小幅的日子更多，中等的更少，大幅的更多。三条合起来是同一个形状：中间更尖、两条尾巴更长。统计上用两个数描述分布和钟形差在哪：</p>
+  <p><span class="l-zh">小幅的日子更多，中等的更少，大幅的更多。三条合起来是同一个形状：中间更尖、两条尾巴更长。统计上用两个数描述分布和钟形差在哪：</span><span class="l-en">More small days, fewer medium ones, more large ones. The three together are one shape: a sharper middle and two longer tails. Statistics uses two numbers to describe how a distribution differs from the bell shape:</span></p>
   <ul>
-    <li><span class="sym" data-say="skewness。两条尾巴一样长是 0；左边（跌的一侧）更长是负，右边更长是正。">偏度</span>：两条尾巴哪边更长。钟形是 0，左尾更长是负数。</li>
-    <li><span class="sym" data-say="kurtosis。这里用的是减掉 3 以后的超额峰度，钟形是 0。正数表示两条尾巴都比钟形长、中间更尖，被挤掉的是中等幅度。">峰度</span>：两条尾巴同时比钟形长多少，中间尖多少。钟形是 0，正数叫<b>肥尾</b>。</li>
+    <li><span class="l-zh"><span class="sym" data-say="skewness。两条尾巴一样长是 0；左边（跌的一侧）更长是负，右边更长是正。">偏度</span>：两条尾巴哪边更长。钟形是 0，左尾更长是负数。</span><span class="l-en"><span class="sym" data-say="Skewness. 0 when both tails are equally long; negative when the left (falling) side is longer, positive when the right side is.">Skewness</span>: which tail is longer. 0 for the bell shape, negative when the left tail is longer.</span></li>
+    <li><span class="l-zh"><span class="sym" data-say="kurtosis。这里用的是减掉 3 以后的超额峰度，钟形是 0。正数表示两条尾巴都比钟形长、中间更尖，被挤掉的是中等幅度。">峰度</span>：两条尾巴同时比钟形长多少，中间尖多少。钟形是 0，正数叫<b>肥尾</b>。</span><span class="l-en"><span class="sym" data-say="Kurtosis. This is excess kurtosis, with 3 subtracted, so the bell shape is 0. A positive number means both tails are longer than the bell shape and the middle sharper; what gets squeezed out is the medium-sized moves.">Kurtosis</span>: how much longer both tails are than the bell shape, and how much sharper the middle is. 0 for the bell shape; a positive number is called <b>fat tails</b>.</span></li>
   </ul>
-  <h3>讲义的两组数据与 SPX</h3>
+  <h3><span class="l-zh">讲义的两组数据与 SPX</span><span class="l-en">The lecture's two data sets and SPX</span></h3>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th style="min-width:5.5rem"></th><th>讲义：标普 500<br>2006-01 至 2016-06</th><th>讲义：Bund 期货<br>2005-01 至 2016-08</th><th>SPX<br>2020-08 至 2026-07</th></tr></thead>
+    <thead><tr><th style="min-width:5.5rem"></th><th><span class="l-zh">讲义：标普 500<br>2006-01 至 2016-06</span><span class="l-en">Lecture: S&amp;P 500<br>2006-01 to 2016-06</span></th><th><span class="l-zh">讲义：Bund 期货<br>2005-01 至 2016-08</span><span class="l-en">Lecture: Bund futures<br>2005-01 to 2016-08</span></th><th>SPX<br><span class="l-zh">2020-08 至 2026-07</span><span class="l-en">2020-08 to 2026-07</span></th></tr></thead>
     <tbody id="lecTb"></tbody>
   </table>
   </div>
   <p id="lecSay"></p>
-  <p>三组数据的峰度都是正的，量级差很多。讲义的说法是：所有交易所交易的期权市场都倾向于有一定的正峰度。偏度就不一样了：SPX 这六年的偏度几乎是 0，是因为 2025-04-09 宣布暂缓加征关税那天涨了 9.35%；去掉这一天，偏度是 −0.45。偏度很容易被一两天左右，历史数据的偏度小，不说明市场给期权定价时不担心下跌（第四节、第六节）。</p>
+  <p><span class="l-zh">三组数据的峰度都是正的，量级差很多。讲义的说法是：所有交易所交易的期权市场都倾向于有一定的正峰度。偏度就不一样了：SPX 这六年的偏度几乎是 0，是因为 2025-04-09 宣布暂缓加征关税那天涨了 9.35%；去掉这一天，偏度是 −0.45。偏度很容易被一两天左右，历史数据的偏度小，不说明市场给期权定价时不担心下跌（第四节、第六节）。</span><span class="l-en">All three data sets have positive kurtosis, of very different sizes. In the lecture's words, all exchange-traded option markets tend to show some positive kurtosis. Skewness is a different story: SPX's skewness over these six years is almost 0 because of a 9.35% rise on 2025-04-09, the day a pause in new tariffs was announced; without that day the skewness is −0.45. Skewness is easily swayed by a day or two, and a small skewness in historical data does not mean the market is unworried about falls when it prices options (sections 4 and 6).</span></p>
 
-  <h3>对期权价格的后果</h3>
-  <p>讲义的问题：真实世界里，很远的<span class="sym" data-say="out of the money（2.1）。现在行权不值钱：call 的行权价高于现价，put 的行权价低于现价。离现价越远越「虚」。">虚值</span>期权比 Black-Scholes 算出来的更值钱还是更不值钱？用 SPX 的数据可以直接算。设想一张明天就到期的 put，行权价在现价下方 k 个一天的标准差。它明天的价值是跌破行权价的那部分。把 1505 个真实日子逐个代进去取平均，和按钟形算的比：</p>
+  <h3><span class="l-zh">对期权价格的后果</span><span class="l-en">What it means for option prices</span></h3>
+  <p><span class="l-zh">讲义的问题：真实世界里，很远的<span class="sym" data-say="out of the money（2.1）。现在行权不值钱：call 的行权价高于现价，put 的行权价低于现价。离现价越远越「虚」。">虚值</span>期权比 Black-Scholes 算出来的更值钱还是更不值钱？用 SPX 的数据可以直接算。设想一张明天就到期的 put，行权价在现价下方 k 个一天的标准差。它明天的价值是跌破行权价的那部分。把 1505 个真实日子逐个代进去取平均，和按钟形算的比：</span><span class="l-en">The lecture's question: in the real world, are far <span class="sym" data-say="Out of the money (2.1). Worth nothing to exercise now: a call's strike is above the current price, a put's below. The further from the current price, the further out of the money.">out-of-the-money</span> options worth more or less than Black-Scholes says? SPX's data can compute it directly. Picture a put expiring tomorrow with its strike k one-day standard deviations below the current price. Its value tomorrow is whatever falls below the strike. Plug in the 1505 real days one by one, average, and compare with the bell-shape value:</span></p>
   <table style="max-width:36rem">
-    <thead><tr><th>离现价</th><th>钟形算的价值</th><th>真实分布 put</th><th>真实分布 call</th></tr></thead>
+    <thead><tr><th><span class="l-zh">离现价</span><span class="l-en">From the current price</span></th><th><span class="l-zh">钟形算的价值</span><span class="l-en">Bell-shape value</span></th><th><span class="l-zh">真实分布 put</span><span class="l-en">Actual distribution, put</span></th><th><span class="l-zh">真实分布 call</span><span class="l-en">Actual distribution, call</span></th></tr></thead>
     <tbody id="tailTb"></tbody>
   </table>
-  <p class="tiny">价值以一天的标准差为单位，只看分布形状，不含利息。「真实分布」把每天的涨跌换算成离平均值几个标准差后逐日代入。4 个标准差那一行只由三五天决定，call 那一格主要来自 2025-04-09 一天。</p>
-  <p>离现价一个标准差的期权，真实价值和钟形差不多，call 还便宜一些，因为中等幅度的涨跌比钟形少。越往外，真实价值是钟形的倍数越大：两个标准差是 1.7 到 2.8 倍，三个标准差是 14 到 17 倍。所以答案是：远虚值期权比模型值更值钱。市场的做法不是换一个模型，而是给远虚值期权填更高的隐含波动率，第六节讲这条曲线。</p>
-  <p class="tiny">数据：分钟线，SPX 取每个交易日美东 15:59 那根的收盘（半日市取 12:59）。2024-05-13 至 05-15 三天 SPX 分钟线整天缺失，用 SPY 同一分钟的涨跌补上。讲义两组数据的统计量照讲义原文。</p>
+  <p class="tiny"><span class="l-zh">价值以一天的标准差为单位，只看分布形状，不含利息。「真实分布」把每天的涨跌换算成离平均值几个标准差后逐日代入。4 个标准差那一行只由三五天决定，call 那一格主要来自 2025-04-09 一天。</span><span class="l-en">Values are in one-day standard deviations and reflect only the shape of the distribution, with no interest. "Actual distribution" converts each day's move into standard deviations from the average and plugs the days in one by one. The 4-standard-deviation row rests on just three to five days, and its call cell comes mostly from the single day of 2025-04-09.</span></p>
+  <p><span class="l-zh">离现价一个标准差的期权，真实价值和钟形差不多，call 还便宜一些，因为中等幅度的涨跌比钟形少。越往外，真实价值是钟形的倍数越大：两个标准差是 1.7 到 2.8 倍，三个标准差是 14 到 17 倍。所以答案是：远虚值期权比模型值更值钱。市场的做法不是换一个模型，而是给远虚值期权填更高的隐含波动率，第六节讲这条曲线。</span><span class="l-en">An option one standard deviation from the current price has an actual value close to the bell shape's, the call even a bit cheaper, because medium moves are rarer than the bell shape says. Further out, the actual value is a growing multiple of the bell shape's: 1.7 to 2.8 times at two standard deviations, 14 to 17 times at three. So the answer is that far out-of-the-money options are worth more than the model value. The market does not switch models; it puts higher implied volatility on far out-of-the-money options, the curve covered in section 6.</span></p>
+  <p class="tiny"><span class="l-zh">数据：分钟线，SPX 取每个交易日美东 15:59 那根的收盘（半日市取 12:59）。2024-05-13 至 05-15 三天 SPX 分钟线整天缺失，用 SPY 同一分钟的涨跌补上。讲义两组数据的统计量照讲义原文。</span><span class="l-en">Data: minute bars; for SPX, the close of the 15:59 ET bar each trading day (12:59 on half days). SPX minute bars are missing for the whole of 2024-05-13 to 05-15; those three days use SPY's move in the same minute. The statistics for the lecture's two data sets are as given in the lecture notes.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>假设 ②：波动率不变</h2>
-  <p class="sub">模型里 σ 从买入到到期是同一个数。讲义用 SPX 2006 到 2016 年的历史波动率曲线检验这一条，下面是 2020 到 2026 年同样的三条线。</p>
-  <p><b>N 日历史波动率</b>：每个交易日往回数 N 个交易日，用这 N 个日涨跌按 1.2 的零均值算法算一个年化波动率，每天算一次，连成一条线。N 越大，线越平滑，反应越慢。灰色虚线是 <span class="sym" data-say="Cboe 波动率指数。用 SPX 一个月左右到期的一串期权价格反推出来的年化波动率，相当于市场对未来一个月 SPX 波动的报价。支线 V 讲它怎么算。">VIX</span>，它是从 SPX 期权价格反推的隐含波动率，看的是未来一个月。</p>
+  <h2><span class="l-zh"><span class="n">二</span>假设 ②：波动率不变</span><span class="l-en"><span class="n">2</span>Assumption ②: volatility is constant</span></h2>
+  <p class="sub"><span class="l-zh">模型里 σ 从买入到到期是同一个数。讲义用 SPX 2006 到 2016 年的历史波动率曲线检验这一条，下面是 2020 到 2026 年同样的三条线。</span><span class="l-en">In the model, σ is one number from purchase to expiration. The lecture notes test this with SPX historical volatility curves from 2006 to 2016; below are the same three lines for 2020 to 2026.</span></p>
+  <p><span class="l-zh"><b>N 日历史波动率</b>：每个交易日往回数 N 个交易日，用这 N 个日涨跌按 1.2 的零均值算法算一个年化波动率，每天算一次，连成一条线。N 越大，线越平滑，反应越慢。灰色虚线是 <span class="sym" data-say="Cboe 波动率指数。用 SPX 一个月左右到期的一串期权价格反推出来的年化波动率，相当于市场对未来一个月 SPX 波动的报价。支线 V 讲它怎么算。">VIX</span>，它是从 SPX 期权价格反推的隐含波动率，看的是未来一个月。</span><span class="l-en"><b>N-day historical volatility</b>: on each trading day, count back N trading days and compute an annualized volatility from those N daily moves with the zero-mean method of 1.2; compute it every day and join the points into a line. The larger N, the smoother the line and the slower it reacts. The gray dashed line is <span class="sym" data-say="Cboe Volatility Index. The annualized volatility backed out of a strip of SPX option prices about a month from expiration; in effect the market's quote for SPX volatility over the next month. Branch V explains how it is computed.">VIX</span>, the implied volatility backed out of SPX option prices, looking a month ahead.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="hvPlay">重播</button></div>
-    <svg id="hv" viewBox="0 0 720 300" role="img" aria-label="SPX 50、100、250 日历史波动率与 VIX，2020 至 2026"></svg>
+    <div class="bar"><button class="btn ghost" id="hvPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <svg id="hv" viewBox="0 0 720 300" role="img" aria-label="SPX 50、100、250 日历史波动率与 VIX，2020 至 2026" data-en-aria-label="SPX 50-, 100- and 250-day historical volatility and VIX, 2020 to 2026"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--control)"></i>50 日历史波动率</span>
-      <span><i class="ln" style="background:var(--warn)"></i>100 日</span>
-      <span><i class="ln" style="background:var(--result)"></i>250 日</span>
-      <span><i class="ln" style="background:var(--ink-soft)"></i>VIX（虚线，缺数据的日子断开）</span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">50 日历史波动率</span><span class="l-en">50-day historical volatility</span></span>
+      <span><i class="ln" style="background:var(--warn)"></i><span class="l-zh">100 日</span><span class="l-en">100-day</span></span>
+      <span><i class="ln" style="background:var(--result)"></i><span class="l-zh">250 日</span><span class="l-en">250-day</span></span>
+      <span><i class="ln" style="background:var(--ink-soft)"></i><span class="l-zh">VIX（虚线，缺数据的日子断开）</span><span class="l-en">VIX (dashed; gaps on days with missing data)</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="hvD"></div></div>
-      <div class="stat"><div class="k">50 日历史波动率</div><div class="d" id="hv50" style="color:var(--control)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="hvD"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">50 日历史波动率</span><span class="l-en">50-day historical volatility</span></div><div class="d" id="hv50" style="color:var(--control)"></div></div>
       <div class="stat"><div class="k">VIX</div><div class="d" id="hvV"></div></div>
     </div>
   </div>
   <table>
-    <thead><tr><th>这六年里</th><th>最低</th><th>最高</th></tr></thead>
+    <thead><tr><th><span class="l-zh">这六年里</span><span class="l-en">Over these six years</span></th><th><span class="l-zh">最低</span><span class="l-en">Low</span></th><th><span class="l-zh">最高</span><span class="l-en">High</span></th></tr></thead>
     <tbody>
-      <tr><td>50 日历史波动率</td><td>8.6%<br><span class="tiny">2024-07-16</span></td><td>34.7%<br><span class="tiny">2025-05-12</span></td></tr>
-      <tr><td>100 日</td><td>9.7%<br><span class="tiny">2025-10-09</span></td><td>26.9%<br><span class="tiny">2022-06-28</span></td></tr>
-      <tr><td>250 日</td><td>11.3%<br><span class="tiny">2024-07-09</span></td><td>24.4%<br><span class="tiny">2023-01-11</span></td></tr>
+      <tr><td><span class="l-zh">50 日历史波动率</span><span class="l-en">50-day historical volatility</span></td><td>8.6%<br><span class="tiny">2024-07-16</span></td><td>34.7%<br><span class="tiny">2025-05-12</span></td></tr>
+      <tr><td><span class="l-zh">100 日</span><span class="l-en">100-day</span></td><td>9.7%<br><span class="tiny">2025-10-09</span></td><td>26.9%<br><span class="tiny">2022-06-28</span></td></tr>
+      <tr><td><span class="l-zh">250 日</span><span class="l-en">250-day</span></td><td>11.3%<br><span class="tiny">2024-07-09</span></td><td>24.4%<br><span class="tiny">2023-01-11</span></td></tr>
       <tr><td>VIX</td><td>11.89<br><span class="tiny">2024-05-24</span></td><td>52.67<br><span class="tiny">2025-04-08</span></td></tr>
     </tbody>
   </table>
-  <p>50 日历史波动率在不到一年里从 8.6% 走到 34.7%，最平滑的 250 日也在 11.3% 到 24.4% 之间。σ 是常数这一条不成立。VIX 的虚线大部分时间在 50 日历史波动率上方（六年里 85.8% 的日子），第三节讲为什么。</p>
+  <p><span class="l-zh">50 日历史波动率在不到一年里从 8.6% 走到 34.7%，最平滑的 250 日也在 11.3% 到 24.4% 之间。σ 是常数这一条不成立。VIX 的虚线大部分时间在 50 日历史波动率上方（六年里 85.8% 的日子），第三节讲为什么。</span><span class="l-en">In under a year the 50-day historical volatility went from 8.6% to 34.7%, and even the smoothest, the 250-day, ranged from 11.3% to 24.4%. The assumption that σ is a constant does not hold. The dashed VIX line sits above the 50-day historical volatility most of the time (85.8% of the days in six years); section 3 explains why.</span></p>
 
-  <h3>波动率怎么走，会不会影响期权价值</h3>
-  <p>讲义用一个例子回答：远期价 100，离到期 107 天，全程的波动率都算 32%。第一行是 Black-Scholes 值。第二、三行的标的走势总的波动一样大，只是分布不同：一条前半段剧烈、后半段平静（波动率下降），一条先平静后剧烈（波动率上升）。表里是买入期权后做<span class="sym" data-say="dynamic hedging（4.1）：delta 随价格和时间一直在变，隔一段时间就按新的 delta 调整股票数量，让仓位一直接近没有方向风险。">动态对冲</span>（按 <span class="sym" data-say="delta（2.1）：标的动 1 美元，期权价格变多少。也是对冲比率：买 1 股期权，卖 delta 那么多股标的，仓位对标的的小涨小跌就不敏感。">delta</span> 不断调整卖出的股数），到期时这个仓位实际值多少。</p>
+  <h3><span class="l-zh">波动率怎么走，会不会影响期权价值</span><span class="l-en">Does the path of volatility affect option value?</span></h3>
+  <p><span class="l-zh">讲义用一个例子回答：远期价 100，离到期 107 天，全程的波动率都算 32%。第一行是 Black-Scholes 值。第二、三行的标的走势总的波动一样大，只是分布不同：一条前半段剧烈、后半段平静（波动率下降），一条先平静后剧烈（波动率上升）。表里是买入期权后做<span class="sym" data-say="dynamic hedging（4.1）：delta 随价格和时间一直在变，隔一段时间就按新的 delta 调整股票数量，让仓位一直接近没有方向风险。">动态对冲</span>（按 <span class="sym" data-say="delta（2.1）：标的动 1 美元，期权价格变多少。也是对冲比率：买 1 股期权，卖 delta 那么多股标的，仓位对标的的小涨小跌就不敏感。">delta</span> 不断调整卖出的股数），到期时这个仓位实际值多少。</span><span class="l-en">The lecture notes answer with an example: forward price 100, 107 days to expiration, volatility 32% over the whole period. The first row is the Black-Scholes value. In the second and third rows the underlying's paths have the same total volatility, just spread differently: one wild in the first half and calm in the second (volatility falling), one calm first and wild later (volatility rising). The table shows what the position is actually worth at expiration if you buy the option and <span class="sym" data-say="Dynamic hedging (4.1): delta keeps changing with price and time, so every so often the stock position is adjusted to the new delta, keeping the position close to free of directional risk.">hedge dynamically</span> (keep adjusting the shares sold to the <span class="sym" data-say="Delta (2.1): how much the option price moves when the underlying moves $1. Also the hedge ratio: for each option share bought, sell delta shares of the underlying, and the position barely reacts to small moves in the underlying.">delta</span>).</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>讲义：107 天，32%，F = 100</th><th>100 call 或 put</th><th>80 put</th><th>120 call</th></tr></thead>
+    <thead><tr><th><span class="l-zh">讲义：107 天，32%，F = 100</span><span class="l-en">Lecture: 107 days, 32%, F = 100</span></th><th><span class="l-zh">100 call 或 put</span><span class="l-en">100 call or put</span></th><th>80 put</th><th>120 call</th></tr></thead>
     <tbody>
-      <tr><td>波动率不变（BS）</td><td>6.90</td><td>.72</td><td>1.43</td></tr>
-      <tr><td>波动率下降</td><td class="no">4.93</td><td class="ok">1.03</td><td class="ok">1.89</td></tr>
-      <tr><td>波动率上升</td><td class="ok">8.10</td><td class="no">.43</td><td class="no">.99</td></tr>
+      <tr><td><span class="l-zh">波动率不变（BS）</span><span class="l-en">Constant volatility (BS)</span></td><td>6.90</td><td>.72</td><td>1.43</td></tr>
+      <tr><td><span class="l-zh">波动率下降</span><span class="l-en">Volatility falling</span></td><td class="no">4.93</td><td class="ok">1.03</td><td class="ok">1.89</td></tr>
+      <tr><td><span class="l-zh">波动率上升</span><span class="l-en">Volatility rising</span></td><td class="ok">8.10</td><td class="no">.43</td><td class="no">.99</td></tr>
     </tbody>
   </table>
-  <p class="tiny">第一行用<span class="sym" data-say="futures-type settlement（2.3）：期权不用先付全款，每天按盈亏结算，所以期权价格不折现。讲义这个例子按这种方式算。">期货型结算</span>的 Black-Scholes 复算是 6.903、0.722、1.426，与讲义一致。第二、三行来自讲义里的两条走势图，走势图在讲义抽取时丢了，数字照讲义。</p>
-  <p>讲义的结论分两半。只持有到期、不对冲：期权的价值只看到期价，路上怎么走无所谓。做动态对冲：波动率以什么顺序出现，会明显改变期权的价值，这叫<span class="sym" data-say="path dependence。结果不只看终点，还看路上怎么走。">路径依赖</span>。</p>
-  <p>原因在 <span class="sym" data-say="gamma（2.2）：标的动 1 美元，delta 变多少。对冲过的多头每次价格变动大约赚 ½ × gamma × 变动²。">gamma</span>。4.2 讲过，对冲过的期权多头每次价格变动大约赚 ½ × gamma × 变动²。<span class="sym" data-say="at the money（2.1）。行权价约等于标的价格；1.1 讲过实务里以远期价为准。">平值</span>期权的 gamma 在临近到期、价格贴着行权价时最大。波动率上升的那条路，剧烈的日子正好落在 gamma 最大的后半段，平值从 6.90 变成 8.10；波动率下降的路把剧烈的日子用在 gamma 还小的前半段，只剩 4.93。80 put 和 120 call 相反：价格要先被推到它们附近，它们的 gamma 才大。剧烈的日子在前面，才有机会把价格推过去，所以波动率下降时<span class="sym" data-say="离现价较远的两侧：低行权价的虚值 put 和高行权价的虚值 call。">两翼</span>反而更值钱。</p>
-  <p>两条路平均：平值是 (4.93 ＋ 8.10) ÷ 2 ＝ 6.52，比 6.90 低；80 put 是 .73、120 call 是 1.44，和模型的 .72、1.43 几乎一样。相对平值，两翼更贵。同一个 σ 没法同时给平值和两翼算出正确的价值，这是后面「每个行权价一个隐含波动率」的另一个来源。</p>
+  <p class="tiny"><span class="l-zh">第一行用<span class="sym" data-say="futures-type settlement（2.3）：期权不用先付全款，每天按盈亏结算，所以期权价格不折现。讲义这个例子按这种方式算。">期货型结算</span>的 Black-Scholes 复算是 6.903、0.722、1.426，与讲义一致。第二、三行来自讲义里的两条走势图，走势图在讲义抽取时丢了，数字照讲义。</span><span class="l-en">Recomputed with Black-Scholes under <span class="sym" data-say="Futures-type settlement (2.3): the option is not paid for in full up front and is settled daily on its gains and losses, so the option price is not discounted. The lecture example is computed this way.">futures-type settlement</span>, the first row is 6.903, 0.722 and 1.426, matching the lecture notes. The second and third rows come from two path charts in the lecture notes; the charts were lost in extraction, and the numbers are as given.</span></p>
+  <p><span class="l-zh">讲义的结论分两半。只持有到期、不对冲：期权的价值只看到期价，路上怎么走无所谓。做动态对冲：波动率以什么顺序出现，会明显改变期权的价值，这叫<span class="sym" data-say="path dependence。结果不只看终点，还看路上怎么走。">路径依赖</span>。</span><span class="l-en">The lecture's conclusion has two halves. Held to expiration without hedging, an option's value depends only on the price at expiration; the path does not matter. With dynamic hedging, the order in which volatility shows up changes the option's value noticeably; this is called <span class="sym" data-say="Path dependence. The result depends not only on the end point but also on the path taken.">path dependence</span>.</span></p>
+  <p><span class="l-zh">原因在 <span class="sym" data-say="gamma（2.2）：标的动 1 美元，delta 变多少。对冲过的多头每次价格变动大约赚 ½ × gamma × 变动²。">gamma</span>。4.2 讲过，对冲过的期权多头每次价格变动大约赚 ½ × gamma × 变动²。<span class="sym" data-say="at the money（2.1）。行权价约等于标的价格；1.1 讲过实务里以远期价为准。">平值</span>期权的 gamma 在临近到期、价格贴着行权价时最大。波动率上升的那条路，剧烈的日子正好落在 gamma 最大的后半段，平值从 6.90 变成 8.10；波动率下降的路把剧烈的日子用在 gamma 还小的前半段，只剩 4.93。80 put 和 120 call 相反：价格要先被推到它们附近，它们的 gamma 才大。剧烈的日子在前面，才有机会把价格推过去，所以波动率下降时<span class="sym" data-say="离现价较远的两侧：低行权价的虚值 put 和高行权价的虚值 call。">两翼</span>反而更值钱。</span><span class="l-en">The reason is <span class="sym" data-say="Gamma (2.2): how much delta changes when the underlying moves $1. A hedged long position earns about ½ × gamma × move² on each price move.">gamma</span>. As 4.2 showed, a hedged long option earns about ½ × gamma × move² on each price move. An <span class="sym" data-say="At the money (2.1). Strike about equal to the underlying price; 1.1 noted that in practice the forward price is the reference.">at-the-money</span> option's gamma is largest near expiration with the price close to the strike. On the rising-volatility path, the wild days fall in the second half, where gamma is largest, and the at-the-money option goes from 6.90 to 8.10; the falling-volatility path spends its wild days in the first half, while gamma is still small, leaving only 4.93. The 80 put and 120 call are the opposite: their gamma is large only after the price has been pushed near them. Only wild days early on can push the price there, so when volatility falls the <span class="sym" data-say="The two sides far from the current price: low-strike out-of-the-money puts and high-strike out-of-the-money calls.">wings</span> are actually worth more.</span></p>
+  <p><span class="l-zh">两条路平均：平值是 (4.93 ＋ 8.10) ÷ 2 ＝ 6.52，比 6.90 低；80 put 是 .73、120 call 是 1.44，和模型的 .72、1.43 几乎一样。相对平值，两翼更贵。同一个 σ 没法同时给平值和两翼算出正确的价值，这是后面「每个行权价一个隐含波动率」的另一个来源。</span><span class="l-en">Averaging the two paths: at the money (4.93 + 8.10) ÷ 2 = 6.52, below 6.90; the 80 put .73 and the 120 call 1.44, almost the same as the model's .72 and 1.43. Relative to at the money, the wings are more expensive. A single σ cannot give the right value for both the at-the-money option and the wings, which is another source of the "one implied volatility per strike" seen later.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>假设 ③：交易连续，不跳空</h2>
-  <p class="sub">模型假设价格一点点地走，对冲随时跟得上。财报在收盘后发布，价格几分钟里跳过一大段；这时期权不交易，股票盘后成交稀少，来不及按常规方式调仓。</p>
-  <p>讲义把价格的走法分成三种：<span class="sym" data-say="diffusion process。价格连续地走，每一小段时间只动一点点。Black-Scholes 假设的就是这种。">扩散</span>，价格连续地走；<span class="sym" data-say="jump process。价格一下子从一个数跳到另一个数，中间的价位没有成交。">跳跃</span>，价格一下子跳过去；<span class="sym" data-say="jump-diffusion。平时连续地走，偶尔跳一次。讲义说真实市场是这种。">跳跃扩散</span>，平时连续走、偶尔跳。真实市场是第三种。</p>
+  <h2><span class="l-zh"><span class="n">三</span>假设 ③：交易连续，不跳空</span><span class="l-en"><span class="n">3</span>Assumption ③: trading is continuous, no gaps</span></h2>
+  <p class="sub"><span class="l-zh">模型假设价格一点点地走，对冲随时跟得上。财报在收盘后发布，价格几分钟里跳过一大段；这时期权不交易，股票盘后成交稀少，来不及按常规方式调仓。</span><span class="l-en">The model assumes prices move a little at a time and the hedge can always keep up. Earnings come out after the close, and the price jumps a long way within minutes; options do not trade then, stock trades thinly after hours, and there is no time to adjust the hedge the usual way.</span></p>
+  <p><span class="l-zh">讲义把价格的走法分成三种：<span class="sym" data-say="diffusion process。价格连续地走，每一小段时间只动一点点。Black-Scholes 假设的就是这种。">扩散</span>，价格连续地走；<span class="sym" data-say="jump process。价格一下子从一个数跳到另一个数，中间的价位没有成交。">跳跃</span>，价格一下子跳过去；<span class="sym" data-say="jump-diffusion。平时连续地走，偶尔跳一次。讲义说真实市场是这种。">跳跃扩散</span>，平时连续走、偶尔跳。真实市场是第三种。</span><span class="l-en">The lecture notes sort price movements into three kinds: <span class="sym" data-say="Diffusion process. The price moves continuously, only a little in each short stretch of time. This is what Black-Scholes assumes.">diffusion</span>, where the price moves continuously; <span class="sym" data-say="Jump process. The price leaps from one number to another with no trades at the prices in between.">jumps</span>, where the price leaps; and <span class="sym" data-say="Jump-diffusion. Usually continuous, with an occasional jump. The lecture notes say real markets are like this.">jump-diffusion</span>, continuous most of the time with an occasional jump. Real markets are the third kind.</span></p>
 
-  <h3>350 call 存续期里的一次跳空</h3>
-  <p>这笔 350 call 从 4/13 持有到 5/15。中间 TSLA 在 4/22 收盘后发财报（Robinhood 财报日历）。下面是那天 15:30 到第二天 10:00 的分钟线，包括盘后和盘前。常规交易时段是 9:30 到 16:00，期权也只在这段时间里交易，大多数对冲都在这段时间里做。</p>
+  <h3><span class="l-zh">350 call 存续期里的一次跳空</span><span class="l-en">A gap during the life of the 350 call</span></h3>
+  <p><span class="l-zh">这笔 350 call 从 4/13 持有到 5/15。中间 TSLA 在 4/22 收盘后发财报。下面是那天 15:30 到第二天 10:00 的分钟线，包括盘后和盘前。常规交易时段是 9:30 到 16:00，期权也只在这段时间里交易，大多数对冲都在这段时间里做。</span><span class="l-en">This 350 call was held from 4/13 to 5/15. In between, TSLA reported earnings after the close on 4/22. Below are minute bars from 15:30 that day to 10:00 the next, including after hours and pre-market. Regular trading hours are 9:30 to 16:00; options trade only then, and most hedging is done then.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="mrPlay">重播</button></div>
-    <svg id="mr" viewBox="0 0 720 290" role="img" aria-label="TSLA 2026-04-22 15:30 至 04-23 10:00 的分钟收盘价"></svg>
+    <div class="bar"><button class="btn ghost" id="mrPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <svg id="mr" viewBox="0 0 720 290" role="img" aria-label="TSLA 2026-04-22 15:30 至 04-23 10:00 的分钟收盘价" data-en-aria-label="TSLA minute closing prices, 2026-04-22 15:30 to 04-23 10:00"></svg>
     <div class="stats">
-      <div class="stat"><div class="k">时间（美东）</div><div class="d" id="mrT"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">时间（美东）</span><span class="l-en">Time (ET)</span></div><div class="d" id="mrT"></div></div>
       <div class="stat"><div class="k">TSLA</div><div class="d" id="mrP"></div></div>
-      <div class="stat"><div class="k">比 4/22 15:59 收盘</div><div class="d" id="mrC" style="color:var(--control)"></div><div class="d2" id="mrC0"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">比 4/22 15:59 收盘</span><span class="l-en">Vs the 4/22 15:59 close</span></div><div class="d" id="mrC" style="color:var(--control)"></div><div class="d2" id="mrC0"></div></div>
     </div>
   </div>
-  <p>16:01 还在 387.95，16:04 已经到 403.99，三分钟涨了 4.1%。按入场时 46.3% 的隐含波动率，一天的标准差是 2.89%，这三分钟走了 1.4 天的量。盘后最高到 406.48（16:13），17:30 之后一小时跌到 378.00，19:59 收在 386.30。20:00 到第二天 4:00 没有成交，4:00 那一分钟收在 380.52。4/23 9:30 开盘成交在 375.28，比前一天收盘低 3.08%，比盘后最高低 7.7%；开盘这一分钟收在 372.68。</p>
-  <p>只在常规时段对冲的人，最后一次调仓在 4/22 收盘的 387.20，下一次机会是 4/23 开盘的 375.28。中间这一段对他是一次跳空，没法分步调。讲义的两个问题和答案：</p>
+  <p><span class="l-zh">16:01 还在 387.95，16:04 已经到 403.99，三分钟涨了 4.1%。按入场时 46.3% 的隐含波动率，一天的标准差是 2.89%，这三分钟走了 1.4 天的量。盘后最高到 406.48（16:13），17:30 之后一小时跌到 378.00，19:59 收在 386.30。20:00 到第二天 4:00 没有成交，4:00 那一分钟收在 380.52。4/23 9:30 开盘成交在 375.28，比前一天收盘低 3.08%，比盘后最高低 7.7%；开盘这一分钟收在 372.68。</span><span class="l-en">At 16:01 it was still 387.95; by 16:04 it was 403.99, up 4.1% in three minutes. At the entry implied volatility of 46.3%, one day's standard deviation is 2.89%, so these three minutes covered 1.4 days' worth. After hours it peaked at 406.48 (16:13), fell to 378.00 in the hour after 17:30, and closed at 386.30 at 19:59. There were no trades from 20:00 to 4:00 the next day; the 4:00 minute closed at 380.52. On 4/23 the 9:30 open traded at 375.28, 3.08% below the previous close and 7.7% below the after-hours high; the opening minute closed at 372.68.</span></p>
+  <p><span class="l-zh">只在常规时段对冲的人，最后一次调仓在 4/22 收盘的 387.20，下一次机会是 4/23 开盘的 375.28。中间这一段对他是一次跳空，没法分步调。讲义的两个问题和答案：</span><span class="l-en">For someone who hedges only in regular hours, the last adjustment was at the 4/22 close of 387.20, and the next chance was the 4/23 open at 375.28. Everything in between is a gap for them, with no way to adjust in steps. The lecture's two questions and answers:</span></p>
   <ul>
-    <li>买入期权并做 <span class="sym" data-say="delta 中性：期权和股票的 delta 合计为 0，标的小涨小跌时仓位几乎不赚不亏（4.1）。">delta 中性</span>对冲，跳空是好是坏？你是正 gamma，跳空是好事。</li>
-    <li>卖出期权并对冲，跳空是好是坏？你是负 gamma，跳空是坏事。</li>
+    <li><span class="l-zh">买入期权并做 <span class="sym" data-say="delta 中性：期权和股票的 delta 合计为 0，标的小涨小跌时仓位几乎不赚不亏（4.1）。">delta 中性</span>对冲，跳空是好是坏？你是正 gamma，跳空是好事。</span><span class="l-en">You bought options and hedged to <span class="sym" data-say="Delta neutral: the deltas of the options and the stock add up to 0, so small moves in the underlying barely make or lose money (4.1).">delta neutral</span>. Is a gap good or bad? You are long gamma, so a gap is good.</span></li>
+    <li><span class="l-zh">卖出期权并对冲，跳空是好是坏？你是负 gamma，跳空是坏事。</span><span class="l-en">You sold options and hedged. Is a gap good or bad? You are short gamma, so a gap is bad.</span></li>
   </ul>
 
-  <h3>为什么「来不及调仓」要紧</h3>
-  <p>对冲过的仓位，每次价格变动的盈亏大约是 ½ × gamma × 变动²。卖方是负的。同样一段距离，如果分成 k 小步走、每步之后重新对冲，每步的变动是原来的 1/k，平方后是 1/k²，走 k 步加起来是 1/k。</p>
+  <h3><span class="l-zh">为什么「来不及调仓」要紧</span><span class="l-en">Why "no time to adjust" matters</span></h3>
+  <p><span class="l-zh">对冲过的仓位，每次价格变动的盈亏大约是 ½ × gamma × 变动²。卖方是负的。同样一段距离，如果分成 k 小步走、每步之后重新对冲，每步的变动是原来的 1/k，平方后是 1/k²，走 k 步加起来是 1/k。</span><span class="l-en">For a hedged position, the P&amp;L on each price move is about ½ × gamma × move², negative for the seller. If the same distance is covered in k small steps, re-hedging after each, each step is 1/k of the move, 1/k² once squared, and k steps add up to 1/k.</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>387.20 → 375.28</th><th>卖方每股</th><th>每张（美元）</th></tr></thead>
+    <thead><tr><th>387.20 → 375.28</th><th><span class="l-zh">卖方每股</span><span class="l-en">Seller, per share</span></th><th><span class="l-zh">每张（美元）</span><span class="l-en">Per contract ($)</span></th></tr></thead>
     <tbody id="kTb"></tbody>
   </table>
-  <p class="tiny">卖方：卖出 350 call 并做 delta 中性对冲。「2 步」指分成 2 段走、每段走完重新对冲一次，其余类推。模型值：Black-Scholes，4/22 收盘时的状态（离 5/15 到期 23 天，隐含波动率 48.55%，利率 4.3%），只看价格变动这一项，隐含波动率与时间不变。</p>
-  <p>价格连续地走，对冲能一路跟上，同样的距离只亏一点点；一次跳过去，整段一次亏掉。模型的对冲论证依赖「随时能调仓」，跳空时这个论证失效。受影响最大的是 gamma 最大的期权：离到期近、行权价贴着现价的那些。</p>
+  <p class="tiny"><span class="l-zh">卖方：卖出 350 call 并做 delta 中性对冲。「2 步」指分成 2 段走、每段走完重新对冲一次，其余类推。模型值：Black-Scholes，4/22 收盘时的状态（离 5/15 到期 23 天，隐含波动率 48.55%，利率 4.3%），只看价格变动这一项，隐含波动率与时间不变。</span><span class="l-en">Seller: sell the 350 call and hedge to delta neutral. "2 steps" means covering the distance in 2 legs and re-hedging after each, and so on. Model values: Black-Scholes at the 4/22 close (23 days to the 5/15 expiration, implied volatility 48.55%, interest rate 4.3%), counting only the price move, with implied volatility and time held fixed.</span></p>
+  <p><span class="l-zh">价格连续地走，对冲能一路跟上，同样的距离只亏一点点；一次跳过去，整段一次亏掉。模型的对冲论证依赖「随时能调仓」，跳空时这个论证失效。受影响最大的是 gamma 最大的期权：离到期近、行权价贴着现价的那些。</span><span class="l-en">When the price moves continuously and the hedge keeps up, the same distance costs only a little; in one jump the whole stretch is lost at once. The model's hedging argument depends on "can adjust at any time", and it fails in a gap. The options hit hardest are those with the largest gamma: near expiration, with strikes close to the current price.</span></p>
 
-  <h3>这次跳空里，对冲过的 350 call 多头</h3>
-  <p>16:00 的报价快照：4/22 收盘时 350 call 中间价 43.40，delta 0.822，gamma 0.00553，<span class="sym" data-say="vega（2.3）：隐含波动率变 1 个点，期权价格变多少。">vega</span> 0.2524，<span class="sym" data-say="theta（2.2）：别的都不变，过一天期权自己掉多少钱。买入的期权一般是负的。">theta</span> −0.30（每天），隐含波动率 48.55%；4/23 收盘时标的 373.69，中间价 30.60，隐含波动率 43.16%。4/22 收盘时买 1 股期权、卖 0.822 股 TSLA 对冲：</p>
+  <h3><span class="l-zh">这次跳空里，对冲过的 350 call 多头</span><span class="l-en">A hedged long 350 call through this gap</span></h3>
+  <p><span class="l-zh">16:00 的报价快照：4/22 收盘时 350 call 中间价 43.40，delta 0.822，gamma 0.00553，<span class="sym" data-say="vega（2.3）：隐含波动率变 1 个点，期权价格变多少。">vega</span> 0.2524，<span class="sym" data-say="theta（2.2）：别的都不变，过一天期权自己掉多少钱。买入的期权一般是负的。">theta</span> −0.30（每天），隐含波动率 48.55%；4/23 收盘时标的 373.69，中间价 30.60，隐含波动率 43.16%。4/22 收盘时买 1 股期权、卖 0.822 股 TSLA 对冲：</span><span class="l-en">The 16:00 quote snapshot: at the 4/22 close the 350 call's mid was 43.40, delta 0.822, gamma 0.00553, <span class="sym" data-say="Vega (2.3): how much the option price changes when implied volatility changes 1 point.">vega</span> 0.2524, <span class="sym" data-say="Theta (2.2): how much the option loses on its own in a day with everything else unchanged. Usually negative for a bought option.">theta</span> −0.30 (per day), implied volatility 48.55%; at the 4/23 close the underlying was 373.69, the mid 30.60, implied volatility 43.16%. Buy 1 option share at the 4/22 close and sell 0.822 TSLA shares to hedge:</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>每股，4/22 16:00 到 4/23 16:00</th><th>盈亏</th></tr></thead>
+    <thead><tr><th><span class="l-zh">每股，4/22 16:00 到 4/23 16:00</span><span class="l-en">Per share, 4/22 16:00 to 4/23 16:00</span></th><th><span class="l-zh">盈亏</span><span class="l-en">P&amp;L</span></th></tr></thead>
     <tbody id="hgTb"></tbody>
   </table>
-  <p>跳空让多头赚到了 gamma 那一块，但整体亏了。原因在 vega：财报一过，隐含波动率从 48.55% 落到 43.16%。跳空的风险在财报前就已经算进了期权价格。</p>
+  <p><span class="l-zh">跳空让多头赚到了 gamma 那一块，但整体亏了。原因在 vega：财报一过，隐含波动率从 48.55% 落到 43.16%。跳空的风险在财报前就已经算进了期权价格。</span><span class="l-en">The gap earned the long position its gamma piece, but overall it lost. The reason is vega: once earnings were out, implied volatility fell from 48.55% to 43.16%. The risk of the gap was already in the option price before earnings.</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>平值隐含波动率</th><th>4/24 到期</th><th>5/1 到期</th><th>5/15 到期</th></tr></thead>
+    <thead><tr><th><span class="l-zh">平值隐含波动率</span><span class="l-en">At-the-money implied volatility</span></th><th><span class="l-zh">4/24 到期</span><span class="l-en">4/24 expiration</span></th><th><span class="l-zh">5/1 到期</span><span class="l-en">5/1 expiration</span></th><th><span class="l-zh">5/15 到期</span><span class="l-en">5/15 expiration</span></th></tr></thead>
     <tbody id="termTb"></tbody>
   </table>
-  <p>4/22 收盘时，两天到期的期权价格里要包含一次财报跳空，折成年化是 89.7%；5/15 到期的把这次跳空摊在 23 天里，只高出几个点。财报一过，两天期的落回 48.3%。</p>
-  <p>市场事先给这次跳空的报价，可以直接看最近到期的平值<span class="sym" data-say="straddle（3.2）：同一个行权价、同一个到期日，买一张 call 加一张 put。标的往哪边走得远都赚。它的价格约等于市场预期的涨跌幅度。">跨式</span>（straddle，3.2）价格：</p>
+  <p><span class="l-zh">4/22 收盘时，两天到期的期权价格里要包含一次财报跳空，折成年化是 89.7%；5/15 到期的把这次跳空摊在 23 天里，只高出几个点。财报一过，两天期的落回 48.3%。</span><span class="l-en">At the 4/22 close, the price of an option expiring in two days has to cover one earnings gap, which annualizes to 89.7%; the 5/15 expiration spreads the gap over 23 days and is only a few points higher. Once earnings were out, the two-day option fell back to 48.3%.</span></p>
+  <p><span class="l-zh">市场事先给这次跳空的报价，可以直接看最近到期的平值<span class="sym" data-say="straddle（3.2）：同一个行权价、同一个到期日，买一张 call 加一张 put。标的往哪边走得远都赚。它的价格约等于市场预期的涨跌幅度。">跨式</span>（straddle，3.2）价格：</span><span class="l-en">The market's advance quote for this gap can be read directly from the price of the nearest-expiration at-the-money <span class="sym" data-say="Straddle (3.2): buy one call and one put at the same strike and the same expiration. It makes money whichever way the underlying moves far. Its price is about the size of the move the market expects.">straddle</span> (3.2):</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>财报日 16:00</th><th>跨式</th><th>价格（占标的）</th><th>第二天实际涨跌</th><th>到期时跨式值</th><th>卖方每股</th></tr></thead>
+    <thead><tr><th><span class="l-zh">财报日 16:00</span><span class="l-en">Earnings day 16:00</span></th><th><span class="l-zh">跨式</span><span class="l-en">Straddle</span></th><th><span class="l-zh">价格（占标的）</span><span class="l-en">Price (share of underlying)</span></th><th><span class="l-zh">第二天实际涨跌</span><span class="l-en">Actual move the next day</span></th><th><span class="l-zh">到期时跨式值</span><span class="l-en">Straddle value at expiration</span></th><th><span class="l-zh">卖方每股</span><span class="l-en">Seller, per share</span></th></tr></thead>
     <tbody id="emTb"></tbody>
   </table>
   </div>
-  <p>4 月那次，跳空比报价小，卖方赚 9.21；7 月那次跌了 14.6%，是报价的两倍多，卖方亏 39.92，四次那样的收入都抵不上。TSLA 最近七次财报第二天的涨跌，按之前 21 天一天的标准差折算：</p>
+  <p><span class="l-zh">4 月那次，跳空比报价小，卖方赚 9.21；7 月那次跌了 14.6%，是报价的两倍多，卖方亏 39.92，四次那样的收入都抵不上。TSLA 最近七次财报第二天的涨跌，按之前 21 天一天的标准差折算：</span><span class="l-en">In April, the gap was smaller than the quote, and the seller made 9.21; in July the stock fell 14.6%, more than twice the quote, and the seller lost 39.92, more than four times that income could cover. TSLA's moves on the day after each of its last seven earnings reports, in units of one day's standard deviation over the previous 21 days:</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>财报日（收盘后）</th><th>收盘</th><th>第二天收盘</th><th>涨跌</th><th>之前 21 天一天的标准差</th><th>几个标准差</th></tr></thead>
+    <thead><tr><th><span class="l-zh">财报日（收盘后）</span><span class="l-en">Earnings day (after close)</span></th><th><span class="l-zh">收盘</span><span class="l-en">Close</span></th><th><span class="l-zh">第二天收盘</span><span class="l-en">Next-day close</span></th><th><span class="l-zh">涨跌</span><span class="l-en">Move</span></th><th><span class="l-zh">之前 21 天一天的标准差</span><span class="l-en">One-day standard deviation, previous 21 days</span></th><th><span class="l-zh">几个标准差</span><span class="l-en">Standard deviations</span></th></tr></thead>
     <tbody id="earnTb"></tbody>
   </table>
   </div>
 
-  <h3>卖方要补偿：隐含波动率高于之后的实际波动</h3>
-  <p>讲义接着问：隐含波动率倾向于低于、等于还是高于历史波动率？卖方承担着对冲不掉的跳空，要收额外的钱，所以期权比模型值贵，隐含波动率偏高。SPX 六年的数据：把每天的 VIX 和之后 21 个交易日 SPX 实际的波动率比，1419 天里 VIX 更高的占 86.9%，平均高 4.42 个点（VIX 平均 19.74，之后实际平均 15.32）。和之前 21 天的历史波动率比，VIX 更高的占 87.7%。</p>
-  <p class="tiny">财报日：Robinhood 财报日历，7 次都在收盘后发布。TSLA 收盘取分钟线 15:59 那根；期权数据取 16:00 报价快照，中间价 ＝ (买一 ＋ 卖一) ÷ 2。两个来源的标的价不完全一样：4/22 报价快照 16:00 是 387.61，分钟线 15:59 收盘是 387.20；4/23 分别是 373.69 与 373.62。分钟线图、跳空和分步对冲表用分钟线的价格，对冲多头的盈亏表用报价快照的标的价。实际波动率用对数涨跌、零均值、乘 16。</p>
+  <h3><span class="l-zh">卖方要补偿：隐含波动率高于之后的实际波动</span><span class="l-en">Sellers need compensation: implied volatility above the volatility that follows</span></h3>
+  <p><span class="l-zh">讲义接着问：隐含波动率倾向于低于、等于还是高于历史波动率？卖方承担着对冲不掉的跳空，要收额外的钱，所以期权比模型值贵，隐含波动率偏高。SPX 六年的数据：把每天的 VIX 和之后 21 个交易日 SPX 实际的波动率比，1419 天里 VIX 更高的占 86.9%，平均高 4.42 个点（VIX 平均 19.74，之后实际平均 15.32）。和之前 21 天的历史波动率比，VIX 更高的占 87.7%。</span><span class="l-en">The lecture notes go on to ask: does implied volatility tend to be below, equal to or above historical volatility? Sellers carry gaps they cannot hedge and need extra pay, so options are more expensive than the model value and implied volatility runs high. Six years of SPX data: comparing each day's VIX with SPX's actual volatility over the following 21 trading days, VIX was higher on 86.9% of 1419 days, by 4.42 points on average (VIX averaged 19.74, the volatility that followed 15.32). Against the historical volatility of the previous 21 days, VIX was higher on 87.7%.</span></p>
+  <p class="tiny"><span class="l-zh">财报日：7 次都在收盘后发布。TSLA 收盘取分钟线 15:59 那根；期权数据取 16:00 报价快照，中间价 ＝ (买一 ＋ 卖一) ÷ 2。两个来源的标的价不完全一样：4/22 报价快照 16:00 是 387.61，分钟线 15:59 收盘是 387.20；4/23 分别是 373.69 与 373.62。分钟线图、跳空和分步对冲表用分钟线的价格，对冲多头的盈亏表用报价快照的标的价。实际波动率用对数涨跌、零均值、乘 16。</span><span class="l-en">Earnings dates: all 7 reports came after the close. TSLA closes are the 15:59 minute bar; option data are from the 16:00 quote snapshot, mid = (bid + ask) ÷ 2. The two sources' underlying prices differ slightly: 387.61 in the 4/22 16:00 quote snapshot against a 387.20 close for the 15:59 minute bar; 373.69 and 373.62 on 4/23. The minute chart, the gap and the step-hedging table use minute-bar prices; the hedged long P&amp;L table uses the quote snapshot's underlying price. Actual volatility uses log moves, zero mean, times 16.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>假设 ④：波动率与方向无关</h2>
-  <p class="sub">讲义的问题：股指现在 2500，两周后可能到 2300，也可能到 2700。在哪个位置波动更大？讲义这一页的标题是 Down Faster，跌得比涨得快。</p>
-  <p>每个点是一个交易日，共 1413 天，VIX 缺数据的日子不算。</p>
+  <h2><span class="l-zh"><span class="n">四</span>假设 ④：波动率与方向无关</span><span class="l-en"><span class="n">4</span>Assumption ④: volatility does not depend on direction</span></h2>
+  <p class="sub"><span class="l-zh">讲义的问题：股指现在 2500，两周后可能到 2300，也可能到 2700。在哪个位置波动更大？讲义这一页的标题是 Down Faster，跌得比涨得快。</span><span class="l-en">The lecture's question: a stock index is at 2500 now and in two weeks may be at 2300 or at 2700. Where is it more volatile? This lecture page is titled Down Faster: falls are faster than rises.</span></p>
+  <p><span class="l-zh">每个点是一个交易日，共 1413 天，VIX 缺数据的日子不算。</span><span class="l-en">Each dot is one trading day, 1413 days in all; days with missing VIX data are left out.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="scPlay">重播</button></div>
-    <div class="chart"><svg id="sc" viewBox="0 0 460 420" role="img" aria-label="SPX 每日涨跌与 VIX 每日变化的散点图"></svg></div>
+    <div class="bar"><button class="btn ghost" id="scPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <div class="chart"><svg id="sc" viewBox="0 0 460 420" role="img" aria-label="SPX 每日涨跌与 VIX 每日变化的散点图" data-en-aria-label="Scatter plot of SPX daily moves against daily changes in VIX"></svg></div>
     <div class="legend">
-      <span><i style="background:var(--control);border-radius:50%"></i>SPX 跌的日子</span>
-      <span><i style="background:var(--result);border-radius:50%"></i>SPX 涨的日子</span>
+      <span><i style="background:var(--control);border-radius:50%"></i><span class="l-zh">SPX 跌的日子</span><span class="l-en">Days SPX fell</span></span>
+      <span><i style="background:var(--result);border-radius:50%"></i><span class="l-zh">SPX 涨的日子</span><span class="l-en">Days SPX rose</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="scD"></div><div class="d2" id="scN"></div></div>
-      <div class="stat"><div class="k">相关系数</div><div class="d" id="scR" style="color:var(--control)"></div><div class="d2">随点数增加实时计算</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="scD"></div><div class="d2" id="scN"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">相关系数</span><span class="l-en">Correlation</span></div><div class="d" id="scR" style="color:var(--control)"></div><div class="d2"><span class="l-zh">随点数增加实时计算</span><span class="l-en">Computed live as dots are added</span></div></div>
     </div>
   </div>
-  <p>1413 对相邻交易日，<span class="sym" data-say="correlation，在 −1 到 +1 之间。−1：一个大，另一个一定小；0：看不出关系。">相关系数</span> −0.80。SPX 每涨 1%，VIX 平均跌 1.38 个点。SPX 跌的 644 天里 VIX 平均涨 1.03 点，77% 的日子 VIX 是涨的；SPX 涨的 769 天里 VIX 平均跌 0.89 点，82% 的日子是跌的。跌超过 2% 的 46 天，VIX 平均涨 4.83 点；涨超过 2% 的 36 天，平均跌 3.14 点。</p>
-  <h3>讲义的问题，用 SPX 的两周来答</h3>
-  <p>从每个交易日起数 10 个交易日（两周），按这两周 SPX 的涨跌分组：</p>
+  <p><span class="l-zh">1413 对相邻交易日，<span class="sym" data-say="correlation，在 −1 到 +1 之间。−1：一个大，另一个一定小；0：看不出关系。">相关系数</span> −0.80。SPX 每涨 1%，VIX 平均跌 1.38 个点。SPX 跌的 644 天里 VIX 平均涨 1.03 点，77% 的日子 VIX 是涨的；SPX 涨的 769 天里 VIX 平均跌 0.89 点，82% 的日子是跌的。跌超过 2% 的 46 天，VIX 平均涨 4.83 点；涨超过 2% 的 36 天，平均跌 3.14 点。</span><span class="l-en">Over 1413 pairs of adjacent trading days, the <span class="sym" data-say="Correlation, between −1 and +1. −1: when one is large the other is always small; 0: no visible relationship.">correlation</span> is −0.80. For every 1% SPX rises, VIX falls 1.38 points on average. On the 644 days SPX fell, VIX rose 1.03 points on average and rose on 77% of them; on the 769 days SPX rose, VIX fell 0.89 points on average and fell on 82% of them. On the 46 days SPX fell more than 2%, VIX rose 4.83 points on average; on the 36 days it rose more than 2%, VIX fell 3.14 points on average.</span></p>
+  <h3><span class="l-zh">讲义的问题，用 SPX 的两周来答</span><span class="l-en">The lecture's question, answered with SPX two-week periods</span></h3>
+  <p><span class="l-zh">从每个交易日起数 10 个交易日（两周），按这两周 SPX 的涨跌分组：</span><span class="l-en">Starting from each trading day, count 10 trading days (two weeks) and group by SPX's move over those two weeks:</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>这两周 SPX</th><th>窗口数</th><th>VIX 变了几点</th><th>两周后的 VIX</th><th>再之后两周的实际波动率</th></tr></thead>
+    <thead><tr><th><span class="l-zh">这两周 SPX</span><span class="l-en">SPX over the two weeks</span></th><th><span class="l-zh">窗口数</span><span class="l-en">Windows</span></th><th><span class="l-zh">VIX 变了几点</span><span class="l-en">VIX change, points</span></th><th><span class="l-zh">两周后的 VIX</span><span class="l-en">VIX after two weeks</span></th><th><span class="l-zh">再之后两周的实际波动率</span><span class="l-en">Actual volatility over the next two weeks</span></th></tr></thead>
     <tbody id="wkTb"></tbody>
   </table>
   </div>
-  <p class="tiny">每个交易日起一个窗口，相邻窗口有重叠，窗口数不是独立样本的个数。VIX 缺数据的日子不作起点或终点。</p>
-  <p>答案是 2300。跌了两周之后，市场给的波动率和之后真实的波动都高得多；涨了两周之后，波动率降下来。这就是讲义说的指数「跌得比涨得快」。这种关系不是所有标的都有：TSLA 用 30 天隐含波动率算，它每涨 1%，隐含波动率按比例只降约 0.3%（SPX 的 VIX 降 5.7%），相关系数 −0.21。讲义留了一个问题：换成商品会不会不一样？有些商品市场是涨的时候更波动，方向就反过来。</p>
+  <p class="tiny"><span class="l-zh">每个交易日起一个窗口，相邻窗口有重叠，窗口数不是独立样本的个数。VIX 缺数据的日子不作起点或终点。</span><span class="l-en">A window starts on every trading day and neighboring windows overlap, so the number of windows is not the number of independent samples. Days with missing VIX data are not used as start or end points.</span></p>
+  <p><span class="l-zh">答案是 2300。跌了两周之后，市场给的波动率和之后真实的波动都高得多；涨了两周之后，波动率降下来。这就是讲义说的指数「跌得比涨得快」。这种关系不是所有标的都有：TSLA 用 30 天隐含波动率算，它每涨 1%，隐含波动率按比例只降约 0.3%（SPX 的 VIX 降 5.7%），相关系数 −0.21。讲义留了一个问题：换成商品会不会不一样？有些商品市场是涨的时候更波动，方向就反过来。</span><span class="l-en">The answer is 2300. After two weeks of falling, both the volatility the market quotes and the real volatility that follows are much higher; after two weeks of rising, volatility comes down. This is what the lecture notes mean by an index "falling faster than it rises". Not every underlying behaves this way: using TSLA's 30-day implied volatility, each 1% rise lowers implied volatility by only about 0.3% in proportion (SPX's VIX falls 5.7%), with a correlation of −0.21. The lecture notes leave a question: would commodities be different? In some commodity markets prices are more volatile when they rise, and the direction is reversed.</span></p>
 
-  <h3>平值跨式的 delta 是负的</h3>
-  <p>讲义的例子：买入正好平远期的股指跨式（一张 2500 call 加一张 2500 put），delta 大约是多少？在 Black-Scholes 里，call 约 +0.5、put 约 −0.5，合起来接近 0。讲义的答案却是负。</p>
-  <p>跨式是正 vega，波动率涨它就赚。指数跌，VIX 涨，跨式因此多赚一块；指数涨，VIX 跌，跨式因此多亏一块。这一块和指数的方向相反，等于额外空了一些指数。用 2026-07-31 的 SPX 算一个月的平值跨式（模型值）：</p>
+  <h3><span class="l-zh">平值跨式的 delta 是负的</span><span class="l-en">An at-the-money straddle has negative delta</span></h3>
+  <p><span class="l-zh">讲义的例子：买入正好平远期的股指跨式（一张 2500 call 加一张 2500 put），delta 大约是多少？在 Black-Scholes 里，call 约 +0.5、put 约 −0.5，合起来接近 0。讲义的答案却是负。</span><span class="l-en">The lecture example: buy an index straddle exactly at the forward (one 2500 call plus one 2500 put). Roughly what is its delta? In Black-Scholes the call is about +0.5 and the put about −0.5, together close to 0. The lecture's answer is negative.</span></p>
+  <p><span class="l-zh">跨式是正 vega，波动率涨它就赚。指数跌，VIX 涨，跨式因此多赚一块；指数涨，VIX 跌，跨式因此多亏一块。这一块和指数的方向相反，等于额外空了一些指数。用 2026-07-31 的 SPX 算一个月的平值跨式（模型值）：</span><span class="l-en">A straddle is long vega and makes money when volatility rises. When the index falls, VIX rises, and the straddle earns an extra piece; when the index rises, VIX falls, and the straddle loses an extra piece. This piece goes against the index's direction, like being short a bit more index. A one-month at-the-money straddle on SPX as of 2026-07-31 (model values):</span></p>
   <div class="formula">
-    <div class="math">真实 delta ≈ <span class="sym" data-say="模型 delta：只算标的动、期权价跟着动，隐含波动率不变。">模型 delta</span> ＋ <span class="sym" data-say="vega（2.3）：隐含波动率变 1 个点，仓位值多少。">vega</span> × <span class="sym" data-say="指数每涨 1 点，隐含波动率变几个点。这里用 VIX 的回归：SPX 每涨 1%，VIX 平均跌 1.38 点。">隐含波动率每点指数的变化</span></div>
+    <div class="math"><span class="l-zh">真实 delta ≈ <span class="sym" data-say="模型 delta：只算标的动、期权价跟着动，隐含波动率不变。">模型 delta</span> ＋ <span class="sym" data-say="vega（2.3）：隐含波动率变 1 个点，仓位值多少。">vega</span> × <span class="sym" data-say="指数每涨 1 点，隐含波动率变几个点。这里用 VIX 的回归：SPX 每涨 1%，VIX 平均跌 1.38 点。">隐含波动率每点指数的变化</span></span><span class="l-en">Actual delta ≈ <span class="sym" data-say="Model delta: only the underlying moves and the option price follows; implied volatility stays fixed.">model delta</span> + <span class="sym" data-say="Vega (2.3): how much the position is worth when implied volatility changes 1 point.">vega</span> × <span class="sym" data-say="How many points implied volatility changes for each 1-point rise in the index. Here from the VIX regression: for every 1% SPX rises, VIX falls 1.38 points on average.">change in implied volatility per index point</span></span></div>
     <div class="gloss" id="stSay"></div>
   </div>
-  <p>所以持有这个跨式的人偏好指数下跌。如果标的是涨的时候更波动的商品，这一项的符号反过来，跨式的真实 delta 为正。讲义在这里只给了答案，模型 delta 与真实 delta 之差怎么按行权价逐个算，是节点 8 的内容。</p>
+  <p><span class="l-zh">所以持有这个跨式的人偏好指数下跌。如果标的是涨的时候更波动的商品，这一项的符号反过来，跨式的真实 delta 为正。讲义在这里只给了答案，模型 delta 与真实 delta 之差怎么按行权价逐个算，是节点 8 的内容。</span><span class="l-en">So whoever holds this straddle prefers the index to fall. If the underlying were a commodity that is more volatile when it rises, this term would flip sign and the straddle's actual delta would be positive. The lecture notes give only the answer here; how to compute the gap between model delta and actual delta strike by strike is the subject of node 8.</span></p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>两个替代模型：CEV 与跳跃扩散</h2>
-  <p class="sub">讲义给了两个修补模型，各修一条假设。讲义只给了定义，下面的式子是这两个模型的常见写法，参数用真实数据估。</p>
+  <h2><span class="l-zh"><span class="n">五</span>两个替代模型：CEV 与跳跃扩散</span><span class="l-en"><span class="n">5</span>Two alternative models: CEV and jump-diffusion</span></h2>
+  <p class="sub"><span class="l-zh">讲义给了两个修补模型，各修一条假设。讲义只给了定义，下面的式子是这两个模型的常见写法，参数用真实数据估。</span><span class="l-en">The lecture notes give two patched models, each fixing one assumption. The notes give only definitions; the formulas below are the usual way these models are written, with parameters estimated from real data.</span></p>
 
-  <h3>CEV：波动率随价格变</h3>
-  <p>讲义的定义：<span class="sym" data-say="Constant Elasticity of Variance，常弹性方差模型。价格的波动幅度与价格水平成固定的幂次关系。">CEV</span> 模型假设波动率随标的价格往哪边走而变化。它修的是假设 ④。</p>
+  <h3><span class="l-zh">CEV：波动率随价格变</span><span class="l-en">CEV: volatility changes with price</span></h3>
+  <p><span class="l-zh">讲义的定义：<span class="sym" data-say="Constant Elasticity of Variance，常弹性方差模型。价格的波动幅度与价格水平成固定的幂次关系。">CEV</span> 模型假设波动率随标的价格往哪边走而变化。它修的是假设 ④。</span><span class="l-en">The lecture's definition: the <span class="sym" data-say="Constant Elasticity of Variance model. The size of price moves has a fixed power relationship with the price level.">CEV</span> model assumes volatility changes depending on which way the underlying price goes. It fixes assumption ④.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="价格为 S 时的年化波动率。">σ(S)</span> ＝ <span class="sym" data-say="起点价格上的波动率。">σ₀</span> × (<span class="sym" data-say="当前价格。">S</span> ÷ <span class="sym" data-say="起点价格。">S₀</span>)<sup><span class="sym" data-say="beta，弹性参数。β = 1 时波动率不随价格变，就是 Black-Scholes；β = 0 时每天的美元幅度不随价格变，就是 1.2 讲的按加减算；β 小于 1 时价格越低波动率越高。">β</span> − 1</sup></div>
-    <div class="gloss">价格为 S 时的波动率 ＝ 起点的波动率 × 价格相对起点的倍数的 β − 1 次方</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="价格为 S 时的年化波动率。">σ(S)</span> ＝ <span class="sym" data-say="起点价格上的波动率。">σ₀</span> × (<span class="sym" data-say="当前价格。">S</span> ÷ <span class="sym" data-say="起点价格。">S₀</span>)<sup><span class="sym" data-say="beta，弹性参数。β = 1 时波动率不随价格变，就是 Black-Scholes；β = 0 时每天的美元幅度不随价格变，就是 1.2 讲的按加减算；β 小于 1 时价格越低波动率越高。">β</span> − 1</sup></span><span class="l-en"><span class="sym" data-say="Annualized volatility at price S.">σ(S)</span> = <span class="sym" data-say="Volatility at the starting price.">σ₀</span> × (<span class="sym" data-say="Current price.">S</span> ÷ <span class="sym" data-say="Starting price.">S₀</span>)<sup><span class="sym" data-say="Beta, the elasticity parameter. At β = 1 volatility does not change with price, which is Black-Scholes; at β = 0 the daily dollar range does not change with price, which is the additive model of 1.2; below 1, the lower the price, the higher the volatility.">β</span> − 1</sup></span></div>
+    <div class="gloss"><span class="l-zh">价格为 S 时的波动率 ＝ 起点的波动率 × 价格相对起点的倍数的 β − 1 次方</span><span class="l-en">Volatility at price S = starting volatility × (price as a multiple of the start) to the power β − 1</span></div>
   </div>
   <ul>
-    <li>β ＝ 1：σ 不随价格变，就是 Black-Scholes，1.2 说的「按比例」。</li>
-    <li>β ＝ 0：每天的美元幅度不随价格变，就是 1.2 说的「按加减」，Bachelier 的做法。</li>
-    <li>β 小于 1：价格越低，波动率越高，跌得比涨得快。</li>
+    <li><span class="l-zh">β ＝ 1：σ 不随价格变，就是 Black-Scholes，1.2 说的「按比例」。</span><span class="l-en">β = 1: σ does not change with price; this is Black-Scholes, the "proportional" model of 1.2.</span></li>
+    <li><span class="l-zh">β ＝ 0：每天的美元幅度不随价格变，就是 1.2 说的「按加减」，Bachelier 的做法。</span><span class="l-en">β = 0: the daily dollar range does not change with price; this is the "additive" model of 1.2, Bachelier's approach.</span></li>
+    <li><span class="l-zh">β 小于 1：价格越低，波动率越高，跌得比涨得快。</span><span class="l-en">β below 1: the lower the price, the higher the volatility; falls are faster than rises.</span></li>
   </ul>
-  <p>β − 1 就是「价格涨 1%，波动率涨百分之几」，可以从数据里量。SPX 用 VIX：SPX 每涨 1%，VIX 平均变化 −5.73%，所以 β ≈ −4.7。TSLA 用 30 天隐含波动率：约 −0.30%，β ≈ 0.7。1.2 第二节第 ③ 条的分组表也在量同一件事：TSLA 的价格从平均 166 到 375，是 2.25 倍，每天的美元幅度只变成 1.90 倍。按比例（β ＝ 1）应该也是 2.25 倍，按加减（β ＝ 0）应该不变，1.90 倍折成 β 约 0.8。</p>
+  <p><span class="l-zh">β − 1 就是「价格涨 1%，波动率涨百分之几」，可以从数据里量。SPX 用 VIX：SPX 每涨 1%，VIX 平均变化 −5.73%，所以 β ≈ −4.7。TSLA 用 30 天隐含波动率：约 −0.30%，β ≈ 0.7。1.2 第二节第 ③ 条的分组表也在量同一件事：TSLA 的价格从平均 166 到 375，是 2.25 倍，每天的美元幅度只变成 1.90 倍。按比例（β ＝ 1）应该也是 2.25 倍，按加减（β ＝ 0）应该不变，1.90 倍折成 β 约 0.8。</span><span class="l-en">β − 1 is "how many percent volatility rises when the price rises 1%", which can be measured from data. For SPX, using VIX: for every 1% SPX rises, VIX changes −5.73% on average, so β ≈ −4.7. For TSLA, using 30-day implied volatility: about −0.30%, β ≈ 0.7. The grouped table in 1.2, section 2, item ③ measures the same thing: TSLA's average price went from 166 to 375, 2.25 times, while its daily dollar range grew only 1.90 times. Proportional (β = 1) would give 2.25 times as well, additive (β = 0) no change; 1.90 times works out to a β of about 0.8.</span></p>
 
-  <h3>跳跃扩散：平时连续走，偶尔跳</h3>
-  <p>讲义的定义：<span class="sym" data-say="Jump Diffusion Model。Merton 1976 年提出的写法：价格平时按 Black-Scholes 连续地走，另外按随机的时间点偶尔跳一次。">跳跃扩散</span>模型假设价格偶尔会跳空，此时连续的动态对冲做不到。它修的是假设 ③，也让两条尾巴变长。</p>
+  <h3><span class="l-zh">跳跃扩散：平时连续走，偶尔跳</span><span class="l-en">Jump-diffusion: continuous most of the time, an occasional jump</span></h3>
+  <p><span class="l-zh">讲义的定义：<span class="sym" data-say="Jump Diffusion Model。Merton 1976 年提出的写法：价格平时按 Black-Scholes 连续地走，另外按随机的时间点偶尔跳一次。">跳跃扩散</span>模型假设价格偶尔会跳空，此时连续的动态对冲做不到。它修的是假设 ③，也让两条尾巴变长。</span><span class="l-en">The lecture's definition: the <span class="sym" data-say="Jump Diffusion Model. The form proposed by Merton in 1976: the price normally moves continuously as in Black-Scholes, and in addition jumps occasionally at random times.">jump-diffusion</span> model assumes the price occasionally gaps, and continuous dynamic hedging is then impossible. It fixes assumption ③ and also lengthens both tails.</span></p>
   <div class="formula">
-    <div class="math">每天的涨跌 ＝ 连续部分（<span class="sym" data-say="连续部分的年化波动率。">σ_d</span>）＋ 偶尔一次跳跃（每年平均 <span class="sym" data-say="lambda，平均每年跳几次。">λ</span> 次，幅度约 ±<span class="sym" data-say="delta 小写，这里指跳跃幅度的标准差，不是希腊字母 delta。">δ</span>）</div>
-    <div class="gloss">平时像 Black-Scholes 一样走；每天有一个小概率跳一次，跳多少也是随机的，平均不往哪边偏</div>
+    <div class="math"><span class="l-zh">每天的涨跌 ＝ 连续部分（<span class="sym" data-say="连续部分的年化波动率。">σ_d</span>）＋ 偶尔一次跳跃（每年平均 <span class="sym" data-say="lambda，平均每年跳几次。">λ</span> 次，幅度约 ±<span class="sym" data-say="delta 小写，这里指跳跃幅度的标准差，不是希腊字母 delta。">δ</span>）</span><span class="l-en">Daily move = continuous part (<span class="sym" data-say="Annualized volatility of the continuous part.">σ_d</span>) + an occasional jump (on average <span class="sym" data-say="Lambda, the average number of jumps per year.">λ</span> a year, size about ±<span class="sym" data-say="Lowercase delta, here the standard deviation of the jump size, not the Greek delta.">δ</span>)</span></div>
+    <div class="gloss"><span class="l-zh">平时像 Black-Scholes 一样走；每天有一个小概率跳一次，跳多少也是随机的，平均不往哪边偏</span><span class="l-en">Normally it moves like Black-Scholes; each day there is a small chance of a jump of random size, with no lean either way on average</span></div>
   </div>
   <p id="jdSay"></p>
 
-  <h3>三种模型的模拟走势</h3>
-  <p>TSLA 参数走 32 天（到 5/15），SPX 参数走 30 天，都分成 24 个交易日画。纵轴是离起点几个标准差。Black-Scholes 与跳跃扩散都用 46.3% 作尺子（跳跃扩散的总波动率就是 46.3%），CEV（SPX 参数）用 19.7%，这样三种模型的总宽度大致相同，比的是形状。右边是 2000 条模拟走势此刻的分布，点线是钟形。三种模式用同一串随机数。</p>
+  <h3><span class="l-zh">三种模型的模拟走势</span><span class="l-en">Simulated paths under the three models</span></h3>
+  <p><span class="l-zh">TSLA 参数走 32 天（到 5/15），SPX 参数走 30 天，都分成 24 个交易日画。纵轴是离起点几个标准差。Black-Scholes 与跳跃扩散都用 46.3% 作尺子（跳跃扩散的总波动率就是 46.3%），CEV（SPX 参数）用 19.7%，这样三种模型的总宽度大致相同，比的是形状。右边是 2000 条模拟走势此刻的分布，点线是钟形。三种模式用同一串随机数。</span><span class="l-en">The TSLA parameters run 32 days (to 5/15), the SPX parameters 30 days, both drawn as 24 trading days. The vertical axis is standard deviations from the start. Black-Scholes and jump-diffusion use 46.3% as the yardstick (jump-diffusion's total volatility is exactly 46.3%), CEV (SPX parameters) uses 19.7%, so the three models have about the same overall width and what is compared is the shape. On the right is the distribution of 2000 simulated paths at this moment, with the bell shape dotted. All three modes use the same string of random numbers.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="mdSeg">
         <button data-m="bs" aria-pressed="false">Black-Scholes</button>
-        <button data-m="cev" aria-pressed="true">CEV（SPX 参数）</button>
-        <button data-m="jd" aria-pressed="false">跳跃扩散（TSLA 参数）</button>
+        <button data-m="cev" aria-pressed="true"><span class="l-zh">CEV（SPX 参数）</span><span class="l-en">CEV (SPX parameters)</span></button>
+        <button data-m="jd" aria-pressed="false"><span class="l-zh">跳跃扩散（TSLA 参数）</span><span class="l-en">Jump-diffusion (TSLA parameters)</span></button>
       </div>
-      <button class="btn ghost" id="mdPlay">重播</button>
+      <button class="btn ghost" id="mdPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button>
     </div>
-    <div class="stage"><canvas id="md" width="264" height="150" aria-label="三种模型的模拟走势与到期分布"></canvas></div>
+    <div class="stage"><canvas id="md" width="264" height="150" aria-label="三种模型的模拟走势与到期分布" data-en-aria-label="Simulated paths and distribution at expiration under three models"></canvas></div>
     <div class="legend">
-      <span>经过的走势 <i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i> 1 条 → 16 条以上</span>
-      <span>点线：±1、±2 个标准差</span>
-      <span><i style="background:var(--control)"></i>在 ±2 个标准差以外</span>
+      <span><span class="l-zh">经过的走势 <i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i> 1 条 → 16 条以上</span><span class="l-en">Paths run <i class="rp" data-k="0"></i><i class="rp" data-k="1"></i><i class="rp" data-k="2"></i><i class="rp" data-k="3"></i><i class="rp" data-k="4"></i> 1 → 16 or more</span></span>
+      <span><span class="l-zh">点线：±1、±2 个标准差</span><span class="l-en">Dotted lines: ±1 and ±2 standard deviations</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">在 ±2 个标准差以外</span><span class="l-en">Beyond ±2 standard deviations</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">第几个交易日</div><div class="d" id="mdDay"></div><div class="d2" id="mdPar"></div></div>
-      <div class="stat"><div class="k">低于 −2 个标准差</div><div class="d" id="mdLo" style="color:var(--control)"></div><div class="d2">2000 条模拟里</div></div>
-      <div class="stat"><div class="k">高于 +2 个标准差</div><div class="d" id="mdHi" style="color:var(--control)"></div><div class="d2">2000 条模拟里</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">第几个交易日</span><span class="l-en">Trading day</span></div><div class="d" id="mdDay"></div><div class="d2" id="mdPar"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">低于 −2 个标准差</span><span class="l-en">Below −2 standard deviations</span></div><div class="d" id="mdLo" style="color:var(--control)"></div><div class="d2"><span class="l-zh">2000 条模拟里</span><span class="l-en">Of 2000 simulations</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">高于 +2 个标准差</span><span class="l-en">Above +2 standard deviations</span></div><div class="d" id="mdHi" style="color:var(--control)"></div><div class="d2"><span class="l-zh">2000 条模拟里</span><span class="l-en">Of 2000 simulations</span></div></div>
     </div>
     <div class="say plain" id="mdSay"></div>
   </div>
-  <p>模拟只画形状，正文里的概率用模型公式精确算：</p>
+  <p><span class="l-zh">模拟只画形状，正文里的概率用模型公式精确算：</span><span class="l-en">The simulation shows only the shape; the probabilities in the text are computed exactly from the model formulas:</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>到期时（模型值）</th><th>低于 −2 个标准差</th><th>高于 +2 个标准差</th></tr></thead>
+    <thead><tr><th><span class="l-zh">到期时（模型值）</span><span class="l-en">At expiration (model values)</span></th><th><span class="l-zh">低于 −2 个标准差</span><span class="l-en">Below −2 standard deviations</span></th><th><span class="l-zh">高于 +2 个标准差</span><span class="l-en">Above +2 standard deviations</span></th></tr></thead>
     <tbody id="probTb"></tbody>
   </table>
   </div>
-  <p class="tiny">「几个标准差」＝ ln(到期价 ÷ 起点远期价) ÷ (σ × √t)。σ 是尺子：TSLA 的三行都用 46.3%，SPX 的两行用 19.7%。Black-Scholes 下两边也不相等（2.67% 与 1.93%）：远期价 F 是到期价的平均值，对数正态的中位数在 F 下方（按对数算低 σ²t ÷ 2），整条分布往下挪了半个 σ√t（TSLA 这里是 0.07 个标准差），所以跌破 −2 个的多一些、涨过 +2 个的少一些；去掉这一挪，两边都是 2.28%（第七节也讲到对数正态的中心略低于 F）。CEV 没有简单的公式，用数值方法按时间一小步一小步推出每个行权价的价格；跳跃扩散按跳 0 次、1 次、2 次……分别用 Black-Scholes 算，再按每种次数的概率加权。SPX 参数：起点 100，平值 19.7%（VIX 六年平均），30 天，β ＝ −4.7。TSLA 参数：起点 352.36，32 天，利率 4.3%。</p>
-  <p>CEV（SPX 参数）把概率从右边搬到左边：跌破 −2 个标准差的可能翻了一倍，涨过 +2 个标准差的只剩六分之一。跳跃扩散两边都多出一截。换成期权价格：跳跃扩散下 TSLA 440 call 值 1.80，Black-Scholes（46.3%）是 1.27；300 put 是 2.52 对 2.49。</p>
+  <p class="tiny"><span class="l-zh">「几个标准差」＝ ln(到期价 ÷ 起点远期价) ÷ (σ × √t)。σ 是尺子：TSLA 的三行都用 46.3%，SPX 的两行用 19.7%。Black-Scholes 下两边也不相等（2.67% 与 1.93%）：远期价 F 是到期价的平均值，对数正态的中位数在 F 下方（按对数算低 σ²t ÷ 2），整条分布往下挪了半个 σ√t（TSLA 这里是 0.07 个标准差），所以跌破 −2 个的多一些、涨过 +2 个的少一些；去掉这一挪，两边都是 2.28%（第七节也讲到对数正态的中心略低于 F）。CEV 没有简单的公式，用数值方法按时间一小步一小步推出每个行权价的价格；跳跃扩散按跳 0 次、1 次、2 次……分别用 Black-Scholes 算，再按每种次数的概率加权。SPX 参数：起点 100，平值 19.7%（VIX 六年平均），30 天，β ＝ −4.7。TSLA 参数：起点 352.36，32 天，利率 4.3%。</span><span class="l-en">"Standard deviations" = ln(price at expiration ÷ starting forward price) ÷ (σ × √t). σ is the yardstick: 46.3% for the three TSLA rows, 19.7% for the two SPX rows. Even under Black-Scholes the two sides are not equal (2.67% and 1.93%): the forward price F is the average price at expiration, and the median of a lognormal is below F (by σ²t ÷ 2 in log terms), so the whole distribution shifts down by half a σ√t (0.07 standard deviations for TSLA here), making a drop below −2 a bit more likely and a rise above +2 a bit less; without that shift both sides are 2.28% (section 7 also notes that the lognormal's center is slightly below F). CEV has no simple formula; each strike's price is worked out numerically in small time steps. Jump-diffusion is computed with Black-Scholes separately for 0 jumps, 1 jump, 2 jumps and so on, weighted by the probability of each count. SPX parameters: start 100, at-the-money 19.7% (six-year VIX average), 30 days, β = −4.7. TSLA parameters: start 352.36, 32 days, 4.3% interest rate.</span></p>
+  <p><span class="l-zh">CEV（SPX 参数）把概率从右边搬到左边：跌破 −2 个标准差的可能翻了一倍，涨过 +2 个标准差的只剩六分之一。跳跃扩散两边都多出一截。换成期权价格：跳跃扩散下 TSLA 440 call 值 1.80，Black-Scholes（46.3%）是 1.27；300 put 是 2.52 对 2.49。</span><span class="l-en">CEV (SPX parameters) moves probability from right to left: the chance of falling below −2 standard deviations doubles, while the chance of rising above +2 shrinks to a sixth. Jump-diffusion adds a bit on both sides. In option prices: under jump-diffusion the TSLA 440 call is worth 1.80, against 1.27 under Black-Scholes (46.3%); the 300 put is 2.52 against 2.49.</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>skew 从哪来</h2>
-  <p class="sub">市场没有换掉 Black-Scholes，而是给每个行权价填一个不同的隐含波动率。这条曲线的形状，记录的就是真实分布和钟形差在哪里。</p>
-  <p>做法：把每一张期权的市场价代进 Black-Scholes，反推出一个 σ，就是这张期权的隐含波动率（1.2 第七节）。如果模型的四条假设都成立，同一个到期日所有行权价应该反推出同一个 σ，曲线是平的。同一到期日、不同行权价的隐含波动率不一样，讲义叫<span class="sym" data-say="volatility skew。同一到期日、不同行权价的期权以不同的隐含波动率交易。">波动率偏斜（skew）</span>。</p>
-  <p>下图的横轴是行权价离远期价几个标准差（1.2 第六节的 ln(<span class="sym" data-say="行权价。">X</span> ÷ <span class="sym" data-say="远期价（1.1）：到期价的平均值，也是平值的位置。">F</span>) ÷ (<span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="离到期时间（年）的平方根。">√t</span>)），纵轴是隐含波动率占平值的百分比，这样不同标的、不同水平可以放在一起比。</p>
+  <h2><span class="l-zh"><span class="n">六</span>skew 从哪来</span><span class="l-en"><span class="n">6</span>Where skew comes from</span></h2>
+  <p class="sub"><span class="l-zh">市场没有换掉 Black-Scholes，而是给每个行权价填一个不同的隐含波动率。这条曲线的形状，记录的就是真实分布和钟形差在哪里。</span><span class="l-en">The market did not replace Black-Scholes; it fills in a different implied volatility for each strike. The shape of that curve records where the real distribution differs from the bell shape.</span></p>
+  <p><span class="l-zh">做法：把每一张期权的市场价代进 Black-Scholes，反推出一个 σ，就是这张期权的隐含波动率（1.2 第七节）。如果模型的四条假设都成立，同一个到期日所有行权价应该反推出同一个 σ，曲线是平的。同一到期日、不同行权价的隐含波动率不一样，讲义叫<span class="sym" data-say="volatility skew。同一到期日、不同行权价的期权以不同的隐含波动率交易。">波动率偏斜（skew）</span>。</span><span class="l-en">How: plug each option's market price into Black-Scholes and back out a σ; that is the option's implied volatility (1.2, section 7). If the model's four assumptions all held, every strike on the same expiration would back out the same σ, and the curve would be flat. Implied volatility differing across strikes on the same expiration is what the lecture notes call <span class="sym" data-say="Volatility skew. Options with the same expiration and different strikes trade at different implied volatilities.">volatility skew</span>.</span></p>
+  <p><span class="l-zh">下图的横轴是行权价离远期价几个标准差（1.2 第六节的 ln(<span class="sym" data-say="行权价。">X</span> ÷ <span class="sym" data-say="远期价（1.1）：到期价的平均值，也是平值的位置。">F</span>) ÷ (<span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="离到期时间（年）的平方根。">√t</span>)），纵轴是隐含波动率占平值的百分比，这样不同标的、不同水平可以放在一起比。</span><span class="l-en">In the chart below, the horizontal axis is how many standard deviations the strike is from the forward price (ln(<span class="sym" data-say="Strike price.">X</span> ÷ <span class="sym" data-say="Forward price (1.1): the average price at expiration, and where at the money is.">F</span>) ÷ (<span class="sym" data-say="Annualized volatility.">σ</span> × <span class="sym" data-say="Square root of the time to expiration in years.">√t</span>) from 1.2, section 6), and the vertical axis is implied volatility as a percentage of at the money, so different underlyings and levels can be compared on one chart.</span></p>
   <div class="panel">
-    <svg id="ivc" viewBox="0 0 720 340" role="img" aria-label="隐含波动率占平值的百分比与行权价离中心标准差个数的关系，三个模型与 TSLA 真实数据"></svg>
+    <svg id="ivc" viewBox="0 0 720 340" role="img" aria-label="隐含波动率占平值的百分比与行权价离中心标准差个数的关系，三个模型与 TSLA 真实数据" data-en-aria-label="Implied volatility as a percentage of at the money against the strike's distance from the center in standard deviations, for three models and real TSLA data"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink-faint)"></i>Black-Scholes：平的</span>
-      <span><i class="ln" style="background:var(--control)"></i>CEV，SPX 参数（β −4.7）</span>
-      <span><i class="ln" style="background:var(--warn)"></i>CEV，TSLA 参数（β 0.7）</span>
-      <span><i class="ln" style="background:var(--result)"></i>跳跃扩散，TSLA 参数</span>
-      <span><i style="background:var(--ink);border-radius:50%"></i>TSLA 真实：4/13 收盘，5/15 到期</span>
+      <span><i class="ln" style="background:var(--ink-faint)"></i><span class="l-zh">Black-Scholes：平的</span><span class="l-en">Black-Scholes: flat</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">CEV，SPX 参数（β −4.7）</span><span class="l-en">CEV, SPX parameters (β −4.7)</span></span>
+      <span><i class="ln" style="background:var(--warn)"></i><span class="l-zh">CEV，TSLA 参数（β 0.7）</span><span class="l-en">CEV, TSLA parameters (β 0.7)</span></span>
+      <span><i class="ln" style="background:var(--result)"></i><span class="l-zh">跳跃扩散，TSLA 参数</span><span class="l-en">Jump-diffusion, TSLA parameters</span></span>
+      <span><i style="background:var(--ink);border-radius:50%"></i><span class="l-zh">TSLA 真实：4/13 收盘，5/15 到期</span><span class="l-en">TSLA actual: 4/13 close, 5/15 expiration</span></span>
     </div>
   </div>
   <p id="ivSay"></p>
-  <p>把四条假设和曲线的形状对起来：</p>
+  <p><span class="l-zh">把四条假设和曲线的形状对起来：</span><span class="l-en">Matching the four assumptions to the shape of the curve:</span></p>
   <div class="tscroll">
   <table class="wide">
-    <thead><tr><th>假设</th><th class="txt">真实数据</th><th class="txt">比模型值贵的期权</th><th class="txt">曲线的形状</th></tr></thead>
+    <thead><tr><th><span class="l-zh">假设</span><span class="l-en">Assumption</span></th><th class="txt"><span class="l-zh">真实数据</span><span class="l-en">Real data</span></th><th class="txt"><span class="l-zh">比模型值贵的期权</span><span class="l-en">Options worth more than the model value</span></th><th class="txt"><span class="l-zh">曲线的形状</span><span class="l-en">Shape of the curve</span></th></tr></thead>
     <tbody>
-      <tr><td>① 钟形</td><td class="txt">两条尾巴更长：SPX 3 个标准差以外 16 天，钟形 4 天</td><td class="txt">两头的远虚值 put 和 call</td><td class="txt">两头翘起，叫微笑（smile），对应峰度</td></tr>
-      <tr><td>② 波动率不变</td><td class="txt">50 日历史波动率在 8.6% 到 34.7% 之间</td><td class="txt">做动态对冲时，平值与两翼的价值往不同方向偏；相对平值，两翼更贵（第二节）</td><td class="txt">不同到期日的高度不同，节点 8 的期限结构；同一到期日两头翘</td></tr>
-      <tr><td>③ 不跳空</td><td class="txt">财报夜三分钟 4.1%；VIX 87% 的日子高于之后的实际波动</td><td class="txt">整体偏贵；跨过事件的短期期权更贵</td><td class="txt">整条抬高，两头翘；事件前的短期到期特别高</td></tr>
-      <tr><td>④ 与方向无关</td><td class="txt">SPX 跌 1%，VIX 平均涨 1.38 点</td><td class="txt">低行权价的 put 贵，高行权价的 call 便宜</td><td class="txt">左高右低，叫偏斜，对应偏度</td></tr>
+      <tr><td><span class="l-zh">① 钟形</span><span class="l-en">① Bell shape</span></td><td class="txt"><span class="l-zh">两条尾巴更长：SPX 3 个标准差以外 16 天，钟形 4 天</span><span class="l-en">Both tails longer: 16 SPX days beyond 3 standard deviations, against 4 for the bell shape</span></td><td class="txt"><span class="l-zh">两头的远虚值 put 和 call</span><span class="l-en">Far out-of-the-money puts and calls at both ends</span></td><td class="txt"><span class="l-zh">两头翘起，叫微笑（smile），对应峰度</span><span class="l-en">Both ends turn up: a smile, matching kurtosis</span></td></tr>
+      <tr><td><span class="l-zh">② 波动率不变</span><span class="l-en">② Volatility is constant</span></td><td class="txt"><span class="l-zh">50 日历史波动率在 8.6% 到 34.7% 之间</span><span class="l-en">50-day historical volatility between 8.6% and 34.7%</span></td><td class="txt"><span class="l-zh">做动态对冲时，平值与两翼的价值往不同方向偏；相对平值，两翼更贵（第二节）</span><span class="l-en">With dynamic hedging, the values of at the money and the wings err in opposite directions; relative to at the money, the wings are more expensive (section 2)</span></td><td class="txt"><span class="l-zh">不同到期日的高度不同，节点 8 的期限结构；同一到期日两头翘</span><span class="l-en">Different heights for different expirations, the term structure of node 8; on one expiration both ends turn up</span></td></tr>
+      <tr><td><span class="l-zh">③ 不跳空</span><span class="l-en">③ No gaps</span></td><td class="txt"><span class="l-zh">财报夜三分钟 4.1%；VIX 87% 的日子高于之后的实际波动</span><span class="l-en">4.1% in three minutes on earnings night; VIX above the volatility that followed on 87% of days</span></td><td class="txt"><span class="l-zh">整体偏贵；跨过事件的短期期权更贵</span><span class="l-en">Expensive overall; short-dated options spanning an event more so</span></td><td class="txt"><span class="l-zh">整条抬高，两头翘；事件前的短期到期特别高</span><span class="l-en">Whole curve raised, both ends up; the short expiration before an event especially high</span></td></tr>
+      <tr><td><span class="l-zh">④ 与方向无关</span><span class="l-en">④ Independent of direction</span></td><td class="txt"><span class="l-zh">SPX 跌 1%，VIX 平均涨 1.38 点</span><span class="l-en">When SPX falls 1%, VIX rises 1.38 points on average</span></td><td class="txt"><span class="l-zh">低行权价的 put 贵，高行权价的 call 便宜</span><span class="l-en">Low-strike puts expensive, high-strike calls cheap</span></td><td class="txt"><span class="l-zh">左高右低，叫偏斜，对应偏度</span><span class="l-en">High on the left, low on the right: a skew, matching skewness</span></td></tr>
     </tbody>
   </table>
   </div>
-  <p>讲义还给了第三个来源：供需。持股的人买低行权价的 put 做保护、卖高行权价的 call 收租，两边的订单都把低行权价的隐含波动率推高，讲义叫投资型偏斜，节点 8 细讲。</p>
-  <h3>模型什么时候不能信</h3>
+  <p><span class="l-zh">讲义还给了第三个来源：供需。持股的人买低行权价的 put 做保护、卖高行权价的 call 收租，两边的订单都把低行权价的隐含波动率推高，讲义叫投资型偏斜，节点 8 细讲。</span><span class="l-en">The lecture notes give a third source as well: supply and demand. Shareholders buy low-strike puts for protection and sell high-strike calls for income, and both sets of orders push up low-strike implied volatility; the lecture notes call this investment skew, covered in node 8.</span></p>
+  <h3><span class="l-zh">模型什么时候不能信</span><span class="l-en">When not to trust the model</span></h3>
   <ul>
-    <li>离现价很远的期权：肥尾让它们的真实价值是钟形的几倍到十几倍。</li>
-    <li>跨过财报、议息这类事件的短期期权：跳空不能对冲，模型的对冲论证失效。</li>
-    <li>股指的虚值 put：指数一动，隐含波动率曲线也在动，这张 put 的隐含波动率跟着变，模型 delta 不是真实的对冲比率。偏多还是偏少要看曲线怎么移：整条曲线随 VIX 一起抬高（第四节的情形），真实 delta 的绝对值比模型大；曲线跟着指数左右平移（节点 8 讲义的例子），95 put 的 −25 变成 −18，比模型小。</li>
-    <li>动态对冲、而波动率在变的时候：同一个 σ 给不出平值和两翼都对的价值。</li>
+    <li><span class="l-zh">离现价很远的期权：肥尾让它们的真实价值是钟形的几倍到十几倍。</span><span class="l-en">Options far from the current price: fat tails make their real value several to more than ten times the bell shape's.</span></li>
+    <li><span class="l-zh">跨过财报、议息这类事件的短期期权：跳空不能对冲，模型的对冲论证失效。</span><span class="l-en">Short-dated options spanning events such as earnings or rate decisions: gaps cannot be hedged, and the model's hedging argument fails.</span></li>
+    <li><span class="l-zh">股指的虚值 put：指数一动，隐含波动率曲线也在动，这张 put 的隐含波动率跟着变，模型 delta 不是真实的对冲比率。偏多还是偏少要看曲线怎么移：整条曲线随 VIX 一起抬高（第四节的情形），真实 delta 的绝对值比模型大；曲线跟着指数左右平移（节点 8 讲义的例子），95 put 的 −25 变成 −18，比模型小。</span><span class="l-en">Out-of-the-money index puts: when the index moves, the implied volatility curve moves too, the put's implied volatility changes with it, and the model delta is not the real hedge ratio. Whether it is too high or too low depends on how the curve moves: if the whole curve rises with VIX (the case in section 4), the real delta is larger in absolute value than the model's; if the curve shifts sideways with the index (the lecture example in node 8), the 95 put's −25 becomes −18, smaller than the model's.</span></li>
+    <li><span class="l-zh">动态对冲、而波动率在变的时候：同一个 σ 给不出平值和两翼都对的价值。</span><span class="l-en">Dynamic hedging while volatility changes: a single σ cannot give the right value for both at the money and the wings.</span></li>
   </ul>
-  <p>这几种情况下，市场价和单一 σ 的模型值的差，就是隐含波动率曲线离开水平线的那部分。节点 8 把这条曲线拆成三个数：水平、倾斜、弯曲。</p>
+  <p><span class="l-zh">这几种情况下，市场价和单一 σ 的模型值的差，就是隐含波动率曲线离开水平线的那部分。节点 8 把这条曲线拆成三个数：水平、倾斜、弯曲。</span><span class="l-en">In these cases, the gap between the market price and a single-σ model value is the part of the implied volatility curve that departs from a flat line. Node 8 breaks the curve into three numbers: level, slope and curvature.</span></p>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>40% 规则</h2>
-  <p class="sub">平值期权的价格可以心算，误差通常不到百分之一。</p>
+  <h2><span class="l-zh"><span class="n">七</span>40% 规则</span><span class="l-en"><span class="n">7</span>The 40% rule</span></h2>
+  <p class="sub"><span class="l-zh">平值期权的价格可以心算，误差通常不到百分之一。</span><span class="l-en">The price of an at-the-money option can be worked out in your head, usually to within one percent.</span></p>
   <div class="formula">
-    <div class="math">平远期期权的价值 ≈ 0.40 × <span class="sym" data-say="远期价（1.1）：分布的中心。">F</span> × <span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="离到期时间（年）的平方根。">√t</span> ÷ (1 ＋ <span class="sym" data-say="利率。">r</span> × <span class="sym" data-say="离到期时间，以年计。">t</span>)</div>
-    <div class="gloss">行权价等于远期价的 call 或 put ≈ 一个标准差（美元）的 40%，再折回今天</div>
-    <div class="note">F ÷ (1 ＋ r·t) 就是现价 S（不派息时），所以也写成 0.40 × S × σ × √t</div>
+    <div class="math"><span class="l-zh">平远期期权的价值 ≈ 0.40 × <span class="sym" data-say="远期价（1.1）：分布的中心。">F</span> × <span class="sym" data-say="年化波动率。">σ</span> × <span class="sym" data-say="离到期时间（年）的平方根。">√t</span> ÷ (1 ＋ <span class="sym" data-say="利率。">r</span> × <span class="sym" data-say="离到期时间，以年计。">t</span></span><span class="l-en">Value of an at-the-forward option ≈ 0.40 × <span class="sym" data-say="Forward price (1.1): the center of the distribution.">F</span> × <span class="sym" data-say="Annualized volatility.">σ</span> × <span class="sym" data-say="Square root of the time to expiration in years.">√t</span> ÷ (1 + <span class="sym" data-say="Interest rate.">r</span> × <span class="sym" data-say="Time to expiration in years.">t</span></span>)</div>
+    <div class="gloss"><span class="l-zh">行权价等于远期价的 call 或 put ≈ 一个标准差（美元）的 40%，再折回今天</span><span class="l-en">A call or put with the strike at the forward price ≈ 40% of one standard deviation (in dollars), discounted back to today</span></div>
+    <div class="note"><span class="l-zh">F ÷ (1 ＋ r·t) 就是现价 S（不派息时），所以也写成 0.40 × S × σ × √t</span><span class="l-en">F ÷ (1 + r·t) is the current price S (with no dividends), so it is also written 0.40 × S × σ × √t</span></div>
   </div>
-  <h3>0.40 从哪来</h3>
-  <p>行权价等于远期价 F 的 call，到期赔付是 max(到期价 − F, 0)。设到期价在 F 周围按钟形分布，一个标准差是 F × σ × √t（1.2）。</p>
+  <h3><span class="l-zh">0.40 从哪来</span><span class="l-en">Where 0.40 comes from</span></h3>
+  <p><span class="l-zh">行权价等于远期价 F 的 call，到期赔付是 max(到期价 − F, 0)。设到期价在 F 周围按钟形分布，一个标准差是 F × σ × √t（1.2）。</span><span class="l-en">A call struck at the forward price F pays max(price at expiration − F, 0). Suppose the price at expiration is bell-shaped around F, with one standard deviation of F × σ × √t (1.2).</span></p>
   <ul>
-    <li>一半的情况到期价低于 F，赔付是 0。</li>
-    <li>另一半高于 F，平均高出 0.80 个标准差。钟形里离中心的平均距离是 √(2/π) ≈ 0.798 个标准差。</li>
-    <li>平均赔付 ＝ 0.5 × 0.80 ＝ 0.40 个标准差。精确值是 1/√(2π) ≈ 0.399。</li>
+    <li><span class="l-zh">一半的情况到期价低于 F，赔付是 0。</span><span class="l-en">Half the time the price at expiration is below F, and the payoff is 0.</span></li>
+    <li><span class="l-zh">另一半高于 F，平均高出 0.80 个标准差。钟形里离中心的平均距离是 √(2/π) ≈ 0.798 个标准差。</span><span class="l-en">The other half it is above F, by 0.80 standard deviations on average. In a bell shape the average distance from the center is √(2/π) ≈ 0.798 standard deviations.</span></li>
+    <li><span class="l-zh">平均赔付 ＝ 0.5 × 0.80 ＝ 0.40 个标准差。精确值是 1/√(2π) ≈ 0.399。</span><span class="l-en">Average payoff = 0.5 × 0.80 = 0.40 standard deviations. The exact value is 1/√(2π) ≈ 0.399.</span></li>
   </ul>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="frPlay">再落一遍</button></div>
-    <div class="stage"><canvas id="fr" width="200" height="110" aria-label="3000 个钟形随机到期价落进直方图，行权价在中心"></canvas></div>
+    <div class="bar"><button class="btn ghost" id="frPlay"><span class="l-zh">再落一遍</span><span class="l-en">Drop them again</span></button></div>
+    <div class="stage"><canvas id="fr" width="200" height="110" aria-label="3000 个钟形随机到期价落进直方图，行权价在中心" data-en-aria-label="3000 bell-shaped random prices at expiration dropping into a histogram, with the strike at the center"></canvas></div>
     <div class="legend">
-      <span><i style="background:var(--control)"></i>到期价高于 F：call 有赔付</span>
-      <span><i class="rp" data-k="2"></i>低于 F：赔付为 0</span>
-      <span>实线：行权价 ＝ F；点线：钟形预测的高度；每格四分之一个标准差。3000 个到期价取钟形的 3000 个等分位，按随机顺序落下</span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">到期价高于 F：call 有赔付</span><span class="l-en">Above F: the call pays</span></span>
+      <span><i class="rp" data-k="2"></i><span class="l-zh">低于 F：赔付为 0</span><span class="l-en">Below F: payoff 0</span></span>
+      <span><span class="l-zh">实线：行权价 ＝ F；点线：钟形预测的高度；每格四分之一个标准差。3000 个到期价取钟形的 3000 个等分位，按随机顺序落下</span><span class="l-en">Solid line: strike = F; dotted line: height the bell shape predicts; each bin a quarter of a standard deviation. The 3000 prices at expiration are the bell shape's 3000 equal quantiles, dropped in random order</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已落下</div><div class="d" id="frN"></div><div class="d2">共 3000 个</div></div>
-      <div class="stat"><div class="k">高于 F 的比例</div><div class="d" id="frA"></div><div class="d2">钟形 50%</div></div>
-      <div class="stat"><div class="k">高于 F 的平均高出</div><div class="d" id="frB"></div><div class="d2">钟形 0.798 个标准差</div></div>
-      <div class="stat"><div class="k">平均赔付</div><div class="d" id="frC" style="color:var(--control)"></div><div class="d2">钟形 0.399 个标准差</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已落下</span><span class="l-en">Dropped</span></div><div class="d" id="frN"></div><div class="d2"><span class="l-zh">共 3000 个</span><span class="l-en">3000 in all</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">高于 F 的比例</span><span class="l-en">Share above F</span></div><div class="d" id="frA"></div><div class="d2"><span class="l-zh">钟形 50%</span><span class="l-en">Bell shape 50%</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">高于 F 的平均高出</span><span class="l-en">Average distance above F</span></div><div class="d" id="frB"></div><div class="d2"><span class="l-zh">钟形 0.798 个标准差</span><span class="l-en">Bell shape 0.798 standard deviations</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">平均赔付</span><span class="l-en">Average payoff</span></div><div class="d" id="frC" style="color:var(--control)"></div><div class="d2"><span class="l-zh">钟形 0.399 个标准差</span><span class="l-en">Bell shape 0.399 standard deviations</span></div></div>
     </div>
   </div>
 
-  <h3>拿 TSLA 350 call 检验</h3>
-  <p>入场时 S ＝ 352.36，σ ＝ 46.3%，32 天，√(32/365) ＝ 0.2961：</p>
+  <h3><span class="l-zh">拿 TSLA 350 call 检验</span><span class="l-en">Checking with the TSLA 350 call</span></h3>
+  <p><span class="l-zh">入场时 S ＝ 352.36，σ ＝ 46.3%，32 天，√(32/365) ＝ 0.2961：</span><span class="l-en">At entry S = 352.36, σ = 46.3%, 32 days, √(32/365) = 0.2961:</span></p>
   <div class="formula">
     <div class="math">0.40 × 352.36 × 0.463 × 0.2961 ≈ 19.32</div>
-    <div class="gloss">这是行权价正好等于远期价 353.69 的期权。Black-Scholes 用同样的输入算出 19.26</div>
+    <div class="gloss"><span class="l-zh">这是行权价正好等于远期价 353.69 的期权。Black-Scholes 用同样的输入算出 19.26</span><span class="l-en">This is the option with its strike exactly at the 353.69 forward price. Black-Scholes, with the same inputs, gives 19.26</span></div>
   </div>
-  <p>350 比远期价低 3.69，是一点点<span class="sym" data-say="in the money（2.1）。现在行权有钱可拿：call 的行权价低于现价，put 的行权价高于现价。">实值</span>。平值附近 delta 约 0.5，实值的这 3.69 大约加一半，1.84。这一步用远期价、先不折现：0.40 × 353.69 × 0.463 × 0.2961 ＝ 19.40，加 1.84 得 21.24，再除以 1 ＋ 4.3% × 32/365 ＝ 1.0038，得 21.16。Black-Scholes 值 21.05，市场中间价 21.05。</p>
-  <p>讲义的例子：远期价 100，107 天，32%，0.40 × 100 × 0.32 × √(107/365) ＝ 6.93，Black-Scholes 值 6.90（期货型结算，不用折现）。讲义第 8 讲（节点 9 用的那一讲）回顾定价模型时的两个例子：远期价 63.50、10 周、27%，心算 2.98，Black-Scholes 2.97；期限拉长到两年、利率取 0，心算 9.70，Black-Scholes 9.61。</p>
-  <h3>什么时候不准</h3>
+  <p><span class="l-zh">350 比远期价低 3.69，是一点点<span class="sym" data-say="in the money（2.1）。现在行权有钱可拿：call 的行权价低于现价，put 的行权价高于现价。">实值</span>。平值附近 delta 约 0.5，实值的这 3.69 大约加一半，1.84。这一步用远期价、先不折现：0.40 × 353.69 × 0.463 × 0.2961 ＝ 19.40，加 1.84 得 21.24，再除以 1 ＋ 4.3% × 32/365 ＝ 1.0038，得 21.16。Black-Scholes 值 21.05，市场中间价 21.05。</span><span class="l-en">350 is 3.69 below the forward price, a little <span class="sym" data-say="In the money (2.1). Exercising now pays something: a call's strike is below the current price, a put's above.">in the money</span>. Near the money delta is about 0.5, so add about half of those 3.69, 1.84. This step uses the forward price without discounting first: 0.40 × 353.69 × 0.463 × 0.2961 = 19.40, plus 1.84 is 21.24, divided by 1 + 4.3% × 32/365 = 1.0038 gives 21.16. The Black-Scholes value is 21.05, the market mid 21.05.</span></p>
+  <p><span class="l-zh">讲义的例子：远期价 100，107 天，32%，0.40 × 100 × 0.32 × √(107/365) ＝ 6.93，Black-Scholes 值 6.90（期货型结算，不用折现）。讲义第 8 讲（节点 9 用的那一讲）回顾定价模型时的两个例子：远期价 63.50、10 周、27%，心算 2.98，Black-Scholes 2.97；期限拉长到两年、利率取 0，心算 9.70，Black-Scholes 9.61。</span><span class="l-en">The lecture example: forward price 100, 107 days, 32%: 0.40 × 100 × 0.32 × √(107/365) = 6.93, Black-Scholes value 6.90 (futures-type settlement, no discounting). Two examples from lecture 8 (the one node 9 uses) when it reviews pricing models: forward price 63.50, 10 weeks, 27%, mental math 2.98, Black-Scholes 2.97; stretched to two years with interest rate 0, mental math 9.70, Black-Scholes 9.61.</span></p>
+  <h3><span class="l-zh">什么时候不准</span><span class="l-en">When it is off</span></h3>
   <div class="panel">
-    <svg id="acc" viewBox="0 0 720 260" role="img" aria-label="40% 规则比 Black-Scholes 高出的百分比随 σ√t 的变化"></svg>
+    <svg id="acc" viewBox="0 0 720 260" role="img" aria-label="40% 规则比 Black-Scholes 高出的百分比随 σ√t 的变化" data-en-aria-label="How much the 40% rule exceeds Black-Scholes, in percent, as σ√t changes"></svg>
   </div>
-  <p>40% 规则把到期价当成钟形，Black-Scholes 用的是对数正态：往下到不了 0，往上拖得更长，中心略低于 F。σ√t 小的时候两者几乎一样，σ√t 越大，心算高估得越多：σ√t ＝ 0.14（TSLA 本例）高 0.3%，0.38（两年、27%）高 0.9%，1.0 高 4.5%。另一个限制是行权价要在平值附近，离得远了「加一半」的修正就不够。第一到第四节说的是另一件事：到了两翼，Black-Scholes 本身就不准。</p>
-  <p>2.3 用过的「平值 vega ≈ 0.4 × S × √t ÷ 100」就是从这条式子来的：σ 多 1 个点，0.40 × S × σ × √t 多 0.40 × S × √t ÷ 100。</p>
+  <p><span class="l-zh">40% 规则把到期价当成钟形，Black-Scholes 用的是对数正态：往下到不了 0，往上拖得更长，中心略低于 F。σ√t 小的时候两者几乎一样，σ√t 越大，心算高估得越多：σ√t ＝ 0.14（TSLA 本例）高 0.3%，0.38（两年、27%）高 0.9%，1.0 高 4.5%。另一个限制是行权价要在平值附近，离得远了「加一半」的修正就不够。第一到第四节说的是另一件事：到了两翼，Black-Scholes 本身就不准。</span><span class="l-en">The 40% rule treats the price at expiration as bell-shaped, while Black-Scholes uses the lognormal: it cannot go below 0, it trails further on the upside, and its center is slightly below F. When σ√t is small the two are almost the same; the larger σ√t, the more mental math overestimates: 0.3% high at σ√t = 0.14 (this TSLA case), 0.9% at 0.38 (two years, 27%), 4.5% at 1.0. The other limit is that the strike must be near the money; far from it, the "add half" correction is not enough. Sections 1 to 4 are about something else: out in the wings, Black-Scholes itself is off.</span></p>
+  <p><span class="l-zh">2.3 用过的「平值 vega ≈ 0.4 × S × √t ÷ 100」就是从这条式子来的：σ 多 1 个点，0.40 × S × σ × √t 多 0.40 × S × √t ÷ 100。</span><span class="l-en">The "at-the-money vega ≈ 0.4 × S × √t ÷ 100" used in 2.3 comes from this formula: one more point of σ adds 0.40 × S × √t ÷ 100 to 0.40 × S × σ × √t.</span></p>
 </section>
 
 <!-- ══════════ 八 ══════════ -->
 <section id="s8">
-  <h2><span class="n">八</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">八</span>费曼检验</span><span class="l-en"><span class="n">8</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">σ</div><div class="t">年化波动率。Black-Scholes 五个输入里唯一要估计的。</div></div>
-      <div class="gl"><div class="s">标准差</div><div class="t">一组数离中心的典型距离。钟形里 3 个标准差以外只占 0.27%。</div></div>
-      <div class="gl"><div class="s">偏度</div><div class="t">两条尾巴哪边长。钟形是 0，左尾（跌的一侧）更长为负。</div></div>
-      <div class="gl"><div class="s">峰度</div><div class="t">两条尾巴同时比钟形长多少，中间尖多少。本页用超额峰度，钟形是 0；正数叫肥尾。</div></div>
-      <div class="gl"><div class="s">N 日历史波动率</div><div class="t">往回数 N 个交易日的日涨跌算出的年化波动率，每天往后挪一天重算一次。</div></div>
-      <div class="gl"><div class="s">VIX</div><div class="t">用 SPX 一个月左右到期的期权价格反推的年化波动率，市场对未来一个月波动的报价。</div></div>
-      <div class="gl"><div class="s">路径依赖</div><div class="t">做动态对冲时，期权的价值取决于波动在什么时候出现，不只看总量。</div></div>
-      <div class="gl"><div class="s">扩散 / 跳跃 / 跳跃扩散</div><div class="t">价格连续地走 / 一下子跳过去 / 平时连续走、偶尔跳。真实市场是第三种。</div></div>
-      <div class="gl"><div class="s">delta</div><div class="t">标的动 1 美元，期权价格变多少（2.1）。也是对冲比率：买 1 股期权，卖 delta 那么多股标的。</div></div>
-      <div class="gl"><div class="s">delta 中性 / 动态对冲</div><div class="t">期权与股票的 delta 合计为 0；delta 一直在变，隔一段时间按新的 delta 调整股票，叫动态对冲（4.1）。</div></div>
-      <div class="gl"><div class="s">模型 delta / 真实 delta</div><div class="t">模型 delta 假定标的动时隐含波动率不变；真实 delta 把隐含波动率跟着变的那部分也算上（节点 8）。</div></div>
-      <div class="gl"><div class="s">gamma</div><div class="t">标的动 1 美元，delta 变多少（2.2）。对冲过的仓位每次变动约赚亏 ½ × gamma × 变动²。</div></div>
-      <div class="gl"><div class="s">theta</div><div class="t">别的都不变，过一天期权自己掉多少钱（2.2）。</div></div>
-      <div class="gl"><div class="s">vega</div><div class="t">隐含波动率变 1 个点，仓位值多少（2.3）。</div></div>
-      <div class="gl"><div class="s">平值 / 虚值 / 实值 / 两翼</div><div class="t">行权价约等于标的价 / 现在行权不值钱 / 现在行权有钱可拿（2.1）；两翼是离现价较远的虚值 put 和虚值 call。</div></div>
-      <div class="gl"><div class="s">期货型结算</div><div class="t">期权不用先付全款，每天按盈亏结算，所以期权价格不折现（2.3）。</div></div>
-      <div class="gl"><div class="s">期限结构</div><div class="t">同一标的、不同到期日的平值隐含波动率连起来的形状（节点 8）。</div></div>
-      <div class="gl"><div class="s">跨式（straddle）</div><div class="t">同一行权价、同一到期日的 call 加 put（3.2）。价格约等于市场预期的涨跌幅度。</div></div>
-      <div class="gl"><div class="s">CEV, β</div><div class="t">常弹性方差模型：σ(S) ＝ σ₀ × (S ÷ S₀)<sup>β−1</sup>。β ＝ 1 是 Black-Scholes，β ＝ 0 是按加减算，β 小于 1 时跌了更波动。</div></div>
-      <div class="gl"><div class="s">σ_d, λ, δ</div><div class="t">跳跃扩散的三个参数：连续部分的波动率、每年平均跳几次、跳跃幅度的标准差。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">把一张期权的市场价代进 Black-Scholes 反推出的 σ。</div></div>
-      <div class="gl"><div class="s">skew（偏斜）</div><div class="t">同一到期日、不同行权价的隐含波动率不一样。左高右低对应偏度，两头翘（smile）对应峰度。</div></div>
-      <div class="gl"><div class="s">40% 规则</div><div class="t">平远期期权 ≈ 0.40 × F × σ × √t 再折现。0.40 是 1/√(2π) ≈ 0.399。</div></div>
-      <div class="gl"><div class="s">F, X, S, r, t</div><div class="t">远期价、行权价、现价、利率、离到期的时间（年）。</div></div>
+      <div class="gl"><div class="s">σ</div><div class="t"><span class="l-zh">年化波动率。Black-Scholes 五个输入里唯一要估计的。</span><span class="l-en">Annualized volatility. The only one of Black-Scholes' five inputs that has to be estimated.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">标准差</span><span class="l-en">Standard deviation</span></div><div class="t"><span class="l-zh">一组数离中心的典型距离。钟形里 3 个标准差以外只占 0.27%。</span><span class="l-en">The typical distance of a set of numbers from the center. In a bell shape only 0.27% lies beyond 3 standard deviations.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">偏度</span><span class="l-en">Skewness</span></div><div class="t"><span class="l-zh">两条尾巴哪边长。钟形是 0，左尾（跌的一侧）更长为负。</span><span class="l-en">Which tail is longer. 0 for the bell shape, negative when the left (falling) tail is longer.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">峰度</span><span class="l-en">Kurtosis</span></div><div class="t"><span class="l-zh">两条尾巴同时比钟形长多少，中间尖多少。本页用超额峰度，钟形是 0；正数叫肥尾。</span><span class="l-en">How much longer both tails are than the bell shape, and how much sharper the middle is. This page uses excess kurtosis, 0 for the bell shape; a positive number is called fat tails.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">N 日历史波动率</span><span class="l-en">N-day historical volatility</span></div><div class="t"><span class="l-zh">往回数 N 个交易日的日涨跌算出的年化波动率，每天往后挪一天重算一次。</span><span class="l-en">Annualized volatility computed from the daily moves of the last N trading days, recomputed each day as the window moves forward one day.</span></div></div>
+      <div class="gl"><div class="s">VIX</div><div class="t"><span class="l-zh">用 SPX 一个月左右到期的期权价格反推的年化波动率，市场对未来一个月波动的报价。</span><span class="l-en">Annualized volatility backed out of SPX option prices about a month from expiration: the market's quote for volatility over the next month.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">路径依赖</span><span class="l-en">Path dependence</span></div><div class="t"><span class="l-zh">做动态对冲时，期权的价值取决于波动在什么时候出现，不只看总量。</span><span class="l-en">With dynamic hedging, an option's value depends on when the volatility shows up, not just how much there is in total.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">扩散 / 跳跃 / 跳跃扩散</span><span class="l-en">Diffusion / jump / jump-diffusion</span></div><div class="t"><span class="l-zh">价格连续地走 / 一下子跳过去 / 平时连续走、偶尔跳。真实市场是第三种。</span><span class="l-en">Price moves continuously / leaps at once / moves continuously with occasional jumps. Real markets are the third kind.</span></div></div>
+      <div class="gl"><div class="s">delta</div><div class="t"><span class="l-zh">标的动 1 美元，期权价格变多少（2.1）。也是对冲比率：买 1 股期权，卖 delta 那么多股标的。</span><span class="l-en">How much the option price changes when the underlying moves $1 (2.1). Also the hedge ratio: for each option share bought, sell delta shares of the underlying.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">delta 中性 / 动态对冲</span><span class="l-en">Delta neutral / dynamic hedging</span></div><div class="t"><span class="l-zh">期权与股票的 delta 合计为 0；delta 一直在变，隔一段时间按新的 delta 调整股票，叫动态对冲（4.1）。</span><span class="l-en">The deltas of the options and the stock add up to 0; since delta keeps changing, adjusting the stock to the new delta every so often is called dynamic hedging (4.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">模型 delta / 真实 delta</span><span class="l-en">Model delta / actual delta</span></div><div class="t"><span class="l-zh">模型 delta 假定标的动时隐含波动率不变；真实 delta 把隐含波动率跟着变的那部分也算上（节点 8）。</span><span class="l-en">Model delta assumes implied volatility stays fixed when the underlying moves; actual delta also counts the part where implied volatility moves with it (node 8).</span></div></div>
+      <div class="gl"><div class="s">gamma</div><div class="t"><span class="l-zh">标的动 1 美元，delta 变多少（2.2）。对冲过的仓位每次变动约赚亏 ½ × gamma × 变动²。</span><span class="l-en">How much delta changes when the underlying moves $1 (2.2). A hedged position makes or loses about ½ × gamma × move² on each move.</span></div></div>
+      <div class="gl"><div class="s">theta</div><div class="t"><span class="l-zh">别的都不变，过一天期权自己掉多少钱（2.2）。</span><span class="l-en">How much the option loses on its own in a day with everything else unchanged (2.2).</span></div></div>
+      <div class="gl"><div class="s">vega</div><div class="t"><span class="l-zh">隐含波动率变 1 个点，仓位值多少（2.3）。</span><span class="l-en">How much the position is worth when implied volatility changes 1 point (2.3).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">平值 / 虚值 / 实值 / 两翼</span><span class="l-en">At the money / out of the money / in the money / wings</span></div><div class="t"><span class="l-zh">行权价约等于标的价 / 现在行权不值钱 / 现在行权有钱可拿（2.1）；两翼是离现价较远的虚值 put 和虚值 call。</span><span class="l-en">Strike about equal to the underlying price / worth nothing to exercise now / worth something to exercise now (2.1); the wings are the out-of-the-money puts and calls far from the current price.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期货型结算</span><span class="l-en">Futures-type settlement</span></div><div class="t"><span class="l-zh">期权不用先付全款，每天按盈亏结算，所以期权价格不折现（2.3）。</span><span class="l-en">The option is not paid for in full up front and is settled daily on its gains and losses, so the option price is not discounted (2.3).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期限结构</span><span class="l-en">Term structure</span></div><div class="t"><span class="l-zh">同一标的、不同到期日的平值隐含波动率连起来的形状（节点 8）。</span><span class="l-en">The shape traced by at-the-money implied volatilities across expirations for one underlying (node 8).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">跨式（straddle）</span><span class="l-en">Straddle</span></div><div class="t"><span class="l-zh">同一行权价、同一到期日的 call 加 put（3.2）。价格约等于市场预期的涨跌幅度。</span><span class="l-en">A call plus a put at the same strike and expiration (3.2). Its price is about the size of the move the market expects.</span></div></div>
+      <div class="gl"><div class="s">CEV, β</div><div class="t l-zh">常弹性方差模型：σ(S) ＝ σ₀ × (S ÷ S₀)<sup>β−1</sup>。β ＝ 1 是 Black-Scholes，β ＝ 0 是按加减算，β 小于 1 时跌了更波动。</div><div class="t l-en">Constant elasticity of variance model: σ(S) = σ₀ × (S ÷ S₀)<sup>β−1</sup>. β = 1 is Black-Scholes, β = 0 is additive, and below 1 a fall brings more volatility.</div></div>
+      <div class="gl"><div class="s">σ_d, λ, δ</div><div class="t"><span class="l-zh">跳跃扩散的三个参数：连续部分的波动率、每年平均跳几次、跳跃幅度的标准差。</span><span class="l-en">The three parameters of jump-diffusion: volatility of the continuous part, average number of jumps per year, standard deviation of the jump size.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></div><div class="t"><span class="l-zh">把一张期权的市场价代进 Black-Scholes 反推出的 σ。</span><span class="l-en">The σ backed out by plugging an option's market price into Black-Scholes.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">skew（偏斜）</span><span class="l-en">Skew</span></div><div class="t"><span class="l-zh">同一到期日、不同行权价的隐含波动率不一样。左高右低对应偏度，两头翘（smile）对应峰度。</span><span class="l-en">Implied volatility differs across strikes with the same expiration. High on the left and low on the right matches skewness; both ends up (a smile) matches kurtosis.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">40% 规则</span><span class="l-en">The 40% rule</span></div><div class="t"><span class="l-zh">平远期期权 ≈ 0.40 × F × σ × √t 再折现。0.40 是 1/√(2π) ≈ 0.399。</span><span class="l-en">At-the-forward option ≈ 0.40 × F × σ × √t, then discounted. 0.40 is 1/√(2π) ≈ 0.399.</span></div></div>
+      <div class="gl"><div class="s">F, X, S, r, t</div><div class="t"><span class="l-zh">远期价、行权价、现价、利率、离到期的时间（年）。</span><span class="l-en">Forward price, strike, current price, interest rate, time to expiration (years).</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-8-skew-surface.html"><b>8 skew 与波动率曲面</b></a>：把第六节那条曲线拆成水平、倾斜、弯曲三个数，分别用 ±50、±25、±5 delta 的期权度量；再加上到期日这一维，成为波动率曲面。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-8-skew-surface.html"><b>8 skew 与波动率曲面</b></a>：把第六节那条曲线拆成水平、倾斜、弯曲三个数，分别用 ±50、±25、±5 delta 的期权度量；再加上到期日这一维，成为波动率曲面。</span><span class="l-en">Next: <a href="station-8-skew-surface.html"><b>8 Skew and the volatility surface</b></a>: the curve from section 6 broken into three numbers, level, slope and curvature, each measured with ±50, ±25 and ±5 delta options; then expiration is added as a dimension, making the volatility surface.</span></p>
+  <p><a href="./"><span class="l-zh">← 回到课程路线图</span><span class="l-en">← Back to the course roadmap</span></a></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
 <script>
+/* 英文模式（lang.js）：页面标题，以及带 data-en-* 的悬停说明、title、aria-label 换成英文 */
+document.title=L(document.title,'Where model assumptions break');
+if(LANG==='en') document.querySelectorAll('[data-en-say],[data-en-title],[data-en-aria-label],[data-en-placeholder]').forEach(e=>{
+  for(const a of ['say','title','aria-label','placeholder']){ const v=e.getAttribute('data-en-'+a); if(v!=null) e.setAttribute(a==='say'?'data-say':a,v); }
+});
 const $ = id => document.getElementById(id);
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const sgn = (n,d=2) => (n>=0?'+':'−')+Math.abs(n).toFixed(d);
@@ -689,7 +695,7 @@ const SPXR=[37,64,64,7,27,-79,137,-19,-3,30,21,-41,29,37,101,33,103,16,67,-21,77
 const SPX0=3294.42;
 const SPXGAP="11113111131111311113111141113111131111311113111131111311113111131111311113111131123111131111311113111411141111311114111311113111131111411131111311113111131111311113111411113111131111311113111131111311113111141113111131111311113111141113111131111311113111131111311113111131111411131111311113111131111311113111131111311113111131111311231111311113111131114111131111311114111311113111131111311114111311113111131111311113111131111311141111311113111131111311113111141113111131111411131111411131111311113111131111311113111131111311114111311113111131111311113111131111311113111131111311113112311113111131111311114111411131111411131111311113111131111411131111311113111131111311113111411113111131111311113111131111311114111311113111141113111132113111131111311113111131111311113111131111411131111311113111131111311113111131111311113111131111311231111311113111131111411141113111141113111131111311113111141113111131111311113111131114111131111311113111131111311113111131111411131111311113121311113112311113111131111311113111131111311113111141113111131111311113111131111311113111131111311113111131111311231111311113111131213121311231111411131111311113111141113111131111311113111131111311113111131114111131111311113111131111411131111311113112311113111411113111131111311113111131111311113111141113111131111311113111131111311113111131111311113111131111311231111311113111131123112311113111141113111131111311114111311113111131111311113111131114111131111311113111131111311113111141113111131111311141111311141111311113111131111";
 const VIXC=[2447,2386,2298,2262,2224,2201,2426,2208,2218,2182,2156,2161,2254,2250,2218,2234,2210,2315,2437,2268,0,2596,2660,3377,3035,3186,2914,2977,2663,2565,2559,2608,2658,2581,2755,2662,2911,2874,2602,2643,2662,0,2668,2746,2808,2946,2818,2636,2482,2518,2599,2637,2696,2685,2928,2923,2873,2787,2732,3256,3308,4070,3674,3806,3727,3479,2978,2777,2489,2570,2498,2358,2577,2313,2269,2277,2370,2283,2353,2264,2171,2122,2089,0,2085,2124,2162,2062,2122,2059,2191,2237,2348,2465,2282,2257,2180,2170,2493,2412,2302,2140,2179,2324,2269,0,2682,2519,2608,2247,2156,2435,2308,2222,2323,2375,2304,2152,2129,2162,2326,2355,3252,3023,3321,2961,2607,2369,2177,2095,2129,2157,2224,2120,1998,2133,2140,2261,2179,2370,2300,2138,2953,2729,2317,2445,2659,2863,2482,2620,2388,2281,2186,2077,1996,2004,1930,2184,2071,1902,2081,2130,2022,1888,2095,1981,0,1734,1787,1815,1727,1699,1664,1688,1664,1724,1650,1608,1744,1846,1717,1876,1697,1772,1754,1746,1749,0,1821,1938,1902,1835,1680,1924,2152,2767,2312,1895,1999,2109,2194,2069,2024,1858,1880,1752,1676,1676,1801,1730,1800,1648,1641,1696,1793,1606,1572,1625,1709,1799,1759,2066,1797,1671,1642,1600,1539,1587,1621,0,1536,1498,1627,1619,1899,1624,1624,1720,1635,1691,1822,2282,1996,1790,1778,1709,1761,1883,1796,1740,1827,1972,1779,1804,1723,1626,1685,1667,1603,1572,1527,1604,1756,2108,2187,1837,1719,1722,1654,1884,1634,1611,0,1612,1644,1628,1786,1778,1884,2102,1950,1975,1816,1858,2083,2475,2367,2102,1872,1784,1866,2334,2292,0,2136,2302,2142,2103,1956,1875,1987,1955,1855,1687,1629,1628,1563,1548,1493,1537,1520,1601,1720,1627,1627,1632,1598,1522,1550,1639,1717,1782,1868,1783,1631,1662,1644,1702,1748,1809,1940,1905,1859,2671,2246,0,3217,2801,3072,2750,2220,1996,2161,1871,2052,2171,1910,2083,2181,2307,2100,1868,1805,1764,1784,1704,1757,0,1663,1677,1993,1975,1895,1929,1835,1781,2035,1921,2289,2399,2560,2923,2955,3060,3079,3099,2730,0,2224,2077,2575,2326,2316,2168,2012,2393,2797,2868,2534,2434,2800,2809,2935,3092,2947,2761,0,3392,3054,3084,3170,3606,3520,3229,3077,3104,3230,3003,2638,2541,2408,2371,2294,2347,2160,2082,1957,1892,1959,0,1943,1847,2133,2213,2160,2133,2424,2436,2165,2254,2244,2062,2065,2286,2805,2699,3252,3189,2936,3410,3214,2956,2512,3172,3015,3491,3304,3293,3182,2885,2755,2619,3090,2938,2953,2842,2951,2841,2725,2559,0,2568,2457,2512,2495,2397,2402,2617,2806,3430,3235,2938,3331,3098,3006,2911,2895,2736,2723,2839,2815,0,2680,2753,2682,2588,2484,2636,2721,2661,2640,2413,2536,2457,2382,2298,2296,2327,2497,2318,2247,2150,2288,2384,2186,2163,2086,2135,2182,1975,2021,1957,1986,1964,2004,1958,2044,2404,2395,2291,2179,2557,2615,2637,0,2525,2570,2671,2468,2356,2293,2407,2711,2626,2643,2614,2580,2723,2813,2729,2974,3197,3274,3037,3191,0,3017,2911,2895,3042,3122,3250,3368,3369,3213,3214,3123,3065,3094,3021,2995,2981,2833,2745,2700,2601,0,2569,2586,2521,2465,2447,2538,2610,2337,2248,2391,2428,2424,2389,2306,2242,2135,2051,2053,2211,2185,0,1991,1901,2059,2211,2260,2228,2286,2502,2264,2132,2278,2246,2225,2146,2008,2188,2097,2183,2218,2147,2170,2279,2201,2252,2111,2186,2067,2116,1889,1820,1931,2034,2057,1977,1972,1938,1909,1874,1838,2000,0,1819,1835,1843,1943,1854,1957,2075,2055,2044,1873,1829,2016,1990,2296,2235,2111,2160,2096,0,2067,1969,1850,1867,1960,1905,2243,2476,2687,2362,2606,2310,2561,2414,2162,2223,2261,2182,2085,2007,1914,1906,0,1856,1908,1907,1843,1898,1922,1916,1784,1709,1694,1677,1635,1729,1667,1680,1965,1900,1702,1591,1608,1781,1863,2010,1706,1703,1776,1687,1682,1686,1721,1810,1684,1617,1673,1729,1851,2011,1906,1801,1753,0,1578,1455,1473,1399,1392,1364,1384,1483,1460,1389,1439,1354,1389,1323,1283,1338,1417,1373,1341,1347,0,1349,1416,1537,1491,1509,1487,1358,1353,1330,1352,1333,1372,1402,1362,1388,1401,1327,1459,1331,0,1386,1602,1633,1725,1586,1600,1614,1584,1508,1480,1634,1684,1782,1742,1708,1703,1602,1714,1568,1512,1442,1383,0,1310,1396,1434,1443,1394,1384,1422,1353,1288,1395,1408,1418,1502,1724,1722,1682,1914,1840,1733,1766,1772,1999,1841,1838,1753,1772,1708,1626,1679,1930,1734,1779,1960,2082,2136,2055,1905,2050,2112,2127,1977,0,1688,1558,1510,1487,1484,1443,1540,1423,1481,1415,1409,1423,1382,1339,1329,1289,1256,1269,1264,1300,0,1263,1306,1286,1300,1305,1247,1266,1204,1217,1244,1231,1250,1249,1379,1355,1309,1296,1239,1249,1240,1322,1398,1407,1342,1302,1279,1273,1242,1267,1383,1477,1419,1337,1322,1259,1307,1347,1328,1362,1330,0,1415,1388,1365,1309,1285,1274,1292,1389,1595,1441,1419,1426,1531,1527,1457,1375,1373,1346,1369,0,1317,1346,1453,1445,1439,1478,1519,1386,1380,1444,1455,1439,1386,1307,1300,1302,1317,1341,1273,1299,1366,1462,1440,1654,1609,1528,1510,1562,1506,1740,1915,1830,1811,1808,1883,1687,1583,1562,1608,1501,1470,0,1538,1474,1355,1344,1320,1299,1273,1258,1363,1338,1240,1244,1194,1214,1191,1232,1303,1189,1283,1420,1419,0,1319,1314,1264,1259,1223,1274,1293,1204,1191,1251,1273,1227,1335,1310,1336,1288,1242,1229,1249,1214,1193,1208,1235,1241,1251,1285,1291,1247,1312,1328,1443,1591,1650,1484,1469,1833,1842,1638,1646,1721,0,1823,2359,3856,2732,2833,2371,2026,2066,1802,1619,1519,1479,1449,1585,1627,1769,1571,1596,1543,1698,1591,1485,2086,2096,2003,2213,1959,1900,1755,1698,1647,1715,1770,1839,1635,1609,1582,1532,1555,1543,1682,0,1931,1900,2046,1863,2280,2142,2084,2083,2052,1978,2052,1956,1900,1813,1844,1815,1937,1924,2020,1977,1961,2022,0,2205,2209,2057,1627,1517,1496,1497,1473,1406,1404,1615,1553,1629,1735,1681,1540,1478,1411,1412,1357,1342,1329,1343,1344,1272,1408,1433,1357,1380,1374,1452,1570,2409,2361,1822,1686,1469,1471,1621,1716,0,1807,1611,1618,1807,1756,1956,1923,1892,1612,1630,1597,1504,1510,1493,1481,1802,1633,1652,1587,0,1849,1684,1588,1534,1664,1574,1595,1576,1500,1485,1543,1515,1542,1838,1917,1967,1925,2119,0,2294,2383,2180,2522,2332,2800,2717,2390,2492,2165,2048,2187,2003,1995,1919,1754,1707,1833,1866,2165,0,2183,2145,2971,4385,4826,5267,3341,4118,3794,3075,3010,3273,3003,3369,3055,2824,2664,2505,2494,2427,0,2424,2253,2359,2471,2364,2262,2199,1825,1824,1866,1797,1723,1798,1789,2047,2031,2234,1903,1919,1905,1875,1848,1765,1749,1863,1681,1711,1676,1736,1794,2114,1917,2143,2038,2059,1990,1751,1668,1644,1625,0,1672,1662,1642,1773,1682,1589,1573,1630,1718,1726,1709,1663,1645,1675,1652,1544,1551,1496,1511,1596,1611,0,2060,1762,1789,1669,1678,1543,1606,1478,1444,1468,1503,1503,1558,1575,1670,1423,1484,1479,1492,1432,1541,1754,1642,1542,1523,1521,1508,1536,1467,1472,1558,1638,1580,1575,1549,1603,1672,1633,1674,1532,1606,0,1615,1660,1657,1636,1722,1625,1645,2205,1893,2042,2048,2459,2106,1831,1767,1862,1730,1641,1580,1642,1711,1735,0,1729,1894,1786,1980,1925,1773,1730,1753,2054,2016,2250,2424,2351,2636,2374,2059,1857,1725,1622,1731,1650,1613,1575,1528,1665,1688,1586,1500,1588,1648,0,1792,1676,1505,1406,1384,1343,1361,1415,1432,1501,1455,1494,1471,1533,1547,1450,1507,1596,1667,1584,1586,2046,1704,1562,1577,1605,1621,1648,1679,1755,1646,1797,1929,2157,1762,1737,1781,1765,2074,2062,2037,1956,2028,1921,2135,1949,1794,1863,1980,2132,2356,2123,2337,2966,2508,2555,2432,2713,2724,2369,2245,2459,2429,2746,2617,2694,2534,2818,3075,3037,2544,2461,2415,2417,2601,2103,1950,1933,1903,1836,1806,1784,1751,1890,2029,1874,1898,1864,1817,1781,1836,1693,1700,1818,1743,1725,1706,1718,1836,1794,1787,1733,1826,1770,1807,1738,1668,1681,1694,1633,1564,1533,1600,1579,1605,1519,2018,1869,1977,2208,1954,1775,1605,1631,1843,1645,1737,1950,1951,1906,1853,1754,1646,1638,1606,1567,1621,1668,1581,1505,1705,1638,1569,1658,1852,1856,1691,1685,1886,1851,1873,1827,2030,1734,1605];
-const BUCK=[["小：1 个标准差以内",1125,1027.4],["中：1 到 3 个标准差",364,473.5],["大：3 个标准差以外",16,4.1]];
+const BUCK=[[L("小：1 个标准差以内","Small: within 1 standard deviation"),1125,1027.4],[L("中：1 到 3 个标准差","Medium: 1 to 3 standard deviations"),364,473.5],[L("大：3 个标准差以外","Large: beyond 3 standard deviations"),16,4.1]];
 const TAILS=[[1,0.0833155,0.0907365,0.071388],[2,0.0084907,0.0234409,0.0142576],[3,0.000382154,0.00644927,0.00540434],[4,7.14526e-06,0.00174048,0.00402318]];
 const LEC={"sp":{"n":2642,"mean":0.0281,"sd":1.29,"vol":20.6,"skew":-0.0901,"kurt":10.4777,"up":11.58,"upd":"2008-10-13","dn":-9.03,"dnd":"2008-10-15"},"bund":{"n":2974,"mean":0.0193,"sd":0.3549,"vol":5.67,"skew":-0.0473,"kurt":1.602,"up":1.98,"upd":"2011-11-01","dn":-1.58,"dnd":"2015-12-15"}};
 const EARN=[["2025-01-29",388.03,400.48,3.21,3.64,0.88],["2025-04-22",238.14,250.79,5.31,6.79,0.78],["2025-07-23",333.09,305.08,-8.41,2.93,-2.87],["2025-10-22",438.71,449.0,2.35,3.22,0.73],["2026-01-28",431.24,416.44,-3.43,2.3,-1.49],["2026-04-22",387.2,373.62,-3.51,2.9,-1.21],["2026-07-22",374.05,319.42,-14.6,3.7,-3.95]];
@@ -699,7 +705,7 @@ const HEDGE={"s0":387.61,"s1":373.69,"m0":43.4,"m1":30.6,"d":0.822,"g":0.00553,"
 const KSTEP=[[1,-0.431],[2,-0.22],[4,-0.111],[16,-0.028]];
 const EXPMV=[["2026-04-22","2026-04-24",387.5,387.61,20.55,5.3,-3.51,376.16,11.34,89.7],["2026-07-22","2026-07-24",375.0,373.95,22.08,5.9,-14.6,313.0,62.0,99.4]];
 const TERM=[["4/22",89.7,57.6,48.1],["4/23",48.3,43.8,41.9]];
-const WK=[["跌超过 5%",61,8.49,30.8,26.2],["跌 2% 到 5%",182,3.77,23.9,19.4],["±2% 以内",714,0.32,18.7,13.7],["涨 2% 到 5%",363,-2.72,17.7,13.2],["涨超过 5%",74,-6.83,20.8,16.0]];
+const WK=[[L("跌超过 5%","Down more than 5%"),61,8.49,30.8,26.2],[L("跌 2% 到 5%","Down 2% to 5%"),182,3.77,23.9,19.4],[L("±2% 以内","Within ±2%"),714,0.32,18.7,13.7],[L("涨 2% 到 5%","Up 2% to 5%"),363,-2.72,17.7,13.2],[L("涨超过 5%","Up more than 5%"),74,-6.83,20.8,16.0]];
 const STRAD={"S":7489.72,"vix":16.05,"d":0.018,"vega":17.13,"dv":-0.01842,"adj":-0.297};
 const PROB={"cevS":[4.83,0.34],"bsS":[2.43,2.13],"cevT":[3.07,1.66],"bsT":[2.67,1.93],"jd":[2.95,2.36]};
 const CEVS={"beta":-4.7,"sig":0.197,"days":30};
@@ -798,9 +804,9 @@ const HC=(()=>{
     }
     s.balls.forEach(b=>{ c.fillStyle=col(b.k); c.fillRect(X0+b.k*PX+2,Math.round(b.y),1,2); });
     $('hcD').textContent= s.lastI>=0 ? iso(s.lastI+1) : '';
-    $('hcN').textContent=`已落下 ${s.landed} 天，共 ${NR} 天`;
-    $('hcF').textContent=`${s.far} 天`;
-    $('hcFb').textContent=`钟形预测 ${(s.landed*P3).toFixed(1)} 天`;
+    $('hcN').textContent=L(`已落下 ${s.landed} 天，共 ${NR} 天`,`${s.landed} of ${NR} days dropped`);
+    $('hcF').textContent=L(`${s.far} 天`,`${s.far} days`);
+    $('hcFb').textContent=L(`钟形预测 ${(s.landed*P3).toFixed(1)} 天`,`Bell shape predicts ${(s.landed*P3).toFixed(1)} days`);
   }
   function start(){ if(s) s.playing=false; init(); if(reduced){ while(!done()) step(); draw(); return; } runLoop(s,16.7,step,draw,done); }
   $('hcPlay').addEventListener('click',start);
@@ -813,23 +819,23 @@ function renderSec1(){
   let s3=0,s4=0; RET.forEach(x=>{ const z=(x-m)/sd; s3+=z**3; s4+=z**4; });
   const skew=n/((n-1)*(n-2))*s3;                                          // 与 Excel SKEW 同口径
   const kurt=n*(n+1)/((n-1)*(n-2)*(n-3))*s4-3*(n-1)**2/((n-2)*(n-3));      // 与 Excel KURT 同口径
-  $('buckTb').innerHTML=BUCK.map(([k,a,b])=>`<tr><td>${k}</td><td class="${a>b?'no':''}">${a}</td><td>${b.toFixed(1)}</td><td>${(a/b).toFixed(2)} 倍</td></tr>`).join('');
+  $('buckTb').innerHTML=BUCK.map(([k,a,b])=>window.L(`<tr><td>${k}</td><td class="${a>b?'no':''}">${a}</td><td>${b.toFixed(1)}</td><td>${(a/b).toFixed(2)} 倍</td></tr>`,`<tr><td>${k}</td><td class="${a>b?'no':''}">${a}</td><td>${b.toFixed(1)}</td><td>${(a/b).toFixed(2)}×</td></tr>`)).join('');
   let im=0, iN=0; RET.forEach((x,i)=>{ if(x>RET[im]) im=i; if(x<RET[iN]) iN=i; });
   const sx=k=>(k>=0?'+':'−')+Math.abs(k).toFixed(2);
   const L=LEC, row=(t,a,b,c)=>`<tr><td>${t}</td><td>${a}</td><td>${b}</td><td>${c}</td></tr>`;
   const zs=(v,s)=>(Math.abs(v)/s).toFixed(2);
   $('lecTb').innerHTML=[
-    row('交易日数',L.sp.n,L.bund.n,n),
-    row('平均每天','+'+L.sp.mean.toFixed(4)+'%','+'+L.bund.mean.toFixed(4)+'%',sgn(m,4)+'%'),
-    row('一天的标准差',L.sp.sd.toFixed(2)+'%',L.bund.sd.toFixed(4)+'%',sd.toFixed(2)+'%'),
-    row('年化波动率',L.sp.vol.toFixed(2)+'%',L.bund.vol.toFixed(2)+'%',(sd*16).toFixed(2)+'%'),
-    row('偏度',fm(L.sp.skew,4),fm(L.bund.skew,4),sgn(skew,4)),
-    row('峰度（钟形 0）',sgn(L.sp.kurt,4),sgn(L.bund.kurt,4),sgn(kurt,4)),
-    row('最大涨幅',`+${L.sp.up}%<br><span class="tiny">${L.sp.upd}，${zs(L.sp.up,L.sp.sd)} 个标准差</span>`,`+${L.bund.up}%<br><span class="tiny">${L.bund.upd}，${zs(L.bund.up,L.bund.sd)} 个</span>`,`+${RET[im].toFixed(2)}%<br><span class="tiny">${iso(im+1)}，${zs(RET[im],sd)} 个</span>`),
-    row('最大跌幅',`${fm(L.sp.dn)}%<br><span class="tiny">${L.sp.dnd}，${zs(L.sp.dn,L.sp.sd)} 个标准差</span>`,`${fm(L.bund.dn)}%<br><span class="tiny">${L.bund.dnd}，${zs(L.bund.dn,L.bund.sd)} 个</span>`,`${fm(RET[iN])}%<br><span class="tiny">${iso(iN+1)}，${zs(RET[iN],sd)} 个</span>`)
+    row(window.L('交易日数','Trading days'),L.sp.n,L.bund.n,n),
+    row(window.L('平均每天','Average per day'),'+'+L.sp.mean.toFixed(4)+'%','+'+L.bund.mean.toFixed(4)+'%',sgn(m,4)+'%'),
+    row(window.L('一天的标准差','One-day standard deviation'),L.sp.sd.toFixed(2)+'%',L.bund.sd.toFixed(4)+'%',sd.toFixed(2)+'%'),
+    row(window.L('年化波动率','Annualized volatility'),L.sp.vol.toFixed(2)+'%',L.bund.vol.toFixed(2)+'%',(sd*16).toFixed(2)+'%'),
+    row(window.L('偏度','Skewness'),fm(L.sp.skew,4),fm(L.bund.skew,4),sgn(skew,4)),
+    row(window.L('峰度（钟形 0）','Kurtosis (bell shape 0)'),sgn(L.sp.kurt,4),sgn(L.bund.kurt,4),sgn(kurt,4)),
+    row(window.L('最大涨幅','Largest rise'),window.L(`+${L.sp.up}%<br><span class="tiny">${L.sp.upd}，${zs(L.sp.up,L.sp.sd)} 个标准差</span>`,`+${L.sp.up}%<br><span class="tiny">${L.sp.upd}, ${zs(L.sp.up,L.sp.sd)} standard deviations</span>`),window.L(`+${L.bund.up}%<br><span class="tiny">${L.bund.upd}，${zs(L.bund.up,L.bund.sd)} 个</span>`,`+${L.bund.up}%<br><span class="tiny">${L.bund.upd}, ${zs(L.bund.up,L.bund.sd)} std devs</span>`),window.L(`+${RET[im].toFixed(2)}%<br><span class="tiny">${iso(im+1)}，${zs(RET[im],sd)} 个</span>`,`+${RET[im].toFixed(2)}%<br><span class="tiny">${iso(im+1)}, ${zs(RET[im],sd)} std devs</span>`)),
+    row(window.L('最大跌幅','Largest fall'),window.L(`${fm(L.sp.dn)}%<br><span class="tiny">${L.sp.dnd}，${zs(L.sp.dn,L.sp.sd)} 个标准差</span>`,`${fm(L.sp.dn)}%<br><span class="tiny">${L.sp.dnd}, ${zs(L.sp.dn,L.sp.sd)} standard deviations</span>`),window.L(`${fm(L.bund.dn)}%<br><span class="tiny">${L.bund.dnd}，${zs(L.bund.dn,L.bund.sd)} 个</span>`,`${fm(L.bund.dn)}%<br><span class="tiny">${L.bund.dnd}, ${zs(L.bund.dn,L.bund.sd)} std devs</span>`),window.L(`${fm(RET[iN])}%<br><span class="tiny">${iso(iN+1)}，${zs(RET[iN],sd)} 个</span>`,`${fm(RET[iN])}%<br><span class="tiny">${iso(iN+1)}, ${zs(RET[iN],sd)} std devs</span>`))
   ].join('');
-  $('lecSay').textContent=`讲义在 Bund 的图上算过：1.98 ÷ 0.3549 ≈ 5.58 个标准差，按钟形约 4100 万天才有一次（涨跌两边合计）；1.58 ÷ 0.3549 ≈ 4.45 个标准差，约 11.6 万天一次。Bund 这两天都出现在 2974 天里。SPX 2025-04-04 跌 5.93%，是 ${zs(RET[iN],sd)} 个标准差，按钟形约 7000 万天一次；2025-04-09 涨 9.35%，是 ${zs(RET[im],sd)} 个标准差，按钟形要 10 的 16 次方年才有一次。`;
-  $('tailTb').innerHTML=TAILS.map(([k,nv,p,c])=>`<tr><td>${k} 个标准差</td><td>${nv<0.0001?nv.toFixed(6):nv.toFixed(4)}</td><td>${p.toFixed(4)}<br><span class="tiny">${(p/nv).toFixed(p/nv<10?2:0)} 倍</span></td><td>${c.toFixed(4)}<br><span class="tiny">${(c/nv).toFixed(c/nv<10?2:0)} 倍</span></td></tr>`).join('');
+  $('lecSay').textContent=window.L(`讲义在 Bund 的图上算过：1.98 ÷ 0.3549 ≈ 5.58 个标准差，按钟形约 4100 万天才有一次（涨跌两边合计）；1.58 ÷ 0.3549 ≈ 4.45 个标准差，约 11.6 万天一次。Bund 这两天都出现在 2974 天里。SPX 2025-04-04 跌 5.93%，是 ${zs(RET[iN],sd)} 个标准差，按钟形约 7000 万天一次；2025-04-09 涨 9.35%，是 ${zs(RET[im],sd)} 个标准差，按钟形要 10 的 16 次方年才有一次。`,`The lecture notes work it out on the Bund chart: 1.98 ÷ 0.3549 ≈ 5.58 standard deviations, which a bell shape gives about once in 41 million days (both directions combined); 1.58 ÷ 0.3549 ≈ 4.45 standard deviations, about once in 116,000 days. Both of these Bund days occurred within 2974 days. SPX fell 5.93% on 2025-04-04, ${zs(RET[iN],sd)} standard deviations, about once in 70 million days under a bell shape; it rose 9.35% on 2025-04-09, ${zs(RET[im],sd)} standard deviations, which a bell shape would see once in 10 to the 16th power years.`);
+  $('tailTb').innerHTML=TAILS.map(([k,nv,p,c])=>window.L(`<tr><td>${k} 个标准差</td><td>${nv<0.0001?nv.toFixed(6):nv.toFixed(4)}</td><td>${p.toFixed(4)}<br><span class="tiny">${(p/nv).toFixed(p/nv<10?2:0)} 倍</span></td><td>${c.toFixed(4)}<br><span class="tiny">${(c/nv).toFixed(c/nv<10?2:0)} 倍</span></td></tr>`,`<tr><td>${k} standard deviations</td><td>${nv<0.0001?nv.toFixed(6):nv.toFixed(4)}</td><td>${p.toFixed(4)}<br><span class="tiny">${(p/nv).toFixed(p/nv<10?2:0)}×</span></td><td>${c.toFixed(4)}<br><span class="tiny">${(c/nv).toFixed(c/nv<10?2:0)}×</span></td></tr>`)).join('');
 }
 
 /* ══════════ 二 · 历史波动率与 VIX，逐日画出 ══════════ */
@@ -858,7 +864,7 @@ const HV=(()=>{
     if(u<n-1) g+=`<line x1="${X(u)}" y1="${T}" x2="${X(u)}" y2="${B}" stroke="var(--ink-faint)" stroke-dasharray="2 3"/>`;
     if(u>=n-1){
       const vmax=S[3].v.reduce((a,v,i)=>v!=null&&(a<0||v>S[3].v[a])?i:a,-1);
-      g+=`<circle cx="${X(vmax)}" cy="${Y(S[3].v[vmax])}" r="3.5" fill="var(--ink-soft)"/>`+lab(X(vmax)-8,Y(S[3].v[vmax])+4,`VIX ${S[3].v[vmax].toFixed(2)}，${iso(vmax)}`,'var(--ink-soft)','end',10.5);
+      g+=`<circle cx="${X(vmax)}" cy="${Y(S[3].v[vmax])}" r="3.5" fill="var(--ink-soft)"/>`+lab(X(vmax)-8,Y(S[3].v[vmax])+4,window.L(`VIX ${S[3].v[vmax].toFixed(2)}，${iso(vmax)}`,`VIX ${S[3].v[vmax].toFixed(2)}, ${iso(vmax)}`),'var(--ink-soft)','end',10.5);
     }
     svg.innerHTML=g;
     $('hvD').textContent=iso(u);
@@ -889,12 +895,12 @@ const MR=(()=>{
   [[30,'16:00'],[90,'17:00'],[150,'18:00'],[210,'19:00'],[750,'4:00'],[870,'6:00'],[990,'8:00'],[1080,'9:30']].forEach(([m,t])=>{
     base+=`<line x1="${X(m)}" y1="${B}" x2="${X(m)}" y2="${B+5}" stroke="var(--ink-faint)"/>`+lab(X(m),B+18,t,'var(--ink-faint)','middle',10);
   });
-  base+=lab(X(0),T-8,'4/22 常规','var(--ink-faint)','start',10)+lab((X(30)+X(E1))/2,T-8,'盘后','var(--ink-faint)','middle',10)
-       +lab(gx,T-8,'隔夜','var(--ink-faint)','middle',10)+lab((X(M0)+X(1080))/2,T-8,'4/23 盘前','var(--ink-faint)','middle',10)
-       +lab(X(1110),T-8,'开盘','var(--ink-faint)','end',10);
-  base+=lab(gx,B+34,'无成交','var(--ink-faint)','middle',10);
+  base+=lab(X(0),T-8,window.L('4/22 常规','4/22 day'),'var(--ink-faint)','start',10)+lab((X(30)+X(E1))/2,T-8,window.L('盘后','After hrs'),'var(--ink-faint)','middle',10)
+       +lab(gx,T-8,window.L('隔夜','Overnight'),'var(--ink-faint)','middle',10)+lab((X(M0)+X(1080))/2,T-8,window.L('4/23 盘前','4/23 pre-market'),'var(--ink-faint)','middle',10)
+       +lab(X(1110),T-8,window.L('开盘','Open'),'var(--ink-faint)','end',10);
+  base+=lab(gx,B+34,window.L('无成交','No trades'),'var(--ink-faint)','middle',10);
   base+=`<line x1="${L}" y1="${Y(C0)}" x2="${R}" y2="${Y(C0)}" stroke="var(--control)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
-  base+=lab(X(1110)-2,Y(C0)-6,`4/22 15:59 收盘 ${C0.toFixed(2)}`,'var(--control)','end',10.5);
+  base+=lab(X(1110)-2,Y(C0)-6,window.L(`4/22 15:59 收盘 ${C0.toFixed(2)}`,`4/22 15:59 close ${C0.toFixed(2)}`),'var(--control)','end',10.5);
   const st={p:n-1,playing:false};
   function draw(){
     const u=Math.floor(st.p);
@@ -902,11 +908,11 @@ const MR=(()=>{
     for(let i=0;i<=u;i++){ const [m,v]=MIN[i]; const brk= i>0 && MIN[i-1][0]<=E1 && m>=M0; d+=(i===0||brk?'M':'L')+X(m).toFixed(1)+','+Y(v).toFixed(1); }
     let g=base+`<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>`;
     const [mu,vu]=MIN[u];
-    if(mu>=34){ g+=lab(X(34)+2,Y(409.5),'三分钟 +4.1%','var(--control)','start',11); }
-    if(mu>=1080){ g+=`<circle cx="${X(1080)}" cy="${Y(GAP.o930)}" r="4" fill="var(--control)"/>`+lab(X(1080)-8,Y(GAP.o930)+16,`9:30 开盘 ${GAP.o930.toFixed(2)}，${sgn((GAP.o930/C0-1)*100)}%`,'var(--control)','end',11); }
+    if(mu>=34){ g+=lab(X(34)+2,Y(409.5),window.L('三分钟 +4.1%','+4.1% in three minutes'),'var(--control)','start',11); }
+    if(mu>=1080){ g+=`<circle cx="${X(1080)}" cy="${Y(GAP.o930)}" r="4" fill="var(--control)"/>`+lab(X(1080)-8,Y(GAP.o930)+16,window.L(`9:30 开盘 ${GAP.o930.toFixed(2)}，${sgn((GAP.o930/C0-1)*100)}%`,`9:30 open ${GAP.o930.toFixed(2)}, ${sgn((GAP.o930/C0-1)*100)}%`),'var(--control)','end',11); }
     g+=`<circle cx="${X(mu)}" cy="${Y(vu)}" r="3.5" fill="var(--ink)"/>`;
     svg.innerHTML=g;
-    $('mrT').textContent=tlabel(mu); $('mrP').textContent=vu.toFixed(2); $('mrC').textContent=sgn((vu/C0-1)*100)+'%'; $('mrC0').textContent='收盘 '+C0.toFixed(2);
+    $('mrT').textContent=tlabel(mu); $('mrP').textContent=vu.toFixed(2); $('mrC').textContent=sgn((vu/C0-1)*100)+'%'; $('mrC0').textContent=window.L('收盘 ','Close ')+C0.toFixed(2);
   }
   function start(){ st.playing=false; if(reduced){ st.p=n-1; draw(); return; } st.p=0; runLoop(st,16.7,()=>{ st.p=Math.min(n-1,st.p+1); },draw,()=>st.p>=n-1); }
   $('mrPlay').addEventListener('click',start);
@@ -914,16 +920,16 @@ const MR=(()=>{
 })();
 
 function renderSec3(){
-  $('kTb').innerHTML=KSTEP.map(([k,v])=>`<tr${k===1?' class="hot"':''}><td>${k===1?'一次跳过去':`${k} 步`}</td><td>${fm(v,3)}</td><td>${fm(v*100,1)}</td></tr>`).join('');
+  $('kTb').innerHTML=KSTEP.map(([k,v])=>`<tr${k===1?' class="hot"':''}><td>${k===1?L('一次跳过去','One jump'):L(`${k} 步`,`${k} steps`)}</td><td>${fm(v,3)}</td><td>${fm(v*100,1)}</td></tr>`).join('');
   const r2=x=>Math.round(x*100)/100, h=HEDGE, dS=h.s1-h.s0, opt=h.m1-h.m0, stk=-h.d*dS, gam=0.5*h.g*dS*dS, veg=h.v*(h.iv1-h.iv0);
   $('hgTb').innerHTML=[
-    ['期权：43.40 → 30.60',opt],[`卖出的 0.822 股：${h.s0} → ${h.s1}`,stk],['合计',opt+stk],
-    ['其中 gamma 那一块：½ × 0.00553 × 变动²',gam],['其中 vega 那一块：0.2524 × (43.16 − 48.55)',veg],['其中一天的 theta',h.th],
-    ['其余：几项之间的交叉影响，例如波动率降了以后 delta 也跟着变',r2(opt+stk)-r2(gam)-r2(veg)-r2(h.th)]
+    [L('期权：43.40 → 30.60','Option: 43.40 → 30.60'),opt],[L(`卖出的 0.822 股：${h.s0} → ${h.s1}`,`Short 0.822 shares: ${h.s0} → ${h.s1}`),stk],[L('合计','Total'),opt+stk],
+    [L('其中 gamma 那一块：½ × 0.00553 × 变动²','Of which the gamma piece: ½ × 0.00553 × move²'),gam],[L('其中 vega 那一块：0.2524 × (43.16 − 48.55)','Of which the vega piece: 0.2524 × (43.16 − 48.55)'),veg],[L('其中一天的 theta','Of which one day\'s theta'),h.th],
+    [L('其余：几项之间的交叉影响，例如波动率降了以后 delta 也跟着变','Remainder: cross effects among the terms, such as delta also changing after volatility falls'),r2(opt+stk)-r2(gam)-r2(veg)-r2(h.th)]
   ].map(([k,v],i)=>`<tr${i===2?' class="hot"':''}><td>${k}</td><td>${sgn(v)}</td></tr>`).join('');
-  $('termTb').innerHTML=TERM.map(r=>`<tr><td>${r[0]} 收盘</td><td>${r[1].toFixed(1)}%</td><td>${r[2].toFixed(1)}%</td><td>${r[3].toFixed(1)}%</td></tr>`).join('');
+  $('termTb').innerHTML=TERM.map(r=>L(`<tr><td>${r[0]} 收盘</td><td>${r[1].toFixed(1)}%</td><td>${r[2].toFixed(1)}%</td><td>${r[3].toFixed(1)}%</td></tr>`,`<tr><td>${r[0]} close</td><td>${r[1].toFixed(1)}%</td><td>${r[2].toFixed(1)}%</td><td>${r[3].toFixed(1)}%</td></tr>`)).join('');
   const md=x=>+x.slice(5,7)+'/'+(+x.slice(8));
-  $('emTb').innerHTML=EXPMV.map(r=>`<tr><td>${r[0]}</td><td>${md(r[1])} 到期 ${r[2]}</td><td>${r[4].toFixed(2)}（${r[5].toFixed(2)}%）</td><td>${sgn(r[6])}%</td><td>${r[8].toFixed(2)}<br><span class="tiny">${md(r[1])} 收盘 ${r[7].toFixed(2)}</span></td><td class="${r[4]-r[8]<0?'no':'ok'}">${sgn(r[4]-r[8])}</td></tr>`).join('');
+  $('emTb').innerHTML=EXPMV.map(r=>L(`<tr><td>${r[0]}</td><td>${md(r[1])} 到期 ${r[2]}</td><td>${r[4].toFixed(2)}（${r[5].toFixed(2)}%）</td><td>${sgn(r[6])}%</td><td>${r[8].toFixed(2)}<br><span class="tiny">${md(r[1])} 收盘 ${r[7].toFixed(2)}</span></td><td class="${r[4]-r[8]<0?'no':'ok'}">${sgn(r[4]-r[8])}</td></tr>`,`<tr><td>${r[0]}</td><td>${md(r[1])} expiration ${r[2]}</td><td>${r[4].toFixed(2)} (${r[5].toFixed(2)}%)</td><td>${sgn(r[6])}%</td><td>${r[8].toFixed(2)}<br><span class="tiny">${md(r[1])} close ${r[7].toFixed(2)}</span></td><td class="${r[4]-r[8]<0?'no':'ok'}">${sgn(r[4]-r[8])}</td></tr>`)).join('');
   $('earnTb').innerHTML=EARN.map(r=>`<tr${Math.abs(r[5])>2.5?' class="hot"':''}><td>${r[0]}</td><td>${r[1].toFixed(2)}</td><td>${r[2].toFixed(2)}</td><td>${sgn(r[3])}%</td><td>${r[4].toFixed(2)}%</td><td>${sgn(r[5])}</td></tr>`).join('');
 }
 
@@ -936,8 +942,8 @@ const SC=(()=>{
   let base='';
   [-5,0,5,10].forEach(t=>{ base+=`<line x1="${X(t)}" y1="${T}" x2="${X(t)}" y2="${B}" stroke="var(--rule)" stroke-width="${t?0.7:1.3}"/>`+lab(X(t),B+17,fm(t,0)+'%','var(--ink-faint)','middle',11); });
   [-20,-10,0,10].forEach(t=>{ base+=`<line x1="${L}" y1="${Y(t)}" x2="${R}" y2="${Y(t)}" stroke="var(--rule)" stroke-width="${t?0.7:1.3}"/>`+lab(L-7,Y(t)+4,fm(t,0),'var(--ink-faint)','end',11); });
-  base+=lab((L+R)/2,H-8,'SPX 当天涨跌','var(--ink-soft)','middle',12);
-  base+=`<text transform="translate(14 ${(T+B)/2}) rotate(-90)" text-anchor="middle" style="font-size:calc(12px * var(--fs))" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">VIX 当天变化（点）</text>`;
+  base+=lab((L+R)/2,H-8,window.L('SPX 当天涨跌','SPX move that day'),'var(--ink-soft)','middle',12);
+  base+=window.L(`<text transform="translate(14 ${(T+B)/2}) rotate(-90)" text-anchor="middle" style="font-size:calc(12px * var(--fs))" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">VIX 当天变化（点）</text>`,`<text transform="translate(14 ${(T+B)/2}) rotate(-90)" text-anchor="middle" style="font-size:calc(12px * var(--fs))" fill="var(--ink-soft)" font-family="IBM Plex Mono,monospace">VIX change that day (points)</text>`);
   svg.innerHTML=base+'<g id="scDots"></g><g id="scFit"></g>';
   const gD=$('scDots'), gF=$('scFit');
   const st={k:0,playing:false}; let sx,sy,sxx,syy,sxy;
@@ -947,11 +953,11 @@ const SC=(()=>{
   function stats(){
     const k=st.k; if(!k){ $('scD').textContent=''; $('scN').textContent=''; $('scR').textContent=''; return; }
     const r=(k*sxy-sx*sy)/Math.sqrt((k*sxx-sx*sx)*(k*syy-sy*sy));
-    $('scD').textContent=iso(P[k-1].i); $('scN').textContent=`${k} / ${P.length} 天`; $('scR').textContent=k>2?fm(r):'';
+    $('scD').textContent=iso(P[k-1].i); $('scN').textContent=window.L(`${k} / ${P.length} 天`,`${k} / ${P.length} days`); $('scR').textContent=k>2?fm(r):'';
     if(k>=P.length){
       const b=(k*sxy-sx*sy)/(k*sxx-sx*sx), a=(sy-b*sx)/k;
       gF.innerHTML=`<line x1="${X(XL)}" y1="${Y(a+b*XL)}" x2="${X(XH)}" y2="${Y(a+b*XH)}" stroke="var(--ink)" stroke-width="2"/>`
-        +lab(X(XH)-2,Y(6),`SPX 每涨 1%，VIX 平均 ${fm(b)} 点`,'var(--ink)','end',11.5);
+        +lab(X(XH)-2,Y(6),window.L(`SPX 每涨 1%，VIX 平均 ${fm(b)} 点`,`SPX +1% → VIX ${fm(b)} pts (avg)`),'var(--ink)','end',11.5);
     }
   }
   function start(){ st.playing=false; reset(); if(reduced){ add(P.length); stats(); return; } runLoop(st,16.7,()=>add(6),stats,()=>st.k>=P.length); }
@@ -963,7 +969,7 @@ const SC=(()=>{
 function renderSec4(){
   $('wkTb').innerHTML=WK.map((r,i)=>`<tr${i===0||i===4?' class="hot"':''}><td>${r[0]}</td><td>${r[1]}</td><td>${sgn(r[2])}</td><td>${r[3].toFixed(1)}</td><td>${r[4].toFixed(1)}%</td></tr>`).join('');
   const s=STRAD;
-  $('stSay').textContent=`2026-07-31 SPX 收 ${s.S}，VIX ${s.vix}。一个月平值跨式的模型 delta ${sgn(s.d,3)}，vega 每个波动率点 ${s.vega.toFixed(2)}。SPX 每涨 1 点 VIX 平均变 ${fm(s.dv,4)} 点。真实 delta ≈ ${sgn(s.d,3)} ＋ ${s.vega.toFixed(2)} × (${fm(s.dv,4)}) ≈ ${fm(s.adj,2)}：每个跨式相当于空了 0.3 份指数。`;
+  $('stSay').textContent=L(`2026-07-31 SPX 收 ${s.S}，VIX ${s.vix}。一个月平值跨式的模型 delta ${sgn(s.d,3)}，vega 每个波动率点 ${s.vega.toFixed(2)}。SPX 每涨 1 点 VIX 平均变 ${fm(s.dv,4)} 点。真实 delta ≈ ${sgn(s.d,3)} ＋ ${s.vega.toFixed(2)} × (${fm(s.dv,4)}) ≈ ${fm(s.adj,2)}：每个跨式相当于空了 0.3 份指数。`,`On 2026-07-31 SPX closed at ${s.S}, VIX ${s.vix}. A one-month at-the-money straddle has a model delta of ${sgn(s.d,3)} and a vega of ${s.vega.toFixed(2)} per volatility point. For each 1-point rise in SPX, VIX changes ${fm(s.dv,4)} points on average. Actual delta ≈ ${sgn(s.d,3)} + ${s.vega.toFixed(2)} × (${fm(s.dv,4)}) ≈ ${fm(s.adj,2)}: each straddle is like being short 0.3 units of the index.`);
 }
 
 /* ══════════ 五 · 三种模型的模拟走势 ══════════
@@ -972,9 +978,9 @@ const MD=(()=>{
   const W=264,H=150, PX0=3,PX1=200, HX0=214,HX1=261, PY0=4,PY1=146, ZM=4.2, NP=100, NH=2000, ND=24, SUB=8;
   const cv=$('md'), ctx=cv.getContext('2d');
   const MODELS={
-    bs:{sig:IV,T:T32,name:'Black-Scholes：平值 46.3%，32 天'},
-    cev:{sig:CEVS.sig,T:CEVS.days/365,beta:CEVS.beta,name:`CEV：平值 ${(CEVS.sig*100).toFixed(1)}%，β ${fm(CEVS.beta,1)}，30 天`},
-    jd:{sig:IV,T:T32,sd:JD.sd,lam:JD.lam,dl:JD.dl,name:`跳跃扩散：连续 ${(JD.sd*100).toFixed(1)}%，每年 ${JD.lam} 次，幅度 ±${(JD.dl*100).toFixed(1)}%`}
+    bs:{sig:IV,T:T32,name:L('Black-Scholes：平值 46.3%，32 天','Black-Scholes: at the money 46.3%, 32 days')},
+    cev:{sig:CEVS.sig,T:CEVS.days/365,beta:CEVS.beta,name:L(`CEV：平值 ${(CEVS.sig*100).toFixed(1)}%，β ${fm(CEVS.beta,1)}，30 天`,`CEV: at the money ${(CEVS.sig*100).toFixed(1)}%, β ${fm(CEVS.beta,1)}, 30 days`)},
+    jd:{sig:IV,T:T32,sd:JD.sd,lam:JD.lam,dl:JD.dl,name:L(`跳跃扩散：连续 ${(JD.sd*100).toFixed(1)}%，每年 ${JD.lam} 次，幅度 ±${(JD.dl*100).toFixed(1)}%`,`Jump-diffusion: continuous ${(JD.sd*100).toFixed(1)}%, ${JD.lam} a year, size ±${(JD.dl*100).toFixed(1)}%`)}
   };
   const NS=ND*SUB, Zs=new Float32Array(NH*NS), Us=new Float32Array(NH*NS), Js=new Float32Array(NH*NS);
   { const r=mulberry32(20260422); for(let i=0;i<NH*NS;i++){ Zs[i]=gauss(r); Us[i]=r(); Js[i]=gauss(r); } }
@@ -1032,14 +1038,14 @@ const MD=(()=>{
     if(d>0){ ctx.fillStyle=C.ink;                                          // 钟形的高度
       for(let b=0;b<nb;b++){ const z0=ZM-(b*bin)/(PY1-PY0)*2*ZM, z1=ZM-((b+1)*bin)/(PY1-PY0)*2*ZM;
         const e=NH*(ncdf(z0/sd)-ncdf(z1/sd)); const w=Math.round(e*unit); if(w>=1&&b%2===0) ctx.fillRect(HX0+w,PY0+b*bin+1,1,1); } }
-    $('mdDay').textContent=`第 ${Math.floor(d)} 天`; $('mdPar').textContent=MODELS[st.m].name;
+    $('mdDay').textContent=L(`第 ${Math.floor(d)} 天`,`Day ${Math.floor(d)}`); $('mdPar').textContent=MODELS[st.m].name;
     $('mdLo').textContent=d>0?(lo/NH*100).toFixed(1)+'%':''; $('mdHi').textContent=d>0?(hi/NH*100).toFixed(1)+'%':'';
     const say=$('mdSay');
     if(d<ND){ say.textContent=''; return; }
     const pr=st.m==='bs'?PROB.bsT:st.m==='cev'?PROB.cevS:PROB.jd, bs=st.m==='cev'?PROB.bsS:PROB.bsT;
-    say.textContent= st.m==='bs' ? `对数正态的中心略低于 F：F 是到期价的平均值，中位数在它下方，整条分布往下挪了半个 σ√t，所以跌破 −2 个的多一些。按公式，低于 −2 个标准差 ${pr[0]}%，高于 +2 个 ${pr[1]}%。`
-      : st.m==='cev' ? `跌下去的走势越走越散，涨上去的越走越收。按公式，低于 −2 个标准差 ${pr[0]}%（Black-Scholes ${bs[0]}%），高于 +2 个只有 ${pr[1]}%（Black-Scholes ${bs[1]}%）。`
-      : `有 ${(avg([...jumped])*100).toFixed(0)}% 的走势至少跳了一次（公式 38.0%），能看到竖直的一段。中间更尖，两头更长。按公式，低于 −2 个标准差 ${pr[0]}%（Black-Scholes ${bs[0]}%），高于 +2 个 ${pr[1]}%（Black-Scholes ${bs[1]}%）。`;
+    say.textContent= st.m==='bs' ? L(`对数正态的中心略低于 F：F 是到期价的平均值，中位数在它下方，整条分布往下挪了半个 σ√t，所以跌破 −2 个的多一些。按公式，低于 −2 个标准差 ${pr[0]}%，高于 +2 个 ${pr[1]}%。`,`The lognormal's center is slightly below F: F is the average price at expiration, the median is below it, and the whole distribution shifts down by half a σ√t, so a drop below −2 is a bit more likely. By the formula, below −2 standard deviations ${pr[0]}%, above +2 ${pr[1]}%.`)
+      : st.m==='cev' ? L(`跌下去的走势越走越散，涨上去的越走越收。按公式，低于 −2 个标准差 ${pr[0]}%（Black-Scholes ${bs[0]}%），高于 +2 个只有 ${pr[1]}%（Black-Scholes ${bs[1]}%）。`,`Falling paths spread out more and more, rising ones draw in. By the formula, below −2 standard deviations ${pr[0]}% (Black-Scholes ${bs[0]}%), above +2 only ${pr[1]}% (Black-Scholes ${bs[1]}%).`)
+      : L(`有 ${(avg([...jumped])*100).toFixed(0)}% 的走势至少跳了一次（公式 38.0%），能看到竖直的一段。中间更尖，两头更长。按公式，低于 −2 个标准差 ${pr[0]}%（Black-Scholes ${bs[0]}%），高于 +2 个 ${pr[1]}%（Black-Scholes ${bs[1]}%）。`,`${(avg([...jumped])*100).toFixed(0)}% of paths jumped at least once (38.0% by formula), and vertical stretches are visible. Sharper in the middle, longer at both ends. By the formula, below −2 standard deviations ${pr[0]}% (Black-Scholes ${bs[0]}%), above +2 ${pr[1]}% (Black-Scholes ${bs[1]}%).`);
   }
   function start(){
     st.playing=false; sim();
@@ -1053,8 +1059,8 @@ const MD=(()=>{
 })();
 
 function renderSec5(){
-  $('jdSay').textContent=`参数从 TSLA 入场前的 ${JD.yrs} 年里估：单日（对数）涨跌超过 10% 的日子当成跳跃，一共 ${JD.n} 天，17 天涨、14 天跌，平均每年 λ ＝ ${JD.lam} 次，幅度的标准差 δ ＝ ${(JD.dl*100).toFixed(1)}%。连续部分取 σ_d ＝ ${(JD.sd*100).toFixed(1)}%，这样总的波动率仍是 46.3%，和 Black-Scholes 版可以直接比。32 天里至少跳一次的概率是 38.0%。`;
-  const rows=[['Black-Scholes，TSLA（46.3%）',PROB.bsT],['CEV，TSLA 参数（β 0.7）',PROB.cevT],['跳跃扩散，TSLA 参数',PROB.jd],['Black-Scholes，SPX 参数（19.7%）',PROB.bsS],['CEV，SPX 参数（β −4.7）',PROB.cevS]];
+  $('jdSay').textContent=L(`参数从 TSLA 入场前的 ${JD.yrs} 年里估：单日（对数）涨跌超过 10% 的日子当成跳跃，一共 ${JD.n} 天，17 天涨、14 天跌，平均每年 λ ＝ ${JD.lam} 次，幅度的标准差 δ ＝ ${(JD.dl*100).toFixed(1)}%。连续部分取 σ_d ＝ ${(JD.sd*100).toFixed(1)}%，这样总的波动率仍是 46.3%，和 Black-Scholes 版可以直接比。32 天里至少跳一次的概率是 38.0%。`,`Parameters estimated from the ${JD.yrs} years before the TSLA entry: days with a single-day (log) move beyond 10% count as jumps, ${JD.n} days in all, 17 up and 14 down, an average of λ = ${JD.lam} a year, with a size standard deviation of δ = ${(JD.dl*100).toFixed(1)}%. The continuous part takes σ_d = ${(JD.sd*100).toFixed(1)}%, so the total volatility is still 46.3% and comparable directly with the Black-Scholes version. The chance of at least one jump in 32 days is 38.0%.`);
+  const rows=[[L('Black-Scholes，TSLA（46.3%）','Black-Scholes, TSLA (46.3%)'),PROB.bsT],[L('CEV，TSLA 参数（β 0.7）','CEV, TSLA parameters (β 0.7)'),PROB.cevT],[L('跳跃扩散，TSLA 参数','Jump-diffusion, TSLA parameters'),PROB.jd],[L('Black-Scholes，SPX 参数（19.7%）','Black-Scholes, SPX parameters (19.7%)'),PROB.bsS],[L('CEV，SPX 参数（β −4.7）','CEV, SPX parameters (β −4.7)'),PROB.cevS]];
   $('probTb').innerHTML=rows.map(([k,v])=>`<tr${k.startsWith('Black')?'':' class="hot"'}><td>${k}</td><td>${v[0].toFixed(2)}%</td><td>${v[1].toFixed(2)}%</td></tr>`).join('');
 }
 
@@ -1064,20 +1070,20 @@ function drawIV(){
   const X=z=>L+(z-XL)/(XH-XL)*(R-L), Y=v=>B-(v-YL)/(YH-YL)*(B-T);
   let g='';
   for(let v=60;v<=140;v+=20){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===100?1.3:.7}"/>`+lab(L-7,Y(v)+4,v+'%','var(--ink-faint)','end',10.5); }
-  for(let z=-2;z<=2;z++){ g+=`<line x1="${X(z)}" y1="${B}" x2="${X(z)}" y2="${B+5}" stroke="var(--ink-faint)"/>`+lab(X(z),B+19,z===0?'0（平值）':(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',10.5); }
-  g+=lab(X(0),H-2,'行权价离远期价几个标准差','var(--ink-soft)','middle',11.5);
-  g+=lab(X(-0.3),T+10,'← 低行权价 put','var(--ink-faint)','end',10)+lab(X(0.3),T+10,'高行权价 call →','var(--ink-faint)','start',10);
+  for(let z=-2;z<=2;z++){ g+=`<line x1="${X(z)}" y1="${B}" x2="${X(z)}" y2="${B+5}" stroke="var(--ink-faint)"/>`+lab(X(z),B+19,z===0?window.L('0（平值）','0 (ATM)'):(z>0?'+':'−')+Math.abs(z),'var(--ink-faint)','middle',10.5); }
+  g+=lab(X(0),H-2,window.L('行权价离远期价几个标准差','Strike\'s distance from forward, in standard deviations'),'var(--ink-soft)','middle',11.5);
+  g+=lab(X(-0.3),T+10,window.L('← 低行权价 put','← Low-strike puts'),'var(--ink-faint)','end',10)+lab(X(0.3),T+10,window.L('高行权价 call →','High-strike calls →'),'var(--ink-faint)','start',10);
   const line=(arr,atm,col,w,dash)=>`<polyline points="${ZS.map((z,i)=>X(z).toFixed(1)+','+Y(arr[i]/atm*100).toFixed(1)).join(' ')}" fill="none" stroke="${col}" stroke-width="${w}"${dash?` stroke-dasharray="${dash}"`:''}/>`;
   g+=`<line x1="${X(XL)}" y1="${Y(100)}" x2="${X(XH)}" y2="${Y(100)}" stroke="var(--ink-faint)" stroke-width="2" stroke-dasharray="6 5"/>`;
   const atmS=CURVE.cevS[10], atmT=CURVE.cevT[10], atmJ=CURVE.jd[10];
   g+=line(CURVE.cevS,atmS,'var(--control)',2.4)+line(CURVE.cevT,atmT,'var(--warn)',2)+line(CURVE.jd,atmJ,'var(--result)',2.4);
   REAL.forEach(([k,z,v])=>{ g+=`<circle cx="${X(z)}" cy="${Y(v/REALATM*100)}" r="3.6" fill="var(--ink)"/>`; });
   const endL=(arr,atm,t,col,dy=0)=>lab(X(XH)+8,Y(arr[20]/atm*100)+4+dy,t,col,'start',10.5);
-  g+=endL(CURVE.jd,atmJ,'跳跃扩散','var(--result)')+endL(CURVE.cevT,atmT,'CEV TSLA','var(--warn)',6)+lab(X(XH)+8,Y(100)-4,'BS','var(--ink-faint)','start',10.5)
+  g+=endL(CURVE.jd,atmJ,window.L('跳跃扩散','Jumps'),'var(--result)')+endL(CURVE.cevT,atmT,'CEV TSLA','var(--warn)',6)+lab(X(XH)+8,Y(100)-4,'BS','var(--ink-faint)','start',10.5)
     +endL(CURVE.cevS,atmS,'CEV SPX','var(--control)');
   $('ivc').innerHTML=g;
   const rv=k=>REAL.find(r=>r[0]===k)[2];
-  $('ivSay').textContent=`CEV（SPX 参数）是一条左高右低的斜线：离远期价 −2 个标准差的 put，隐含波动率是平值的 ${(CURVE.cevS[2]/atmS*100).toFixed(0)}%，+2 个标准差的 call 只有 ${(CURVE.cevS[18]/atmS*100).toFixed(0)}%。TSLA 的 β 接近 1，CEV 版几乎是平的。跳跃扩散是两头翘的笑脸：±2 个标准差处是平值的 ${(CURVE.jd[2]/atmJ*100).toFixed(0)}% 和 ${(CURVE.jd[18]/atmJ*100).toFixed(0)}%。TSLA 4/13 真实的 5/15 到期：300 是 ${rv(300).toFixed(1)}%，350 是 ${rv(350).toFixed(1)}%，400 是 ${rv(400).toFixed(1)}%，再往上又翘起来，440 是 ${rv(440).toFixed(1)}%，460 是 ${rv(460).toFixed(1)}%。左边比右边高，右边也翘：偏斜和微笑同时存在。`;
+  $('ivSay').textContent=window.L(`CEV（SPX 参数）是一条左高右低的斜线：离远期价 −2 个标准差的 put，隐含波动率是平值的 ${(CURVE.cevS[2]/atmS*100).toFixed(0)}%，+2 个标准差的 call 只有 ${(CURVE.cevS[18]/atmS*100).toFixed(0)}%。TSLA 的 β 接近 1，CEV 版几乎是平的。跳跃扩散是两头翘的笑脸：±2 个标准差处是平值的 ${(CURVE.jd[2]/atmJ*100).toFixed(0)}% 和 ${(CURVE.jd[18]/atmJ*100).toFixed(0)}%。TSLA 4/13 真实的 5/15 到期：300 是 ${rv(300).toFixed(1)}%，350 是 ${rv(350).toFixed(1)}%，400 是 ${rv(400).toFixed(1)}%，再往上又翘起来，440 是 ${rv(440).toFixed(1)}%，460 是 ${rv(460).toFixed(1)}%。左边比右边高，右边也翘：偏斜和微笑同时存在。`,`CEV (SPX parameters) is a line sloping down from left to right: a put −2 standard deviations from the forward price has an implied volatility ${(CURVE.cevS[2]/atmS*100).toFixed(0)}% of at the money, a call at +2 only ${(CURVE.cevS[18]/atmS*100).toFixed(0)}%. TSLA's β is close to 1, so its CEV version is nearly flat. Jump-diffusion is a smile turned up at both ends: ${(CURVE.jd[2]/atmJ*100).toFixed(0)}% and ${(CURVE.jd[18]/atmJ*100).toFixed(0)}% of at the money at ±2 standard deviations. TSLA's real 5/15 expiration on 4/13: ${rv(300).toFixed(1)}% at 300, ${rv(350).toFixed(1)}% at 350, ${rv(400).toFixed(1)}% at 400, then turning up again, ${rv(440).toFixed(1)}% at 440 and ${rv(460).toFixed(1)}% at 460. Higher on the left than the right, with the right turned up too: skew and smile at the same time.`);
 }
 
 /* ══════════ 七 · 40% 规则的来历：钟形随机到期价落成直方图 ══════════ */
@@ -1125,66 +1131,66 @@ function drawAcc(){
   let g='';
   for(let v=0;v<=10;v+=2){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.2}"/>`+lab(L-7,Y(v)+4,'+'+v+'%','var(--ink-faint)','end',10.5); }
   [0,0.25,0.5,0.75,1,1.25,1.5].forEach(v=>{ g+=`<line x1="${X(v)}" y1="${B}" x2="${X(v)}" y2="${B+5}" stroke="var(--ink-faint)"/>`+lab(X(v),B+19,v,'var(--ink-faint)','middle',10.5); });
-  g+=lab((L+R)/2,H-4,'σ × √t（期限内的一个标准差，占远期价的比例）','var(--ink-soft)','middle',11.5);
-  g+=lab(L+6,T+10,'40% 规则比 Black-Scholes 高出','var(--ink-soft)','start',11);
+  g+=lab((L+R)/2,H-4,window.L('σ × √t（期限内的一个标准差，占远期价的比例）','σ × √t (one SD over the term)'),'var(--ink-soft)','middle',11.5);
+  g+=lab(L+6,T+10,window.L('40% 规则比 Black-Scholes 高出','How much the 40% rule exceeds Black-Scholes'),'var(--ink-soft)','start',11);
   let p=[]; for(let s=0.01;s<=1.5001;s+=0.01) p.push(X(s).toFixed(1)+','+Y(over(s)).toFixed(1));
   g+=`<polyline points="${p.join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.4"/>`;
-  [[0.1371,'TSLA 本例',-64],[0.1733,'讲义 107 天',-34],[0.3818,'两年、27%',15],[1.0,'σ√t ＝ 1',20]].forEach(([s,t,dy])=>{
+  [[0.1371,window.L('TSLA 本例','This TSLA case'),-64],[0.1733,window.L('讲义 107 天','Lecture, 107 days'),-34],[0.3818,window.L('两年、27%','Two years, 27%'),15],[1.0,window.L('σ√t ＝ 1','σ√t = 1'),20]].forEach(([s,t,dy])=>{
     const y=Y(over(s)); g+=`<circle cx="${X(s)}" cy="${y}" r="4.2" fill="var(--result)"/>`;
     if(dy<0) g+=`<line x1="${X(s)}" y1="${y-5}" x2="${X(s)}" y2="${y+dy+4}" stroke="var(--result)" stroke-width=".8"/>`;
-    g+=lab(X(s)+4,y+dy,`${t}：+${over(s).toFixed(1)}%`,'var(--result)','start',10.5);
+    g+=lab(X(s)+4,y+dy,window.L(`${t}：+${over(s).toFixed(1)}%`,`${t}: +${over(s).toFixed(1)}%`),'var(--result)','start',10.5);
   });
   $('acc').innerHTML=g;
 }
 
 /* ══════════ 八 · 费曼检验 ══════════ */
 const QS=[
- {q:'期权的风险分成「输入错」和「模型错」两种。各举一个本页的例子，并说明为什么换一个更准的波动率估计修不好第二种。',
-  a:['输入错：σ 填错。比如用入场前一年的历史波动率去估未来一个月，估得不准。换更好的预测就能改善。',
-     '模型错：模型默认每天的涨跌是钟形、不跳空、波动率不变、与方向无关。SPX 六年里 3 个标准差以外的日子有 16 天，钟形只该有 4 天。',
-     '一个 σ 只能管分布的宽度，管不了形状。平值期权用 46% 也许对，远虚值期权按同一个 σ 就低估了。',
-     '市场的办法是给每个行权价用不同的隐含波动率，这就是 skew。'],
-  s:'「模型只是近似，所以会有误差」：没说出错在哪一条假设，也没说出错的方向。'},
- {q:'SPX 六年里超过 3 个标准差的日子有 16 天，钟形预测约 4 天。这对一张离现价很远的 put 意味着什么？对平值期权呢？',
-  a:['远虚值 put 只在大跌时才有价值。大幅的日子比钟形多几倍，它的真实价值比模型值高：明天到期、离现价 3 个标准差的 put，按真实分布约是钟形的 17 倍。',
-     '平值期权几乎不受影响：真实数据里中等幅度的日子反而比钟形少，小幅的更多。',
-     '所以贵的是两翼，不是所有期权。',
-     '市场不换模型，给两翼填更高的隐含波动率，曲线两头翘起来。'],
-  s:'「大跌多了，所以期权都更贵」：平值期权不一定，离现价一个标准差的 call 按真实分布反而便宜一些。'},
- {q:'同样从 387.20 走到 375.28，一次跳过去，和分 16 步走、每步重新对冲，卖出并对冲的 350 call 亏的钱差几倍？为什么？买方呢？',
-  a:['对冲过的仓位每次价格变动的盈亏约是 ½ × gamma × 变动²，卖方是负的。',
-     '分 k 步走，每步的变动是 1/k，平方后是 1/k²，走 k 步加起来是 1/k。所以 16 步只亏一次跳过去的十六分之一左右（0.43 对 0.028 每股）。',
-     '跳空时期权不交易、股票成交稀少，没法分步调仓，整段一次亏掉。模型的对冲论证依赖「随时能调仓」，这里失效。',
-     '买方正好相反，是正 gamma，跳空对他是好事。'],
-  s:'「跳空风险大」：没说出对谁有利、对谁不利，也没说出和重新对冲的关系。'},
- {q:'4/22 财报前，两天后到期的平值期权隐含波动率 89.7%，5/15 到期的 48.1%；财报后第二天分别是 48.3% 和 41.9%。为什么？对冲过的 350 call 多头在这次跳空里赚到了 gamma，为什么整体还是亏的？',
-  a:['跳空只影响财报之后才到期的期权。两天期的期权价格里要包含一次跳空，折成年化就很高。',
-     '期限越长，这一次跳空摊得越薄，所以 5/15 到期的只高一些。',
-     '财报一公布，这次跳空不再是风险，隐含波动率回落。',
-     '多头赚了 ½ × gamma × 变动²，约 0.54；但隐含波动率从 48.55% 降到 43.16%，vega 那一块约 −1.36。跳空的钱在财报前已经付进了期权价格。'],
-  s:'「财报后大家不恐慌了」：说的是情绪，没说出跳空和到期日的关系。'},
- {q:'股指 2500，两周后可能到 2300 或 2700，在哪个位置波动更大？持有平值跨式，在 Black-Scholes 里 delta 约为 0，在真实的股指市场是正还是负？如果标的是涨的时候更波动的商品呢？',
-  a:['2300。SPX 两周跌超 5% 之后，VIX 平均涨 8.5 点，再之后两周的实际波动 26.2%；涨超 5% 之后，VIX 平均跌 6.8 点，实际波动 16.0%。',
-     '跨式是正 vega。指数跌，波动率涨，跨式多赚；指数涨，波动率跌，跨式多亏。这一块和指数方向相反，等于额外空了一些指数，delta 为负（讲义的答案）。',
-     '用 2026-07-31 的 SPX 算一个月平值跨式，大约是 −0.3。',
-     '商品市场如果涨的时候更波动，这一块的符号反过来，delta 为正。'],
-  s:'「跨式不赌方向，所以 delta 永远是 0」：只在波动率与方向无关的世界里成立。'},
- {q:'CEV 与跳跃扩散各修的是 Black-Scholes 的哪条假设？各自会让隐含波动率曲线变成什么形状？',
-  a:['CEV：σ 随价格变，β 小于 1 时价格越低波动率越高，修的是「波动率与方向无关」。',
-     '跌下去的一侧更散，低行权价的 put 更值钱、高行权价的 call 更便宜，曲线左高右低。SPX 的 β 约 −4.7：离远期价 −2 个标准差的 put，隐含波动率约是平值的 1.36 倍。',
-     '跳跃扩散：平时连续走、偶尔跳，修的是「不跳空」，也让两条尾巴变长。两头的期权都更值钱，曲线两头翘。',
-     '真实 TSLA 曲线左边高、右边也翘：两种偏差叠在一起，节点 8 把它拆成倾斜和弯曲。'],
-  s:'「换一个更复杂的模型就准了」：每个模型只修一条，真实曲线是几种偏差叠在一起。'},
- {q:'心算 TSLA 350 call 入场时的价格（S 352.36，σ 46.3%，32 天），并说清 0.40 从哪来、什么时候这个心算不能用。',
-  a:['√(32/365) 约 0.3。352 × 0.46 × 0.3 约 48.6，乘 0.4 约 19.4，这是行权价等于远期价的期权。',
-     '350 比远期价 353.69 低约 3.7，是一点点实值，加一半约 1.8，得到约 21.2。市场中间价 21.05。',
-     '0.4 ＝ 一半的情况赔付为 0，另一半平均高出 0.8 个标准差：0.5 × 0.8。0.8 是钟形里离中心的平均距离 √(2/π)。',
-     'σ√t 大时心算偏高（σ√t ＝ 1 时高 4.5%）；离平值远时不能用；到了两翼，Black-Scholes 本身也不准。'],
-  s:'「0.4 是个经验系数」：它是 1/√(2π) ≈ 0.399，是从钟形算出来的。'}
+ {q:L('期权的风险分成「输入错」和「模型错」两种。各举一个本页的例子，并说明为什么换一个更准的波动率估计修不好第二种。','An option\'s risk comes in two kinds, "wrong inputs" and "wrong model". Give an example of each from this page, and explain why a more accurate volatility estimate cannot fix the second.'),
+  a:[L('输入错：σ 填错。比如用入场前一年的历史波动率去估未来一个月，估得不准。换更好的预测就能改善。','Wrong inputs: σ filled in wrong. For example, estimating the next month with the historical volatility of the year before entry, and getting it wrong. A better forecast improves it.'),
+     L('模型错：模型默认每天的涨跌是钟形、不跳空、波动率不变、与方向无关。SPX 六年里 3 个标准差以外的日子有 16 天，钟形只该有 4 天。','Wrong model: the model takes for granted that daily moves are bell-shaped, with no gaps, constant volatility and no link to direction. SPX had 16 days beyond 3 standard deviations in six years, where a bell shape allows only 4.'),
+     L('一个 σ 只能管分布的宽度，管不了形状。平值期权用 46% 也许对，远虚值期权按同一个 σ 就低估了。','A single σ controls only the width of the distribution, not its shape. 46% may be right for an at-the-money option, but the same σ undervalues a far out-of-the-money one.'),
+     L('市场的办法是给每个行权价用不同的隐含波动率，这就是 skew。','The market\'s fix is a different implied volatility for each strike: that is skew.')],
+  s:L('「模型只是近似，所以会有误差」：没说出错在哪一条假设，也没说出错的方向。','"The model is only an approximation, so there is error": this names neither which assumption fails nor which way the error goes.')},
+ {q:L('SPX 六年里超过 3 个标准差的日子有 16 天，钟形预测约 4 天。这对一张离现价很远的 put 意味着什么？对平值期权呢？','SPX had 16 days beyond 3 standard deviations in six years, against about 4 predicted by the bell shape. What does this mean for a put far below the current price? For an at-the-money option?'),
+  a:[L('远虚值 put 只在大跌时才有价值。大幅的日子比钟形多几倍，它的真实价值比模型值高：明天到期、离现价 3 个标准差的 put，按真实分布约是钟形的 17 倍。','A far out-of-the-money put has value only in a big fall. Large days are several times as common as the bell shape says, so its real value is above the model value: a put expiring tomorrow 3 standard deviations below the current price is worth about 17 times the bell-shape value under the real distribution.'),
+     L('平值期权几乎不受影响：真实数据里中等幅度的日子反而比钟形少，小幅的更多。','At-the-money options are barely affected: in real data, medium days are actually rarer than the bell shape says, and small ones more common.'),
+     L('所以贵的是两翼，不是所有期权。','So it is the wings that are expensive, not every option.'),
+     L('市场不换模型，给两翼填更高的隐含波动率，曲线两头翘起来。','The market does not change models; it puts higher implied volatility on the wings, and the curve turns up at both ends.')],
+  s:L('「大跌多了，所以期权都更贵」：平值期权不一定，离现价一个标准差的 call 按真实分布反而便宜一些。','"More big falls, so all options are more expensive": not necessarily at the money; a call one standard deviation from the current price is actually a bit cheaper under the real distribution.')},
+ {q:L('同样从 387.20 走到 375.28，一次跳过去，和分 16 步走、每步重新对冲，卖出并对冲的 350 call 亏的钱差几倍？为什么？买方呢？','From 387.20 to 375.28 either in one jump or in 16 steps with a re-hedge after each: how many times more does a sold and hedged 350 call lose one way than the other? Why? And the buyer?'),
+  a:[L('对冲过的仓位每次价格变动的盈亏约是 ½ × gamma × 变动²，卖方是负的。','A hedged position\'s P&amp;L on each price move is about ½ × gamma × move², negative for the seller.'),
+     L('分 k 步走，每步的变动是 1/k，平方后是 1/k²，走 k 步加起来是 1/k。所以 16 步只亏一次跳过去的十六分之一左右（0.43 对 0.028 每股）。','In k steps, each move is 1/k of the distance, 1/k² once squared, and k steps add up to 1/k. So 16 steps lose only about a sixteenth of one jump (0.028 against 0.43 per share).'),
+     L('跳空时期权不交易、股票成交稀少，没法分步调仓，整段一次亏掉。模型的对冲论证依赖「随时能调仓」，这里失效。','In a gap, options do not trade and stock trades thinly, so there is no way to adjust in steps and the whole stretch is lost at once. The model\'s hedging argument depends on "can adjust at any time", and it fails here.'),
+     L('买方正好相反，是正 gamma，跳空对他是好事。','The buyer is the exact opposite: long gamma, so a gap is good for them.')],
+  s:L('「跳空风险大」：没说出对谁有利、对谁不利，也没说出和重新对冲的关系。','"Gap risk is large": this says neither whom it helps and whom it hurts, nor how it relates to re-hedging.')},
+ {q:L('4/22 财报前，两天后到期的平值期权隐含波动率 89.7%，5/15 到期的 48.1%；财报后第二天分别是 48.3% 和 41.9%。为什么？对冲过的 350 call 多头在这次跳空里赚到了 gamma，为什么整体还是亏的？','Before the 4/22 earnings, the at-the-money option expiring in two days had an implied volatility of 89.7%, the 5/15 one 48.1%; the day after earnings they were 48.3% and 41.9%. Why? The hedged long 350 call earned its gamma in this gap; why did it still lose overall?'),
+  a:[L('跳空只影响财报之后才到期的期权。两天期的期权价格里要包含一次跳空，折成年化就很高。','The gap affects only options expiring after earnings. A two-day option\'s price has to include a whole gap, which annualizes to a very high number.'),
+     L('期限越长，这一次跳空摊得越薄，所以 5/15 到期的只高一些。','The longer the term, the thinner this one gap is spread, so the 5/15 expiration is only a little higher.'),
+     L('财报一公布，这次跳空不再是风险，隐含波动率回落。','Once earnings are out, the gap is no longer a risk, and implied volatility falls back.'),
+     L('多头赚了 ½ × gamma × 变动²，约 0.54；但隐含波动率从 48.55% 降到 43.16%，vega 那一块约 −1.36。跳空的钱在财报前已经付进了期权价格。','The long position earned ½ × gamma × move², about 0.54; but implied volatility fell from 48.55% to 43.16%, a vega piece of about −1.36. The money for the gap had already been paid into the option price before earnings.')],
+  s:L('「财报后大家不恐慌了」：说的是情绪，没说出跳空和到期日的关系。','"After earnings people stop panicking": this is about mood and does not connect the gap to the expiration dates.')},
+ {q:L('股指 2500，两周后可能到 2300 或 2700，在哪个位置波动更大？持有平值跨式，在 Black-Scholes 里 delta 约为 0，在真实的股指市场是正还是负？如果标的是涨的时候更波动的商品呢？','A stock index is at 2500 and in two weeks may be at 2300 or 2700. Where is it more volatile? Holding an at-the-money straddle, delta is about 0 in Black-Scholes; in a real stock index market is it positive or negative? What if the underlying were a commodity that is more volatile when it rises?'),
+  a:[L('2300。SPX 两周跌超 5% 之后，VIX 平均涨 8.5 点，再之后两周的实际波动 26.2%；涨超 5% 之后，VIX 平均跌 6.8 点，实际波动 16.0%。','2300. After SPX falls more than 5% over two weeks, VIX rises 8.5 points on average and actual volatility over the next two weeks is 26.2%; after it rises more than 5%, VIX falls 6.8 points on average and actual volatility is 16.0%.'),
+     L('跨式是正 vega。指数跌，波动率涨，跨式多赚；指数涨，波动率跌，跨式多亏。这一块和指数方向相反，等于额外空了一些指数，delta 为负（讲义的答案）。','A straddle is long vega. When the index falls, volatility rises and the straddle earns extra; when the index rises, volatility falls and the straddle loses extra. This piece goes against the index\'s direction, like being short a bit more index, so delta is negative (the lecture\'s answer).'),
+     L('用 2026-07-31 的 SPX 算一个月平值跨式，大约是 −0.3。','Computed for a one-month at-the-money SPX straddle as of 2026-07-31, it is about −0.3.'),
+     L('商品市场如果涨的时候更波动，这一块的符号反过来，delta 为正。','If a commodity market is more volatile when prices rise, this piece flips sign and delta is positive.')],
+  s:L('「跨式不赌方向，所以 delta 永远是 0」：只在波动率与方向无关的世界里成立。','"A straddle does not bet on direction, so its delta is always 0": true only in a world where volatility does not depend on direction.')},
+ {q:L('CEV 与跳跃扩散各修的是 Black-Scholes 的哪条假设？各自会让隐含波动率曲线变成什么形状？','Which Black-Scholes assumption does each of CEV and jump-diffusion fix? What shape does each give the implied volatility curve?'),
+  a:[L('CEV：σ 随价格变，β 小于 1 时价格越低波动率越高，修的是「波动率与方向无关」。','CEV: σ changes with price; with β below 1, the lower the price, the higher the volatility. It fixes "volatility does not depend on direction".'),
+     L('跌下去的一侧更散，低行权价的 put 更值钱、高行权价的 call 更便宜，曲线左高右低。SPX 的 β 约 −4.7：离远期价 −2 个标准差的 put，隐含波动率约是平值的 1.36 倍。','The falling side spreads out more, so low-strike puts are worth more and high-strike calls less, and the curve is high on the left and low on the right. SPX\'s β is about −4.7: a put −2 standard deviations from the forward price has an implied volatility about 1.36 times at the money.'),
+     L('跳跃扩散：平时连续走、偶尔跳，修的是「不跳空」，也让两条尾巴变长。两头的期权都更值钱，曲线两头翘。','Jump-diffusion: continuous most of the time with occasional jumps. It fixes "no gaps" and also lengthens both tails. Options at both ends are worth more, and the curve turns up at both ends.'),
+     L('真实 TSLA 曲线左边高、右边也翘：两种偏差叠在一起，节点 8 把它拆成倾斜和弯曲。','The real TSLA curve is high on the left and turned up on the right: both errors stacked together; node 8 separates them into slope and curvature.')],
+  s:L('「换一个更复杂的模型就准了」：每个模型只修一条，真实曲线是几种偏差叠在一起。','"A more complex model will be accurate": each model fixes only one assumption, and the real curve is several errors stacked together.')},
+ {q:L('心算 TSLA 350 call 入场时的价格（S 352.36，σ 46.3%，32 天），并说清 0.40 从哪来、什么时候这个心算不能用。','Work out in your head the TSLA 350 call\'s price at entry (S 352.36, σ 46.3%, 32 days), and explain where 0.40 comes from and when this mental math cannot be used.'),
+  a:[L('√(32/365) 约 0.3。352 × 0.46 × 0.3 约 48.6，乘 0.4 约 19.4，这是行权价等于远期价的期权。','√(32/365) is about 0.3. 352 × 0.46 × 0.3 is about 48.6, times 0.4 is about 19.4; that is the option with its strike at the forward price.'),
+     L('350 比远期价 353.69 低约 3.7，是一点点实值，加一半约 1.8，得到约 21.2。市场中间价 21.05。','350 is about 3.7 below the 353.69 forward price, a little in the money; adding half, about 1.8, gives about 21.2. The market mid is 21.05.'),
+     L('0.4 ＝ 一半的情况赔付为 0，另一半平均高出 0.8 个标准差：0.5 × 0.8。0.8 是钟形里离中心的平均距离 √(2/π)。','0.4 = half the time the payoff is 0, the other half it is on average 0.8 standard deviations above: 0.5 × 0.8. 0.8 is the average distance from the center in a bell shape, √(2/π).'),
+     L('σ√t 大时心算偏高（σ√t ＝ 1 时高 4.5%）；离平值远时不能用；到了两翼，Black-Scholes 本身也不准。','When σ√t is large the mental math runs high (4.5% high at σ√t = 1); it cannot be used far from the money; and out in the wings Black-Scholes itself is off.')],
+  s:L('「0.4 是个经验系数」：它是 1/√(2π) ≈ 0.399，是从钟形算出来的。','"0.4 is a rule-of-thumb factor": it is 1/√(2π) ≈ 0.399, computed from the bell shape.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1198,7 +1204,20 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-7-q'+i); if(v) t.value=v; }catch(e){}
@@ -1207,8 +1226,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? L('对照参考答案','Compare with the reference answer') : L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 

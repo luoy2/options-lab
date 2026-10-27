@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="lang.js"></script>
 <title>parity 与 conversion</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M6%2012H26M6%2020H26'%20stroke='%23fdf6ec'%20stroke-width='2.8'%20stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -216,141 +217,141 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 conversion</a><a href="#s1">一 五步推导</a><a href="#s2">二 combo</a><a href="#s3">三 反推第四个</a>
-  <a href="#s4">四 找异常</a><a href="#s5">五 pin risk</a><a href="#s6">六 settlement risk</a><a href="#s7">七 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 conversion</span><span class="l-en">0 Conversion</span></a><a href="#s1"><span class="l-zh">一 五步推导</span><span class="l-en">1 Five-step derivation</span></a><a href="#s2"><span class="l-zh">二 combo</span><span class="l-en">2 Combo</span></a><a href="#s3"><span class="l-zh">三 反推第四个</span><span class="l-en">3 Solving for the fourth</span></a>
+  <a href="#s4"><span class="l-zh">四 找异常</span><span class="l-en">4 Spotting anomalies</span></a><a href="#s5"><span class="l-zh">五 pin risk</span><span class="l-en">5 Pin risk</span></a><a href="#s6"><span class="l-zh">六 settlement risk</span><span class="l-en">6 Settlement risk</span></a><a href="#s7"><span class="l-zh">七 费曼检验</span><span class="l-en">7 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 5.2</p>
-  <h1>parity 与 conversion</h1>
-  <p class="lede">5.1 把几条腿拼成合成股票，只讲结构，留下两个小差额：合成多头比直接买股票少赚 1.29，<span class="sym" data-say="butterfly（3.2）：三个等距的行权价，买 1 张低的、卖 2 张中间的、买 1 张高的。TSLA 用的是 325 / 350 / 375。">butterfly</span> 加 <span class="sym" data-say="iron butterfly（3.2）：买一个 350 straddle、卖一个 325/375 strangle。5.1 说明了 butterfly 加它，到期固定值两个行权价的间距 25。">iron butterfly</span> 是 24.95 而不是 25。这一节给合成关系装上价格：把利息和分红算进去，「相当于」就变成一个等式，put-call parity。等式被打破，就有人能锁定利润。案例还是 2026-04-13 收盘的 TSLA 5/15 期权链，外加 5/15 到期日收盘前后的分钟线。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 5.2</span><span class="l-en">FIN 580 review · Node 5.2</span></p>
+  <h1><span class="l-zh">parity 与 conversion</span><span class="l-en">Parity and conversion</span></h1>
+  <p class="lede"><span class="l-zh">5.1 把几条腿拼成合成股票，只讲结构，留下两个小差额：合成多头比直接买股票少赚 1.29，<span class="sym" data-say="butterfly（3.2）：三个等距的行权价，买 1 张低的、卖 2 张中间的、买 1 张高的。TSLA 用的是 325 / 350 / 375。">butterfly</span> 加 <span class="sym" data-say="iron butterfly（3.2）：买一个 350 straddle、卖一个 325/375 strangle。5.1 说明了 butterfly 加它，到期固定值两个行权价的间距 25。">iron butterfly</span> 是 24.95 而不是 25。这一节给合成关系装上价格：把利息和分红算进去，「相当于」就变成一个等式，put-call parity。等式被打破，就有人能锁定利润。案例还是 2026-04-13 收盘的 TSLA 5/15 期权链，外加 5/15 到期日收盘前后的分钟线。</span><span class="l-en">5.1 assembled legs into synthetic stock and covered only structure, leaving two small differences: the synthetic long made 1.29 less than buying the stock directly, and the <span class="sym" data-say="Butterfly (3.2): three equally spaced strikes, buy 1 low, sell 2 middle, buy 1 high. For TSLA: 325 / 350 / 375.">butterfly</span> plus the <span class="sym" data-say="Iron butterfly (3.2): buy a 350 straddle and sell a 325/375 strangle. 5.1 showed that a butterfly plus this is worth the 25 width between strikes at expiration, fixed.">iron butterfly</span> came to 24.95 rather than 25. This node puts prices on the synthetic relationships: with interest and dividends included, "equivalent to" becomes an equation, put-call parity. When the equation breaks, someone can lock in a profit. The case is still the TSLA 5/15 option chain at the 2026-04-13 close, plus minute bars around the close on the 5/15 expiration day.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>conversion：三条腿拼成一条水平线</h2>
-  <p class="sub">5.1 讲过：买 call、卖 put（同一个行权价、同一个到期日），到期损益和持有股票一样，叫合成多头股票；反过来卖 call、买 put 是合成空头股票。把合成空头和一份真股票放在一起，涨跌就全部抵消。</p>
+  <h2><span class="l-zh"><span class="n">〇</span>conversion：三条腿拼成一条水平线</span><span class="l-en"><span class="n">0</span>Conversion: three legs that make a horizontal line</span></h2>
+  <p class="sub"><span class="l-zh">5.1 讲过：买 call、卖 put（同一个行权价、同一个到期日），到期损益和持有股票一样，叫合成多头股票；反过来卖 call、买 put 是合成空头股票。把合成空头和一份真股票放在一起，涨跌就全部抵消。</span><span class="l-en">As 5.1 explained, buying a call and selling a put (same strike, same expiration) has the same expiration P&amp;L as holding the stock; it is called a synthetic long stock. The reverse, selling a call and buying a put, is a synthetic short stock. Put a synthetic short together with a share of real stock and the gains and losses cancel completely.</span></p>
 
-  <p>讲义对<span class="sym" data-say="arbitrage。讲义的定义：在不同市场买卖同一种或密切相关的产品，利用两边的价格差赚钱。">套利</span>的定义是：同一样东西，或者几乎一样的东西，在两处价格不同，一边买、一边卖，赚中间的差。合成空头股票和真股票就是「几乎一样的东西」，由此有两个交易：</p>
+  <p><span class="l-zh">讲义对<span class="sym" data-say="arbitrage。讲义的定义：在不同市场买卖同一种或密切相关的产品，利用两边的价格差赚钱。">套利</span>的定义是：同一样东西，或者几乎一样的东西，在两处价格不同，一边买、一边卖，赚中间的差。合成空头股票和真股票就是「几乎一样的东西」，由此有两个交易：</span><span class="l-en">The lecture's definition of <span class="sym" data-say="Arbitrage. The lecture's definition: buying and selling the same or closely related products in different markets to profit from the price difference.">arbitrage</span>: when the same thing, or nearly the same thing, has different prices in two places, buy on one side, sell on the other, and earn the difference. Synthetic short stock and real stock are "nearly the same thing", which gives two trades:</span></p>
   <table>
-    <thead><tr><th>名称</th><th class="txt">三条腿（同一行权价、同一到期日）</th><th class="txt">等于</th></tr></thead>
+    <thead><tr><th><span class="l-zh">名称</span><span class="l-en">Name</span></th><th class="txt"><span class="l-zh">三条腿（同一行权价、同一到期日）</span><span class="l-en">Three legs (same strike, same expiration)</span></th><th class="txt"><span class="l-zh">等于</span><span class="l-en">Equals</span></th></tr></thead>
     <tbody>
-      <tr><td><span class="sym" data-say="conversion，转换套利。买股票、卖 call、买 put。到期时一定按行权价卖出股票。">conversion</span></td><td class="txt">买股票、卖 call、买 put</td><td class="txt">真股票多头 ＋ 合成股票空头</td></tr>
-      <tr><td><span class="sym" data-say="reversal，也叫 reverse conversion，反向转换。卖空股票、买 call、卖 put。到期时一定按行权价买回股票。">reversal</span></td><td class="txt">卖空股票、买 call、卖 put</td><td class="txt">真股票空头 ＋ 合成股票多头</td></tr>
+      <tr><td><span class="sym" data-say="conversion，转换套利。买股票、卖 call、买 put。到期时一定按行权价卖出股票。" data-en-say="Conversion. Buy stock, sell a call, buy a put. At expiration you are sure to sell the stock at the strike.">conversion</span></td><td class="txt"><span class="l-zh">买股票、卖 call、买 put</span><span class="l-en">Buy stock, sell a call, buy a put</span></td><td class="txt"><span class="l-zh">真股票多头 ＋ 合成股票空头</span><span class="l-en">Real long stock + synthetic short stock</span></td></tr>
+      <tr><td><span class="sym" data-say="reversal，也叫 reverse conversion，反向转换。卖空股票、买 call、卖 put。到期时一定按行权价买回股票。" data-en-say="Reversal, also called reverse conversion. Sell stock short, buy a call, sell a put. At expiration you are sure to buy the stock back at the strike.">reversal</span></td><td class="txt"><span class="l-zh">卖空股票、买 call、卖 put</span><span class="l-en">Short stock, buy a call, sell a put</span></td><td class="txt"><span class="l-zh">真股票空头 ＋ 合成股票多头</span><span class="l-en">Real short stock + synthetic long stock</span></td></tr>
     </tbody>
   </table>
-  <p>拿 conversion 来看到期时发生什么。设行权价是 <span class="sym" data-say="exercise price，行权价。合约里写死的买卖价格。">X</span>：</p>
+  <p><span class="l-zh">拿 conversion 来看到期时发生什么。设行权价是 <span class="sym" data-say="exercise price，行权价。合约里写死的买卖价格。">X</span>：</span><span class="l-en">Take the conversion and look at what happens at expiration. Let the strike be <span class="sym" data-say="Exercise price, the strike. The buy or sell price fixed in the contract.">X</span>:</span></p>
   <ul>
-    <li>TSLA 到期时在 X 上方：put 没用了，作废；call 的买方会行权，你被<span class="sym" data-say="assignment。卖出期权的一方被对手行权选中，必须履约。卖 call 被指派，就要按行权价交出股票。">指派</span>，按 X 交出股票。</li>
-    <li>TSLA 到期时在 X 下方：call 作废；你行权手里的 put，按 X 卖出股票。</li>
+    <li><span class="l-zh">TSLA 到期时在 X 上方：put 没用了，作废；call 的买方会行权，你被<span class="sym" data-say="assignment。卖出期权的一方被对手行权选中，必须履约。卖 call 被指派，就要按行权价交出股票。">指派</span>，按 X 交出股票。</span><span class="l-en">TSLA above X at expiration: the put is useless and expires; the call buyer exercises, you are <span class="sym" data-say="Assignment. The option seller is picked when the other side exercises and must perform. A short call that is assigned must deliver the stock at the strike.">assigned</span>, and you deliver the stock at X.</span></li>
+    <li><span class="l-zh">TSLA 到期时在 X 下方：call 作废；你行权手里的 put，按 X 卖出股票。</span><span class="l-en">TSLA below X at expiration: the call expires; you exercise the put you hold and sell the stock at X.</span></li>
   </ul>
-  <p>两种情况的结果一样：<b>股票按 X 卖掉，手里什么都不剩</b>。今天付多少钱是确定的，到期收多少钱也是确定的，和 TSLA 走到哪里无关。</p>
+  <p><span class="l-zh">两种情况的结果一样：<b>股票按 X 卖掉，手里什么都不剩</b>。今天付多少钱是确定的，到期收多少钱也是确定的，和 TSLA 走到哪里无关。</span><span class="l-en">Both cases end the same way: <b>the stock is sold at X and nothing is left</b>. How much you pay today is certain, how much you receive at expiration is certain, and neither depends on where TSLA goes.</span></p>
 
   <div class="panel">
     <div class="bar">
       <div class="seg" id="lgMode"><button data-m="conv" aria-pressed="true">conversion</button><button data-m="rev" aria-pressed="false">reversal</button></div>
-      <button class="btn ghost" id="lgPlay">再拼一遍</button>
+      <button class="btn ghost" id="lgPlay"><span class="l-zh">再拼一遍</span><span class="l-en">Build it again</span></button>
     </div>
-    <svg id="legs" viewBox="0 0 720 352" role="img" aria-label="三条腿的到期损益逐条相加，合成一条水平线"></svg>
+    <svg id="legs" viewBox="0 0 720 352" role="img" aria-label="三条腿的到期损益逐条相加，合成一条水平线" data-en-aria-label="Expiration P&amp;L of the three legs added one by one, making a horizontal line"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink-faint)"></i>股票</span>
+      <span><i class="ln" style="background:var(--ink-faint)"></i><span class="l-zh">股票</span><span class="l-en">Stock</span></span>
       <span><i class="ln" style="background:var(--result)"></i>350 call</span>
       <span><i class="ln" style="background:var(--warn)"></i>350 put</span>
-      <span><i class="ln" style="background:var(--control)"></i>三条腿合计</span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">三条腿合计</span><span class="l-en">Three legs combined</span></span>
     </div>
     <div class="stats">
       <div class="stat"><div class="k" id="lgK1"></div><div class="d" id="lgV1"></div><div class="d2" id="lgV1b"></div></div>
       <div class="stat"><div class="k" id="lgK2"></div><div class="d" id="lgV2"></div><div class="d2" id="lgV2b"></div></div>
-      <div class="stat"><div class="k">到期比今天</div><div class="d" id="lgV3" style="color:var(--control)"></div><div class="d2" id="lgV3b"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">到期比今天</span><span class="l-en">At expiration versus today</span></div><div class="d" id="lgV3" style="color:var(--control)"></div><div class="d2" id="lgV3b"></div></div>
     </div>
     <div class="say plain" id="lgSay"></div>
   </div>
-  <p>三条腿用 4/13 收盘的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价（3.1）。">中间价</span>：TSLA 352.36，350 call 21.05，350 put 17.40。水平线说明 conversion 没有方向，也不怕波动：<span class="sym" data-say="delta（2.1）：TSLA 涨 1 美元，仓位赚或亏多少。水平线不管 TSLA 在哪都一样高，所以是 0。">delta</span>、<span class="sym" data-say="gamma（2.2）：TSLA 涨 1 美元，delta 变多少。delta 一直是 0，gamma 也是 0。">gamma</span>、<span class="sym" data-say="vega（2.3）：隐含波动率涨 1 个点，仓位赚或亏多少。卖出的 call 和买入的 put 同一行权价，vega 正好抵消。">vega</span> 全是 0。它的盈亏在建仓那一刻就定了。</p>
-  <p>这条水平线高出 0 的 1.29，就是 5.1 里合成多头比直接买股票少赚的那 1.29：两者差的正是一笔 conversion。它看起来像白赚，其实不是。今天付出的 348.71 要占用 32 天，到 5/15 才换回 350。按 1.1 反解出的利率 4.3%，这笔钱 32 天的利息是 1.31。扣掉利息，每股 −0.02，一张 −2.46 美元，几乎正好是 0。下一节把这笔账列全。</p>
+  <p><span class="l-zh">三条腿用 4/13 收盘的<span class="sym" data-say="中间价：买一和卖一的平均。买一是市场上有人愿意买的最高价，卖一是有人愿意卖的最低价（3.1）。">中间价</span>：TSLA 352.36，350 call 21.05，350 put 17.40。水平线说明 conversion 没有方向，也不怕波动：<span class="sym" data-say="delta（2.1）：TSLA 涨 1 美元，仓位赚或亏多少。水平线不管 TSLA 在哪都一样高，所以是 0。">delta</span>、<span class="sym" data-say="gamma（2.2）：TSLA 涨 1 美元，delta 变多少。delta 一直是 0，gamma 也是 0。">gamma</span>、<span class="sym" data-say="vega（2.3）：隐含波动率涨 1 个点，仓位赚或亏多少。卖出的 call 和买入的 put 同一行权价，vega 正好抵消。">vega</span> 全是 0。它的盈亏在建仓那一刻就定了。</span><span class="l-en">The three legs use <span class="sym" data-say="Mid price: the average of the bid and the ask. The bid is the highest price someone in the market will pay; the ask is the lowest price someone will sell at (3.1).">mid prices</span> at the 4/13 close: TSLA 352.36, 350 call 21.05, 350 put 17.40. The horizontal line shows that a conversion has no direction and doesn't care about volatility: <span class="sym" data-say="Delta (2.1): how much the position gains or loses when TSLA rises $1. A horizontal line is the same height wherever TSLA is, so it is 0.">delta</span>, <span class="sym" data-say="Gamma (2.2): how much delta changes when TSLA rises $1. Delta stays at 0, so gamma is 0 too.">gamma</span> and <span class="sym" data-say="Vega (2.3): how much the position gains or loses when implied volatility rises 1 point. The short call and the long put have the same strike, so their vegas cancel exactly.">vega</span> are all 0. Its P&amp;L is fixed the moment the position is opened.</span></p>
+  <p><span class="l-zh">这条水平线高出 0 的 1.29，就是 5.1 里合成多头比直接买股票少赚的那 1.29：两者差的正是一笔 conversion。它看起来像白赚，其实不是。今天付出的 348.71 要占用 32 天，到 5/15 才换回 350。按 1.1 反解出的利率 4.3%，这笔钱 32 天的利息是 1.31。扣掉利息，每股 −0.02，一张 −2.46 美元，几乎正好是 0。下一节把这笔账列全。</span><span class="l-en">The 1.29 by which this horizontal line sits above 0 is exactly the 1.29 by which the synthetic long in 5.1 trailed buying the stock directly: the difference between the two is one conversion. It looks like free money, but it isn't. The 348.71 paid today is tied up for 32 days and turns back into 350 only on 5/15. At the 4.3% rate backed out in 1.1, the interest on this money for 32 days is 1.31. Net of interest, it is −0.02 per share, −$2.46 per contract, almost exactly 0. The next section lays out the full accounting.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>五步推导 put-call parity</h2>
-  <p class="sub">1.1 用 put-call parity 从 TSLA 的真实报价反解出市场用的利率，340 到 360 几个行权价在 4.1% 到 4.4% 之间，那时只用了结论。这里从 conversion 的每一笔钱出发，把它推出来。</p>
+  <h2><span class="l-zh"><span class="n">一</span>五步推导 put-call parity</span><span class="l-en"><span class="n">1</span>Deriving put-call parity in five steps</span></h2>
+  <p class="sub"><span class="l-zh">1.1 用 put-call parity 从 TSLA 的真实报价反解出市场用的利率，340 到 360 几个行权价在 4.1% 到 4.4% 之间，那时只用了结论。这里从 conversion 的每一笔钱出发，把它推出来。</span><span class="l-en">1.1 used put-call parity to back out the interest rate the market was using from real TSLA quotes, between 4.1% and 4.4% across strikes from 340 to 360; at that point only the result was used. Here it is derived from each cash flow of a conversion.</span></p>
 
-  <p>讲义的做法是把 conversion 从建仓到到期的每一笔钱分成两栏：<span class="sym" data-say="credits。收到的钱，或者能拿来生息的钱。">贷方</span>记收到的钱，<span class="sym" data-say="debits。付出的钱，或者因为付了钱而少赚的利息。">借方</span>记付出的钱。钱放着会生息，所以每一笔今天发生的钱都要带上它到期前的利息。</p>
-  <p>利息用两个字母表示。<span class="sym" data-say="r：年利率。本页沿用 1.1 从 TSLA 报价反解出的 4.3%。">r</span> 是年利率，这里沿用 1.1 反解出的 4.3%；<span class="sym" data-say="t：从今天到到期的时间，以年计。4/13 到 5/15 是 32 天，t ＝ 32/365。">t</span> 是到期时间，以年计，32 天就是 32/365 年。讲义用单利，<span class="sym" data-say="r·t：这段时间的利息占本金的比例。4.3% × 32/365 ＝ 0.0038，每 100 美元 32 天的利息约 0.38 美元。">r·t</span> 就是这段时间的利息占本金的比例，所以一笔钱 C 放到到期，利息是 C·r·t。</p>
+  <p><span class="l-zh">讲义的做法是把 conversion 从建仓到到期的每一笔钱分成两栏：<span class="sym" data-say="credits。收到的钱，或者能拿来生息的钱。">贷方</span>记收到的钱，<span class="sym" data-say="debits。付出的钱，或者因为付了钱而少赚的利息。">借方</span>记付出的钱。钱放着会生息，所以每一笔今天发生的钱都要带上它到期前的利息。</span><span class="l-en">The lecture's method is to split every cash flow of the conversion, from opening to expiration, into two columns: <span class="sym" data-say="Credits. Money received, or money that can earn interest.">credits</span> record money received and <span class="sym" data-say="Debits. Money paid out, or interest forgone because money was paid out.">debits</span> record money paid out. Money earns interest while it sits, so every amount that occurs today has to carry its interest until expiration.</span></p>
+  <p><span class="l-zh">利息用两个字母表示。<span class="sym" data-say="r：年利率。本页沿用 1.1 从 TSLA 报价反解出的 4.3%。">r</span> 是年利率，这里沿用 1.1 反解出的 4.3%；<span class="sym" data-say="t：从今天到到期的时间，以年计。4/13 到 5/15 是 32 天，t ＝ 32/365。">t</span> 是到期时间，以年计，32 天就是 32/365 年。讲义用单利，<span class="sym" data-say="r·t：这段时间的利息占本金的比例。4.3% × 32/365 ＝ 0.0038，每 100 美元 32 天的利息约 0.38 美元。">r·t</span> 就是这段时间的利息占本金的比例，所以一笔钱 C 放到到期，利息是 C·r·t。</span><span class="l-en">Interest is written with two letters. <span class="sym" data-say="r: annual interest rate. This page keeps the 4.3% backed out of TSLA quotes in 1.1.">r</span> is the annual interest rate, here the 4.3% backed out in 1.1; <span class="sym" data-say="t: time from today to expiration, in years. 4/13 to 5/15 is 32 days, t = 32/365.">t</span> is the time to expiration in years, so 32 days is 32/365 years. The lecture notes use simple interest, so <span class="sym" data-say="r·t: the interest over this period as a fraction of principal. 4.3% × 32/365 = 0.0038, about $0.38 of interest per $100 over 32 days.">r·t</span> is the interest over this period as a fraction of principal, and an amount C held to expiration earns interest of C·r·t.</span></p>
   <table>
-    <thead><tr><th>贷方（收到）</th><th class="txt">为什么</th><th>借方（付出）</th><th class="txt">为什么</th></tr></thead>
+    <thead><tr><th><span class="l-zh">贷方（收到）</span><span class="l-en">Credits (received)</span></th><th class="txt"><span class="l-zh">为什么</span><span class="l-en">Why</span></th><th><span class="l-zh">借方（付出）</span><span class="l-en">Debits (paid)</span></th><th class="txt"><span class="l-zh">为什么</span><span class="l-en">Why</span></th></tr></thead>
     <tbody>
-      <tr><td><span class="sym" data-say="call 价格。卖出 call 今天收到的钱。">C</span></td><td class="txt">卖 call 收到的钱</td><td><span class="sym" data-say="stock price，今天的股价。买股票今天付的钱。">S</span></td><td class="txt">买股票付的钱</td></tr>
-      <tr><td>C·r·t</td><td class="txt">C 存到到期的利息</td><td>S·r·t</td><td class="txt">买股票的钱是借来的，要付利息</td></tr>
-      <tr><td><span class="sym" data-say="dividend。持有股票期间收到的分红合计。">D</span></td><td class="txt">拿着股票收到的分红</td><td><span class="sym" data-say="put 价格。买入 put 今天付的钱。">P</span></td><td class="txt">买 put 付的钱</td></tr>
-      <tr><td>X</td><td class="txt">到期按行权价卖出股票</td><td>P·r·t</td><td class="txt">买 put 的钱也要付利息</td></tr>
+      <tr><td><span class="sym" data-say="call 价格。卖出 call 今天收到的钱。" data-en-say="Call price. The money received today for selling the call.">C</span></td><td class="txt"><span class="l-zh">卖 call 收到的钱</span><span class="l-en">Money received for selling the call</span></td><td><span class="sym" data-say="stock price，今天的股价。买股票今天付的钱。" data-en-say="Stock price, today's share price. The money paid today to buy the stock.">S</span></td><td class="txt"><span class="l-zh">买股票付的钱</span><span class="l-en">Money paid for the stock</span></td></tr>
+      <tr><td>C·r·t</td><td class="txt"><span class="l-zh">C 存到到期的利息</span><span class="l-en">Interest on C held to expiration</span></td><td>S·r·t</td><td class="txt"><span class="l-zh">买股票的钱是借来的，要付利息</span><span class="l-en">The money for the stock is borrowed and pays interest</span></td></tr>
+      <tr><td><span class="sym" data-say="dividend。持有股票期间收到的分红合计。" data-en-say="Dividend. Total dividends received while holding the stock.">D</span></td><td class="txt"><span class="l-zh">拿着股票收到的分红</span><span class="l-en">Dividends received while holding the stock</span></td><td><span class="sym" data-say="put 价格。买入 put 今天付的钱。" data-en-say="Put price. The money paid today to buy the put.">P</span></td><td class="txt"><span class="l-zh">买 put 付的钱</span><span class="l-en">Money paid for the put</span></td></tr>
+      <tr><td>X</td><td class="txt"><span class="l-zh">到期按行权价卖出股票</span><span class="l-en">Sell the stock at the strike at expiration</span></td><td>P·r·t</td><td class="txt"><span class="l-zh">买 put 的钱也要付利息</span><span class="l-en">The money for the put also pays interest</span></td></tr>
     </tbody>
   </table>
-  <p class="tiny">分红本身到期前也能生息，讲义忽略这一小块。</p>
+  <p class="tiny"><span class="l-zh">分红本身到期前也能生息，讲义忽略这一小块。</span><span class="l-en">The dividends themselves can also earn interest before expiration; the lecture notes ignore this small piece.</span></p>
 
-  <h3>32 天的账</h3>
-  <p>用 TSLA 350 这一组把两栏填满。建仓当天净付出 352.36 − 21.05 ＋ 17.40 ＝ 348.71，这笔钱借来，每天按 4.3% 计息；5/15 收回 350。</p>
+  <h3><span class="l-zh">32 天的账</span><span class="l-en">The 32-day account</span></h3>
+  <p><span class="l-zh">用 TSLA 350 这一组把两栏填满。建仓当天净付出 352.36 − 21.05 ＋ 17.40 ＝ 348.71，这笔钱借来，每天按 4.3% 计息；5/15 收回 350。</span><span class="l-en">Fill in both columns with the TSLA 350 set. On the opening day the net payment is 352.36 − 21.05 + 17.40 = 348.71; this money is borrowed and accrues interest daily at 4.3%; on 5/15, 350 comes back.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="ldPlay">再走一遍</button></div>
-    <svg id="ledger" viewBox="0 0 720 290" role="img" aria-label="conversion 建仓后借款逐日计息，到期与收回的 350 比较"></svg>
+    <div class="bar"><button class="btn ghost" id="ldPlay"><span class="l-zh">再走一遍</span><span class="l-en">Run it again</span></button></div>
+    <svg id="ledger" viewBox="0 0 720 290" role="img" aria-label="conversion 建仓后借款逐日计息，到期与收回的 350 比较" data-en-aria-label="After opening the conversion, the loan accrues interest day by day and is compared at expiration with the 350 received"></svg>
     <div class="tscroll">
     <table id="ldTb">
-      <thead><tr><th>贷方</th><th></th><th>借方</th><th></th></tr></thead>
+      <thead><tr><th><span class="l-zh">贷方</span><span class="l-en">Credits</span></th><th></th><th><span class="l-zh">借方</span><span class="l-en">Debits</span></th><th></th></tr></thead>
       <tbody></tbody>
     </table>
     </div>
     <div class="say plain" id="ldSay"></div>
   </div>
 
-  <h3>五步</h3>
-  <p>两栏相等，市场上就没有人能靠 conversion 赚钱。从这个等式出发：</p>
+  <h3><span class="l-zh">五步</span><span class="l-en">Five steps</span></h3>
+  <p><span class="l-zh">两栏相等，市场上就没有人能靠 conversion 赚钱。从这个等式出发：</span><span class="l-en">If the two columns are equal, nobody in the market can make money from a conversion. Starting from this equation:</span></p>
   <div class="steps">
-    <div class="step"><span class="k">①</span><div class="math">C ＋ C·r·t ＋ D ＋ X ＝ S ＋ S·r·t ＋ P ＋ P·r·t</div><div class="gloss">贷方合计 ＝ 借方合计</div></div>
-    <div class="step"><span class="k">②</span><div class="math">(C ＋ C·r·t) − (P ＋ P·r·t) ＝ (S ＋ S·r·t) − D − X</div><div class="gloss">期权放左边，股票、分红、行权价放右边：挪到等号另一边就变号</div></div>
-    <div class="step"><span class="k">③</span><div class="math">(C − P)(1 ＋ r·t) ＝ S(1 ＋ r·t) − D − X</div><div class="gloss">每一项都带着自己的利息，提出公因子 (<span class="sym" data-say="1 ＋ r·t：1 美元今天存进去，到期变成多少。TSLA 这 32 天是 1.0038。">1 ＋ r·t</span>)</div></div>
-    <div class="step"><span class="k">④</span><div class="math">(C − P)(1 ＋ r·t) ＝ <span class="sym" data-say="远期价，1.1 讲过：F = S(1 + r·t) − D。今天约定、到期交割的公平价格。">F</span> − X</div><div class="gloss">S(1 ＋ r·t) − D 就是 1.1 的远期价 F</div></div>
-    <div class="step hot"><span class="k">⑤</span><div class="math">C − P ＝ (F − X) ÷ (1 ＋ r·t)</div><div class="gloss">两边除以 (1 ＋ r·t)。1 美元今天存到到期变成 1 ＋ r·t，反过来，到期才拿到的钱除以 1 ＋ r·t，就是它今天值多少，叫<span class="sym" data-say="present value，现值：将来才收到的一笔钱今天值多少。单利下除以 1 ＋ r·t。本页说「折回今天」就是算现值。">现值</span>，也说「折回今天」。所以 call 与 put 之差，等于远期价超出行权价的部分的现值</div></div>
+    <div class="step"><span class="k">①</span><div class="math"><span class="l-zh">C ＋ C·r·t ＋ D ＋ X ＝ S ＋ S·r·t ＋ P ＋ P·r·t</span><span class="l-en">C + C·r·t + D + X = S + S·r·t + P + P·r·t</span></div><div class="gloss"><span class="l-zh">贷方合计 ＝ 借方合计</span><span class="l-en">Total credits = total debits</span></div></div>
+    <div class="step"><span class="k">②</span><div class="math"><span class="l-zh">(C ＋ C·r·t) − (P ＋ P·r·t) ＝ (S ＋ S·r·t) − D − X</span><span class="l-en">(C + C·r·t) − (P + P·r·t) = (S + S·r·t) − D − X</span></div><div class="gloss"><span class="l-zh">期权放左边，股票、分红、行权价放右边：挪到等号另一边就变号</span><span class="l-en">Options on the left; stock, dividends and strike on the right: a term changes sign when it moves to the other side</span></div></div>
+    <div class="step"><span class="k">③</span><div class="math"><span class="l-zh">(C − P)(1 ＋ r·t) ＝ S(1 ＋ r·t) − D − X</span><span class="l-en">(C − P)(1 + r·t) = S(1 + r·t) − D − X</span></div><div class="gloss"><span class="l-zh">每一项都带着自己的利息，提出公因子 (<span class="sym" data-say="1 ＋ r·t：1 美元今天存进去，到期变成多少。TSLA 这 32 天是 1.0038。">1 ＋ r·t</span></span><span class="l-en">Each term carries its own interest; factor out (<span class="sym" data-say="1 + r·t: what $1 deposited today becomes at expiration. For TSLA's 32 days it is 1.0038.">1 + r·t</span></span>)</div></div>
+    <div class="step"><span class="k">④</span><div class="math"><span class="l-zh">(C − P)(1 ＋ r·t) ＝ <span class="sym" data-say="远期价，1.1 讲过：F = S(1 + r·t) − D。今天约定、到期交割的公平价格。">F</span></span><span class="l-en">(C − P)(1 + r·t) = <span class="sym" data-say="Forward price, from 1.1: F = S(1 + r·t) − D. The fair price agreed today for delivery at expiration.">F</span></span> − X</div><div class="gloss"><span class="l-zh">S(1 ＋ r·t) − D 就是 1.1 的远期价 F</span><span class="l-en">S(1 + r·t) − D is the forward price F from 1.1</span></div></div>
+    <div class="step hot"><span class="k">⑤</span><div class="math"><span class="l-zh">C − P ＝ (F − X) ÷ (1 ＋ r·t)</span><span class="l-en">C − P = (F − X) ÷ (1 + r·t)</span></div><div class="gloss"><span class="l-zh">两边除以 (1 ＋ r·t)。1 美元今天存到到期变成 1 ＋ r·t，反过来，到期才拿到的钱除以 1 ＋ r·t，就是它今天值多少，叫<span class="sym" data-say="present value，现值：将来才收到的一笔钱今天值多少。单利下除以 1 ＋ r·t。本页说「折回今天」就是算现值。">现值</span>，也说「折回今天」。所以 call 与 put 之差，等于远期价超出行权价的部分的现值</span><span class="l-en">Divide both sides by (1 + r·t). $1 deposited today becomes 1 + r·t at expiration; conversely, money received only at expiration, divided by 1 + r·t, is what it is worth today, called its <span class="sym" data-say="Present value: what an amount received in the future is worth today. With simple interest, divide by 1 + r·t. On this page, &quot;discount to today&quot; means computing present value.">present value</span>, or "discounting to today". So the difference between call and put equals the present value of the amount by which the forward price exceeds the strike</span></div></div>
   </div>
   <p id="stepCheck"></p>
-  <p>5.1 另一个差额也在这里：butterfly 加 iron butterfly 到期固定拿到 25，折回今天是 25 ÷ (1 ＋ r·t) ＝ 24.91，和下表「不派息的股票」那一行里的 X ÷ (1 ＋ r·t) 是同一种折现。中间价合计 24.95 比 24.91 多出的 0.04，5.1 算过，在中间价的误差以内。</p>
+  <p><span class="l-zh">5.1 另一个差额也在这里：butterfly 加 iron butterfly 到期固定拿到 25，折回今天是 25 ÷ (1 ＋ r·t) ＝ 24.91，和下表「不派息的股票」那一行里的 X ÷ (1 ＋ r·t) 是同一种折现。中间价合计 24.95 比 24.91 多出的 0.04，5.1 算过，在中间价的误差以内。</span><span class="l-en">The other difference from 5.1 is here too: the butterfly plus iron butterfly receives a fixed 25 at expiration, which discounted to today is 25 ÷ (1 + r·t) = 24.91, the same discounting as X ÷ (1 + r·t) in the "non-dividend stock" row of the table below. The 0.04 by which the 24.95 total at mid prices exceeds 24.91 was worked out in 5.1 and is within the error of mid prices.</span></p>
 
-  <h3>不同标的上的样子</h3>
-  <p>同一条关系，按标的和结算方式不同，写法不同。期权的标的也可以是<span class="sym" data-say="futures，期货：约定到期按今天定下的价格买卖标的的合约。买期货不用付全款，只放一笔保证金；价格每天变，盈亏每天用现金结清。">期货</span>，这时 F 就是期货价。结算方式 2.3 讲过：<span class="sym" data-say="stock-type settlement（2.3）：买期权时全额付钱，盈亏到平仓或到期才兑现。美国的股票期权和期货期权都是这样。">股票型结算</span>买期权时全额付钱，<span class="sym" data-say="futures-type settlement（2.3）：买期权不付全款，每天按结算价把盈亏结清，不占用钱。美国以外多数交易所的期货期权是这样。">期货型结算</span>每天按结算价结清、不占用钱。</p>
+  <h3><span class="l-zh">不同标的上的样子</span><span class="l-en">How it looks on different underlyings</span></h3>
+  <p><span class="l-zh">同一条关系，按标的和结算方式不同，写法不同。期权的标的也可以是<span class="sym" data-say="futures，期货：约定到期按今天定下的价格买卖标的的合约。买期货不用付全款，只放一笔保证金；价格每天变，盈亏每天用现金结清。">期货</span>，这时 F 就是期货价。结算方式 2.3 讲过：<span class="sym" data-say="stock-type settlement（2.3）：买期权时全额付钱，盈亏到平仓或到期才兑现。美国的股票期权和期货期权都是这样。">股票型结算</span>买期权时全额付钱，<span class="sym" data-say="futures-type settlement（2.3）：买期权不付全款，每天按结算价把盈亏结清，不占用钱。美国以外多数交易所的期货期权是这样。">期货型结算</span>每天按结算价结清、不占用钱。</span><span class="l-en">The same relationship is written differently depending on the underlying and the settlement method. An option's underlying can also be a <span class="sym" data-say="Futures: a contract to buy or sell the underlying at expiration at a price agreed today. Buying futures doesn't require the full price, only a margin deposit; the price changes daily and gains and losses are settled in cash every day.">futures contract</span>, in which case F is the futures price. Settlement methods were covered in 2.3: with <span class="sym" data-say="Stock-type settlement (2.3): you pay the full price when buying the option, and gains or losses are realized only when you close or at expiration. US stock options and futures options work this way.">stock-type settlement</span> you pay the full price when buying an option; with <span class="sym" data-say="Futures-type settlement (2.3): you don't pay the full price for the option; gains and losses are settled daily at the settlement price, and no money is tied up. Most futures options outside the US work this way.">futures-type settlement</span> it is settled daily at the settlement price and no money is tied up.</span></p>
   <div class="tscroll">
   <table>
-    <thead><tr><th>标的</th><th class="nw">C − P ＝</th><th class="txt">为什么</th></tr></thead>
+    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th class="nw"><span class="l-zh">C − P ＝</span><span class="l-en">C − P =</span></th><th class="txt"><span class="l-zh">为什么</span><span class="l-en">Why</span></th></tr></thead>
     <tbody>
-      <tr><td>不计利息和分红</td><td class="nw">S − X</td><td class="txt">r ＝ 0、D ＝ 0 时的最简形式</td></tr>
-      <tr><td>股票</td><td class="nw">(F − X) ÷ (1 ＋ r·t)</td><td class="txt">上面推的就是这一种</td></tr>
-      <tr><td>不派息的股票</td><td class="nw">S − X ÷ (1 ＋ r·t)</td><td class="txt">D ＝ 0，F ＝ S(1 ＋ r·t)，化简后剩下这两项</td></tr>
-      <tr><td>期货期权，股票型结算</td><td class="nw">(F − X) ÷ (1 ＋ r·t)</td><td class="txt">F 是期货价；期权要全额付钱，所以还要折现</td></tr>
-      <tr><td>期货期权，期货型结算</td><td class="nw">F − X</td><td class="txt">期权也不占用钱，不用折现</td></tr>
+      <tr><td><span class="l-zh">不计利息和分红</span><span class="l-en">Ignoring interest and dividends</span></td><td class="nw">S − X</td><td class="txt"><span class="l-zh">r ＝ 0、D ＝ 0 时的最简形式</span><span class="l-en">The simplest form, with r = 0 and D = 0</span></td></tr>
+      <tr><td><span class="l-zh">股票</span><span class="l-en">Stock</span></td><td class="nw"><span class="l-zh">(F − X) ÷ (1 ＋ r·t)</span><span class="l-en">(F − X) ÷ (1 + r·t)</span></td><td class="txt"><span class="l-zh">上面推的就是这一种</span><span class="l-en">This is the one derived above</span></td></tr>
+      <tr><td><span class="l-zh">不派息的股票</span><span class="l-en">Non-dividend stock</span></td><td class="nw"><span class="l-zh">S − X ÷ (1 ＋ r·t)</span><span class="l-en">S − X ÷ (1 + r·t)</span></td><td class="txt"><span class="l-zh">D ＝ 0，F ＝ S(1 ＋ r·t)，化简后剩下这两项</span><span class="l-en">D = 0 and F = S(1 + r·t); after simplifying, these two terms remain</span></td></tr>
+      <tr><td><span class="l-zh">期货期权，股票型结算</span><span class="l-en">Futures option, stock-type settlement</span></td><td class="nw"><span class="l-zh">(F − X) ÷ (1 ＋ r·t)</span><span class="l-en">(F − X) ÷ (1 + r·t)</span></td><td class="txt"><span class="l-zh">F 是期货价；期权要全额付钱，所以还要折现</span><span class="l-en">F is the futures price; the option is paid in full, so it still has to be discounted</span></td></tr>
+      <tr><td><span class="l-zh">期货期权，期货型结算</span><span class="l-en">Futures option, futures-type settlement</span></td><td class="nw">F − X</td><td class="txt"><span class="l-zh">期权也不占用钱，不用折现</span><span class="l-en">The option doesn't tie up money either, so no discounting</span></td></tr>
     </tbody>
   </table>
   </div>
 
-  <h3>心算用的近似式</h3>
-  <p>第 ⑤ 步要做一次除法，心算不方便。讲义先把它拆开，再做两步近似：</p>
+  <h3><span class="l-zh">心算用的近似式</span><span class="l-en">An approximation for mental math</span></h3>
+  <p><span class="l-zh">第 ⑤ 步要做一次除法，心算不方便。讲义先把它拆开，再做两步近似：</span><span class="l-en">Step ⑤ requires a division, which is awkward to do in your head. The lecture notes first split it apart, then make two approximations:</span></p>
   <div class="steps">
-    <div class="step"><span class="k">a</span><div class="math"><span class="nw">C − P ＝ [S(1 ＋ r·t) − D − X]</span> <span class="nw">÷ (1 ＋ r·t)</span><br><span class="nw">＝ S − D ÷ (1 ＋ r·t)</span> <span class="nw">− X ÷ (1 ＋ r·t)</span></div><div class="gloss">把 F ＝ S(1 ＋ r·t) − D 代进第 ⑤ 步，三项分别除以 1 ＋ r·t。S 那一项的 (1 ＋ r·t) 约掉，只剩 S</div></div>
-    <div class="step"><span class="k">b</span><div class="math">D ÷ (1 ＋ r·t) ≈ D</div><div class="gloss">分红是几毛钱到一两块，再乘上 r·t（TSLA 这 32 天是 0.0038），差的不到一分钱</div></div>
-    <div class="step"><span class="k">c</span><div class="math">X ÷ (1 ＋ r·t) ≈ X − X·r·t</div><div class="gloss">反过来乘回去核对：<span class="nw">(X − X·r·t)(1 ＋ r·t)</span> ＝ <span class="nw">X − X·(r·t)²</span>。(r·t)² 只有 0.0038² ≈ 0.000014，乘上 350 是 0.005，所以 X − X·r·t 几乎就是 <span class="nw">X ÷ (1 ＋ r·t)</span></div></div>
+    <div class="step"><span class="k">a</span><div class="math"><span class="nw"><span class="l-zh">C − P ＝ [S(1 ＋ r·t) − D − X]</span><span class="l-en">C − P = [S(1 + r·t) − D − X]</span></span> <span class="nw"><span class="l-zh">÷ (1 ＋ r·t)</span><span class="l-en">÷ (1 + r·t)</span></span><br><span class="nw"><span class="l-zh">＝ S − D ÷ (1 ＋ r·t)</span><span class="l-en">= S − D ÷ (1 + r·t)</span></span> <span class="nw"><span class="l-zh">− X ÷ (1 ＋ r·t)</span><span class="l-en">− X ÷ (1 + r·t)</span></span></div><div class="gloss"><span class="l-zh">把 F ＝ S(1 ＋ r·t) − D 代进第 ⑤ 步，三项分别除以 1 ＋ r·t。S 那一项的 (1 ＋ r·t) 约掉，只剩 S</span><span class="l-en">Substitute F = S(1 + r·t) − D into step ⑤ and divide each of the three terms by 1 + r·t. The (1 + r·t) in the S term cancels, leaving just S</span></div></div>
+    <div class="step"><span class="k">b</span><div class="math"><span class="l-zh">D ÷ (1 ＋ r·t) ≈ D</span><span class="l-en">D ÷ (1 + r·t) ≈ D</span></div><div class="gloss"><span class="l-zh">分红是几毛钱到一两块，再乘上 r·t（TSLA 这 32 天是 0.0038），差的不到一分钱</span><span class="l-en">Dividends are tens of cents to a dollar or two; multiplied by r·t (0.0038 for TSLA's 32 days), the difference is under a cent</span></div></div>
+    <div class="step"><span class="k">c</span><div class="math"><span class="l-zh">X ÷ (1 ＋ r·t) ≈ X − X·r·t</span><span class="l-en">X ÷ (1 + r·t) ≈ X − X·r·t</span></div><div class="gloss"><span class="l-zh">反过来乘回去核对：<span class="nw">(X − X·r·t)(1 ＋ r·t)</span> ＝ <span class="nw">X − X·(r·t)²</span>。(r·t)² 只有 0.0038² ≈ 0.000014，乘上 350 是 0.005，所以 X − X·r·t 几乎就是 <span class="nw">X ÷ (1 ＋ r·t)</span></span><span class="l-en">Check by multiplying back: <span class="nw">(X − X·r·t)(1 + r·t)</span> = <span class="nw">X − X·(r·t)²</span>. (r·t)² is only 0.0038² ≈ 0.000014, which times 350 is 0.005, so X − X·r·t is almost exactly <span class="nw">X ÷ (1 + r·t)</span></span></div></div>
   </div>
   <div class="formula">
-    <div class="math">C − P ≈ S − X ＋ X·r·t − D</div>
-    <div class="gloss">把 b、c 代进 a：现价算的内在价值 S − X，加上行权价晚付省下的利息，减去分红</div>
+    <div class="math"><span class="l-zh">C − P ≈ S − X ＋ X·r·t − D</span><span class="l-en">C − P ≈ S − X + X·r·t − D</span></div>
+    <div class="gloss"><span class="l-zh">把 b、c 代进 a：现价算的内在价值 S − X，加上行权价晚付省下的利息，减去分红</span><span class="l-en">Substitute b and c into a: the intrinsic value at the current price, S − X, plus the interest saved by paying the strike later, minus the dividend</span></div>
     <div class="note" id="approxNote"></div>
   </div>
 
-  <h3>conversion 还剩什么风险</h3>
-  <p>水平线说明股价怎么走都不影响 conversion。式子里除了价格只剩 r 和 D，风险也就只剩这两个（讲义的风险表）：</p>
+  <h3><span class="l-zh">conversion 还剩什么风险</span><span class="l-en">What risk a conversion still has</span></h3>
+  <p><span class="l-zh">水平线说明股价怎么走都不影响 conversion。式子里除了价格只剩 r 和 D，风险也就只剩这两个（讲义的风险表）：</span><span class="l-en">The horizontal line shows that the stock's path doesn't affect a conversion. Apart from prices, the only things left in the formula are r and D, so those are the only risks left (the lecture's risk table):</span></p>
   <table>
-    <thead><tr><th>头寸</th><th class="txt">利率</th><th class="txt">分红</th></tr></thead>
+    <thead><tr><th><span class="l-zh">头寸</span><span class="l-en">Position</span></th><th class="txt"><span class="l-zh">利率</span><span class="l-en">Interest rate</span></th><th class="txt"><span class="l-zh">分红</span><span class="l-en">Dividend</span></th></tr></thead>
     <tbody>
-      <tr><td>conversion</td><td class="txt">利率上升就亏：借钱买的股票，利息多付</td><td class="txt">分红下调就亏：本来算好能收的钱少了</td></tr>
-      <tr><td>reversal</td><td class="txt">利率下降就亏：卖空股票收到的钱，利息少赚</td><td class="txt">分红上调就亏：卖空股票要替借出方补发分红</td></tr>
+      <tr><td>conversion</td><td class="txt"><span class="l-zh">利率上升就亏：借钱买的股票，利息多付</span><span class="l-en">Loses if rates rise: the stock was bought with borrowed money, so more interest is paid</span></td><td class="txt"><span class="l-zh">分红下调就亏：本来算好能收的钱少了</span><span class="l-en">Loses if the dividend is cut: money counted on is smaller</span></td></tr>
+      <tr><td>reversal</td><td class="txt"><span class="l-zh">利率下降就亏：卖空股票收到的钱，利息少赚</span><span class="l-en">Loses if rates fall: the proceeds from the short stock earn less interest</span></td><td class="txt"><span class="l-zh">分红上调就亏：卖空股票要替借出方补发分红</span><span class="l-en">Loses if the dividend is raised: a short seller has to pay the dividend to the lender</span></td></tr>
     </tbody>
   </table>
   <p id="rhoSay"></p>
@@ -358,141 +359,141 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>combo：call 减 put</h2>
-  <p class="sub">交易员把同一行权价、同一到期日的「买 call、卖 put」当成一个整体来报价，叫 <span class="sym" data-say="combo。同一行权价、同一到期日的 call 价格减 put 价格，C − P。买 combo 就是买合成股票。">combo</span>，价格就是 C − P。</p>
-  <p>第 ⑤ 步说 combo 等于 (F − X) ÷ (1 ＋ r·t)。F − X 是按远期价算的<span class="sym" data-say="intrinsic value。期权立刻行权能得到的钱。call 是标的价减行权价，put 是行权价减标的价，不够就是 0。">内在价值</span>，再折回今天。所以讲义说：<b>combo 是内在价值的现值</b>。不是按现价算的 S − X，也不是没折现的 F − X。</p>
-  <p>买 combo 等于约好到期按 X 买股票。和今天直接买股票比，X 到期才付，钱多留在手里 32 天，利息归自己；如果股票期间派息，分红拿不到。这两件事让 combo 比 S − X 高出利息、低掉分红。</p>
+  <h2><span class="l-zh"><span class="n">二</span>combo：call 减 put</span><span class="l-en"><span class="n">2</span>Combo: call minus put</span></h2>
+  <p class="sub"><span class="l-zh">交易员把同一行权价、同一到期日的「买 call、卖 put」当成一个整体来报价，叫 <span class="sym" data-say="combo。同一行权价、同一到期日的 call 价格减 put 价格，C − P。买 combo 就是买合成股票。">combo</span>，价格就是 C − P。</span><span class="l-en">Traders quote "buy a call, sell a put" with the same strike and expiration as one unit, called a <span class="sym" data-say="Combo. The call price minus the put price at the same strike and expiration, C − P. Buying a combo is buying synthetic stock.">combo</span>, priced at C − P.</span></p>
+  <p><span class="l-zh">第 ⑤ 步说 combo 等于 (F − X) ÷ (1 ＋ r·t)。F − X 是按远期价算的<span class="sym" data-say="intrinsic value。期权立刻行权能得到的钱。call 是标的价减行权价，put 是行权价减标的价，不够就是 0。">内在价值</span>，再折回今天。所以讲义说：<b>combo 是内在价值的现值</b>。不是按现价算的 S − X，也不是没折现的 F − X。</span><span class="l-en">Step ⑤ says the combo equals (F − X) ÷ (1 + r·t). F − X is the <span class="sym" data-say="Intrinsic value. The money an option would pay if exercised immediately. For a call it is underlying price minus strike, for a put strike minus underlying price, and 0 if negative.">intrinsic value</span> at the forward price, discounted to today. So the lecture notes say: <b>the combo is the present value of the intrinsic value</b>. Not S − X at the current price, and not the undiscounted F − X.</span></p>
+  <p><span class="l-zh">买 combo 等于约好到期按 X 买股票。和今天直接买股票比，X 到期才付，钱多留在手里 32 天，利息归自己；如果股票期间派息，分红拿不到。这两件事让 combo 比 S − X 高出利息、低掉分红。</span><span class="l-en">Buying a combo is agreeing to buy the stock at X at expiration. Compared with buying the stock today, X is paid only at expiration, so the money stays with you for 32 more days and the interest is yours; but if the stock pays a dividend in the meantime, you don't get it. These two things put the combo above S − X by the interest and below it by the dividend.</span></p>
 
   <table>
-    <thead><tr><th>例子</th><th>S − X</th><th>F − X</th><th>折回今天</th><th>C − P</th></tr></thead>
+    <thead><tr><th><span class="l-zh">例子</span><span class="l-en">Example</span></th><th>S − X</th><th>F − X</th><th><span class="l-zh">折回今天</span><span class="l-en">Discounted to today</span></th><th>C − P</th></tr></thead>
     <tbody id="comboTb"></tbody>
   </table>
   <p id="comboSay"></p>
   <div class="story">
-    <p><b>讲义的三个例子。</b>① r ＝ 0、D ＝ 0：100 call 6.00，100 put 2.25，combo 3.75，合成出的标的价是 100 ＋ 3.75 ＝ 103.75。② 期货 1216.50，3 个月，利率 6%，1250 combo ＝ (1216.50 − 1250) ÷ (1 ＋ 6% × 3/12) ＝ −33.50 ÷ 1.015 ＝ −33.00；内在价值是 −33.50，差的 0.50 就是折现。③ 股票 68.50，4 个月，6%，分红 0.22：F ＝ 68.50 × 1.02 − 0.22 ＝ 69.65，65 combo 精确值 (69.65 − 65) ÷ 1.02 ＝ 4.56，近似式 68.50 − 65 ＋ 65 × 6% × 4/12 − 0.22 ＝ 4.58，差 0.02。</p>
+    <p><span class="l-zh"><b>讲义的三个例子。</b>① r ＝ 0、D ＝ 0：100 call 6.00，100 put 2.25，combo 3.75，合成出的标的价是 100 ＋ 3.75 ＝ 103.75。② 期货 1216.50，3 个月，利率 6%，1250 combo ＝ (1216.50 − 1250) ÷ (1 ＋ 6% × 3/12) ＝ −33.50 ÷ 1.015 ＝ −33.00；内在价值是 −33.50，差的 0.50 就是折现。③ 股票 68.50，4 个月，6%，分红 0.22：F ＝ 68.50 × 1.02 − 0.22 ＝ 69.65，65 combo 精确值 (69.65 − 65) ÷ 1.02 ＝ 4.56，近似式 68.50 − 65 ＋ 65 × 6% × 4/12 − 0.22 ＝ 4.58，差 0.02。</span><span class="l-en"><b>The lecture's three examples.</b> ① r = 0, D = 0: 100 call 6.00, 100 put 2.25, combo 3.75, and the synthetic underlying price is 100 + 3.75 = 103.75. ② Futures at 1216.50, 3 months, 6% interest: the 1250 combo = (1216.50 − 1250) ÷ (1 + 6% × 3/12) = −33.50 ÷ 1.015 = −33.00; the intrinsic value is −33.50, and the 0.50 difference is the discounting. ③ Stock at 68.50, 4 months, 6%, dividend 0.22: F = 68.50 × 1.02 − 0.22 = 69.65; the 65 combo exactly is (69.65 − 65) ÷ 1.02 = 4.56, the approximation gives 68.50 − 65 + 65 × 6% × 4/12 − 0.22 = 4.58, a difference of 0.02.</span></p>
   </div>
-  <p>有了 combo，conversion 和 reversal 可以换一种说法：conversion 是按市价卖出 combo、同时买股票；reversal 是买入 combo、同时卖空股票。套的是 combo 的市价和它该值的 (F − X) ÷ (1 ＋ r·t) 之间的差。</p>
+  <p><span class="l-zh">有了 combo，conversion 和 reversal 可以换一种说法：conversion 是按市价卖出 combo、同时买股票；reversal 是买入 combo、同时卖空股票。套的是 combo 的市价和它该值的 (F − X) ÷ (1 ＋ r·t) 之间的差。</span><span class="l-en">With the combo, conversion and reversal can be described another way: a conversion sells the combo at the market price and buys the stock at the same time; a reversal buys the combo and sells the stock short at the same time. What they capture is the gap between the combo's market price and what it should be worth, (F − X) ÷ (1 + r·t).</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>从三个价格反推第四个</h2>
-  <p class="sub">parity 把 call、put、股价、行权价四个数和利率、分红拴在一起。知道其中三个，第四个就定了。</p>
+  <h2><span class="l-zh"><span class="n">三</span>从三个价格反推第四个</span><span class="l-en"><span class="n">3</span>Solving for the fourth from three prices</span></h2>
+  <p class="sub"><span class="l-zh">parity 把 call、put、股价、行权价四个数和利率、分红拴在一起。知道其中三个，第四个就定了。</span><span class="l-en">Parity ties four numbers (call, put, stock price, strike) to the interest rate and dividends. Know three of them and the fourth is determined.</span></p>
   <div class="pair">
-    <div class="formula"><div class="math">C ≈ S − X ＋ X·r·t − D ＋ P</div><div class="gloss">由 put 和股票推 call</div></div>
-    <div class="formula"><div class="math">P ≈ C − S ＋ X − X·r·t ＋ D</div><div class="gloss">由 call 和股票推 put</div></div>
+    <div class="formula"><div class="math"><span class="l-zh">C ≈ S − X ＋ X·r·t − D ＋ P</span><span class="l-en">C ≈ S − X + X·r·t − D + P</span></div><div class="gloss"><span class="l-zh">由 put 和股票推 call</span><span class="l-en">Call from the put and the stock</span></div></div>
+    <div class="formula"><div class="math"><span class="l-zh">P ≈ C − S ＋ X − X·r·t ＋ D</span><span class="l-en">P ≈ C − S + X − X·r·t + D</span></div><div class="gloss"><span class="l-zh">由 call 和股票推 put</span><span class="l-en">Put from the call and the stock</span></div></div>
   </div>
-  <div class="formula"><div class="math">S ≈ C − P ＋ X − X·r·t ＋ D</div><div class="gloss">由 call 和 put 推股价。讲义这三行用近似式；要精确就把 X − X·r·t 换回 X ÷ (1 ＋ r·t)</div></div>
+  <div class="formula"><div class="math"><span class="l-zh">S ≈ C − P ＋ X − X·r·t ＋ D</span><span class="l-en">S ≈ C − P + X − X·r·t + D</span></div><div class="gloss"><span class="l-zh">由 call 和 put 推股价。讲义这三行用近似式；要精确就把 X − X·r·t 换回 X ÷ (1 ＋ r·t)</span><span class="l-en">Stock price from the call and the put. The lecture notes use the approximation for these three rows; for the exact value, replace X − X·r·t with X ÷ (1 + r·t)</span></div></div>
 
-  <h3>TSLA 350：盖住一个，用另外三个算</h3>
+  <h3><span class="l-zh">TSLA 350：盖住一个，用另外三个算</span><span class="l-en">TSLA 350: cover one, compute it from the other three</span></h3>
   <table>
-    <thead><tr><th>盖住</th><th class="txt">用精确式算</th><th>算出</th><th>屏幕上</th></tr></thead>
+    <thead><tr><th><span class="l-zh">盖住</span><span class="l-en">Covered</span></th><th class="txt"><span class="l-zh">用精确式算</span><span class="l-en">Computed with the exact formula</span></th><th><span class="l-zh">算出</span><span class="l-en">Computed</span></th><th><span class="l-zh">屏幕上</span><span class="l-en">On screen</span></th></tr></thead>
     <tbody id="fourTb"></tbody>
   </table>
   <p id="fourSay"></p>
 
   <div class="story">
-    <p><b>讲义例题：对不上的时候。</b>125 call 9.60，125 put 3.15，51 天，利率 4.2%，预期分红 0.88。股价应该是 9.60 − 3.15 ＋ 125 − 125 × 4.2% × 51/365 ＋ 0.88 ＝ 6.45 ＋ 125 − 0.73 ＋ 0.88 ＝ 131.60。可实际股价是 131.25，低了 0.35。</p>
-    <p>讲义的解释不是「市场错了」，而是先怀疑自己的输入：要么用的利率太低，要么用的分红太高。市场价格认的分红是 0.88 − 0.35 ＝ 0.53，这叫<span class="sym" data-say="implied dividend。从期权价格反推出来的、市场认定的分红。">隐含分红</span>。parity 除了定价，还能反推市场用的参数，1.1 反推利率是同一个用法。</p>
+    <p><span class="l-zh"><b>讲义例题：对不上的时候。</b>125 call 9.60，125 put 3.15，51 天，利率 4.2%，预期分红 0.88。股价应该是 9.60 − 3.15 ＋ 125 − 125 × 4.2% × 51/365 ＋ 0.88 ＝ 6.45 ＋ 125 − 0.73 ＋ 0.88 ＝ 131.60。可实际股价是 131.25，低了 0.35。</span><span class="l-en"><b>Lecture exercise: when it doesn't match.</b> 125 call 9.60, 125 put 3.15, 51 days, 4.2% interest, expected dividend 0.88. The stock price should be 9.60 − 3.15 + 125 − 125 × 4.2% × 51/365 + 0.88 = 6.45 + 125 − 0.73 + 0.88 = 131.60. But the actual stock price is 131.25, 0.35 lower.</span></p>
+    <p><span class="l-zh">讲义的解释不是「市场错了」，而是先怀疑自己的输入：要么用的利率太低，要么用的分红太高。市场价格认的分红是 0.88 − 0.35 ＝ 0.53，这叫<span class="sym" data-say="implied dividend。从期权价格反推出来的、市场认定的分红。">隐含分红</span>。parity 除了定价，还能反推市场用的参数，1.1 反推利率是同一个用法。</span><span class="l-en">The lecture's explanation is not "the market is wrong" but to suspect your own inputs first: either the interest rate used is too low or the dividend used is too high. The dividend implied by the market prices is 0.88 − 0.35 = 0.53; this is called the <span class="sym" data-say="Implied dividend. The dividend the market assumes, backed out of option prices.">implied dividend</span>. Besides pricing, parity can back out the parameters the market is using; backing out the interest rate in 1.1 is the same use.</span></p>
   </div>
 
-  <h3>算一算</h3>
+  <h3><span class="l-zh">算一算</span><span class="l-en">Work it out</span></h3>
   <div class="panel">
     <div class="bar">
-      <div class="seg" id="svWhat"><button data-w="C" aria-pressed="false">求 call</button><button data-w="P" aria-pressed="false">求 put</button><button data-w="S" aria-pressed="true">求股价</button><button data-w="X" aria-pressed="false">求行权价</button></div>
+      <div class="seg" id="svWhat"><button data-w="C" aria-pressed="false"><span class="l-zh">求 call</span><span class="l-en">Solve for call</span></button><button data-w="P" aria-pressed="false"><span class="l-zh">求 put</span><span class="l-en">Solve for put</span></button><button data-w="S" aria-pressed="true"><span class="l-zh">求股价</span><span class="l-en">Solve for stock price</span></button><button data-w="X" aria-pressed="false"><span class="l-zh">求行权价</span><span class="l-en">Solve for strike</span></button></div>
     </div>
     <div class="presets" style="margin-top:.4rem">
-      <button data-p="tsla">TSLA 350</button><button data-p="lecG">讲义：合成 70 call</button><button data-p="lecD">讲义：131.60</button>
+      <button data-p="tsla">TSLA 350</button><button data-p="lecG"><span class="l-zh">讲义：合成 70 call</span><span class="l-en">Lecture: synthetic 70 call</span></button><button data-p="lecD"><span class="l-zh">讲义：131.60</span><span class="l-en">Lecture: 131.60</span></button>
     </div>
     <div class="solver">
       <label>call C<input type="number" step="0.01" id="svC"></label>
       <label>put P<input type="number" step="0.01" id="svP"></label>
-      <label>股价 S<input type="number" step="0.01" id="svS"></label>
-      <label>行权价 X<input type="number" step="0.5" id="svX"></label>
-      <label>天数<input type="number" step="1" id="svD"></label>
-      <label>年利率 %<input type="number" step="0.01" id="svR"></label>
-      <label>分红 D<input type="number" step="0.01" id="svDiv"></label>
+      <label><span class="l-zh">股价 S</span><span class="l-en">Stock price S</span><input type="number" step="0.01" id="svS"></label>
+      <label><span class="l-zh">行权价 X</span><span class="l-en">Strike X</span><input type="number" step="0.5" id="svX"></label>
+      <label><span class="l-zh">天数</span><span class="l-en">Days</span><input type="number" step="1" id="svD"></label>
+      <label><span class="l-zh">年利率 %</span><span class="l-en">Annual rate %</span><input type="number" step="0.01" id="svR"></label>
+      <label><span class="l-zh">分红 D</span><span class="l-en">Dividend D</span><input type="number" step="0.01" id="svDiv"></label>
     </div>
     <div class="say plain" id="svSay"></div>
   </div>
 
-  <h3>讲义的填空练习</h3>
-  <p class="sub">r ＝ 0、D ＝ 0，式子就是 C − P ＝ S − X。每行缺一个数。带 * 的四行是指数期权。</p>
+  <h3><span class="l-zh">讲义的填空练习</span><span class="l-en">The lecture's fill-in exercise</span></h3>
+  <p class="sub"><span class="l-zh">r ＝ 0、D ＝ 0，式子就是 C − P ＝ S − X。每行缺一个数。带 * 的四行是指数期权。</span><span class="l-en">With r = 0 and D = 0 the formula is C − P = S − X. Each row is missing one number. The four rows marked * are index options.</span></p>
   <div class="panel">
     <div class="tscroll">
     <table id="exF">
-      <thead><tr><th>#</th><th>标的价</th><th>行权价</th><th>call</th><th>put</th></tr></thead>
+      <thead><tr><th>#</th><th><span class="l-zh">标的价</span><span class="l-en">Underlying price</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th>call</th><th>put</th></tr></thead>
       <tbody></tbody>
     </table>
     </div>
-    <div class="btnrow"><button class="btn" id="exFChk">检查</button><button class="btn ghost" id="exFGive">揭晓</button><span class="tiny" id="exFMsg"></span></div>
+    <div class="btnrow"><button class="btn" id="exFChk"><span class="l-zh">检查</span><span class="l-en">Check</span></button><button class="btn ghost" id="exFGive"><span class="l-zh">揭晓</span><span class="l-en">Reveal</span></button><span class="tiny" id="exFMsg"></span></div>
   </div>
 
-  <h3>同一个东西，走哪条路买更便宜</h3>
-  <p>parity 还给了第二个用处：想买 call，可以直接买，也可以买 put 再买股票（合成 call）。哪条路便宜，要用<b>实际能成交的那一边的价格</b>来比：买按<span class="sym" data-say="卖一：市场上有人愿意卖的最低价。你要买，只能按它成交。">卖一</span>，卖按<span class="sym" data-say="买一：市场上有人愿意买的最高价。你要卖，只能按它成交。">买一</span>。</p>
+  <h3><span class="l-zh">同一个东西，走哪条路买更便宜</span><span class="l-en">Same thing, which route is cheaper to buy</span></h3>
+  <p><span class="l-zh">parity 还给了第二个用处：想买 call，可以直接买，也可以买 put 再买股票（合成 call）。哪条路便宜，要用<b>实际能成交的那一边的价格</b>来比：买按<span class="sym" data-say="卖一：市场上有人愿意卖的最低价。你要买，只能按它成交。">卖一</span>，卖按<span class="sym" data-say="买一：市场上有人愿意买的最高价。你要卖，只能按它成交。">买一</span>。</span><span class="l-en">Parity also gives a second use: to buy a call you can buy it directly, or buy a put and buy the stock (a synthetic call). To see which route is cheaper, compare using <b>the side of the quote you can actually trade at</b>: buy at the <span class="sym" data-say="Ask: the lowest price someone in the market will sell at. To buy, you have to trade at it.">ask</span>, sell at the <span class="sym" data-say="Bid: the highest price someone in the market will pay. To sell, you have to trade at it.">bid</span>.</span></p>
   <div class="story">
-    <p><b>讲义例题。</b>47 天，利率 5.2%，分红 0.39；股票 68.90 / 69.00，70 call 3.30 / 3.40，70 put 4.15 / 4.25。合成 call ＝ 69.00 − 70 ＋ 0.47 − 0.39 ＋ 4.25 ＝ 3.33，比直接按 3.40 买便宜。另一组 121 天、4.5%、分红 0.23，50 call 5.85 / 6.00，50 put 4.15 / 4.25，股票 51.30 / 51.40：合成买股票 6.00 − 4.15 ＋ 50 − 0.75 ＋ 0.23 ＝ 51.33，比直接按 51.40 买便宜；合成卖股票 5.85 − 4.25 ＋ 50 − 0.75 ＋ 0.23 ＝ 51.08，不如直接按 51.30 卖。合成不是总更好。</p>
+    <p><span class="l-zh"><b>讲义例题。</b>47 天，利率 5.2%，分红 0.39；股票 68.90 / 69.00，70 call 3.30 / 3.40，70 put 4.15 / 4.25。合成 call ＝ 69.00 − 70 ＋ 0.47 − 0.39 ＋ 4.25 ＝ 3.33，比直接按 3.40 买便宜。另一组 121 天、4.5%、分红 0.23，50 call 5.85 / 6.00，50 put 4.15 / 4.25，股票 51.30 / 51.40：合成买股票 6.00 − 4.15 ＋ 50 − 0.75 ＋ 0.23 ＝ 51.33，比直接按 51.40 买便宜；合成卖股票 5.85 − 4.25 ＋ 50 − 0.75 ＋ 0.23 ＝ 51.08，不如直接按 51.30 卖。合成不是总更好。</span><span class="l-en"><b>Lecture exercise.</b> 47 days, 5.2% interest, dividend 0.39; stock 68.90 / 69.00, 70 call 3.30 / 3.40, 70 put 4.15 / 4.25. Synthetic call = 69.00 − 70 + 0.47 − 0.39 + 4.25 = 3.33, cheaper than buying directly at 3.40. Another set, 121 days, 4.5%, dividend 0.23, 50 call 5.85 / 6.00, 50 put 4.15 / 4.25, stock 51.30 / 51.40: synthetic stock purchase 6.00 − 4.15 + 50 − 0.75 + 0.23 = 51.33, cheaper than buying directly at 51.40; synthetic stock sale 5.85 − 4.25 + 50 − 0.75 + 0.23 = 51.08, worse than selling directly at 51.30. Synthetic is not always better.</span></p>
   </div>
   <table>
-    <thead><tr><th>TSLA，4/13 收盘</th><th>直接</th><th>合成</th><th class="txt">合成怎么做</th></tr></thead>
+    <thead><tr><th><span class="l-zh">TSLA，4/13 收盘</span><span class="l-en">TSLA, 4/13 close</span></th><th><span class="l-zh">直接</span><span class="l-en">Direct</span></th><th><span class="l-zh">合成</span><span class="l-en">Synthetic</span></th><th class="txt"><span class="l-zh">合成怎么做</span><span class="l-en">How to build it synthetically</span></th></tr></thead>
     <tbody id="execTb"></tbody>
   </table>
   <p id="execSay"></p>
-  <p class="tiny">数据里没有股票的买卖报价，股票一律按 352.36 成交。利率 4.3%，32 天。</p>
+  <p class="tiny"><span class="l-zh">数据里没有股票的买卖报价，股票一律按 352.36 成交。利率 4.3%，32 天。</span><span class="l-en">The data has no bid-ask quotes for the stock, so the stock always trades at 352.36. Interest 4.3%, 32 days.</span></p>
 
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>找定价异常，决定怎么套</h2>
-  <p class="sub">combo 的市价偏离 (F − X) ÷ (1 ＋ r·t)，就有一边能锁定利润。先定方向，再用 TSLA 4/13 收盘的整条链找一遍。</p>
+  <h2><span class="l-zh"><span class="n">四</span>找定价异常，决定怎么套</span><span class="l-en"><span class="n">4</span>Spotting pricing anomalies and choosing the arbitrage</span></h2>
+  <p class="sub"><span class="l-zh">combo 的市价偏离 (F − X) ÷ (1 ＋ r·t)，就有一边能锁定利润。先定方向，再用 TSLA 4/13 收盘的整条链找一遍。</span><span class="l-en">When the combo's market price deviates from (F − X) ÷ (1 + r·t), one side can lock in a profit. First set the direction, then search the whole TSLA chain at the 4/13 close.</span></p>
   <table>
-    <thead><tr><th>看到</th><th class="txt">意思</th><th class="txt">怎么套</th></tr></thead>
+    <thead><tr><th><span class="l-zh">看到</span><span class="l-en">You see</span></th><th class="txt"><span class="l-zh">意思</span><span class="l-en">It means</span></th><th class="txt"><span class="l-zh">怎么套</span><span class="l-en">How to arbitrage</span></th></tr></thead>
     <tbody>
-      <tr><td>C − P 太高</td><td class="txt">call 相对 put 太贵</td><td class="txt">卖贵的：卖 call、买 put，再买股票补上方向，这是 conversion</td></tr>
-      <tr><td>C − P 太低</td><td class="txt">call 相对 put 太便宜</td><td class="txt">买便宜的：买 call、卖 put，再卖空股票，这是 reversal</td></tr>
+      <tr><td><span class="l-zh">C − P 太高</span><span class="l-en">C − P too high</span></td><td class="txt"><span class="l-zh">call 相对 put 太贵</span><span class="l-en">Call too expensive relative to put</span></td><td class="txt"><span class="l-zh">卖贵的：卖 call、买 put，再买股票补上方向，这是 conversion</span><span class="l-en">Sell the expensive one: sell the call, buy the put, then buy stock to cover the direction. This is a conversion</span></td></tr>
+      <tr><td><span class="l-zh">C − P 太低</span><span class="l-en">C − P too low</span></td><td class="txt"><span class="l-zh">call 相对 put 太便宜</span><span class="l-en">Call too cheap relative to put</span></td><td class="txt"><span class="l-zh">买便宜的：买 call、卖 put，再卖空股票，这是 reversal</span><span class="l-en">Buy the cheap one: buy the call, sell the put, then sell stock short. This is a reversal</span></td></tr>
     </tbody>
   </table>
-  <p>「太高」「太低」要按能成交的价格判断。做 conversion 时 call 只能按买一卖出、put 只能按卖一买入；做 reversal 反过来。下图每个行权价画一根竖条：下端是按 conversion 的价格卖出 combo 能收到的钱，上端是按 reversal 的价格买入 combo 要付的钱，都减掉 parity 算出的该值。竖条整根在 0 上方，conversion 有利润；整根在 0 下方，reversal 有利润；跨过 0，两边都没有。</p>
+  <p><span class="l-zh">「太高」「太低」要按能成交的价格判断。做 conversion 时 call 只能按买一卖出、put 只能按卖一买入；做 reversal 反过来。下图每个行权价画一根竖条：下端是按 conversion 的价格卖出 combo 能收到的钱，上端是按 reversal 的价格买入 combo 要付的钱，都减掉 parity 算出的该值。竖条整根在 0 上方，conversion 有利润；整根在 0 下方，reversal 有利润；跨过 0，两边都没有。</span><span class="l-en">"Too high" and "too low" have to be judged at prices you can trade at. In a conversion the call can only be sold at the bid and the put bought at the ask; in a reversal it is the other way around. The chart below draws one vertical bar per strike: the bottom is the money received selling the combo at conversion prices, the top is the money paid buying the combo at reversal prices, both minus the value from parity. If the whole bar is above 0, a conversion has a profit; if the whole bar is below 0, a reversal has a profit; if it crosses 0, neither side does.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="scPlay">重新扫一遍</button></div>
-    <svg id="scan" viewBox="0 0 720 372" role="img" aria-label="TSLA 各行权价按买卖价做 conversion 与 reversal 的利润区间"></svg>
+    <div class="bar"><button class="btn ghost" id="scPlay"><span class="l-zh">重新扫一遍</span><span class="l-en">Scan again</span></button></div>
+    <svg id="scan" viewBox="0 0 720 372" role="img" aria-label="TSLA 各行权价按买卖价做 conversion 与 reversal 的利润区间" data-en-aria-label="Profit range of conversions and reversals at bid and ask prices for each TSLA strike"></svg>
     <div class="legend">
-      <span><i style="background:var(--ink-faint)"></i>竖条跨过 0：两边都没利润</span>
-      <span><i style="background:var(--control)"></i>竖条整根在 0 下方：reversal 表面上有利润</span>
-      <span><i style="background:var(--ink);width:.45rem;height:.45rem;border-radius:50%"></i>中间价</span>
-      <span><i class="dsh" style="border-color:var(--result)"></i>put 提前行权的价值（模型，取负）</span>
+      <span><i style="background:var(--ink-faint)"></i><span class="l-zh">竖条跨过 0：两边都没利润</span><span class="l-en">Bar crosses 0: no profit on either side</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">竖条整根在 0 下方：reversal 表面上有利润</span><span class="l-en">Whole bar below 0: reversal shows an apparent profit</span></span>
+      <span><i style="background:var(--ink);width:.45rem;height:.45rem;border-radius:50%"></i><span class="l-zh">中间价</span><span class="l-en">Mid price</span></span>
+      <span><i class="dsh" style="border-color:var(--result)"></i><span class="l-zh">put 提前行权的价值（模型，取负）</span><span class="l-en">Value of early put exercise (model, negated)</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已扫到</div><div class="d" id="scK"></div><div class="d2" id="scKb"></div></div>
-      <div class="stat"><div class="k">conversion 有利润</div><div class="d" id="scC"></div><div class="d2">个行权价</div></div>
-      <div class="stat"><div class="k">reversal 表面有利润</div><div class="d" id="scR" style="color:var(--control)"></div><div class="d2" id="scRb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已扫到</span><span class="l-en">Scanned</span></div><div class="d" id="scK"></div><div class="d2" id="scKb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">conversion 有利润</span><span class="l-en">Conversion profitable</span></div><div class="d" id="scC"></div><div class="d2"><span class="l-zh">个行权价</span><span class="l-en">strikes</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">reversal 表面有利润</span><span class="l-en">Reversal apparently profitable</span></div><div class="d" id="scR" style="color:var(--control)"></div><div class="d2" id="scRb"></div></div>
     </div>
     <div class="say plain" id="scSay"></div>
   </div>
   <div class="tscroll">
   <table>
-    <thead><tr><th class="nw">行权价</th><th>conversion<br>利润</th><th>reversal<br>利润</th><th>put 提前<br>行权价值（模型）</th></tr></thead>
+    <thead><tr><th class="nw"><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th>conversion<br><span class="l-zh">利润</span><span class="l-en">Profit</span></th><th>reversal<br><span class="l-zh">利润</span><span class="l-en">Profit</span></th><th><span class="l-zh">put 提前<br>行权价值（模型）</span><span class="l-en">Early put exercise<br>value (model)</span></th></tr></thead>
     <tbody id="scTb"></tbody>
   </table>
   </div>
-  <p class="tiny">利润按 4/13 的钱计，每股；负数就是亏。利率 4.3%，股票按 352.36。</p>
+  <p class="tiny"><span class="l-zh">利润按 4/13 的钱计，每股；负数就是亏。利率 4.3%，股票按 352.36。</span><span class="l-en">Profit in 4/13 money, per share; negative means a loss. Interest 4.3%, stock at 352.36.</span></p>
 
-  <h3>450 上的 0.58 是白捡的吗</h3>
-  <p>不是。parity 的推导默认期权只能在到期日行权，这叫<span class="sym" data-say="European option。只能在到期日行权。">欧式</span>。TSLA 的期权是<span class="sym" data-say="American option。到期前任何一天都可以行权。美国的个股期权都是美式。">美式</span>，买方到期前任何一天都能行权。</p>
-  <p>reversal 里卖出的是 put。450 put 深度实值（TSLA 352.36，行权价 450），它的买方有理由提前行权：今天就按 450 卖出股票，拿到 450 美元现金去生息，比等 32 天划算。节点 9 专门讲这套判据：股票 put 的提前行权靠的是利息。</p>
-  <p>这项权利值多少钱，要用模型算。这里用的是<span class="sym" data-say="binomial tree，二叉树模型：把到期前的时间切成很多小步，每一步标的要么涨一格、要么跌一格，从到期那一步往回算出期权今天的价值。节点 9 会再用到。">二叉树模型</span>：把到期前的 32 天切成 2000 小步，每一步 TSLA 要么涨一格、要么跌一格，一格多大由波动率决定。从到期那一步往回算，美式 put 在每一步都比较两个数，现在行权拿到的 X − S 和继续拿着的价值，取大的；欧式 put 只能继续拿着。两者今天的价值之差，就是提前行权这项权利的价值，图里的蓝色虚线。波动率用报价快照给每个行权价算出的<span class="sym" data-say="implied volatility，隐含波动率（1.2）：从市场上的期权价格反推出来的波动率，相当于市场的报价。">隐含波动率</span>，利率 4.3%。</p>
+  <h3><span class="l-zh">450 上的 0.58 是白捡的吗</span><span class="l-en">Is the 0.58 at 450 free money?</span></h3>
+  <p><span class="l-zh">不是。parity 的推导默认期权只能在到期日行权，这叫<span class="sym" data-say="European option。只能在到期日行权。">欧式</span>。TSLA 的期权是<span class="sym" data-say="American option。到期前任何一天都可以行权。美国的个股期权都是美式。">美式</span>，买方到期前任何一天都能行权。</span><span class="l-en">No. The parity derivation assumes options can be exercised only on the expiration date; these are called <span class="sym" data-say="European option. Can be exercised only on the expiration date.">European</span>. TSLA options are <span class="sym" data-say="American option. Can be exercised on any day before expiration. US single-stock options are all American.">American</span>: the buyer can exercise on any day before expiration.</span></p>
+  <p><span class="l-zh">reversal 里卖出的是 put。450 put 深度实值（TSLA 352.36，行权价 450），它的买方有理由提前行权：今天就按 450 卖出股票，拿到 450 美元现金去生息，比等 32 天划算。节点 9 专门讲这套判据：股票 put 的提前行权靠的是利息。</span><span class="l-en">In a reversal the put is the leg you sell. The 450 put is deep in the money (TSLA 352.36, strike 450), and its buyer has a reason to exercise early: sell the stock at 450 today and put the $450 in cash to work earning interest, which beats waiting 32 days. Node 9 covers these criteria in detail: early exercise of a stock put is driven by interest.</span></p>
+  <p><span class="l-zh">这项权利值多少钱，要用模型算。这里用的是<span class="sym" data-say="binomial tree，二叉树模型：把到期前的时间切成很多小步，每一步标的要么涨一格、要么跌一格，从到期那一步往回算出期权今天的价值。节点 9 会再用到。">二叉树模型</span>：把到期前的 32 天切成 2000 小步，每一步 TSLA 要么涨一格、要么跌一格，一格多大由波动率决定。从到期那一步往回算，美式 put 在每一步都比较两个数，现在行权拿到的 X − S 和继续拿着的价值，取大的；欧式 put 只能继续拿着。两者今天的价值之差，就是提前行权这项权利的价值，图里的蓝色虚线。波动率用报价快照给每个行权价算出的<span class="sym" data-say="implied volatility，隐含波动率（1.2）：从市场上的期权价格反推出来的波动率，相当于市场的报价。">隐含波动率</span>，利率 4.3%。</span><span class="l-en">What this right is worth has to be computed with a model. The one used here is a <span class="sym" data-say="Binomial tree model: cut the time to expiration into many small steps; at each step the underlying moves up one notch or down one notch; working back from the expiration step gives the option's value today. Node 9 uses it again.">binomial tree model</span>: cut the 32 days before expiration into 2000 small steps; at each step TSLA moves up one notch or down one notch, with the notch size set by volatility. Working back from the expiration step, the American put compares two numbers at every step, the X − S from exercising now and the value of holding on, and takes the larger; the European put can only hold on. The difference between their values today is the value of the early-exercise right, the blue dashed line in the chart. Volatility is the <span class="sym" data-say="Implied volatility (1.2): the volatility backed out of market option prices, in effect the market's quote.">implied volatility</span> the quote snapshot gives for each strike; interest is 4.3%.</span></p>
   <p id="amSay"></p>
-  <p>平值附近这块也不是 0。350 的提前行权价值是 0.08：put 因此贵了 0.08，C − P 就低了 0.08，1.1 从 C − P 反解出的利率跟着偏低，折成利率约 0.25 个百分点。340 到 360 五个行权价都加回这一块，反解出的 4.10% 到 4.43% 变成 4.46% 到 4.62%，行权价之间的差距也缩小一半。所以 1.1 反解出的利率略微偏低；全课用的 4.3% 就是从这些美式报价反解出来的，里面已经含着这一小块。</p>
-  <p>讲义那道 131.60 对 131.25 的例题说的是同一件事：parity 对不上时，先查输入。利率用得对不对，分红对不对，期权是欧式还是美式，股票借不借得到，报价是不是同一时刻。这些都查过还对不上，才轮到「市场错了」。</p>
+  <p><span class="l-zh">平值附近这块也不是 0。350 的提前行权价值是 0.08：put 因此贵了 0.08，C − P 就低了 0.08，1.1 从 C − P 反解出的利率跟着偏低，折成利率约 0.25 个百分点。340 到 360 五个行权价都加回这一块，反解出的 4.10% 到 4.43% 变成 4.46% 到 4.62%，行权价之间的差距也缩小一半。所以 1.1 反解出的利率略微偏低；全课用的 4.3% 就是从这些美式报价反解出来的，里面已经含着这一小块。</span><span class="l-en">Near the money this piece isn't 0 either. The early-exercise value at 350 is 0.08: the put is 0.08 more expensive because of it, so C − P is 0.08 lower, and the interest rate backed out of C − P in 1.1 comes out low by about 0.25 percentage points. Adding this piece back at the five strikes from 340 to 360, the backed-out 4.10% to 4.43% becomes 4.46% to 4.62%, and the spread across strikes is cut in half. So the rate backed out in 1.1 is slightly low; the 4.3% used throughout the course was backed out of these American quotes and already contains this small piece.</span></p>
+  <p><span class="l-zh">讲义那道 131.60 对 131.25 的例题说的是同一件事：parity 对不上时，先查输入。利率用得对不对，分红对不对，期权是欧式还是美式，股票借不借得到，报价是不是同一时刻。这些都查过还对不上，才轮到「市场错了」。</span><span class="l-en">The lecture exercise with 131.60 against 131.25 makes the same point: when parity doesn't match, check the inputs first. Is the interest rate right, is the dividend right, are the options European or American, can the stock be borrowed, are the quotes from the same moment? Only after all of these are checked and it still doesn't match is it time for "the market is wrong".</span></p>
   <div class="story">
-    <p><b>练一题。</b>还是讲义那组数：股票 131.25，125 call 9.60，125 put 3.15，51 天，利率 4.2%，预期分红 0.88。假设你确信 4.2% 和 0.88 都对：C − P 是太高还是太低？该做 conversion 还是 reversal，每股锁定多少？这笔利润要靠什么才拿得到？</p>
+    <p><span class="l-zh"><b>练一题。</b>还是讲义那组数：股票 131.25，125 call 9.60，125 put 3.15，51 天，利率 4.2%，预期分红 0.88。假设你确信 4.2% 和 0.88 都对：C − P 是太高还是太低？该做 conversion 还是 reversal，每股锁定多少？这笔利润要靠什么才拿得到？</span><span class="l-en"><b>An exercise.</b> The same lecture numbers: stock 131.25, 125 call 9.60, 125 put 3.15, 51 days, 4.2% interest, expected dividend 0.88. Suppose you are sure 4.2% and 0.88 are both right: is C − P too high or too low? Should you do a conversion or a reversal, and how much do you lock in per share? What does this profit depend on?</span></p>
     <details>
-      <summary>参考答案</summary>
+      <summary><span class="l-zh">参考答案</span><span class="l-en">Reference answer</span></summary>
       <ul>
-        <li>按近似式，C − P 该值 131.25 − 125 ＋ 125 × 4.2% × 51/365 − 0.88 ＝ 6.25 ＋ 0.73 − 0.88 ＝ 6.10。市场上是 9.60 − 3.15 ＝ 6.45，高了 0.35。</li>
-        <li>C − P 太高，call 相对 put 太贵。卖贵的：卖 125 call、买 125 put，再按 131.25 买股票补上方向，这是 conversion。每股锁定约 0.35，一张约 35 美元，没算买卖价差。</li>
-        <li>conversion 拿着股票收分红，这 0.35 要靠 0.88 的分红真的发下来。市场价格认的分红只有 0.53；真只发 0.53，少收的 0.35 正好把利润吃光。这就是一节风险表里的「分红下调就亏」。</li>
+        <li><span class="l-zh">按近似式，C − P 该值 131.25 − 125 ＋ 125 × 4.2% × 51/365 − 0.88 ＝ 6.25 ＋ 0.73 − 0.88 ＝ 6.10。市场上是 9.60 − 3.15 ＝ 6.45，高了 0.35。</span><span class="l-en">By the approximation, C − P should be 131.25 − 125 + 125 × 4.2% × 51/365 − 0.88 = 6.25 + 0.73 − 0.88 = 6.10. The market has 9.60 − 3.15 = 6.45, 0.35 too high.</span></li>
+        <li><span class="l-zh">C − P 太高，call 相对 put 太贵。卖贵的：卖 125 call、买 125 put，再按 131.25 买股票补上方向，这是 conversion。每股锁定约 0.35，一张约 35 美元，没算买卖价差。</span><span class="l-en">C − P is too high, so the call is too expensive relative to the put. Sell the expensive one: sell the 125 call, buy the 125 put, then buy stock at 131.25 to cover the direction. This is a conversion. It locks in about 0.35 per share, about $35 per contract, before bid-ask spreads.</span></li>
+        <li><span class="l-zh">conversion 拿着股票收分红，这 0.35 要靠 0.88 的分红真的发下来。市场价格认的分红只有 0.53；真只发 0.53，少收的 0.35 正好把利润吃光。这就是一节风险表里的「分红下调就亏」。</span><span class="l-en">A conversion holds the stock and collects the dividend, so this 0.35 depends on the 0.88 dividend actually being paid. The dividend implied by market prices is only 0.53; if only 0.53 is paid, the 0.35 shortfall wipes out the profit exactly. This is "loses if the dividend is cut" from the risk table in section 1.</span></li>
       </ul>
     </details>
   </div>
@@ -500,147 +501,152 @@ input.cell.ok{border-color:var(--good);color:var(--good)} input.cell.no{border-c
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>pin risk：到期时恰好停在行权价上</h2>
-  <p class="sub">conversion 靠到期时「自己行权 put」或「call 被指派」把股票卖掉。股价收在行权价附近时，这一步会出问题。</p>
-  <p>讲义的问题：持有 100 行权价的 conversion，到期时标的恰好是 100，怎么办？</p>
+  <h2><span class="l-zh"><span class="n">五</span>pin risk：到期时恰好停在行权价上</span><span class="l-en"><span class="n">5</span>Pin risk: expiring right at the strike</span></h2>
+  <p class="sub"><span class="l-zh">conversion 靠到期时「自己行权 put」或「call 被指派」把股票卖掉。股价收在行权价附近时，这一步会出问题。</span><span class="l-en">A conversion sells the stock at expiration by "exercising your own put" or "having the call assigned". When the stock closes near the strike, this step can go wrong.</span></p>
+  <p><span class="l-zh">讲义的问题：持有 100 行权价的 conversion，到期时标的恰好是 100，怎么办？</span><span class="l-en">The lecture's question: you hold a conversion at the 100 strike, and at expiration the underlying is exactly 100. What do you do?</span></p>
   <ul>
-    <li>call 被指派了，股票已经按 100 交出去，就不该再行权 put，否则会多卖一份，变成空头。</li>
-    <li>call 没被指派，就必须行权 put，否则股票留在手里，变成多头。</li>
-    <li>有没有被指派，要到到期<b>之后</b>才知道。</li>
+    <li><span class="l-zh">call 被指派了，股票已经按 100 交出去，就不该再行权 put，否则会多卖一份，变成空头。</span><span class="l-en">If the call is assigned, the stock has already been delivered at 100, and you should not exercise the put, or you sell one unit too many and end up short.</span></li>
+    <li><span class="l-zh">call 没被指派，就必须行权 put，否则股票留在手里，变成多头。</span><span class="l-en">If the call is not assigned, you must exercise the put, or the stock stays with you and you end up long.</span></li>
+    <li><span class="l-zh">有没有被指派，要到到期<b>之后</b>才知道。</span><span class="l-en">Whether you were assigned is known only <b>after</b> expiration.</span></li>
   </ul>
-  <p>讲义的定义：<span class="sym" data-say="pin risk。到期时手里有平值空头期权，不知道会不会被指派，结果可能意外留下标的头寸。">pin risk</span> 是到期时持有平值空头期权的风险，市场「钉」在了行权价上。conversion 空着 call，reversal 空着 put，两种都有。</p>
-  <p>美国股票期权还有两条惯例让它更难办：收盘时实值 0.01 美元以上的期权默认自动行权；持有人在到期日 17:30（美东）之前还可以改主意，收盘后的盘后价格仍然会影响对手的决定。</p>
+  <p><span class="l-zh">讲义的定义：<span class="sym" data-say="pin risk。到期时手里有平值空头期权，不知道会不会被指派，结果可能意外留下标的头寸。">pin risk</span> 是到期时持有平值空头期权的风险，市场「钉」在了行权价上。conversion 空着 call，reversal 空着 put，两种都有。</span><span class="l-en">The lecture's definition: <span class="sym" data-say="Pin risk. Holding short at-the-money options at expiration without knowing whether they will be assigned, which can leave an unexpected position in the underlying.">pin risk</span> is the risk of holding short at-the-money options at expiration, when the market is "pinned" to the strike. A conversion is short a call and a reversal is short a put, so both have it.</span></p>
+  <p><span class="l-zh">美国股票期权还有两条惯例让它更难办：收盘时实值 0.01 美元以上的期权默认自动行权；持有人在到期日 17:30（美东）之前还可以改主意，收盘后的盘后价格仍然会影响对手的决定。</span><span class="l-en">US stock options have two more conventions that make it harder: options in the money by $0.01 or more at the close are exercised automatically by default; and holders can still change their minds until 17:30 (ET) on expiration day, so after-hours prices still affect the other side's decision.</span></p>
 
-  <h3>5/15 收盘前后</h3>
-  <p>5/15 TSLA 开盘 433.98，半小时内跌到 426 附近（09:59 收 425.98），之后四个多小时按分钟收盘在 423.60 到 429.58 之间来回，最后一小时往 422.5 靠，15:54 到过全天最低 422.00。收盘附近有三个行权价：420、422.5、425，每一档都有几千到上万张<span class="sym" data-say="open interest，未平仓量：已经成交、还没有平掉的合约张数。到期时这些合约都要么行权，要么作废。">未平仓</span>合约。表里的期权报价是买一 / 卖一：15:59 是收盘前最后一分钟，16:00 是收盘那一刻的快照。</p>
+  <h3><span class="l-zh">5/15 收盘前后</span><span class="l-en">Around the 5/15 close</span></h3>
+  <p><span class="l-zh">5/15 TSLA 开盘 433.98，半小时内跌到 426 附近（09:59 收 425.98），之后四个多小时按分钟收盘在 423.60 到 429.58 之间来回，最后一小时往 422.5 靠，15:54 到过全天最低 422.00。收盘附近有三个行权价：420、422.5、425，每一档都有几千到上万张<span class="sym" data-say="open interest，未平仓量：已经成交、还没有平掉的合约张数。到期时这些合约都要么行权，要么作废。">未平仓</span>合约。表里的期权报价是买一 / 卖一：15:59 是收盘前最后一分钟，16:00 是收盘那一刻的快照。</span><span class="l-en">On 5/15 TSLA opened at 433.98 and fell to around 426 within half an hour (closing 425.98 at 09:59). For the next four-plus hours, minute closes moved back and forth between 423.60 and 429.58; in the last hour it drifted toward 422.5 and hit the day's low of 422.00 at 15:54. Three strikes sit near the close: 420, 422.5 and 425, each with thousands to over ten thousand contracts of <span class="sym" data-say="Open interest: the number of contracts traded and not yet closed. At expiration each of them is either exercised or expires.">open interest</span>. Option quotes in the table are bid / ask: 15:59 is the last minute before the close, 16:00 the snapshot at the moment of the close.</span></p>
   <div class="tscroll">
   <table id="oiTb"></table>
   </div>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="pnPlay">重播</button></div>
-    <svg id="pin" viewBox="0 0 720 350" role="img" aria-label="5/15 下午三点到五点半 TSLA 每分钟价格与三个行权价，最后是周一开盘"></svg>
+    <div class="bar"><button class="btn ghost" id="pnPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <svg id="pin" viewBox="0 0 720 350" role="img" aria-label="5/15 下午三点到五点半 TSLA 每分钟价格与三个行权价，最后是周一开盘" data-en-aria-label="TSLA price each minute from 3 p.m. to 5:30 p.m. on 5/15 with three strikes, ending with Monday's open"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink)"></i>TSLA 每分钟收盘，正常交易时段</span>
-      <span><i class="ln" style="background:var(--ink-faint)"></i>收盘后到 17:30</span>
+      <span><i class="ln" style="background:var(--ink)"></i><span class="l-zh">TSLA 每分钟收盘，正常交易时段</span><span class="l-en">TSLA minute close, regular session</span></span>
+      <span><i class="ln" style="background:var(--ink-faint)"></i><span class="l-zh">收盘后到 17:30</span><span class="l-en">After the close, to 17:30</span></span>
       <span><i class="dsh" style="border-color:var(--control)"></i>422.5</span>
-      <span><i class="dsh" style="border-color:var(--ink-faint)"></i>420、425</span>
+      <span><i class="dsh" style="border-color:var(--ink-faint)"></i><span class="l-zh">420、425</span><span class="l-en">420, 425</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">时间（美东）</div><div class="d" id="pnT"></div><div class="d2" id="pnTb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">时间（美东）</span><span class="l-en">Time (ET)</span></div><div class="d" id="pnT"></div><div class="d2" id="pnTb"></div></div>
       <div class="stat"><div class="k">TSLA</div><div class="d" id="pnS"></div><div class="d2" id="pnSb"></div></div>
-      <div class="stat"><div class="k">422.5 call / put 中间价</div><div class="d" id="pnO"></div><div class="d2" id="pnOb"></div></div>
-      <div class="stat"><div class="k">穿过 422.5</div><div class="d" id="pnX" style="color:var(--control)"></div><div class="d2">次，按分钟收盘</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">422.5 call / put 中间价</span><span class="l-en">422.5 call / put mid</span></div><div class="d" id="pnO"></div><div class="d2" id="pnOb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">穿过 422.5</span><span class="l-en">Crossed 422.5</span></div><div class="d" id="pnX" style="color:var(--control)"></div><div class="d2"><span class="l-zh">次，按分钟收盘</span><span class="l-en">times, by minute close</span></div></div>
     </div>
     <div class="say plain" id="pnDo"></div>
   </div>
   <p id="pinSay"></p>
   <p id="pinCost"></p>
   <p id="pinEnd"></p>
-  <p>讲义的配套问答：恰好平值的期权，在到期那一刻理论价值是 0；有人还去行权它，理由是交易成本（行权换股票可能比在市场上买卖便宜）。所以对手会不会行权，没有理论答案。讲义给的是实务答案：<b>不要把平值空头期权带到到期</b>，收盘前把它买回来，代价大概是一个买卖价差。</p>
-  <p>讲义还提到一个现象：临近到期，平值的 conversion 和 reversal 常按 C − P ＝ S − X 这个价成交（讲义叫 <span class="sym" data-say="even money：按 C − P ＝ S − X 成交平值的 conversion 或 reversal，不算利息。临近到期利息只剩几分钱，这个价就是公平价。">even money</span>），持有的人借此把 pin risk 交给对手。讲义问：你该不该接？要看你手里的头寸和多数人一样还是相反。相反的话，接下这笔正好把自己的头寸平掉，自己的 pin risk 也没了，可以按 even money 接；一样的话，接过来等于同样的风险再加一份，要对方让价才值得接。</p>
-  <p>只有行权会产生标的头寸时才有 pin risk。<span class="sym" data-say="cash settlement。到期不交割标的，按结算价差额付现金。">现金结算</span>的品种没有：SPX、NDX、RUT 这类指数期权，以及季月到期的股指期货期权，到期只按差额付钱，不会留下股票或期货头寸。</p>
-  <p class="tiny">数据：分钟线（美东时间，含盘后），每分钟取收盘；16:00 那一点用官方收盘价 422.32，与分钟线差几分钱。期权报价与未平仓量：5/15 的期权分钟快照。自动行权的门槛见 OCC 规则 805（exercise by exception，实值 0.01 美元）；到期日 17:30 的改主意截止时间见 FINRA 规则 2360(b)(23)(A)，券商常把自己客户的截止时间定得更早。</p>
+  <p><span class="l-zh">讲义的配套问答：恰好平值的期权，在到期那一刻理论价值是 0；有人还去行权它，理由是交易成本（行权换股票可能比在市场上买卖便宜）。所以对手会不会行权，没有理论答案。讲义给的是实务答案：<b>不要把平值空头期权带到到期</b>，收盘前把它买回来，代价大概是一个买卖价差。</span><span class="l-en">The lecture's companion Q&amp;A: an option exactly at the money has a theoretical value of 0 at the moment of expiration; if someone still exercises it, the reason is transaction costs (exercising to get stock may be cheaper than trading in the market). So whether the other side exercises has no theoretical answer. The lecture gives the practical answer: <b>don't carry short at-the-money options into expiration</b>; buy them back before the close, at a cost of roughly one bid-ask spread.</span></p>
+  <p><span class="l-zh">讲义还提到一个现象：临近到期，平值的 conversion 和 reversal 常按 C − P ＝ S − X 这个价成交（讲义叫 <span class="sym" data-say="even money：按 C − P ＝ S − X 成交平值的 conversion 或 reversal，不算利息。临近到期利息只剩几分钱，这个价就是公平价。">even money</span>），持有的人借此把 pin risk 交给对手。讲义问：你该不该接？要看你手里的头寸和多数人一样还是相反。相反的话，接下这笔正好把自己的头寸平掉，自己的 pin risk 也没了，可以按 even money 接；一样的话，接过来等于同样的风险再加一份，要对方让价才值得接。</span><span class="l-en">The lecture notes also mention something else: near expiration, at-the-money conversions and reversals often trade at C − P = S − X (the lecture calls it <span class="sym" data-say="Even money: trading an at-the-money conversion or reversal at C − P = S − X, ignoring interest. Near expiration the interest is only a few cents, so this is the fair price.">even money</span>), and the holders use this to hand their pin risk to the other side. The lecture asks: should you take it? It depends on whether your position is the same as most people's or the opposite. If it is the opposite, taking the trade closes out your own position and your pin risk goes away too, so you can take it at even money; if it is the same, taking it adds a second helping of the same risk, and it is worth taking only if the other side gives you a better price.</span></p>
+  <p><span class="l-zh">只有行权会产生标的头寸时才有 pin risk。<span class="sym" data-say="cash settlement。到期不交割标的，按结算价差额付现金。">现金结算</span>的品种没有：SPX、NDX、RUT 这类指数期权，以及季月到期的股指期货期权，到期只按差额付钱，不会留下股票或期货头寸。</span><span class="l-en">Pin risk exists only when exercise produces a position in the underlying. <span class="sym" data-say="Cash settlement. No delivery of the underlying at expiration; the difference from the settlement price is paid in cash.">Cash-settled</span> products don't have it: index options such as SPX, NDX and RUT, and quarterly stock index futures options, pay only the difference at expiration and leave no stock or futures position.</span></p>
+  <p class="tiny"><span class="l-zh">数据：分钟线（美东时间，含盘后），每分钟取收盘；16:00 那一点用官方收盘价 422.32，与分钟线差几分钱。期权报价与未平仓量：5/15 的期权分钟快照。自动行权的门槛见 OCC 规则 805（exercise by exception，实值 0.01 美元）；到期日 17:30 的改主意截止时间见 FINRA 规则 2360(b)(23)(A)，券商常把自己客户的截止时间定得更早。</span><span class="l-en">Data: minute bars (ET, including after hours), using each minute's close; the 16:00 point uses the official close of 422.32, a few cents from the minute bar. Option quotes and open interest: option minute snapshots for 5/15. The automatic exercise threshold is in OCC Rule 805 (exercise by exception, $0.01 in the money); the 17:30 deadline for changing your mind on expiration day is in FINRA Rule 2360(b)(23)(A), and brokers often set an earlier deadline for their own customers.</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>settlement risk：期货期权的 conversion 不中性</h2>
-  <p class="sub">股票期权的 conversion 是精确中性的。换成美国交易所的期货期权，就不是了。</p>
-  <p>先看股票期权。350 conversion 里，卖 call、买 put 合起来是合成空头，delta 是 −100（按一张合约 100 股计，相当于空 100 股）；一份股票 ＋100。合计 0。</p>
-  <p>换成期货期权：卖 1 张 call、买 1 张 put、买 1 张期货。2.3 讲过，美国的期货期权按股票型结算：期权买的时候全额付钱，盈亏到平仓或到期才兑现。可期货本身每天按结算价结清。讲义的问题：三月期货跌 10 点，期权上的盈利能不能正好抵掉期货上的亏损？</p>
+  <h2><span class="l-zh"><span class="n">六</span>settlement risk：期货期权的 conversion 不中性</span><span class="l-en"><span class="n">6</span>Settlement risk: a conversion on futures options is not neutral</span></h2>
+  <p class="sub"><span class="l-zh">股票期权的 conversion 是精确中性的。换成美国交易所的期货期权，就不是了。</span><span class="l-en">A conversion on stock options is exactly neutral. On futures options from US exchanges, it isn't.</span></p>
+  <p><span class="l-zh">先看股票期权。350 conversion 里，卖 call、买 put 合起来是合成空头，delta 是 −100（按一张合约 100 股计，相当于空 100 股）；一份股票 ＋100。合计 0。</span><span class="l-en">Start with stock options. In the 350 conversion, the short call and long put together are a synthetic short with a delta of −100 (counting one contract as 100 shares, equivalent to being short 100 shares); the stock is +100. Total 0.</span></p>
+  <p><span class="l-zh">换成期货期权：卖 1 张 call、买 1 张 put、买 1 张期货。2.3 讲过，美国的期货期权按股票型结算：期权买的时候全额付钱，盈亏到平仓或到期才兑现。可期货本身每天按结算价结清。讲义的问题：三月期货跌 10 点，期权上的盈利能不能正好抵掉期货上的亏损？</span><span class="l-en">Now futures options: sell 1 call, buy 1 put, buy 1 futures contract. As 2.3 explained, US futures options use stock-type settlement: options are paid in full when bought, and gains or losses are realized only when closed or at expiration. But the futures contract itself is settled daily at the settlement price. The lecture's question: if March futures fall 10 points, does the gain on the options exactly offset the loss on the futures?</span></p>
   <ul>
-    <li>期货亏的 10 点当天就要从<span class="sym" data-say="margin account，保证金账户：交易期货时放在经纪商那里的钱。期货每天按结算价结算，亏了当天从这里扣，赚了当天存进来。">保证金账户</span>划走，这是<b>已实现</b>的亏损，钱不够就得借。</li>
-    <li>合成空头赚的 10 点要到期权到期才拿到，是<b>未实现</b>的盈利。</li>
-    <li>中间这段时间，借来的 10 点要付利息。</li>
+    <li><span class="l-zh">期货亏的 10 点当天就要从<span class="sym" data-say="margin account，保证金账户：交易期货时放在经纪商那里的钱。期货每天按结算价结算，亏了当天从这里扣，赚了当天存进来。">保证金账户</span>划走，这是<b>已实现</b>的亏损，钱不够就得借。</span><span class="l-en">The 10-point futures loss is taken out of the <span class="sym" data-say="Margin account: the money held at the broker for trading futures. Futures settle daily at the settlement price; a loss is debited from it that day and a gain credited that day.">margin account</span> the same day. It is a <b>realized</b> loss, and if there isn't enough money you have to borrow.</span></li>
+    <li><span class="l-zh">合成空头赚的 10 点要到期权到期才拿到，是<b>未实现</b>的盈利。</span><span class="l-en">The 10 points gained on the synthetic short are received only when the options expire. It is an <b>unrealized</b> gain.</span></li>
+    <li><span class="l-zh">中间这段时间，借来的 10 点要付利息。</span><span class="l-en">In between, the borrowed 10 points cost interest.</span></li>
   </ul>
-  <p>反过来期货涨 10 点，账户当天收进 10 点现金，能生息。所以这个头寸总是希望期货涨：它带着正 delta。讲义给这个风险起名 <span class="sym" data-say="settlement risk。期货期权按股票型结算时，期货上已实现的亏损没法用期权上未实现的盈利抵掉，要借钱付息。">settlement risk</span>。</p>
+  <p><span class="l-zh">反过来期货涨 10 点，账户当天收进 10 点现金，能生息。所以这个头寸总是希望期货涨：它带着正 delta。讲义给这个风险起名 <span class="sym" data-say="settlement risk。期货期权按股票型结算时，期货上已实现的亏损没法用期权上未实现的盈利抵掉，要借钱付息。">settlement risk</span>。</span><span class="l-en">If instead the futures rise 10 points, the account receives 10 points of cash that day, which can earn interest. So this position always wants the futures to rise: it carries positive delta. The lecture notes name this risk <span class="sym" data-say="Settlement risk. When futures options use stock-type settlement, realized losses on the futures can't be offset by unrealized gains on the options, so you have to borrow and pay interest.">settlement risk</span>.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="stPlay">重播</button></div>
-    <svg id="settle" viewBox="0 0 720 294" role="img" aria-label="期货跌 10 点与涨 10 点两种情形下，保证金的利息逐日累积"></svg>
+    <div class="bar"><button class="btn ghost" id="stPlay"><span class="l-zh">重播</span><span class="l-en">Replay</span></button></div>
+    <svg id="settle" viewBox="0 0 720 294" role="img" aria-label="期货跌 10 点与涨 10 点两种情形下，保证金的利息逐日累积" data-en-aria-label="Interest on margin accumulating day by day, with futures down 10 points and up 10 points"></svg>
     <div class="stats">
-      <div class="stat"><div class="k">过了</div><div class="d" id="stD"></div><div class="d2">共 3 个月</div></div>
-      <div class="stat"><div class="k">期货跌 10 点：付的利息</div><div class="d" id="stDn" style="color:var(--control)"></div><div class="d2">借来的 10 点</div></div>
-      <div class="stat"><div class="k">期货涨 10 点：收的利息</div><div class="d" id="stUp" style="color:var(--good)"></div><div class="d2">收进的 10 点</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">过了</span><span class="l-en">Elapsed</span></div><div class="d" id="stD"></div><div class="d2"><span class="l-zh">共 3 个月</span><span class="l-en">of 3 months</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">期货跌 10 点：付的利息</span><span class="l-en">Futures down 10 points: interest paid</span></div><div class="d" id="stDn" style="color:var(--control)"></div><div class="d2"><span class="l-zh">借来的 10 点</span><span class="l-en">10 points borrowed</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">期货涨 10 点：收的利息</span><span class="l-en">Futures up 10 points: interest received</span></div><div class="d" id="stUp" style="color:var(--good)"></div><div class="d2"><span class="l-zh">收进的 10 点</span><span class="l-en">10 points received</span></div></div>
     </div>
     <div class="say plain" id="stSay"></div>
   </div>
-  <p>合成腿的 <span class="sym" data-say="合成 delta：买 call、卖 put 这一对（或反过来）合起来的 delta。股票期权里正好是 ±100。">delta</span> 不再是 100，而是：</p>
+  <p><span class="l-zh">合成腿的 <span class="sym" data-say="合成 delta：买 call、卖 put 这一对（或反过来）合起来的 delta。股票期权里正好是 ±100。">delta</span> 不再是 100，而是：</span><span class="l-en">The synthetic legs' <span class="sym" data-say="Synthetic delta: the combined delta of a long call and short put pair (or the reverse). With stock options it is exactly ±100.">delta</span> is no longer 100 but:</span></p>
   <div class="formula">
-    <div class="math">合成 delta ＝ 100 ÷ (1 ＋ r·t)</div>
-    <div class="gloss">期权的盈亏要等 t 年才拿到，所以按今天的钱只值 1 ÷ (1 ＋ r·t)</div>
+    <div class="math"><span class="l-zh">合成 delta ＝ 100 ÷ (1 ＋ r·t)</span><span class="l-en">Synthetic delta = 100 ÷ (1 + r·t)</span></div>
+    <div class="gloss"><span class="l-zh">期权的盈亏要等 t 年才拿到，所以按今天的钱只值 1 ÷ (1 ＋ r·t)</span><span class="l-en">The options' gain or loss arrives only after t years, so in today's money it is worth only 1 ÷ (1 + r·t)</span></div>
     <div class="note" id="stNote"></div>
   </div>
-  <p>讲义的数字：卖 call 的 delta −60、买 put −39、期货 ＋100，合计 ＋1；另一组 −59、−38、＋100，合计 ＋3。利率越高、离到期越远，合计离 0 越远。</p>
+  <p><span class="l-zh">讲义的数字：卖 call 的 delta −60、买 put −39、期货 ＋100，合计 ＋1；另一组 −59、−38、＋100，合计 ＋3。利率越高、离到期越远，合计离 0 越远。</span><span class="l-en">The lecture's numbers: short call delta −60, long put −39, futures +100, total +1; another set: −59, −38, +100, total +3. The higher the interest rate and the longer to expiration, the farther the total is from 0.</span></p>
   <table>
-    <thead><tr><th>标的</th><th class="txt">conversion 的风险</th></tr></thead>
+    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th class="txt"><span class="l-zh">conversion 的风险</span><span class="l-en">Conversion risk</span></th></tr></thead>
     <tbody>
-      <tr><td>股票期权</td><td class="txt">利率（负 <span class="sym" data-say="rho（2.3）：利率涨 1 个百分点，仓位赚或亏多少。conversion 借钱买股票，利率涨就多付利息，所以 rho 是负的。">rho</span>）、分红</td></tr>
-      <tr><td>期货期权，股票型结算（美国）</td><td class="txt">settlement risk：带正 delta</td></tr>
-      <tr><td>期货期权，期货型结算（美国以外多数交易所）</td><td class="txt">没有 settlement risk，conversion 和 reversal 精确中性</td></tr>
+      <tr><td><span class="l-zh">股票期权</span><span class="l-en">Stock options</span></td><td class="txt"><span class="l-zh">利率（负 <span class="sym" data-say="rho（2.3）：利率涨 1 个百分点，仓位赚或亏多少。conversion 借钱买股票，利率涨就多付利息，所以 rho 是负的。">rho</span>）、分红</span><span class="l-en">Interest rate (negative <span class="sym" data-say="Rho (2.3): how much the position gains or loses when interest rates rise 1 percentage point. A conversion borrows to buy stock and pays more interest when rates rise, so its rho is negative.">rho</span>), dividends</span></td></tr>
+      <tr><td><span class="l-zh">期货期权，股票型结算（美国）</span><span class="l-en">Futures options, stock-type settlement (US)</span></td><td class="txt"><span class="l-zh">settlement risk：带正 delta</span><span class="l-en">Settlement risk: carries positive delta</span></td></tr>
+      <tr><td><span class="l-zh">期货期权，期货型结算（美国以外多数交易所）</span><span class="l-en">Futures options, futures-type settlement (most exchanges outside the US)</span></td><td class="txt"><span class="l-zh">没有 settlement risk，conversion 和 reversal 精确中性</span><span class="l-en">No settlement risk; conversions and reversals are exactly neutral</span></td></tr>
     </tbody>
   </table>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">七</span>费曼检验</span><span class="l-en"><span class="n">7</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号</summary>
+    <summary><span class="l-zh">本页出现的全部符号</span><span class="l-en">All symbols on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">C / P</div><div class="t">同一行权价、同一到期日的 call 价格与 put 价格。</div></div>
-      <div class="gl"><div class="s">S</div><div class="t">今天的股价。</div></div>
-      <div class="gl"><div class="s">X</div><div class="t">行权价。</div></div>
-      <div class="gl"><div class="s">r, t</div><div class="t">年利率；到期时间，以年计。32 天 ＝ 32/365 年。讲义用单利，r·t 是这段时间的利息比例。</div></div>
-      <div class="gl"><div class="s">1 ＋ r·t</div><div class="t">1 美元存到到期变成多少。一笔到期才收到的钱除以它，就是今天的价值（现值）。</div></div>
-      <div class="gl"><div class="s">D</div><div class="t">到期前股票派发的分红合计。</div></div>
-      <div class="gl"><div class="s">F</div><div class="t">远期价，F ＝ S(1 ＋ r·t) − D（1.1）。</div></div>
-      <div class="gl"><div class="s">put-call parity</div><div class="t">C − P ＝ (F − X) ÷ (1 ＋ r·t)。讲义也叫 synthetic relationship、conversion market。</div></div>
-      <div class="gl"><div class="s">套利</div><div class="t">同一种或几乎一样的东西两处价格不同，一边买一边卖，赚差价。</div></div>
-      <div class="gl"><div class="s">conversion</div><div class="t">买股票、卖 call、买 put。到期一定按 X 卖出股票。</div></div>
-      <div class="gl"><div class="s">reversal</div><div class="t">卖空股票、买 call、卖 put。到期一定按 X 买回股票。也叫 reverse conversion。</div></div>
-      <div class="gl"><div class="s">combo</div><div class="t">C − P，同一行权价的 call 减 put。等于按远期价算的内在价值的现值。</div></div>
-      <div class="gl"><div class="s">贷方 / 借方</div><div class="t">收到的钱 / 付出的钱。推导 parity 时每一笔都带上到期前的利息。</div></div>
-      <div class="gl"><div class="s">内在价值</div><div class="t">立刻行权能得到的钱，不够就是 0。</div></div>
-      <div class="gl"><div class="s">隐含分红</div><div class="t">从期权价格反推出来的、市场认定的分红。</div></div>
-      <div class="gl"><div class="s">买一 / 卖一</div><div class="t">市场上最高的买价 / 最低的卖价。卖出只能按买一，买入只能按卖一。</div></div>
-      <div class="gl"><div class="s">中间价</div><div class="t">（买一 ＋ 卖一）÷ 2（3.1）。</div></div>
-      <div class="gl"><div class="s">delta / gamma / vega / rho</div><div class="t">标的涨 1 美元仓位的盈亏（2.1）/ delta 的变化（2.2）/ 隐含波动率涨 1 个点的盈亏（2.3）/ 利率涨 1 个百分点的盈亏（2.3）。conversion 前三个都是 0，rho 为负。</div></div>
-      <div class="gl"><div class="s">butterfly / iron butterfly</div><div class="t">买 1 卖 2 买 1 三个等距行权价 / 买中间的 straddle、卖两翼的 strangle（3.2）。两者之和到期固定值行权价间距（5.1）。</div></div>
-      <div class="gl"><div class="s">期货</div><div class="t">约定到期按今天定下的价格买卖标的的合约，不付全款，盈亏每天用现金结清。</div></div>
-      <div class="gl"><div class="s">保证金账户</div><div class="t">交易期货时放在经纪商那里的钱，期货的盈亏每天从这里扣或存进来。</div></div>
-      <div class="gl"><div class="s">隐含波动率</div><div class="t">从期权价格反推出的波动率（1.2）。本页的二叉树用报价快照给每个行权价算的值。</div></div>
-      <div class="gl"><div class="s">二叉树模型</div><div class="t">把到期前的时间切成很多小步，每步标的涨一格或跌一格，从到期往回算期权今天的价值。美式 put 每一步都比较「现在行权」和「继续拿着」。</div></div>
-      <div class="gl"><div class="s">提前行权价值</div><div class="t">美式 put 比同样条件的欧式 put 多出的价值，本页用二叉树算。它让 C − P 偏低，从 parity 反解的利率随之偏低。</div></div>
-      <div class="gl"><div class="s">报价快照</div><div class="t">本页 TSLA 的真实买卖价、隐含波动率和未平仓量来自历史期权报价快照，按分钟记录。</div></div>
-      <div class="gl"><div class="s">欧式 / 美式</div><div class="t">只能在到期日行权 / 到期前任何一天都能行权。parity 的等式按欧式推导。</div></div>
-      <div class="gl"><div class="s">指派</div><div class="t">卖出期权的一方被对手行权选中，必须履约。</div></div>
-      <div class="gl"><div class="s">未平仓量</div><div class="t">还没平掉的合约张数。</div></div>
-      <div class="gl"><div class="s">pin risk</div><div class="t">到期时手里有平值空头期权，不知道会不会被指派的风险。</div></div>
-      <div class="gl"><div class="s">现金结算</div><div class="t">到期不交割标的，按差额付现金。没有 pin risk。</div></div>
-      <div class="gl"><div class="s">已实现 / 未实现</div><div class="t">已经变成现金进出账户的盈亏 / 还只是账面上的盈亏。</div></div>
-      <div class="gl"><div class="s">股票型 / 期货型结算</div><div class="t">买期权时全额付钱、盈亏平仓才兑现 / 不付全款、每天按结算价结清（2.3）。</div></div>
-      <div class="gl"><div class="s">现值</div><div class="t">将来才收到的一笔钱今天值多少：除以 1 ＋ r·t。</div></div>
-      <div class="gl"><div class="s">合成 delta</div><div class="t">合成股票（call 减 put）的 delta。股票期权里正好 100；股票型结算的期货期权里是 100 ÷ (1 ＋ r·t)。</div></div>
-      <div class="gl"><div class="s">even money</div><div class="t">按 C − P ＝ S − X 成交平值的 conversion 或 reversal，临近到期时常见。</div></div>
-      <div class="gl"><div class="s">settlement risk</div><div class="t">股票型结算的期货期权里，期货的已实现亏损要借钱垫付，期权的盈利到期才到，conversion 因此带正 delta。</div></div>
+      <div class="gl"><div class="s">C / P</div><div class="t"><span class="l-zh">同一行权价、同一到期日的 call 价格与 put 价格。</span><span class="l-en">The call price and the put price at the same strike and expiration.</span></div></div>
+      <div class="gl"><div class="s">S</div><div class="t"><span class="l-zh">今天的股价。</span><span class="l-en">Today's stock price.</span></div></div>
+      <div class="gl"><div class="s">X</div><div class="t"><span class="l-zh">行权价。</span><span class="l-en">Strike.</span></div></div>
+      <div class="gl"><div class="s">r, t</div><div class="t"><span class="l-zh">年利率；到期时间，以年计。32 天 ＝ 32/365 年。讲义用单利，r·t 是这段时间的利息比例。</span><span class="l-en">Annual interest rate; time to expiration in years. 32 days = 32/365 years. The lecture notes use simple interest, so r·t is the interest over this period as a fraction.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">1 ＋ r·t</span><span class="l-en">1 + r·t</span></div><div class="t"><span class="l-zh">1 美元存到到期变成多少。一笔到期才收到的钱除以它，就是今天的价值（现值）。</span><span class="l-en">What $1 deposited until expiration becomes. Divide an amount received at expiration by it to get its value today (present value).</span></div></div>
+      <div class="gl"><div class="s">D</div><div class="t"><span class="l-zh">到期前股票派发的分红合计。</span><span class="l-en">Total dividends paid by the stock before expiration.</span></div></div>
+      <div class="gl"><div class="s">F</div><div class="t"><span class="l-zh">远期价，F ＝ S(1 ＋ r·t) − D（1.1）。</span><span class="l-en">Forward price, F = S(1 + r·t) − D (1.1).</span></div></div>
+      <div class="gl"><div class="s">put-call parity</div><div class="t"><span class="l-zh">C − P ＝ (F − X) ÷ (1 ＋ r·t)。讲义也叫 synthetic relationship、conversion market。</span><span class="l-en">C − P = (F − X) ÷ (1 + r·t). The lecture notes also call it the synthetic relationship or the conversion market.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">套利</span><span class="l-en">Arbitrage</span></div><div class="t"><span class="l-zh">同一种或几乎一样的东西两处价格不同，一边买一边卖，赚差价。</span><span class="l-en">When the same or nearly the same thing has different prices in two places, buy on one side, sell on the other, and earn the difference.</span></div></div>
+      <div class="gl"><div class="s">conversion</div><div class="t"><span class="l-zh">买股票、卖 call、买 put。到期一定按 X 卖出股票。</span><span class="l-en">Buy stock, sell a call, buy a put. At expiration you are sure to sell the stock at X.</span></div></div>
+      <div class="gl"><div class="s">reversal</div><div class="t"><span class="l-zh">卖空股票、买 call、卖 put。到期一定按 X 买回股票。也叫 reverse conversion。</span><span class="l-en">Sell stock short, buy a call, sell a put. At expiration you are sure to buy the stock back at X. Also called reverse conversion.</span></div></div>
+      <div class="gl"><div class="s">combo</div><div class="t"><span class="l-zh">C − P，同一行权价的 call 减 put。等于按远期价算的内在价值的现值。</span><span class="l-en">C − P, the call minus the put at the same strike. Equals the present value of the intrinsic value at the forward price.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">贷方 / 借方</span><span class="l-en">Credits / debits</span></div><div class="t"><span class="l-zh">收到的钱 / 付出的钱。推导 parity 时每一笔都带上到期前的利息。</span><span class="l-en">Money received / money paid. When deriving parity, each one carries its interest until expiration.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">内在价值</span><span class="l-en">Intrinsic value</span></div><div class="t"><span class="l-zh">立刻行权能得到的钱，不够就是 0。</span><span class="l-en">The money from exercising immediately, or 0 if negative.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含分红</span><span class="l-en">Implied dividend</span></div><div class="t"><span class="l-zh">从期权价格反推出来的、市场认定的分红。</span><span class="l-en">The dividend the market assumes, backed out of option prices.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">买一 / 卖一</span><span class="l-en">Bid / ask</span></div><div class="t"><span class="l-zh">市场上最高的买价 / 最低的卖价。卖出只能按买一，买入只能按卖一。</span><span class="l-en">The highest bid / lowest ask in the market. You can only sell at the bid and buy at the ask.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">中间价</span><span class="l-en">Mid price</span></div><div class="t"><span class="l-zh">（买一 ＋ 卖一）÷ 2（3.1）。</span><span class="l-en">(Bid + ask) ÷ 2 (3.1).</span></div></div>
+      <div class="gl"><div class="s">delta / gamma / vega / rho</div><div class="t"><span class="l-zh">标的涨 1 美元仓位的盈亏（2.1）/ delta 的变化（2.2）/ 隐含波动率涨 1 个点的盈亏（2.3）/ 利率涨 1 个百分点的盈亏（2.3）。conversion 前三个都是 0，rho 为负。</span><span class="l-en">Position P&amp;L when the underlying rises $1 (2.1) / change in delta (2.2) / P&amp;L when implied volatility rises 1 point (2.3) / P&amp;L when interest rates rise 1 percentage point (2.3). For a conversion the first three are 0 and rho is negative.</span></div></div>
+      <div class="gl"><div class="s">butterfly / iron butterfly</div><div class="t"><span class="l-zh">买 1 卖 2 买 1 三个等距行权价 / 买中间的 straddle、卖两翼的 strangle（3.2）。两者之和到期固定值行权价间距（5.1）。</span><span class="l-en">Buy 1, sell 2, buy 1 at three equally spaced strikes / buy the middle straddle, sell the outer strangle (3.2). Together they are worth the strike width at expiration, fixed (5.1).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期货</span><span class="l-en">Futures</span></div><div class="t"><span class="l-zh">约定到期按今天定下的价格买卖标的的合约，不付全款，盈亏每天用现金结清。</span><span class="l-en">A contract to buy or sell the underlying at expiration at a price agreed today; not paid in full, with gains and losses settled in cash every day.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">保证金账户</span><span class="l-en">Margin account</span></div><div class="t"><span class="l-zh">交易期货时放在经纪商那里的钱，期货的盈亏每天从这里扣或存进来。</span><span class="l-en">The money held at the broker for trading futures; daily futures gains and losses are debited from or credited to it.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></div><div class="t"><span class="l-zh">从期权价格反推出的波动率（1.2）。本页的二叉树用报价快照给每个行权价算的值。</span><span class="l-en">Volatility backed out of option prices (1.2). The binomial tree on this page uses the value the quote snapshot gives for each strike.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">二叉树模型</span><span class="l-en">Binomial tree model</span></div><div class="t"><span class="l-zh">把到期前的时间切成很多小步，每步标的涨一格或跌一格，从到期往回算期权今天的价值。美式 put 每一步都比较「现在行权」和「继续拿着」。</span><span class="l-en">Cut the time to expiration into many small steps, with the underlying moving up or down one notch each step, and work back from expiration to the option's value today. At every step an American put compares "exercise now" with "keep holding".</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">提前行权价值</span><span class="l-en">Early-exercise value</span></div><div class="t"><span class="l-zh">美式 put 比同样条件的欧式 put 多出的价值，本页用二叉树算。它让 C − P 偏低，从 parity 反解的利率随之偏低。</span><span class="l-en">The value an American put has over a European put with the same terms, computed on this page with the binomial tree. It makes C − P come out low, and the interest rate backed out of parity comes out low with it.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">报价快照</span><span class="l-en">Quote snapshot</span></div><div class="t"><span class="l-zh">本页 TSLA 的真实买卖价、隐含波动率和未平仓量来自历史期权报价快照，按分钟记录。</span><span class="l-en">The real TSLA bids, asks, implied volatilities and open interest on this page come from historical option quote snapshots, recorded by the minute.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">欧式 / 美式</span><span class="l-en">European / American</span></div><div class="t"><span class="l-zh">只能在到期日行权 / 到期前任何一天都能行权。parity 的等式按欧式推导。</span><span class="l-en">Exercisable only on the expiration date / exercisable on any day before expiration. The parity equation is derived for European options.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">指派</span><span class="l-en">Assignment</span></div><div class="t"><span class="l-zh">卖出期权的一方被对手行权选中，必须履约。</span><span class="l-en">The option seller is picked when the other side exercises and must perform.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">未平仓量</span><span class="l-en">Open interest</span></div><div class="t"><span class="l-zh">还没平掉的合约张数。</span><span class="l-en">The number of contracts not yet closed.</span></div></div>
+      <div class="gl"><div class="s">pin risk</div><div class="t"><span class="l-zh">到期时手里有平值空头期权，不知道会不会被指派的风险。</span><span class="l-en">The risk of holding short at-the-money options at expiration without knowing whether they will be assigned.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">现金结算</span><span class="l-en">Cash settlement</span></div><div class="t"><span class="l-zh">到期不交割标的，按差额付现金。没有 pin risk。</span><span class="l-en">No delivery of the underlying at expiration; the difference is paid in cash. No pin risk.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">已实现 / 未实现</span><span class="l-en">Realized / unrealized</span></div><div class="t"><span class="l-zh">已经变成现金进出账户的盈亏 / 还只是账面上的盈亏。</span><span class="l-en">P&amp;L that has already moved in or out of the account as cash / P&amp;L that exists only on paper.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">股票型 / 期货型结算</span><span class="l-en">Stock-type / futures-type settlement</span></div><div class="t"><span class="l-zh">买期权时全额付钱、盈亏平仓才兑现 / 不付全款、每天按结算价结清（2.3）。</span><span class="l-en">Pay in full when buying the option, realize gains only on closing / no full payment, settled daily at the settlement price (2.3).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">现值</span><span class="l-en">Present value</span></div><div class="t"><span class="l-zh">将来才收到的一笔钱今天值多少：除以 1 ＋ r·t。</span><span class="l-en">What an amount received in the future is worth today: divide by 1 + r·t.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">合成 delta</span><span class="l-en">Synthetic delta</span></div><div class="t"><span class="l-zh">合成股票（call 减 put）的 delta。股票期权里正好 100；股票型结算的期货期权里是 100 ÷ (1 ＋ r·t)。</span><span class="l-en">The delta of synthetic stock (call minus put). Exactly 100 with stock options; 100 ÷ (1 + r·t) with stock-type-settled futures options.</span></div></div>
+      <div class="gl"><div class="s">even money</div><div class="t"><span class="l-zh">按 C − P ＝ S − X 成交平值的 conversion 或 reversal，临近到期时常见。</span><span class="l-en">Trading an at-the-money conversion or reversal at C − P = S − X, common near expiration.</span></div></div>
+      <div class="gl"><div class="s">settlement risk</div><div class="t"><span class="l-zh">股票型结算的期货期权里，期货的已实现亏损要借钱垫付，期权的盈利到期才到，conversion 因此带正 delta。</span><span class="l-en">With stock-type-settled futures options, realized losses on the futures have to be funded with borrowed money while the option gains arrive only at expiration, so a conversion carries positive delta.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>下一节 <a href="station-5-3-box-roll-collar.html"><b>5.3 box · roll · collar</b></a>：两个行权价上的 conversion 与 reversal 拼成 box，反推无风险利率；两个到期月拼成 roll，只剩持有成本；collar 用卖 call 的钱付 put。另一条分支是 <a href="station-9-early-exercise.html"><b>9 提前行权</b></a>：第四节那几个深度实值 put 为什么会被提前行权，三套判据。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">下一节 <a href="station-5-3-box-roll-collar.html"><b>5.3 box · roll · collar</b></a>：两个行权价上的 conversion 与 reversal 拼成 box，反推无风险利率；两个到期月拼成 roll，只剩持有成本；collar 用卖 call 的钱付 put。另一条分支是 <a href="station-9-early-exercise.html"><b>9 提前行权</b></a>：第四节那几个深度实值 put 为什么会被提前行权，三套判据。</span><span class="l-en">Next: <a href="station-5-3-box-roll-collar.html"><b>5.3 box · roll · collar</b></a>: a conversion and a reversal at two strikes make a box, which backs out the risk-free rate; two expiration months make a roll, leaving only the cost of carry; a collar uses the money from selling a call to pay for a put. The other branch is <a href="station-9-early-exercise.html"><b>9 Early exercise</b></a>: why the deep-in-the-money puts in section 4 get exercised early, with three sets of criteria.</span></p>
+  <p><a href="./"><span class="l-zh">← 回到课程路线图</span><span class="l-en">← Back to the course roadmap</span></a></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
 <script>
+/* 英文模式（lang.js）：页面标题，以及带 data-en-* 的悬停说明、title、aria-label 换成英文 */
+document.title=L(document.title,'Parity and Conversion');
+if(LANG==='en') document.querySelectorAll('[data-en-say],[data-en-title],[data-en-aria-label],[data-en-placeholder]').forEach(e=>{
+  for(const a of ['say','title','aria-label','placeholder']){ const v=e.getAttribute('data-en-'+a); if(v!=null) e.setAttribute(a==='say'?'data-say':a,v); }
+});
 const $ = id => document.getElementById(id);
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);           // 负数用真正的减号
@@ -722,9 +728,9 @@ const LEGS=(()=>{
   const st={prog:4,mode:'conv',playing:false};
   const legs=()=>{ const s=st.mode==='conv'?1:-1;
     return [
-      {f:x=>s*(x-S0), c:'var(--ink-faint)', t:s>0?'买股票 352.36':'卖空股票 352.36'},
-      {f:x=>s*(CM-Math.max(x-K0,0)), c:'var(--result)', t:s>0?'卖 350 call，收 21.05':'买 350 call，付 21.05'},
-      {f:x=>s*(Math.max(K0-x,0)-PM), c:'var(--warn)', t:s>0?'买 350 put，付 17.40':'卖 350 put，收 17.40'}
+      {f:x=>s*(x-S0), c:'var(--ink-faint)', t:s>0?window.L('买股票 352.36','Buy stock 352.36'):window.L('卖空股票 352.36','Short stock 352.36')},
+      {f:x=>s*(CM-Math.max(x-K0,0)), c:'var(--result)', t:s>0?window.L('卖 350 call，收 21.05','Sell 350 call, receive 21.05'):window.L('买 350 call，付 21.05','Buy 350 call, pay 21.05')},
+      {f:x=>s*(Math.max(K0-x,0)-PM), c:'var(--warn)', t:s>0?window.L('买 350 put，付 17.40','Buy 350 put, pay 17.40'):window.L('卖 350 put，收 17.40','Sell 350 put, receive 17.40')}
     ]; };
   function pl(f,frac){
     const xe=X0+(X1-X0)*frac, pts=[];
@@ -734,13 +740,13 @@ const LEGS=(()=>{
   function draw(){
     T=18+16*FK; B=T+266; const H=B+26+26*FK; setVB('legs',W,H);
     const p=st.prog, lg=legs(), s=st.mode==='conv'?1:-1;
-    let g=lab(L,T-10-6*FK,'每股到期损益','var(--ink-soft)','start',12.5);
+    let g=lab(L,T-10-6*FK,window.L('每股到期损益','Expiration P&amp;L per share'),'var(--ink-soft)','start',12.5);
     [-60,-40,-20,0,20,40,60].forEach(v=>{
       g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.7}"/>`;
       g+=lab(L-8,Y(v)+4,v===0?'0':fm(v,0),'var(--ink-faint)','end',12);
     });
     [300,325,350,375,400].forEach(v=>g+=lab(X(v),B+14+6*FK,v,'var(--ink-faint)','middle',12));
-    g+=lab((L+R2)/2,H-6,'5/15 到期时 TSLA 的价格','var(--ink-soft)','middle',12.5);
+    g+=lab((L+R2)/2,H-6,window.L('5/15 到期时 TSLA 的价格','TSLA price at expiration on 5/15'),'var(--ink-soft)','middle',12.5);
     g+=`<line x1="${X(350)}" y1="${T}" x2="${X(350)}" y2="${B}" stroke="var(--rule)" stroke-dasharray="3 4"/>`;
     const fade=p>=3?.35:1;
     lg.forEach((l,i)=>{
@@ -757,13 +763,13 @@ const LEGS=(()=>{
     if(p>=2 && p<3){                                    // 股票 + call：只在加第三条腿之前出现，图上直接标名字
       const f=x=>lg[0].f(x)+lg[1].f(x);
       g+=`<polyline points="${pl(f,1)}" fill="none" stroke="var(--ink-soft)" stroke-width="1.8" stroke-dasharray="6 5"/>`;
-      g+=lab(X(362),Y(f(362))+(s>0?-10:6+14*FK),'股票 ＋ call','var(--ink-soft)','start',12);
+      g+=lab(X(362),Y(f(362))+(s>0?-10:6+14*FK),window.L('股票 ＋ call','Stock + call'),'var(--ink-soft)','start',12);
     }
     if(p>=3){
       const fr=clamp(p-3,0,1), f=x=>lg[0].f(x)+lg[1].f(x)+lg[2].f(x);
       g+=`<polyline points="${pl(f,fr)}" fill="none" stroke="var(--control)" stroke-width="3.6"/>`;
       if(fr>=1){                                        // 合计的字放在左下（conversion）或左上（reversal），那里没有别的线穿过
-        const v=f(300), x0=X(301.5), l1=`合计 ${sgn(v)}`, l2='TSLA 在哪都一样';
+        const v=f(300), x0=X(301.5), l1=window.L(`合计 ${sgn(v)}`,`Total ${sgn(v)}`), l2=window.L('TSLA 在哪都一样','Same wherever TSLA is');
         if(s>0){ g+=lab(x0,Y(v)+8+13.5*FK,l1,'var(--control)','start',13.5,600); g+=lab(x0,Y(v)+8+13.5*FK+16*FK,l2,'var(--control)','start',12,500); }
         else   { g+=lab(x0,Y(v)-10-16*FK,l1,'var(--control)','start',13.5,600); g+=lab(x0,Y(v)-10,l2,'var(--control)','start',12,500); }
       }
@@ -772,15 +778,15 @@ const LEGS=(()=>{
   }
   function stats(){
     const c=st.mode==='conv';
-    $('lgK1').textContent= c?'今天付出':'今天收到';
-    $('lgV1').textContent=f2(COST); $('lgV1b').textContent=`${f2(S0)} − ${f2(CM)} ＋ ${f2(PM)}`;
-    $('lgK2').textContent= c?'到期收回':'到期付出';
-    $('lgV2').textContent=f2(K0); $('lgV2b').textContent= c?'按 350 卖出股票':'按 350 买回股票';
-    $('lgV3').textContent=sgn((K0-COST)*(c?1:-1)); $('lgV3b').textContent='每股，未算利息';
+    $('lgK1').textContent= c?window.L('今天付出','Paid today'):window.L('今天收到','Received today');
+    $('lgV1').textContent=f2(COST); $('lgV1b').textContent=window.L(`${f2(S0)} − ${f2(CM)} ＋ ${f2(PM)}`,`${f2(S0)} − ${f2(CM)} + ${f2(PM)}`);
+    $('lgK2').textContent= c?window.L('到期收回','Received at expiration'):window.L('到期付出','Paid at expiration');
+    $('lgV2').textContent=f2(K0); $('lgV2b').textContent= c?window.L('按 350 卖出股票','Sell the stock at 350'):window.L('按 350 买回股票','Buy back the stock at 350');
+    $('lgV3').textContent=sgn((K0-COST)*(c?1:-1)); $('lgV3b').textContent=window.L('每股，未算利息','Per share, before interest');
     const it=COST*R*T0;
     $('lgSay').textContent= c
-      ? `352.36 − 21.05 ＋ 17.40 ＝ ${f2(COST)} 今天付出去，32 天后换回 350，多出 ${f2(K0-COST)}。可这 ${f2(COST)} 要占用 32 天，按 4.3% 的利息是 ${f2(it)}，扣掉之后每股 ${fm(K0-COST*G)}。`
-      : `reversal 今天收到 ${f2(COST)}，32 天后付 350 买回股票，少 ${f2(K0-COST)}。可收到的 ${f2(COST)} 能存 32 天，按 4.3% 赚 ${f2(it)} 利息，扣掉之后每股 ${sgn(COST*G-K0)}。`;
+      ? window.L(`352.36 − 21.05 ＋ 17.40 ＝ ${f2(COST)} 今天付出去，32 天后换回 350，多出 ${f2(K0-COST)}。可这 ${f2(COST)} 要占用 32 天，按 4.3% 的利息是 ${f2(it)}，扣掉之后每股 ${fm(K0-COST*G)}。`,`352.36 − 21.05 + 17.40 = ${f2(COST)} paid out today, turning back into 350 after 32 days, ${f2(K0-COST)} more. But the ${f2(COST)} is tied up for 32 days, and its interest at 4.3% is ${f2(it)}; net of that, ${fm(K0-COST*G)} per share.`)
+      : window.L(`reversal 今天收到 ${f2(COST)}，32 天后付 350 买回股票，少 ${f2(K0-COST)}。可收到的 ${f2(COST)} 能存 32 天，按 4.3% 赚 ${f2(it)} 利息，扣掉之后每股 ${sgn(COST*G-K0)}。`,`The reversal receives ${f2(COST)} today and pays 350 to buy back the stock after 32 days, ${f2(K0-COST)} less. But the ${f2(COST)} received can be deposited for 32 days and earns ${f2(it)} interest at 4.3%; net of that, ${sgn(COST*G-K0)} per share.`);
   }
   function start(){
     st.playing=false; stats();
@@ -811,33 +817,33 @@ const LEDGER=(()=>{
     }
     TICK.forEach(([d,t])=>g+=lab(X(d),B+10+10*FK,t,'var(--ink-faint)','middle',12));
     g+=`<line x1="${L}" y1="${Y(350)}" x2="${R2}" y2="${Y(350)}" stroke="var(--good)" stroke-width="1.8" stroke-dasharray="7 5"/>`;
-    g+=lab(R2+6,Y(350)-4,'到期收回','var(--good)','start',12,500);
-    g+=lab(R2+6,Y(350)+4+10*FK,'X ＝ 350','var(--good)','start',12,500);
+    g+=lab(R2+6,Y(350)-4,window.L('到期收回','Received'),'var(--good)','start',12,500);
+    g+=lab(R2+6,Y(350)+4+10*FK,window.L('X ＝ 350','X = 350'),'var(--good)','start',12,500);
     const pts=[]; for(let d=0; d<=p+1e-9; d+=0.25) pts.push(X(d).toFixed(1)+','+Y(owe(d)).toFixed(1));
     g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--control)" stroke-width="3"/>`;
     g+=`<circle cx="${X(p)}" cy="${Y(owe(p))}" r="5" fill="var(--control)"/>`;
-    g+=lab(X(0)+6,Y(owe(0))+8+12*FK,`第 0 天借 ${f2(COST)}`,'var(--control)','start',12.5,500);
+    g+=lab(X(0)+6,Y(owe(0))+8+12*FK,window.L(`第 0 天借 ${f2(COST)}`,`Day 0: borrow ${f2(COST)}`),'var(--control)','start',12.5,500);
     if(p>=NDAY){
-      g+=lab(X(NDAY)-6,Y(owe(NDAY))-12,`第 32 天欠 ${f2(owe(NDAY))}`,'var(--control)','end',12.5,600);
+      g+=lab(X(NDAY)-6,Y(owe(NDAY))-12,window.L(`第 32 天欠 ${f2(owe(NDAY))}`,`Day 32: owe ${f2(owe(NDAY))}`),'var(--control)','end',12.5,600);
     } else {
       g+=lab(X(p)+8,Y(owe(p))+6+12*FK,f2(owe(p)),'var(--control)','start',12);
     }
-    g+=lab((L+R2)/2,H-6,'4/13 建仓 → 5/15 到期','var(--ink-soft)','middle',12.5);
+    g+=lab((L+R2)/2,H-6,window.L('4/13 建仓 → 5/15 到期','4/13 open → 5/15 expiration'),'var(--ink-soft)','middle',12.5);
     $('ledger').innerHTML=g;
     table(p);
   }
   function table(p){
     const k=R*p/365, done=p>=NDAY;
-    const cr=[['卖 call C',CM],['利息 C·r·t',CM*k],['分红 D',0],['到期收回 X',done?K0:null]];
-    const db=[['买股票 S',S0],['利息 S·r·t',S0*k],['买 put P',PM],['利息 P·r·t',PM*k]];
-    const n=v=> v===null?'到期才有':v===0?'0':(Math.abs(v)<10?v.toFixed(4):f2(v));
+    const cr=[[window.L('卖 call C','Sell call C'),CM],[window.L('利息 C·r·t','Interest C·r·t'),CM*k],[window.L('分红 D','Dividend D'),0],[window.L('到期收回 X','Received at expiration X'),done?K0:null]];
+    const db=[[window.L('买股票 S','Buy stock S'),S0],[window.L('利息 S·r·t','Interest S·r·t'),S0*k],[window.L('买 put P','Buy put P'),PM],[window.L('利息 P·r·t','Interest P·r·t'),PM*k]];
+    const n=v=> v===null?window.L('到期才有','At expiration'):v===0?'0':(Math.abs(v)<10?v.toFixed(4):f2(v));
     let h='';
     for(let i=0;i<4;i++) h+=`<tr><td>${cr[i][0]}</td><td>${n(cr[i][1])}</td><td class="txt">${db[i][0]}</td><td>${n(db[i][1])}</td></tr>`;
     const sc=cr.reduce((s,x)=>s+(x[1]||0),0), sd=db.reduce((s,x)=>s+x[1],0);
-    h+=`<tr class="tot"><td>贷方合计</td><td>${sc.toFixed(4)}</td><td class="txt">借方合计</td><td>${sd.toFixed(4)}</td></tr>`;
+    h+=window.L(`<tr class="tot"><td>贷方合计</td><td>${sc.toFixed(4)}</td><td class="txt">借方合计</td><td>${sd.toFixed(4)}</td></tr>`,`<tr class="tot"><td>Total credits</td><td>${sc.toFixed(4)}</td><td class="txt">Total debits</td><td>${sd.toFixed(4)}</td></tr>`);
     $('ldTb').querySelector('tbody').innerHTML=h;
     $('ldSay').textContent= done
-      ? `第 32 天：贷方 ${sc.toFixed(2)}，借方 ${sd.toFixed(2)}，差 ${fm(sc-sd)}。两栏几乎相等：按 4/13 的市价，这笔 conversion 扣掉利息正好不赚不亏。欠款线在最后一天才越过 350，越过的那一点就是这 ${fm(sc-sd)}。`
+      ? window.L(`第 32 天：贷方 ${sc.toFixed(2)}，借方 ${sd.toFixed(2)}，差 ${fm(sc-sd)}。两栏几乎相等：按 4/13 的市价，这笔 conversion 扣掉利息正好不赚不亏。欠款线在最后一天才越过 350，越过的那一点就是这 ${fm(sc-sd)}。`,`Day 32: credits ${sc.toFixed(2)}, debits ${sd.toFixed(2)}, difference ${fm(sc-sd)}. The two columns are almost equal: at 4/13 market prices, this conversion breaks exactly even after interest. The amount owed crosses 350 only on the last day, and the amount by which it crosses is this ${fm(sc-sd)}.`)
       : '';
   }
   function start(){
@@ -852,11 +858,11 @@ const LEDGER=(()=>{
 /* ══════════ 一 · 推导的核对、近似式、利率风险 ══════════ */
 function renderS1(){
   const pv=(F0-K0)/G;
-  $('stepCheck').textContent=`TSLA 350：F ＝ 352.36 × (1 ＋ 4.3% × 32/365) ＝ ${f2(F0)}，(F − X) ÷ (1 ＋ r·t) ＝ ${f2(F0-K0)} ÷ ${G.toFixed(4)} ＝ ${f2(pv)}；市场上 C − P ＝ 21.05 − 17.40 ＝ ${f2(CM-PM)}，差 ${fm(CM-PM-pv)}，就是上面那 ${fm(K0-COST*G)} 折回今天。`;
+  $('stepCheck').textContent=L(`TSLA 350：F ＝ 352.36 × (1 ＋ 4.3% × 32/365) ＝ ${f2(F0)}，(F − X) ÷ (1 ＋ r·t) ＝ ${f2(F0-K0)} ÷ ${G.toFixed(4)} ＝ ${f2(pv)}；市场上 C − P ＝ 21.05 − 17.40 ＝ ${f2(CM-PM)}，差 ${fm(CM-PM-pv)}，就是上面那 ${fm(K0-COST*G)} 折回今天。`,`TSLA 350: F = 352.36 × (1 + 4.3% × 32/365) = ${f2(F0)}, (F − X) ÷ (1 + r·t) = ${f2(F0-K0)} ÷ ${G.toFixed(4)} = ${f2(pv)}; in the market C − P = 21.05 − 17.40 = ${f2(CM-PM)}, a difference of ${fm(CM-PM-pv)}, which is the ${fm(K0-COST*G)} above discounted to today.`);
   const ap=S0-K0+K0*R*T0, ex=S0-K0/G;
-  $('approxNote').textContent=`TSLA 350：近似式 ${f2(S0)} − 350 ＋ 350 × 4.3% × 32/365 ＝ ${ap.toFixed(3)}，精确式 ${ex.toFixed(3)}，差 ${(ap-ex).toFixed(3)}。讲义的 65 combo 例子差 0.02。`;
+  $('approxNote').textContent=L(`TSLA 350：近似式 ${f2(S0)} − 350 ＋ 350 × 4.3% × 32/365 ＝ ${ap.toFixed(3)}，精确式 ${ex.toFixed(3)}，差 ${(ap-ex).toFixed(3)}。讲义的 65 combo 例子差 0.02。`,`TSLA 350: approximation ${f2(S0)} − 350 + 350 × 4.3% × 32/365 = ${ap.toFixed(3)}, exact ${ex.toFixed(3)}, difference ${(ap-ex).toFixed(3)}. The lecture's 65 combo example differs by 0.02.`);
   const dr=COST*0.005*T0;
-  $('rhoSay').textContent=`TSLA 不派息，350 conversion 只剩利率风险。建仓后利率如果从 4.3% 升到 4.8%，借来的 ${f2(COST)} 32 天多付 ${f2(COST)} × 0.5% × 32/365 ＝ ${dr.toFixed(2)}，一张 ${f2(dr*100)} 美元。delta、gamma、vega 都是 0，这个盈亏不会被股价抵消。`;
+  $('rhoSay').textContent=L(`TSLA 不派息，350 conversion 只剩利率风险。建仓后利率如果从 4.3% 升到 4.8%，借来的 ${f2(COST)} 32 天多付 ${f2(COST)} × 0.5% × 32/365 ＝ ${dr.toFixed(2)}，一张 ${f2(dr*100)} 美元。delta、gamma、vega 都是 0，这个盈亏不会被股价抵消。`,`TSLA pays no dividend, so the 350 conversion has only interest-rate risk. If rates rise from 4.3% to 4.8% after opening, the ${f2(COST)} borrowed costs ${f2(COST)} × 0.5% × 32/365 = ${dr.toFixed(2)} more over 32 days, $${f2(dr*100)} per contract. Delta, gamma and vega are all 0, so this loss is not offset by the stock price.`);
 }
 
 /* ══════════ 二 · combo 表 ══════════ */
@@ -868,20 +874,20 @@ function renderCombo(){
   }).join('');
   const lowBy=k=>{ const r=CH.rows.find(x=>x[0]===k); return f2((F0-k)/G-((r[1]+r[2])/2-(r[3]+r[4])/2)); };
   const r350=CH.rows.find(x=>x[0]===350), c350=(r350[1]+r350[2])/2-(r350[3]+r350[4])/2;
-  $('comboSay').textContent=`最后两列贴在一起，S − X 那一列差得远。350 这一行，C − P 是 ${f2(c350)}，按现价算的内在价值只有 ${f2(S0-350)}，多出的 ${f2(c350-(S0-350))} 差不多就是 350 美元晚付 32 天省下的利息 350 × 4.3% × 32/365 ＝ ${f2(350*R*T0)}。370、400 两行 C − P 比折回今天的值分别低 ${lowBy(370)} 和 ${lowBy(400)}，第四节解释。`;
+  $('comboSay').textContent=L(`最后两列贴在一起，S − X 那一列差得远。350 这一行，C − P 是 ${f2(c350)}，按现价算的内在价值只有 ${f2(S0-350)}，多出的 ${f2(c350-(S0-350))} 差不多就是 350 美元晚付 32 天省下的利息 350 × 4.3% × 32/365 ＝ ${f2(350*R*T0)}。370、400 两行 C − P 比折回今天的值分别低 ${lowBy(370)} 和 ${lowBy(400)}，第四节解释。`,`The last two columns sit close together; the S − X column is far off. In the 350 row, C − P is ${f2(c350)} while the intrinsic value at the current price is only ${f2(S0-350)}; the extra ${f2(c350-(S0-350))} is about the interest saved by paying the $350 32 days later, 350 × 4.3% × 32/365 = ${f2(350*R*T0)}. In the 370 and 400 rows, C − P is below the discounted value by ${lowBy(370)} and ${lowBy(400)}; section 4 explains why.`);
 }
 
 /* ══════════ 三 · 盖住一个 ══════════ */
 function renderFour(){
   const pvx=K0/G;
   const rows=[
-    ['股价 S','C − P ＋ X ÷ (1 ＋ r·t)',CM-PM+pvx,'352.36'],
-    ['put P','C − S ＋ X ÷ (1 ＋ r·t)',CM-S0+pvx,'17.35 / 17.45'],
-    ['call C','S − X ÷ (1 ＋ r·t) ＋ P',S0-pvx+PM,'21.00 / 21.10'],
-    ['行权价 X','(S − C ＋ P)(1 ＋ r·t)',COST*G,'350']
+    [L('股价 S','Stock price S'),L('C − P ＋ X ÷ (1 ＋ r·t)','C − P + X ÷ (1 + r·t)'),CM-PM+pvx,'352.36'],
+    ['put P',L('C − S ＋ X ÷ (1 ＋ r·t)','C − S + X ÷ (1 + r·t)'),CM-S0+pvx,'17.35 / 17.45'],
+    ['call C',L('S − X ÷ (1 ＋ r·t) ＋ P','S − X ÷ (1 + r·t) + P'),S0-pvx+PM,'21.00 / 21.10'],
+    [L('行权价 X','Strike X'),L('(S − C ＋ P)(1 ＋ r·t)','(S − C + P)(1 + r·t)'),COST*G,'350']
   ];
   $('fourTb').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td class="txt">${r[1]}</td><td><b>${f2(r[2])}</b></td><td>${r[3]}</td></tr>`).join('');
-  $('fourSay').textContent=`X ÷ (1 ＋ r·t) ＝ 350 ÷ ${G.toFixed(4)} ＝ ${f2(pvx)}。四个都算回到屏幕上的数附近：股价差 ${f2(S0-(CM-PM+pvx))}，call 和 put 算出来都落在买一和卖一之间。一张期权报价表自己就带着股价和利率的信息。`;
+  $('fourSay').textContent=L(`X ÷ (1 ＋ r·t) ＝ 350 ÷ ${G.toFixed(4)} ＝ ${f2(pvx)}。四个都算回到屏幕上的数附近：股价差 ${f2(S0-(CM-PM+pvx))}，call 和 put 算出来都落在买一和卖一之间。一张期权报价表自己就带着股价和利率的信息。`,`X ÷ (1 + r·t) = 350 ÷ ${G.toFixed(4)} = ${f2(pvx)}. All four come back close to the numbers on screen: the stock price is off by ${f2(S0-(CM-PM+pvx))}, and the computed call and put both fall between their bids and asks. An option quote table carries the stock price and interest rate inside it.`);
 }
 
 /* ══════════ 三 · 求解器 ══════════ */
@@ -903,18 +909,18 @@ function svRun(){
   const t=d/365, gg=1+r*t, w=SV.what;
   ['svC','svP','svS','svX'].forEach(id=>$(id).classList.remove('out'));
   let ex, ap, name;
-  if(w==='S'){ ex=C-P+X/gg+D/gg; ap=C-P+X-X*r*t+D; name='股价'; }
+  if(w==='S'){ ex=C-P+X/gg+D/gg; ap=C-P+X-X*r*t+D; name=L('股价','Stock price'); }
   if(w==='C'){ ex=S-D/gg-X/gg+P; ap=S-X+X*r*t-D+P; name='call'; }
   if(w==='P'){ ex=C-S+D/gg+X/gg; ap=C-S+X-X*r*t+D; name='put'; }
-  if(w==='X'){ ex=(S-D/gg-(C-P))*gg; ap=NaN; name='行权价'; }
+  if(w==='X'){ ex=(S-D/gg-(C-P))*gg; ap=NaN; name=L('行权价','Strike'); }
   const id={S:'svS',C:'svC',P:'svP',X:'svX'}[w];
-  if(!isFinite(ex)){ $('svSay').textContent='缺数，算不出来。'; return; }
+  if(!isFinite(ex)){ $('svSay').textContent=L('缺数，算不出来。','Missing inputs; can\'t compute.'); return; }
   $(id).value=f2(ex); $(id).classList.add('out');
-  let say=`${name}：精确式 <b>${f2(ex)}</b>`+(isFinite(ap)?`，近似式 ${f2(ap)}`:'')+`。1 ＋ r·t ＝ ${gg.toFixed(4)}。`;
-  if(D) say+=` 这里的精确式按第 ⑤ 步把分红也折回今天，用 D ÷ (1 ＋ r·t)。`;
-  if(SV.preset==='tsla') say+=' 屏幕上的股价是 352.36。';
-  if(SV.preset==='lecG') say+=' 讲义用近似式得 3.33，比直接按卖一 3.40 买 call 便宜。';
-  if(SV.preset==='lecD') say+=` 屏幕上的股价是 131.25，比算出的低 ${f2(ap-131.25)}。讲义的解释：市场认的分红只有 0.88 − 0.35 ＝ 0.53。`;
+  let say=L(`${name}：精确式 <b>${f2(ex)}</b>`,`${name}: exact <b>${f2(ex)}</b>`)+(isFinite(ap)?L(`，近似式 ${f2(ap)}`,`, approximation ${f2(ap)}`):'')+L(`。1 ＋ r·t ＝ ${gg.toFixed(4)}。`,`. 1 + r·t = ${gg.toFixed(4)}.`);
+  if(D) say+=L(` 这里的精确式按第 ⑤ 步把分红也折回今天，用 D ÷ (1 ＋ r·t)。`,` The exact formula here also discounts the dividend to today, per step ⑤, using D ÷ (1 + r·t).`);
+  if(SV.preset==='tsla') say+=L(' 屏幕上的股价是 352.36。',' The stock price on screen is 352.36.');
+  if(SV.preset==='lecG') say+=L(' 讲义用近似式得 3.33，比直接按卖一 3.40 买 call 便宜。',' The lecture\'s approximation gives 3.33, cheaper than buying the call directly at the 3.40 ask.');
+  if(SV.preset==='lecD') say+=L(` 屏幕上的股价是 131.25，比算出的低 ${f2(ap-131.25)}。讲义的解释：市场认的分红只有 0.88 − 0.35 ＝ 0.53。`,` The stock price on screen is 131.25, ${f2(ap-131.25)} below the computed value. The lecture's explanation: the dividend the market assumes is only 0.88 − 0.35 = 0.53.`);
   $('svSay').innerHTML=say;
 }
 segOn('svWhat',d=>{ SV.what=d.w; SV.preset=null; svRun(); });
@@ -940,12 +946,12 @@ document.querySelectorAll('.presets button[data-p]').forEach(b=>b.addEventListen
     EXF.forEach((r,i)=>{ const el=$('xf'+i); if(el.value===''){ el.className='cell'; return; }
       filled++; const d=+el.value-ans(r);
       if(Math.abs(d)<=0.005){ el.className='cell ok'; ok++; }
-      else { el.className='cell no'; wrong.push(`第 ${i+1} 行差 ${sgn(d)}`); } });
-    $('exFMsg').textContent= filled? `对了 ${ok} / ${filled}`+(wrong.length?'；'+wrong.join('，'):'') : '';
+      else { el.className='cell no'; wrong.push(L(`第 ${i+1} 行差 ${sgn(d)}`,`Row ${i+1} off by ${sgn(d)}`)); } });
+    $('exFMsg').textContent= filled? L(`对了 ${ok} / ${filled}`,`${ok} / ${filled} correct`)+(wrong.length?L('；',';')+wrong.join(L('，',',')):'') : '';
   });
   $('exFGive').addEventListener('click',()=>{
     EXF.forEach((r,i)=>{ $('xf'+i).value=f2(ans(r)); $('xf'+i).className='cell ok'; });
-    $('exFMsg').textContent='第 4、8、12 行求的是行权价：S − C ＋ P。';
+    $('exFMsg').textContent=L('第 4、8、12 行求的是行权价：S − C ＋ P。','Rows 4, 8 and 12 solve for the strike: S − C + P.');
   });
 })();
 
@@ -954,13 +960,13 @@ function renderExec(){
   const row=k=>CH.rows.find(x=>x[0]===k), pv=k=>k/G;
   const out=[];
   [250,350,400].forEach(k=>{ const r=row(k), syn=S0+r[4]-pv(k);
-    out.push([`买 ${k} call`,r[2],syn,`买股票 ＋ 按卖一 ${f2(r[4])} 买 ${k} put`,r[2]-syn]); });
+    out.push([L(`买 ${k} call`,`Buy ${k} call`),r[2],syn,L(`买股票 ＋ 按卖一 ${f2(r[4])} 买 ${k} put`,`Buy stock + buy ${k} put at the ${f2(r[4])} ask`),r[2]-syn]); });
   const r=row(350);
-  out.push(['买股票',S0,r[2]-r[3]+pv(350),`按卖一 ${f2(r[2])} 买 350 call ＋ 按买一 ${f2(r[3])} 卖 350 put`,S0-(r[2]-r[3]+pv(350))]);
-  out.push(['卖股票',S0,r[1]-r[4]+pv(350),`按买一 ${f2(r[1])} 卖 350 call ＋ 按卖一 ${f2(r[4])} 买 350 put`,(r[1]-r[4]+pv(350))-S0]);
+  out.push([L('买股票','Buy stock'),S0,r[2]-r[3]+pv(350),L(`按卖一 ${f2(r[2])} 买 350 call ＋ 按买一 ${f2(r[3])} 卖 350 put`,`Buy 350 call at the ${f2(r[2])} ask + sell 350 put at the ${f2(r[3])} bid`),S0-(r[2]-r[3]+pv(350))]);
+  out.push([L('卖股票','Sell stock'),S0,r[1]-r[4]+pv(350),L(`按买一 ${f2(r[1])} 卖 350 call ＋ 按卖一 ${f2(r[4])} 买 350 put`,`Sell 350 call at the ${f2(r[1])} bid + buy 350 put at the ${f2(r[4])} ask`),(r[1]-r[4]+pv(350))-S0]);
   $('execTb').innerHTML=out.map(o=>`<tr><td>${o[0]}</td><td>${f2(o[1])}</td><td class="${o[4]>0?'pos':''}">${f2(o[2])}</td><td class="txt">${o[3]}</td></tr>`).join('');
   const a=out[0];
-  $('execSay').textContent=`只有第一行合成更好：买 250 call 直接付 ${f2(a[1])}，合成只要 ${f2(a[2])}，一股省 ${f2(a[4])}，一张约 ${(a[4]*100).toFixed(0)} 美元。深度实值的 250 call 买卖价差有 ${f2(row(250)[2]-row(250)[1])}，对应的 250 put 只有 ${f2(row(250)[4]-row(250)[3])}，合成绕开了宽的那一边。350 附近两边价差都只有 0.10，直接交易更便宜；400 call 合成要多付 ${f2(-out[2][4])}，因为 400 put 的价差有 ${f2(row(400)[4]-row(400)[3])}。`;
+  $('execSay').textContent=L(`只有第一行合成更好：买 250 call 直接付 ${f2(a[1])}，合成只要 ${f2(a[2])}，一股省 ${f2(a[4])}，一张约 ${(a[4]*100).toFixed(0)} 美元。深度实值的 250 call 买卖价差有 ${f2(row(250)[2]-row(250)[1])}，对应的 250 put 只有 ${f2(row(250)[4]-row(250)[3])}，合成绕开了宽的那一边。350 附近两边价差都只有 0.10，直接交易更便宜；400 call 合成要多付 ${f2(-out[2][4])}，因为 400 put 的价差有 ${f2(row(400)[4]-row(400)[3])}。`,`Only the first row is better synthetic: buying the 250 call directly costs ${f2(a[1])}, synthetically only ${f2(a[2])}, saving ${f2(a[4])} per share, about $${(a[4]*100).toFixed(0)} per contract. The deep-in-the-money 250 call has a bid-ask spread of ${f2(row(250)[2]-row(250)[1])}, while the matching 250 put has only ${f2(row(250)[4]-row(250)[3])}; the synthetic route avoids the wide side. Near 350 both spreads are only 0.10, and trading directly is cheaper; the synthetic 400 call costs ${f2(-out[2][4])} more because the 400 put's spread is ${f2(row(400)[4]-row(400)[3])}.`);
 }
 
 /* ══════════ 四 · 全链扫描 ══════════ */
@@ -974,15 +980,15 @@ const SCAN=(()=>{
   function draw(){
     L=FK>1?62:56; T=20+16*FK; B=T+284; const H=B+26+26*FK; setVB('scan',W,H);
     const p=st.prog, shown=Math.floor(p+1e-9);
-    let g=lab(L,T-10-6*FK,'combo 价格 − parity 价值，每股','var(--ink-soft)','start',12.5);
+    let g=lab(L,T-10-6*FK,window.L('combo 价格 − parity 价值，每股','Combo price − parity value, per share'),'var(--ink-soft)','start',12.5);
     for(let v=-1.5; v<=1.51; v+=0.5){
       g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${Math.abs(v)<1e-9?1.6:.7}"/>`;
       g+=lab(L-8,Y(v)+4,Math.abs(v)<1e-9?'0':fm(v,1),'var(--ink-faint)','end',12);
     }
     rows.forEach((r,i)=>{ if(r.k%50===0) g+=lab(X(i),B+14+6*FK,r.k,'var(--ink-faint)','middle',12); });
-    g+=lab((L+R2)/2,H-6,'行权价','var(--ink-soft)','middle',12.5);
-    g+=lab(R2,Y(1.35),'整根在上方：conversion 赚','var(--ink-faint)','end',12);
-    g+=lab(L+4,Y(-1.62),'整根在下方：reversal 赚','var(--ink-faint)','start',12);
+    g+=lab((L+R2)/2,H-6,window.L('行权价','Strike'),'var(--ink-soft)','middle',12.5);
+    g+=lab(R2,Y(1.35),window.L('整根在上方：conversion 赚','Whole bar above: conversion profits'),'var(--ink-faint)','end',12);
+    g+=lab(L+4,Y(-1.62),window.L('整根在下方：reversal 赚','Whole bar below: reversal profits'),'var(--ink-faint)','start',12);
     // 模型：提前行权价值（取负），只画已扫过的
     const pts=[]; rows.forEach((r,i)=>{ if(i<shown) pts.push(X(i).toFixed(1)+','+Y(-r.prem).toFixed(1)); });
     if(pts.length>1) g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--result)" stroke-width="2" stroke-dasharray="5 4"/>`;
@@ -997,18 +1003,18 @@ const SCAN=(()=>{
     if(p>=n){
       const i450=rows.findIndex(r=>r.k===450);
       const ia=rows.findIndex(r=>r.k===300);
-      g+=lab(X(ia),Y(-1.08),'450：reversal 表面 '+sgn(-rows[i450].hi),'var(--control)','start',12.5,600);
-      g+=lab(X(ia),Y(-1.08)+4+15*FK,'450 put 提前行权价值 '+f2(rows[i450].prem),'var(--result)','start',12.5,600);
-      g+=lab(X(rows.findIndex(r=>r.k===300)),Y(1.05),'← 250 到 295：深度实值 call 买卖价差宽','var(--ink-soft)','start',12);
+      g+=lab(X(ia),Y(-1.08),window.L('450：reversal 表面 ','450: reversal apparent')+sgn(-rows[i450].hi),'var(--control)','start',12.5,600);
+      g+=lab(X(ia),Y(-1.08)+4+15*FK,window.L('450 put 提前行权价值 ','450 put early-exercise value')+f2(rows[i450].prem),'var(--result)','start',12.5,600);
+      g+=lab(X(rows.findIndex(r=>r.k===300)),Y(1.05),window.L('← 250 到 295：深度实值 call 买卖价差宽','← 250–295: wide bid-ask spreads'),'var(--ink-soft)','start',12);
     }
     $('scan').innerHTML=g;
     const sh=rows.slice(0,shown), nc=sh.filter(r=>r.lo>0.0005).length, rv=sh.filter(r=>r.hi<-0.0005);
     $('scK').textContent= shown? rows[shown-1].k : '';
-    $('scKb').textContent=`${shown} / ${n} 个行权价`;
+    $('scKb').textContent=window.L(`${shown} / ${n} 个行权价`,`${shown} / ${n} strikes`);
     $('scC').textContent=nc; $('scR').textContent=rv.length;
-    $('scRb').textContent= rv.length? '最多 '+f2(Math.max(...rv.map(r=>-r.hi))) : '个行权价';
+    $('scRb').textContent= rv.length? window.L('最多 ','Max')+f2(Math.max(...rv.map(r=>-r.hi))) : window.L('个行权价','strikes');
     $('scSay').textContent= p>=n
-      ? `41 个行权价里，没有一个能做 conversion 赚钱。250 到 365 的竖条都跨过 0，250 到 295 那几根特别长，是深度实值 call 的买卖价差宽（0.95 到 2.85）。从 375 往上有 ${rv.length} 个行权价，竖条整根掉到 0 下方，按报价做 reversal 表面上能赚，450 最多，0.58。这些竖条越往右越低，贴着蓝色虚线走。`
+      ? window.L(`41 个行权价里，没有一个能做 conversion 赚钱。250 到 365 的竖条都跨过 0，250 到 295 那几根特别长，是深度实值 call 的买卖价差宽（0.95 到 2.85）。从 375 往上有 ${rv.length} 个行权价，竖条整根掉到 0 下方，按报价做 reversal 表面上能赚，450 最多，0.58。这些竖条越往右越低，贴着蓝色虚线走。`,`Of the 41 strikes, not one allows a profitable conversion. The bars from 250 to 365 all cross 0, and the ones from 250 to 295 are especially long because deep-in-the-money calls have wide bid-ask spreads (0.95 to 2.85). From 375 up there are ${rv.length} strikes whose whole bar drops below 0: at the quotes, a reversal appears to make money, most at 450, 0.58. These bars get lower toward the right, tracking the blue dashed line.`)
       : '';
   }
   function start(){
@@ -1021,7 +1027,7 @@ const SCAN=(()=>{
     return `<tr${rv>0.0005?' class="hot"':''}><td>${k}</td><td>${fm(r.lo,3)}</td><td class="${rv>0.0005?'neg':''}">${fm(rv,3)}</td><td>${r.prem.toFixed(3)}</td></tr>`; }).join('');
   const rv=rows.filter(r=>r.hi<-0.0005), r450=rows.find(r=>r.k===450);
   const c450=CH.rows.find(r=>r[0]===450), recv=S0-c450[2]+c450[3];
-  $('amSay').textContent=`提前行权对 reversal 意味着什么：put 被行权，你按 450 买进股票，平掉卖空的股票，手里只剩那张 450 call。原本 5/15 才付的 450 提前付了，这 450 美元 32 天的利息 450 × 4.3% × 32/365 ＝ ${f2(450*R*T0)} 就拿不到；那张 call 还值一点钱，所以实际少赚的比 ${f2(450*R*T0)} 小。按 4/13 的报价算：建仓收到 ${f2(S0)} − ${f2(c450[2])} ＋ ${f2(c450[3])} ＝ ${f2(recv)}，当场被行权就付出 450，剩 ${fm(recv-450)}；再按买一 ${f2(c450[1])} 卖掉那张 call，合计 ${fm(recv-450+c450[1])}，比计划的 ${sgn(-r450.hi)} 少 ${f2(-r450.hi-(recv-450+c450[1]))}。模型算出 450 put 提前行权这项权利值 ${f2(r450.prem)}，比表面利润 ${f2(-r450.hi)} 大。表面有利润的 ${rv.length} 个行权价，每一个都是这样：利润小于提前行权的价值。put 的报价按美式定价，parity 按欧式推，差的就是这一块。`;
+  $('amSay').textContent=window.L(`提前行权对 reversal 意味着什么：put 被行权，你按 450 买进股票，平掉卖空的股票，手里只剩那张 450 call。原本 5/15 才付的 450 提前付了，这 450 美元 32 天的利息 450 × 4.3% × 32/365 ＝ ${f2(450*R*T0)} 就拿不到；那张 call 还值一点钱，所以实际少赚的比 ${f2(450*R*T0)} 小。按 4/13 的报价算：建仓收到 ${f2(S0)} − ${f2(c450[2])} ＋ ${f2(c450[3])} ＝ ${f2(recv)}，当场被行权就付出 450，剩 ${fm(recv-450)}；再按买一 ${f2(c450[1])} 卖掉那张 call，合计 ${fm(recv-450+c450[1])}，比计划的 ${sgn(-r450.hi)} 少 ${f2(-r450.hi-(recv-450+c450[1]))}。模型算出 450 put 提前行权这项权利值 ${f2(r450.prem)}，比表面利润 ${f2(-r450.hi)} 大。表面有利润的 ${rv.length} 个行权价，每一个都是这样：利润小于提前行权的价值。put 的报价按美式定价，parity 按欧式推，差的就是这一块。`,`What early exercise means for a reversal: the put is exercised, you buy stock at 450, closing out the short stock, and you are left with just the 450 call. The 450 that was due on 5/15 is paid early, so the interest on that $450 for 32 days, 450 × 4.3% × 32/365 = ${f2(450*R*T0)}, is lost; the call is still worth a little, so the actual shortfall is less than ${f2(450*R*T0)}. At 4/13 quotes: opening receives ${f2(S0)} − ${f2(c450[2])} + ${f2(c450[3])} = ${f2(recv)}; exercised on the spot, you pay 450, leaving ${fm(recv-450)}; then selling the call at the ${f2(c450[1])} bid gives a total of ${fm(recv-450+c450[1])}, ${f2(-r450.hi-(recv-450+c450[1]))} less than the planned ${sgn(-r450.hi)}. The model values the early-exercise right on the 450 put at ${f2(r450.prem)}, more than the apparent profit of ${f2(-r450.hi)}. Each of the ${rv.length} strikes with an apparent profit is the same: the profit is smaller than the early-exercise value. Put quotes are priced as American while parity is derived for European options, and the gap is exactly this piece.`);
   return {start,draw,el:$('scan')};
 })();
 
@@ -1049,16 +1055,16 @@ const PINR=(()=>{
     [[420,'var(--ink-faint)'],[425,'var(--ink-faint)'],[422.5,'var(--control)']].forEach(([k,c])=>{
       g+=`<line x1="${L}" y1="${Y(k)}" x2="${XM+20}" y2="${Y(k)}" stroke="${c}" stroke-width="${k===K?1.8:1.2}" stroke-dasharray="6 4"/>`;
     });
-    g+=lab(L+4,Y(422.5)-6,'行权价 422.5','var(--control)','start',12,600);
+    g+=lab(L+4,Y(422.5)-6,window.L('行权价 422.5','Strike 422.5'),'var(--control)','start',12,600);
     g+=lab(XR1-6,Y(425)-6,'425','var(--ink-faint)','end',12);
     g+=lab(XA1-4,Y(420)+4+12*FK,'420','var(--ink-faint)','end',12);
     [[0,'15:00'],[30,'15:30'],[60,'16:00'],[90,'16:30'],[120,'17:00'],[150,'17:30']].forEach(([mm,t])=>{
       g+=`<line x1="${X(mm)}" y1="${B}" x2="${X(mm)}" y2="${B+5}" stroke="var(--ink-faint)"/>`;
       if(FK===1 || mm<=60 || mm===150) g+=lab(X(mm),r1,t,'var(--ink-faint)','middle',12);   // 手机上盘后只标 16:00 与 17:30
     });
-    g+=lab((XR0+XR1)/2,r2,'正常交易时段','var(--ink-soft)','middle',12);
-    g+=lab((XR1+XA1)/2,r2,'收盘后','var(--ink-soft)','middle',12);
-    g+=lab(XM,r1,'周一','var(--ink-faint)','middle',12);
+    g+=lab((XR0+XR1)/2,r2,window.L('正常交易时段','Regular session'),'var(--ink-soft)','middle',12);
+    g+=lab((XR1+XA1)/2,r2,window.L('收盘后','After the close'),'var(--ink-soft)','middle',12);
+    g+=lab(XM,r1,window.L('周一','Monday'),'var(--ink-faint)','middle',12);
     g+=lab(XM,r2,'09:30','var(--ink-soft)','middle',12);
     g+=`<line x1="${XA1+14}" y1="${T}" x2="${XA1+14}" y2="${B}" stroke="var(--rule)" stroke-dasharray="2 3"/>`;
     // 价格线
@@ -1070,7 +1076,7 @@ const PINR=(()=>{
     if(pa.length>1) g+=`<polyline points="${pa.join(' ')}" fill="none" stroke="var(--ink-faint)" stroke-width="2"/>`;
     const cur=priceAt(m);
     g+=`<circle cx="${X(m)}" cy="${Y(cur)}" r="4.5" fill="${Math.abs(cur-K)<0.5?'var(--control)':'var(--ink)'}"/>`;
-    if(m>=60) g+=lab(X(60)+6,Y(last[60])-6-4*FK,'收盘 422.32','var(--ink)','start',12.5,600);
+    if(m>=60) g+=lab(X(60)+6,Y(last[60])-6-4*FK,window.L('收盘 422.32','Close 422.32'),'var(--ink)','start',12.5,600);
     if(p>N){
       g+=`<circle cx="${XM}" cy="${Y(PIN.mon)}" r="5" fill="var(--control)"/>`;
       g+=lab(FK>1?W-2:XM,Y(PIN.mon)-11,f2(PIN.mon),'var(--control)',FK>1?'end':'middle',12.5,600);
@@ -1078,22 +1084,22 @@ const PINR=(()=>{
     $('pin').innerHTML=g;
     // 读数
     const isMon=p>N;
-    $('pnT').textContent= isMon?'周一 09:30':hm(m);
-    $('pnTb').textContent= isMon?'5/18 开盘' : m<60?'正常交易时段':m===60?'收盘':'收盘后';
+    $('pnT').textContent= isMon?window.L('周一 09:30','Monday 09:30'):hm(m);
+    $('pnTb').textContent= isMon?window.L('5/18 开盘','5/18 open') : m<60?window.L('正常交易时段','Regular session'):m===60?window.L('收盘','Close'):window.L('收盘后','After the close');
     const px=isMon?PIN.mon:cur;
-    $('pnS').textContent=f2(px); $('pnSb').textContent=`离 422.5 ${sgn(px-K)}`;
-    if(!isMon && m<=60){ $('pnO').textContent=`${f2(PIN.optc[m])} / ${f2(PIN.optp[m])}`; $('pnOb').textContent=m===60?'16:00 快照':'分钟报价快照'; }
-    else { $('pnO').textContent='停止交易'; $('pnOb').textContent='股票期权 16:00 收盘'; }
+    $('pnS').textContent=f2(px); $('pnSb').textContent=window.L(`离 422.5 ${sgn(px-K)}`,`${sgn(px-K)} from 422.5`);
+    if(!isMon && m<=60){ $('pnO').textContent=`${f2(PIN.optc[m])} / ${f2(PIN.optp[m])}`; $('pnOb').textContent=m===60?window.L('16:00 快照','16:00 snapshot'):window.L('分钟报价快照','Minute quote snapshot'); }
+    else { $('pnO').textContent=window.L('停止交易','Trading halted'); $('pnOb').textContent=window.L('股票期权 16:00 收盘','Stock options close at 16:00'); }
     $('pnX').textContent=crosses(m);
     const d=$('pnDo');
     if(isMon){
-      d.textContent=`周一开盘 ${f2(PIN.mon)}，比周五收盘低 ${f2(PIN.settle-PIN.mon)}。如果周末意外拿着 100 股，一张亏 ${((PIN.settle-PIN.mon)*100).toFixed(0)} 美元。`;
+      d.textContent=window.L(`周一开盘 ${f2(PIN.mon)}，比周五收盘低 ${f2(PIN.settle-PIN.mon)}。如果周末意外拿着 100 股，一张亏 ${((PIN.settle-PIN.mon)*100).toFixed(0)} 美元。`,`Monday opens at ${f2(PIN.mon)}, ${f2(PIN.settle-PIN.mon)} below Friday's close. Holding 100 shares over the weekend by accident loses $${((PIN.settle-PIN.mon)*100).toFixed(0)} per contract.`);
     } else if(m<60){
       d.textContent= cur<K
-        ? `此刻若收盘：put 实值 ${f2(K-cur)}，行权 put，按 422.5 卖出股票；call 虚值，不会被自动行权。`
-        : `此刻若收盘：call 实值 ${f2(cur-K)}，会被自动行权，股票按 422.5 被交走；put 作废，不该行权。`;
+        ? window.L(`此刻若收盘：put 实值 ${f2(K-cur)}，行权 put，按 422.5 卖出股票；call 虚值，不会被自动行权。`,`If it closed now: the put is ${f2(K-cur)} in the money, so exercise the put and sell the stock at 422.5; the call is out of the money and won't be exercised automatically.`)
+        : window.L(`此刻若收盘：call 实值 ${f2(cur-K)}，会被自动行权，股票按 422.5 被交走；put 作废，不该行权。`,`If it closed now: the call is ${f2(cur-K)} in the money and will be exercised automatically, taking the stock at 422.5; the put expires and should not be exercised.`);
     } else {
-      d.textContent=`收盘价定在 422.32，put 实值 0.18，按规则会自动行权；call 虚值 0.18。可 call 的买方到 17:30 前还能改主意，此刻盘后价格 ${f2(cur)}。`;
+      d.textContent=window.L(`收盘价定在 422.32，put 实值 0.18，按规则会自动行权；call 虚值 0.18。可 call 的买方到 17:30 前还能改主意，此刻盘后价格 ${f2(cur)}。`,`The close is set at 422.32: the put is 0.18 in the money and is exercised automatically under the rules; the call is 0.18 out of the money. But the call buyer can still change their mind until 17:30, and the after-hours price right now is ${f2(cur)}.`);
     }
   }
   function start(){
@@ -1110,20 +1116,20 @@ function renderPin(){
   const hc=i=>ks[i]==='422.5'?' class="nw" style="background:var(--control-bg)"':' class="nw"';
   const row=(name,fn)=>`<tr><td>${name}</td>${ks.map((k,i)=>`<td${hc(i)}>${fn(k,+k)}</td>`).join('')}</tr>`;
   const ba=(b,a)=>`${f2(b)} / ${f2(a)}`;
-  $('oiTb').innerHTML=`<thead><tr><th>行权价</th>${ks.map((k,i)=>`<th${hc(i)}>${+k===422.5?'422.5':(+k).toFixed(0)}</th>`).join('')}</tr></thead><tbody>`+
-    row('收盘时',(k,kk)=>kk<S?`call 实值 ${f2(S-kk)}`:`put 实值 ${f2(kk-S)}`)+
-    row('未平仓 call',k=>q[k].coi.toLocaleString('en-US'))+
-    row('未平仓 put',k=>q[k].poi.toLocaleString('en-US'))+
+  $('oiTb').innerHTML=L(`<thead><tr><th>行权价</th>${ks.map((k,i)=>`<th${hc(i)}>${+k===422.5?'422.5':(+k).toFixed(0)}</th>`).join('')}</tr></thead><tbody>`,`<thead><tr><th>Strike</th>${ks.map((k,i)=>`<th${hc(i)}>${+k===422.5?'422.5':(+k).toFixed(0)}</th>`).join('')}</tr></thead><tbody>`)+
+    row(L('收盘时','At the close'),(k,kk)=>kk<S?L(`call 实值 ${f2(S-kk)}`,`Call ${f2(S-kk)} in the money`):L(`put 实值 ${f2(kk-S)}`,`Put ${f2(kk-S)} in the money`))+
+    row(L('未平仓 call','Call open interest'),k=>q[k].coi.toLocaleString('en-US'))+
+    row(L('未平仓 put','Put open interest'),k=>q[k].poi.toLocaleString('en-US'))+
     row('15:59 call',k=>ba(q[k].cb,q[k].ca))+
     row('15:59 put',k=>ba(q[k].pb,q[k].pa))+
     row('16:00 call',k=>ba(q6[k].cb,q6[k].ca))+
     row('16:00 put',k=>ba(q6[k].pb,q6[k].pa))+'</tbody>';
   const last=PIN.last; let above=0; for(let i=0;i<60;i++) if(last[i]>422.5) above++;
-  $('pinSay').textContent=`15:00 TSLA 还在 ${f2(last[0])}，在 425 上方；15:08 起跌到 425 下方就没再回去。最后一小时有 ${above} 分钟在 422.5 上方，可最后 5 分钟按分钟收盘穿过 422.5 三次（15:55、15:57、15:58），收在 422.32，比 422.5 低 0.18。持有 422.5 conversion 的人，最后 5 分钟里「该不该行权 put」的答案换了三次。收盘后 TSLA 继续往下，${PIN.ahmint} 到过 ${f2(PIN.ahmin)}，离 420 只剩 ${f2(PIN.ahmin-420)}；周一开盘 ${f2(PIN.mon)}。`;
+  $('pinSay').textContent=L(`15:00 TSLA 还在 ${f2(last[0])}，在 425 上方；15:08 起跌到 425 下方就没再回去。最后一小时有 ${above} 分钟在 422.5 上方，可最后 5 分钟按分钟收盘穿过 422.5 三次（15:55、15:57、15:58），收在 422.32，比 422.5 低 0.18。持有 422.5 conversion 的人，最后 5 分钟里「该不该行权 put」的答案换了三次。收盘后 TSLA 继续往下，${PIN.ahmint} 到过 ${f2(PIN.ahmin)}，离 420 只剩 ${f2(PIN.ahmin-420)}；周一开盘 ${f2(PIN.mon)}。`,`At 15:00 TSLA was still at ${f2(last[0])}, above 425; from 15:08 it fell below 425 and never went back. In the last hour it spent ${above} minutes above 422.5, yet in the last 5 minutes the minute closes crossed 422.5 three times (15:55, 15:57, 15:58), and it closed at 422.32, 0.18 below 422.5. For someone holding the 422.5 conversion, the answer to "should I exercise the put" changed three times in the last 5 minutes. After the close TSLA kept falling, reaching ${f2(PIN.ahmin)} at ${PIN.ahmint}, only ${f2(PIN.ahmin-420)} above 420; Monday opened at ${f2(PIN.mon)}.`);
   const k6=q6['422.5'], k9=q['422.5'], pm6=(k6.pb+k6.pa)/2;
-  $('pinCost').textContent=`市场给这份不确定定了价。16:00 收盘那一刻，正常交易已经结束，股价定在 422.32。422.5 call 按这个价一分钱内在价值都没有，买一还有 ${f2(k6.cb)}；put 内在价值 0.18，买一 ${f2(k6.pb)}，中间价 ${f2(pm6)} 比内在价值多约 ${f2(pm6-(422.5-S))}。同一刻 420 call 的买一 ${f2(q6['420.0'].cb)}、425 put 的买一 ${f2(q6['425.0'].pb)}，都不高于各自的内在价值 ${f2(S-420)}、${f2(425-S)}。422.5 多出来的这些钱，买的是收盘后那一个半小时：对手还能改主意，股价还在动。持有 conversion 的人可以在收盘前付掉它：15:59 按卖一 ${f2(k9.ca)} 买回空头 call，一张 ${(k9.ca*100).toFixed(0)} 美元，就不用赌周末。`;
+  $('pinCost').textContent=L(`市场给这份不确定定了价。16:00 收盘那一刻，正常交易已经结束，股价定在 422.32。422.5 call 按这个价一分钱内在价值都没有，买一还有 ${f2(k6.cb)}；put 内在价值 0.18，买一 ${f2(k6.pb)}，中间价 ${f2(pm6)} 比内在价值多约 ${f2(pm6-(422.5-S))}。同一刻 420 call 的买一 ${f2(q6['420.0'].cb)}、425 put 的买一 ${f2(q6['425.0'].pb)}，都不高于各自的内在价值 ${f2(S-420)}、${f2(425-S)}。422.5 多出来的这些钱，买的是收盘后那一个半小时：对手还能改主意，股价还在动。持有 conversion 的人可以在收盘前付掉它：15:59 按卖一 ${f2(k9.ca)} 买回空头 call，一张 ${(k9.ca*100).toFixed(0)} 美元，就不用赌周末。`,`The market put a price on this uncertainty. At the moment of the 16:00 close, regular trading had ended and the stock was set at 422.32. At that price the 422.5 call has no intrinsic value at all, yet its bid was still ${f2(k6.cb)}; the put has 0.18 of intrinsic value, a bid of ${f2(k6.pb)}, and a mid of ${f2(pm6)}, about ${f2(pm6-(422.5-S))} above intrinsic value. At the same moment the 420 call's bid was ${f2(q6['420.0'].cb)} and the 425 put's bid ${f2(q6['425.0'].pb)}, neither above its intrinsic value of ${f2(S-420)} and ${f2(425-S)}. The extra money at 422.5 buys the hour and a half after the close: the other side can still change their mind and the stock is still moving. Someone holding the conversion can pay it off before the close: buy back the short call at the ${f2(k9.ca)} ask at 15:59, $${(k9.ca*100).toFixed(0)} per contract, and not gamble on the weekend.`);
   const ahMax=Math.max(...PIN.ah), ahMaxI=PIN.ah.indexOf(ahMax);
-  $('pinEnd').textContent=`这一天实际的结果：收在 422.5 下方，盘后 TSLA 按分钟收盘最高只到 ${f2(ahMax)}（16:${String(ahMaxI).padStart(2,'0')}），再没回到 422.5 上方，call 的买方没有理由行权；put 自动行权，按 422.5 卖出股票，conversion 正好平掉。如果收盘停在 15:57 那样的 ${f2(last[57])}，事情就反过来：put 虚值不会行权，持有人等着 call 被指派；盘后价格跌回 422.5 下方，call 的买方放弃行权，股票留在手里，周末多出 100 股。按这一天的走势，周一开盘 ${f2(PIN.mon)}，比周五收盘 ${f2(S)} 低 ${f2(S-PIN.mon)}，一张亏 ${((S-PIN.mon)*100).toFixed(0)} 美元。`;
+  $('pinEnd').textContent=L(`这一天实际的结果：收在 422.5 下方，盘后 TSLA 按分钟收盘最高只到 ${f2(ahMax)}（16:${String(ahMaxI).padStart(2,'0')}），再没回到 422.5 上方，call 的买方没有理由行权；put 自动行权，按 422.5 卖出股票，conversion 正好平掉。如果收盘停在 15:57 那样的 ${f2(last[57])}，事情就反过来：put 虚值不会行权，持有人等着 call 被指派；盘后价格跌回 422.5 下方，call 的买方放弃行权，股票留在手里，周末多出 100 股。按这一天的走势，周一开盘 ${f2(PIN.mon)}，比周五收盘 ${f2(S)} 低 ${f2(S-PIN.mon)}，一张亏 ${((S-PIN.mon)*100).toFixed(0)} 美元。`,`What actually happened that day: it closed below 422.5, after hours TSLA's minute closes reached at most ${f2(ahMax)} (16:${String(ahMaxI).padStart(2,'0')}) and never got back above 422.5, so the call buyer had no reason to exercise; the put was exercised automatically, the stock was sold at 422.5, and the conversion closed out exactly. Had the close landed at ${f2(last[57])}, as at 15:57, it would have gone the other way: the put is out of the money and not exercised, and the holder waits for the call to be assigned; after hours the price falls back below 422.5, the call buyer gives up on exercising, and the stock stays with you, 100 extra shares over the weekend. Given that day's path, Monday opened at ${f2(PIN.mon)}, ${f2(S-PIN.mon)} below Friday's close of ${f2(S)}, a loss of $${((S-PIN.mon)*100).toFixed(0)} per contract.`);
 }
 
 /* ══════════ 六 · settlement risk ══════════ */
@@ -1136,26 +1142,26 @@ const SETTLE=(()=>{
   function draw(){
     L=FK>1?88:80; R2=FK>1?520:600; T=20+16*FK; B=T+220; const H=B+26+12*FK; setVB('settle',W,H);
     const p=st.prog;
-    let g=lab(L,T-10-6*FK,'累计利息，每单位','var(--ink-soft)','start',12.5);
+    let g=lab(L,T-10-6*FK,window.L('累计利息，每单位','Cumulative interest, per unit'),'var(--ink-soft)','start',12.5);
     [-0.15,-0.1,-0.05,0,0.05,0.1,0.15].forEach(v=>{
       g+=`<line x1="${L}" y1="${Y(v)}" x2="${R2}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v===0?1.4:.6}"/>`;
       g+=lab(L-8,Y(v)+4,v===0?'0':fm(v),'var(--ink-faint)','end',12);
     });
-    [[0,'建仓'],[30,'1 个月'],[61,'2 个月'],[91,'到期']].forEach(([d,t])=>g+=lab(X(d),B+14+6*FK,t,'var(--ink-faint)','middle',12));
+    [[0,window.L('建仓','Open')],[30,window.L('1 个月','1 month')],[61,window.L('2 个月','2 months')],[91,window.L('到期','Expiration')]].forEach(([d,t])=>g+=lab(X(d),B+14+6*FK,t,'var(--ink-faint)','middle',12));
     const up=[], dn=[];
     for(let d=0; d<=p+1e-9; d+=0.5){ up.push(X(d).toFixed(1)+','+Y(intAt(d)).toFixed(1)); dn.push(X(d).toFixed(1)+','+Y(-intAt(d)).toFixed(1)); }
     g+=`<polyline points="${up.join(' ')}" fill="none" stroke="var(--good)" stroke-width="3"/>`;
     g+=`<polyline points="${dn.join(' ')}" fill="none" stroke="var(--control)" stroke-width="3"/>`;
-    g+=lab(X(p)+8,Y(intAt(p))+4,`涨 10 点 ${sgn(intAt(p))}`,'var(--good)','start',12.5,600);
-    g+=lab(X(p)+8,Y(-intAt(p))+4,`跌 10 点 ${fm(-intAt(p))}`,'var(--control)','start',12.5,600);
-    g+=lab(X(4),Y(0.165),'期货涨：保证金账户收进 10 点，存着生息','var(--good)','start',12);
-    g+=lab(X(4),Y(-0.155),'期货跌：付出 10 点，借来的钱要付息','var(--control)','start',12);
+    g+=lab(X(p)+8,Y(intAt(p))+4,window.L(`涨 10 点 ${sgn(intAt(p))}`,`Up 10 ${sgn(intAt(p))}`),'var(--good)','start',12.5,600);
+    g+=lab(X(p)+8,Y(-intAt(p))+4,window.L(`跌 10 点 ${fm(-intAt(p))}`,`Down 10 ${fm(-intAt(p))}`),'var(--control)','start',12.5,600);
+    g+=lab(X(4),Y(0.165),window.L('期货涨：保证金账户收进 10 点，存着生息','Futures up: get 10, earning interest'),'var(--good)','start',12);
+    g+=lab(X(4),Y(-0.155),window.L('期货跌：付出 10 点，借来的钱要付息','Futures down: pay 10, owing interest'),'var(--control)','start',12);
     $('settle').innerHTML=g;
     const mo=p/DAYS*3;
-    $('stD').textContent= p>=DAYS?'3 个月':(mo<1?Math.round(p)+' 天':mo.toFixed(1)+' 个月');
+    $('stD').textContent= p>=DAYS?window.L('3 个月','3 months'):(mo<1?Math.round(p)+window.L(' 天',' days'):mo.toFixed(1)+window.L(' 个月',' months'));
     $('stDn').textContent=fm(-intAt(p),3); $('stUp').textContent=sgn(intAt(p),3);
     $('stSay').textContent= p>=DAYS
-      ? `两种情形里，期权到期时都正好补回期货的 10 点，差别只在利息：跌的一边付 0.15，涨的一边收 0.15。同样幅度的涨跌结果不对称，这个头寸偏向上涨，也就是带正 delta。每 10 点差 0.15，相当于 100 份里 1.5 份的方向头寸。`
+      ? window.L(`两种情形里，期权到期时都正好补回期货的 10 点，差别只在利息：跌的一边付 0.15，涨的一边收 0.15。同样幅度的涨跌结果不对称，这个头寸偏向上涨，也就是带正 delta。每 10 点差 0.15，相当于 100 份里 1.5 份的方向头寸。`,`In both cases the options exactly make up the futures' 10 points at expiration; the only difference is interest: the down case pays 0.15 and the up case receives 0.15. Moves of the same size give unequal results, so the position leans toward a rise, which means it carries positive delta. A difference of 0.15 per 10 points is equivalent to a directional position of 1.5 units out of 100.`)
       : '';
   }
   function start(){
@@ -1165,58 +1171,58 @@ const SETTLE=(()=>{
   }
   $('stPlay').addEventListener('click',start);
   const g6=1+RR*TT;
-  $('stNote').textContent=`沿用讲义例题 B 的利率 6%、3 个月：合成 delta ＝ 100 ÷ 1.015 ＝ ${(100/g6).toFixed(2)}，conversion 合计 100 − ${(100/g6).toFixed(2)} ＝ ${sgn(100-100/g6)}。同样 6%，期限拉到 12 个月是 ${sgn(100-100/1.06)}。`;
+  $('stNote').textContent=window.L(`沿用讲义例题 B 的利率 6%、3 个月：合成 delta ＝ 100 ÷ 1.015 ＝ ${(100/g6).toFixed(2)}，conversion 合计 100 − ${(100/g6).toFixed(2)} ＝ ${sgn(100-100/g6)}。同样 6%，期限拉到 12 个月是 ${sgn(100-100/1.06)}。`,`Using lecture exercise B's 6% rate and 3 months: synthetic delta = 100 ÷ 1.015 = ${(100/g6).toFixed(2)}, and the conversion totals 100 − ${(100/g6).toFixed(2)} = ${sgn(100-100/g6)}. At the same 6% with a 12-month term it is ${sgn(100-100/1.06)}.`);
   return {start,draw,el:$('settle')};
 })();
 
 /* ══════════ 七 · 费曼检验 ══════════ */
 const QS=[
- {q:`不写公式，向一个只买卖股票的人解释 conversion：为什么买股票、卖 350 call、买 350 put 放在一起，到期时不管 TSLA 在哪，股票都正好按 350 卖掉？这笔交易最后赚不赚钱，由什么决定？`,
-  a:['到期在 350 上方，call 被行权，股票按 350 交出去；在下方，自己行权 put，按 350 卖出。两种情况都按 350 卖掉，手里什么都不剩。',
-     '今天付出 352.36 − 21.05 ＋ 17.40 ＝ 348.71，到期收回 350，多 1.29，和 TSLA 涨跌、波动大小都无关。',
-     '但 348.71 要占用 32 天。按 4.3% 算利息 1.31，扣掉后约等于 0。赚不赚只看「今天付出的钱加上利息」是不是少于 X。',
-     '剩下的风险只有利率和分红：利率升了利息多付，分红降了少收。'],
-  s:'「因为 put 和 call 互相对冲了」：没说出为什么结果恰好是 X，也没提利息，看不出它什么时候会赚钱。'},
- {q:`推导 parity 时，为什么卖 call 收到的钱的利息记在贷方，而股票和 put 的利息记在借方？如果 TSLA 这 32 天里派 1 美元分红，C − P 会怎么变？`,
-  a:['卖 call 今天收到钱，可以存到到期生息，是收入。',
-     '买股票、买 put 今天付出钱，这钱要么是借的要付利息，要么本来能存着生息，都是成本。',
-     '分红是拿着股票收到的钱，记在贷方。它让远期价 F ＝ S(1 ＋ r·t) − D 少 1。',
-     'C − P ＝ (F − X) ÷ (1 ＋ r·t)，所以 C − P 下降约 1：call 变便宜、put 变贵。'],
-  s:'「利息都算在借方，因为要借钱」：只有付出的钱才是成本，收到的期权费能生息。'},
- {q:`TSLA 350 的 C − P 是 3.65，按现价算的内在价值 S − X 只有 2.36。差的 1.3 是什么？为什么说 combo 是「内在价值的现值」？`,
-  a:['买 call、卖 put 等于约好到期按 350 买股票，这 350 到期才付。',
-     '和今天直接买股票比，350 晚付 32 天，省下利息约 350 × 4.3% × 32/365 ＝ 1.32，所以合成股票值得多付这么多。',
-     '准确地说，C − P ＝ (F − X) ÷ (1 ＋ r·t)：按远期价算的内在价值，再折回今天。',
-     '期货期权例子里 1250 combo 是 −33.00 而不是 −33.50，差的就是折现。'],
-  s:'「call 比 put 多了时间价值」：同一行权价的 call 和 put 时间价值差不多，差额来自利息。'},
- {q:`已知 TSLA 350 call 21.05、put 17.40、利率 4.3%、32 天。不看股价，怎么知道股价大约多少？如果算出来比屏幕上高 0.35，第一反应应该是什么？`,
-  a:['S ＝ C − P ＋ X ÷ (1 ＋ r·t) ＝ 3.65 ＋ 348.69 ＝ 352.34，屏幕上是 352.36。',
-     '差 0.35 时先怀疑自己的输入，不是市场：利率用低了，或者分红用高了。',
-     '讲义例题就是这样反推出隐含分红：0.88 − 0.35 ＝ 0.53。',
-     '还要查：期权是不是美式、报价是不是同一时刻、股票借不借得到。'],
-  s:'「差了 0.35，赶紧套利」：多数时候是参数没对上。'},
- {q:`4/13 收盘，按报价在 TSLA 450 上做 reversal，表面能赚 0.58。这是白捡的钱吗？为什么 350 附近没有这种现象？`,
-  a:['reversal 卖出 put。TSLA 期权是美式，450 put 深度实值，买方可以今天就行权，拿到 450 美元去生息。',
-     '被提前行权时，reversal 按 450 买进股票、平掉卖空的股票，手里还剩那张 450 call。原本 5/15 才付的 450 提前付了，32 天的利息 450 × 4.3% × 32/365 ＝ 1.70 拿不到；减去那张 call 还值的钱，才是少赚的部分。4/13 当场被行权的话，比计划少 0.69。',
-     '模型算这项提前行权的权利值 0.94，比 0.58 大。0.58 是在补偿这个风险，不是白捡。',
-     '平值附近提前行权的价值很小（350 约 0.08），所以 parity 在那里最准。但不是 0：它让 1.1 反解出的利率偏低约 0.25 个百分点。'],
-  s:'「报价错了，能套」：没看到期权是美式，parity 的等式只对欧式成立。'},
- {q:`5/15 TSLA 收在 422.32，离 422.5 只有 0.18。持有 422.5 conversion 的人收盘后还面对什么不确定？16:00 收盘那一刻，422.5 call 还报 0.28 / 0.34，按收盘价它没有内在价值，这 0.31 是什么的价格？`,
-  a:['put 实值 0.18，自己会行权，按 422.5 卖出股票；按规则 call 虚值，不会被自动行权。',
-     '可 call 的买方到 17:30 前还能改主意，盘后价格还在动。call 被行权加上自己行权 put，股票卖了两次，变成空 100 股；两样都没发生，变成多 100 股。',
-     '要到到期之后才知道自己有没有被指派。周末意外多出 100 股，周一开盘 419.27，一张亏 305 美元。',
-     '0.31 就是收盘后这段不确定的价格：对手还能改主意，股价还在动。实务解法是收盘前买回空头 call，15:59 按卖一 0.39，一张 39 美元。'],
-  s:'「平值期权到期值 0，没有风险」：理论价值是 0，可对手会不会行权不知道，结果是一整份股票头寸。'},
- {q:`为什么在美国交易期货期权，conversion 带正 delta？为什么期限越长、利率越高越明显？股票期权为什么没有这个问题？`,
-  a:['期货每天结算：跌的时候亏损当天就要付现金，钱得借，要付利息；涨的时候收到现金，能生息。',
-     '美国的期货期权按股票型结算，期权上的盈利要到期才兑现，抵不上中间的利息。',
-     '所以同样涨跌 10 点，跌亏利息、涨赚利息，头寸偏向上涨，就是正 delta。合成腿的 delta 是 100 ÷ (1 ＋ r·t)，6%、3 个月时 conversion 合计 ＋1.48。',
-     'r·t 越大，100 ÷ (1 ＋ r·t) 离 100 越远。股票期权里股票本身不逐日结算，合成空头的 delta 正好 −100，合计 0。'],
-  s:'「因为期货期权的 delta 算法不同」：没说出已实现与未实现的差别，也没说利息从哪来。'}
+ {q:L(`不写公式，向一个只买卖股票的人解释 conversion：为什么买股票、卖 350 call、买 350 put 放在一起，到期时不管 TSLA 在哪，股票都正好按 350 卖掉？这笔交易最后赚不赚钱，由什么决定？`,`Without formulas, explain a conversion to someone who only trades stock: why does buying stock, selling a 350 call and buying a 350 put mean that at expiration the stock is sold at exactly 350, wherever TSLA is? What decides whether the trade makes money in the end?`),
+  a:[L('到期在 350 上方，call 被行权，股票按 350 交出去；在下方，自己行权 put，按 350 卖出。两种情况都按 350 卖掉，手里什么都不剩。','Above 350 at expiration, the call is exercised and the stock is delivered at 350; below, you exercise the put and sell at 350. Either way it is sold at 350 and nothing is left.'),
+     L('今天付出 352.36 − 21.05 ＋ 17.40 ＝ 348.71，到期收回 350，多 1.29，和 TSLA 涨跌、波动大小都无关。','You pay 352.36 − 21.05 + 17.40 = 348.71 today and receive 350 at expiration, 1.29 more, regardless of TSLA\'s direction or volatility.'),
+     L('但 348.71 要占用 32 天。按 4.3% 算利息 1.31，扣掉后约等于 0。赚不赚只看「今天付出的钱加上利息」是不是少于 X。','But the 348.71 is tied up for 32 days. Interest at 4.3% is 1.31, and net of that it is about 0. Whether it makes money depends only on whether "the money paid today plus interest" is less than X.'),
+     L('剩下的风险只有利率和分红：利率升了利息多付，分红降了少收。','The only remaining risks are the interest rate and dividends: if rates rise you pay more interest, if the dividend is cut you collect less.')],
+  s:L('「因为 put 和 call 互相对冲了」：没说出为什么结果恰好是 X，也没提利息，看不出它什么时候会赚钱。','"Because the put and call hedge each other": this doesn\'t say why the result is exactly X, and it leaves out interest, so you can\'t tell when it makes money.')},
+ {q:L(`推导 parity 时，为什么卖 call 收到的钱的利息记在贷方，而股票和 put 的利息记在借方？如果 TSLA 这 32 天里派 1 美元分红，C − P 会怎么变？`,`When deriving parity, why is the interest on the money from selling the call recorded as a credit, while the interest on the stock and the put is a debit? If TSLA paid a $1 dividend during these 32 days, how would C − P change?`),
+  a:[L('卖 call 今天收到钱，可以存到到期生息，是收入。','Selling the call brings in money today, which can be deposited until expiration to earn interest: income.'),
+     L('买股票、买 put 今天付出钱，这钱要么是借的要付利息，要么本来能存着生息，都是成本。','Buying the stock and the put costs money today; that money is either borrowed and pays interest, or could otherwise have earned interest: a cost either way.'),
+     L('分红是拿着股票收到的钱，记在贷方。它让远期价 F ＝ S(1 ＋ r·t) − D 少 1。','The dividend is money received for holding the stock, recorded as a credit. It makes the forward price F = S(1 + r·t) − D lower by 1.'),
+     L('C − P ＝ (F − X) ÷ (1 ＋ r·t)，所以 C − P 下降约 1：call 变便宜、put 变贵。','C − P = (F − X) ÷ (1 + r·t), so C − P falls by about 1: the call gets cheaper and the put more expensive.')],
+  s:L('「利息都算在借方，因为要借钱」：只有付出的钱才是成本，收到的期权费能生息。','"All interest goes in debits because you borrow": only money paid out is a cost; option premium received can earn interest.')},
+ {q:L(`TSLA 350 的 C − P 是 3.65，按现价算的内在价值 S − X 只有 2.36。差的 1.3 是什么？为什么说 combo 是「内在价值的现值」？`,`TSLA 350's C − P is 3.65, while the intrinsic value at the current price, S − X, is only 2.36. What is the 1.3 difference? Why is the combo called "the present value of the intrinsic value"?`),
+  a:[L('买 call、卖 put 等于约好到期按 350 买股票，这 350 到期才付。','Buying a call and selling a put is agreeing to buy the stock at 350 at expiration, and the 350 is paid only at expiration.'),
+     L('和今天直接买股票比，350 晚付 32 天，省下利息约 350 × 4.3% × 32/365 ＝ 1.32，所以合成股票值得多付这么多。','Compared with buying the stock today, the 350 is paid 32 days later, saving about 350 × 4.3% × 32/365 = 1.32 in interest, so synthetic stock is worth that much more.'),
+     L('准确地说，C − P ＝ (F − X) ÷ (1 ＋ r·t)：按远期价算的内在价值，再折回今天。','Precisely, C − P = (F − X) ÷ (1 + r·t): the intrinsic value at the forward price, discounted to today.'),
+     L('期货期权例子里 1250 combo 是 −33.00 而不是 −33.50，差的就是折现。','In the futures option example, the 1250 combo is −33.00 rather than −33.50; the difference is the discounting.')],
+  s:L('「call 比 put 多了时间价值」：同一行权价的 call 和 put 时间价值差不多，差额来自利息。','"The call has more time value than the put": a call and a put at the same strike have about the same time value; the difference comes from interest.')},
+ {q:L(`已知 TSLA 350 call 21.05、put 17.40、利率 4.3%、32 天。不看股价，怎么知道股价大约多少？如果算出来比屏幕上高 0.35，第一反应应该是什么？`,`You know the TSLA 350 call is 21.05, the put 17.40, the rate 4.3%, 32 days. Without looking at the stock price, how do you know roughly what it is? If your answer comes out 0.35 above the screen, what should your first reaction be?`),
+  a:[L('S ＝ C − P ＋ X ÷ (1 ＋ r·t) ＝ 3.65 ＋ 348.69 ＝ 352.34，屏幕上是 352.36。','S = C − P + X ÷ (1 + r·t) = 3.65 + 348.69 = 352.34; the screen shows 352.36.'),
+     L('差 0.35 时先怀疑自己的输入，不是市场：利率用低了，或者分红用高了。','When it is 0.35 off, suspect your own inputs first, not the market: the interest rate used is too low, or the dividend used is too high.'),
+     L('讲义例题就是这样反推出隐含分红：0.88 − 0.35 ＝ 0.53。','That is exactly how the lecture exercise backs out the implied dividend: 0.88 − 0.35 = 0.53.'),
+     L('还要查：期权是不是美式、报价是不是同一时刻、股票借不借得到。','Also check: are the options American, are the quotes from the same moment, can the stock be borrowed?')],
+  s:L('「差了 0.35，赶紧套利」：多数时候是参数没对上。','"It\'s 0.35 off, arbitrage it now": most of the time the parameters just don\'t match.')},
+ {q:L(`4/13 收盘，按报价在 TSLA 450 上做 reversal，表面能赚 0.58。这是白捡的钱吗？为什么 350 附近没有这种现象？`,`At the 4/13 close, a reversal on TSLA 450 at the quotes appears to make 0.58. Is this free money? Why doesn't this happen near 350?`),
+  a:[L('reversal 卖出 put。TSLA 期权是美式，450 put 深度实值，买方可以今天就行权，拿到 450 美元去生息。','A reversal sells the put. TSLA options are American, the 450 put is deep in the money, and its buyer can exercise today and put the $450 to work earning interest.'),
+     L('被提前行权时，reversal 按 450 买进股票、平掉卖空的股票，手里还剩那张 450 call。原本 5/15 才付的 450 提前付了，32 天的利息 450 × 4.3% × 32/365 ＝ 1.70 拿不到；减去那张 call 还值的钱，才是少赚的部分。4/13 当场被行权的话，比计划少 0.69。','When exercised early, the reversal buys stock at 450 to close the short stock and is left holding the 450 call. The 450 due on 5/15 is paid early, so 32 days of interest, 450 × 4.3% × 32/365 = 1.70, is lost; subtract what the call is still worth and you get the shortfall. Exercised on the spot on 4/13, it comes out 0.69 below plan.'),
+     L('模型算这项提前行权的权利值 0.94，比 0.58 大。0.58 是在补偿这个风险，不是白捡。','The model values this early-exercise right at 0.94, more than 0.58. The 0.58 compensates for this risk; it isn\'t free.'),
+     L('平值附近提前行权的价值很小（350 约 0.08），所以 parity 在那里最准。但不是 0：它让 1.1 反解出的利率偏低约 0.25 个百分点。','Near the money the early-exercise value is small (about 0.08 at 350), so parity is most accurate there. But it isn\'t 0: it makes the interest rate backed out in 1.1 about 0.25 percentage points too low.')],
+  s:L('「报价错了，能套」：没看到期权是美式，parity 的等式只对欧式成立。','"The quote is wrong, arbitrage it": this misses that the options are American, and the parity equation holds only for European options.')},
+ {q:L(`5/15 TSLA 收在 422.32，离 422.5 只有 0.18。持有 422.5 conversion 的人收盘后还面对什么不确定？16:00 收盘那一刻，422.5 call 还报 0.28 / 0.34，按收盘价它没有内在价值，这 0.31 是什么的价格？`,`On 5/15 TSLA closed at 422.32, only 0.18 from 422.5. What uncertainty does someone holding the 422.5 conversion still face after the close? At the moment of the 16:00 close the 422.5 call was still quoted 0.28 / 0.34 and had no intrinsic value at the closing price. What is this 0.31 the price of?`),
+  a:[L('put 实值 0.18，自己会行权，按 422.5 卖出股票；按规则 call 虚值，不会被自动行权。','The put is 0.18 in the money and you will exercise it, selling the stock at 422.5; under the rules the call is out of the money and won\'t be exercised automatically.'),
+     L('可 call 的买方到 17:30 前还能改主意，盘后价格还在动。call 被行权加上自己行权 put，股票卖了两次，变成空 100 股；两样都没发生，变成多 100 股。','But the call buyer can change their mind until 17:30, and after-hours prices are still moving. If the call is exercised and you also exercise the put, the stock is sold twice and you end up short 100 shares; if neither happens, you end up long 100 shares.'),
+     L('要到到期之后才知道自己有没有被指派。周末意外多出 100 股，周一开盘 419.27，一张亏 305 美元。','You find out whether you were assigned only after expiration. 100 unexpected shares over the weekend, with Monday opening at 419.27, lose $305 per contract.'),
+     L('0.31 就是收盘后这段不确定的价格：对手还能改主意，股价还在动。实务解法是收盘前买回空头 call，15:59 按卖一 0.39，一张 39 美元。','The 0.31 is the price of this uncertainty after the close: the other side can still change their mind and the stock is still moving. The practical fix is to buy back the short call before the close: at 15:59 at the 0.39 ask, $39 per contract.')],
+  s:L('「平值期权到期值 0，没有风险」：理论价值是 0，可对手会不会行权不知道，结果是一整份股票头寸。','"An at-the-money option is worth 0 at expiration, so there\'s no risk": its theoretical value is 0, but you don\'t know whether the other side will exercise, and the outcome is a full stock position.')},
+ {q:L(`为什么在美国交易期货期权，conversion 带正 delta？为什么期限越长、利率越高越明显？股票期权为什么没有这个问题？`,`Why does a conversion on US futures options carry positive delta? Why is this more pronounced with longer terms and higher interest rates? Why don't stock options have this problem?`),
+  a:[L('期货每天结算：跌的时候亏损当天就要付现金，钱得借，要付利息；涨的时候收到现金，能生息。','Futures settle daily: when they fall, the loss must be paid in cash that day, with borrowed money that costs interest; when they rise, you receive cash that can earn interest.'),
+     L('美国的期货期权按股票型结算，期权上的盈利要到期才兑现，抵不上中间的利息。','US futures options use stock-type settlement, so the option gains are realized only at expiration and can\'t cover the interest in between.'),
+     L('所以同样涨跌 10 点，跌亏利息、涨赚利息，头寸偏向上涨，就是正 delta。合成腿的 delta 是 100 ÷ (1 ＋ r·t)，6%、3 个月时 conversion 合计 ＋1.48。','So for the same 10-point move, a fall costs interest and a rise earns interest; the position leans toward a rise, which is positive delta. The synthetic legs\' delta is 100 ÷ (1 + r·t), and at 6% for 3 months the conversion totals +1.48.'),
+     L('r·t 越大，100 ÷ (1 ＋ r·t) 离 100 越远。股票期权里股票本身不逐日结算，合成空头的 delta 正好 −100，合计 0。','The larger r·t is, the farther 100 ÷ (1 + r·t) is from 100. With stock options the stock itself isn\'t settled daily, so the synthetic short\'s delta is exactly −100 and the total is 0.')],
+  s:L('「因为期货期权的 delta 算法不同」：没说出已实现与未实现的差别，也没说利息从哪来。','"Because futures options compute delta differently": this doesn\'t explain the difference between realized and unrealized, or where the interest comes from.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1230,7 +1236,20 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-5-2-q'+i); if(v) t.value=v; }catch(e){}
@@ -1239,8 +1258,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? L('对照参考答案','Compare with the reference answer') : L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 

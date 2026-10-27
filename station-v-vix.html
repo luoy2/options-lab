@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="lang.js"></script>
 <title>波动率合约与 VIX</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23b5642f'/%3E%3Cpath%20d='M5%2020L10%2014L14%2018L19%207L23%2016L27%2012'%20stroke='%23fdf6ec'%20stroke-width='2.6'%20fill='none'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -197,432 +198,437 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
 <div id="tip" role="tooltip"></div>
 
 <nav><div class="navin">
-  <a href="#s0">〇 直接交易波动率</a><a href="#s1">一 方差合约</a><a href="#s2">二 为什么 1/K²</a><a href="#s3">三 VIX 公式</a>
-  <a href="#s4">四 TSLA 算一遍</a><a href="#s5">五 VIX 与隐含</a><a href="#s6">六 真实的 VIX</a><a href="#s7">七 VIX 期货</a><a href="#s8">八 费曼检验</a>
-  <button id="themeBtn">明暗</button>
+  <a href="#s0"><span class="l-zh">〇 直接交易波动率</span><span class="l-en">0 Trading volatility directly</span></a><a href="#s1"><span class="l-zh">一 方差合约</span><span class="l-en">1 Variance contracts</span></a><a href="#s2"><span class="l-zh">二 为什么 1/K²</span><span class="l-en">2 Why 1/K²</span></a><a href="#s3"><span class="l-zh">三 VIX 公式</span><span class="l-en">3 The VIX formula</span></a>
+  <a href="#s4"><span class="l-zh">四 TSLA 算一遍</span><span class="l-en">4 Working it out on TSLA</span></a><a href="#s5"><span class="l-zh">五 VIX 与隐含</span><span class="l-en">5 VIX and implied vol</span></a><a href="#s6"><span class="l-zh">六 真实的 VIX</span><span class="l-en">6 The real VIX</span></a><a href="#s7"><span class="l-zh">七 VIX 期货</span><span class="l-en">7 VIX futures</span></a><a href="#s8"><span class="l-zh">八 费曼检验</span><span class="l-en">8 Feynman test</span></a>
+  <button id="themeBtn"><span class="l-zh">明暗</span><span class="l-en">Light/dark</span></button>
 </div></nav>
 
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">FIN 580 复习 · 节点 V</p>
-  <h1>波动率合约与 VIX</h1>
-  <p class="lede">节点 8 把隐含波动率读成一张曲面：每个行权价、每个到期日各有一个数。这一节讲两件事：直接按波动率结算的合约有哪几种、到期怎么结算；VIX 怎样把一整排期权的价格压成一个数。案例是 2026-04-13 收盘的 TSLA 期权链，和 2020 年 8 月以来的标普 500 与 VIX。</p>
+  <p class="eyebrow"><span class="l-zh">FIN 580 复习 · 节点 V</span><span class="l-en">FIN 580 review · Node V</span></p>
+  <h1><span class="l-zh">波动率合约与 VIX</span><span class="l-en">Volatility contracts and VIX</span></h1>
+  <p class="lede"><span class="l-zh">节点 8 把隐含波动率读成一张曲面：每个行权价、每个到期日各有一个数。这一节讲两件事：直接按波动率结算的合约有哪几种、到期怎么结算；VIX 怎样把一整排期权的价格压成一个数。案例是 2026-04-13 收盘的 TSLA 期权链，和 2020 年 8 月以来的标普 500 与 VIX。</span><span class="l-en">Node 8 read implied volatility as a surface: one number for every strike and every expiration. This node covers two things: which contracts settle directly on volatility and how they settle at expiration, and how VIX compresses the prices of a whole row of options into one number. The cases are the TSLA option chain at the 2026-04-13 close, and the S&amp;P 500 and VIX since August 2020.</span></p>
 </header>
 
 <!-- ══════════ 〇 ══════════ -->
 <section id="s0">
-  <h2><span class="n">〇</span>为什么要直接交易波动率</h2>
-  <p class="sub">4.2 讲过：买一张期权，用标的做动态对冲，盈亏大体看实际波动和隐含波动差多少，但还要看大涨大跌落在哪几天。4.2 那 24 天按日历折算的实际波动 47.4%，比买入时的隐含波动 46.3% 还高，账本却亏了 34.53，因为对冲的收入只在 gamma 大的日子进账。讲义 S10 接着问：这条路靠得住吗？</p>
-  <p>讲义的回答是：要靠得住，定价模型的几条假设都得成立。它列了四条，每一条在前面的节点里都已经看到不成立：</p>
+  <h2><span class="l-zh"><span class="n">〇</span>为什么要直接交易波动率</span><span class="l-en"><span class="n">0</span>Why trade volatility directly</span></h2>
+  <p class="sub"><span class="l-zh">4.2 讲过：买一张期权，用标的做动态对冲，盈亏大体看实际波动和隐含波动差多少，但还要看大涨大跌落在哪几天。4.2 那 24 天按日历折算的实际波动 47.4%，比买入时的隐含波动 46.3% 还高，账本却亏了 34.53，因为对冲的收入只在 gamma 大的日子进账。讲义 S10 接着问：这条路靠得住吗？</span><span class="l-en">As 4.2 showed, if you buy an option and hedge it dynamically with the underlying, the profit or loss depends broadly on the gap between realized and implied volatility, but also on which days the big moves land. Over the 24 days in 4.2, realized volatility on a calendar-day basis was 47.4%, above the 46.3% implied at purchase, yet the book lost 34.53, because hedging income only comes in on days when gamma is large. Lecture S10 then asks: is this route reliable?</span></p>
+  <p><span class="l-zh">讲义的回答是：要靠得住，定价模型的几条假设都得成立。它列了四条，每一条在前面的节点里都已经看到不成立：</span><span class="l-en">The lecture's answer: for it to be reliable, all of the pricing model's assumptions have to hold. It lists four, and the earlier nodes have already shown each one failing:</span></p>
   <table>
-    <thead><tr><th>讲义的假设</th><th class="txt">在哪里见过它不成立</th></tr></thead>
+    <thead><tr><th><span class="l-zh">讲义的假设</span><span class="l-en">Lecture assumption</span></th><th class="txt"><span class="l-zh">在哪里见过它不成立</span><span class="l-en">Where we saw it fail</span></th></tr></thead>
     <tbody>
-      <tr><td>① 涨跌是钟形分布</td><td class="txt">1.2 与节点 7：TSLA 和 SPX 的日涨跌，两条尾巴都比钟形长</td></tr>
-      <tr><td>② 能连续地对冲</td><td class="txt">节点 7：TSLA 财报那一晚，盘后三分钟涨了 4.1%，中间来不及调仓</td></tr>
-      <tr><td>③ 存续期内波动率不变</td><td class="txt">节点 7：SPX 的 50 日历史波动率不到一年从 8.6% 走到 34.7%</td></tr>
-      <tr><td>④ 波动率与方向无关</td><td class="txt">节点 7：SPX 每涨 1%，VIX 平均跌 1.38 点</td></tr>
+      <tr><td><span class="l-zh">① 涨跌是钟形分布</span><span class="l-en">① Moves are bell-shaped</span></td><td class="txt"><span class="l-zh">1.2 与节点 7：TSLA 和 SPX 的日涨跌，两条尾巴都比钟形长</span><span class="l-en">1.2 and node 7: daily moves in TSLA and SPX have both tails longer than a bell curve</span></td></tr>
+      <tr><td><span class="l-zh">② 能连续地对冲</span><span class="l-en">② Hedging can be continuous</span></td><td class="txt"><span class="l-zh">节点 7：TSLA 财报那一晚，盘后三分钟涨了 4.1%，中间来不及调仓</span><span class="l-en">Node 7: on TSLA's earnings night it rose 4.1% in three minutes after hours, with no time to adjust in between</span></td></tr>
+      <tr><td><span class="l-zh">③ 存续期内波动率不变</span><span class="l-en">③ Volatility is constant over the option's life</span></td><td class="txt"><span class="l-zh">节点 7：SPX 的 50 日历史波动率不到一年从 8.6% 走到 34.7%</span><span class="l-en">Node 7: SPX 50-day historical volatility went from 8.6% to 34.7% in under a year</span></td></tr>
+      <tr><td><span class="l-zh">④ 波动率与方向无关</span><span class="l-en">④ Volatility is unrelated to direction</span></td><td class="txt"><span class="l-zh">节点 7：SPX 每涨 1%，VIX 平均跌 1.38 点</span><span class="l-en">Node 7: for each 1% rise in SPX, VIX falls 1.38 points on average</span></td></tr>
     </tbody>
   </table>
-  <p>讲义的结论：模型有这些弱点，所以即使你对波动率的判断是对的，动态对冲不但要花交易成本，结果也常常和模型预测的不一样，有时差得很远。于是讲义问：<b>能不能不用期权、不靠定价模型，直接交易波动率？</b></p>
+  <p><span class="l-zh">讲义的结论：模型有这些弱点，所以即使你对波动率的判断是对的，动态对冲不但要花交易成本，结果也常常和模型预测的不一样，有时差得很远。于是讲义问：<b>能不能不用期权、不靠定价模型，直接交易波动率？</b></span><span class="l-en">The lecture's conclusion: because the model has these weaknesses, even if your view on volatility is right, dynamic hedging not only costs money to trade, its outcome also often differs from what the model predicts, sometimes by a lot. So the lecture asks: <b>can you trade volatility directly, without options and without a pricing model?</b></span></p>
 
-  <h3>两类波动率合约</h3>
+  <h3><span class="l-zh">两类波动率合约</span><span class="l-en">Two kinds of volatility contracts</span></h3>
   <table>
-    <thead><tr><th>名称</th><th class="txt">到期时结算成什么</th><th class="txt">例子</th></tr></thead>
+    <thead><tr><th><span class="l-zh">名称</span><span class="l-en">Name</span></th><th class="txt"><span class="l-zh">到期时结算成什么</span><span class="l-en">What it settles to at expiration</span></th><th class="txt"><span class="l-zh">例子</span><span class="l-en">Examples</span></th></tr></thead>
     <tbody>
-      <tr><td>已实现波动率合约</td><td class="txt">这段时间里标的实际走出来的波动率，或者它的平方：方差</td><td class="txt">方差互换（variance swap）</td></tr>
-      <tr><td>隐含波动率合约</td><td class="txt">到期那一刻，从标的的期权价格反推出来的隐含波动率</td><td class="txt">VIX 期货与期权；VSTOXX（欧洲 Stoxx 50 指数的波动率指数）期货与期权</td></tr>
+      <tr><td><span class="l-zh">已实现波动率合约</span><span class="l-en">Realized volatility contract</span></td><td class="txt"><span class="l-zh">这段时间里标的实际走出来的波动率，或者它的平方：方差</span><span class="l-en">The volatility the underlying actually showed over the period, or its square, the variance</span></td><td class="txt"><span class="l-zh">方差互换（variance swap）</span><span class="l-en">Variance swap</span></td></tr>
+      <tr><td><span class="l-zh">隐含波动率合约</span><span class="l-en">Implied volatility contract</span></td><td class="txt"><span class="l-zh">到期那一刻，从标的的期权价格反推出来的隐含波动率</span><span class="l-en">The implied volatility backed out from the underlying's option prices at the moment of expiration</span></td><td class="txt"><span class="l-zh">VIX 期货与期权；VSTOXX（欧洲 Stoxx 50 指数的波动率指数）期货与期权</span><span class="l-en">VIX futures and options; VSTOXX (the volatility index of Europe's Stoxx 50 index) futures and options</span></td></tr>
     </tbody>
   </table>
-  <p>前一种结算的是这段时间真实发生了什么，要等到期才知道。后一种结算的是到期那天市场给之后一段时间报的价。第一节讲前一种；第二到第六节讲 VIX 是什么；第七节讲以 VIX 结算的期货和期权。期货是今天约定一个价、到期按结算值和约定价的差额收付现金的合约，第七节细讲。</p>
+  <p><span class="l-zh">前一种结算的是这段时间真实发生了什么，要等到期才知道。后一种结算的是到期那天市场给之后一段时间报的价。第一节讲前一种；第二到第六节讲 VIX 是什么；第七节讲以 VIX 结算的期货和期权。期货是今天约定一个价、到期按结算值和约定价的差额收付现金的合约，第七节细讲。</span><span class="l-en">The first kind settles on what actually happened over the period, which is known only at expiration. The second settles on the price the market quotes on expiration day for the period after it. Section 1 covers the first kind; sections 2 to 6 explain what VIX is; section 7 covers the futures and options that settle on VIX. A futures contract agrees on a price today and at expiration pays cash equal to the difference between the settlement value and the agreed price; section 7 goes into detail.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
 <section id="s1">
-  <h2><span class="n">一</span>已实现的合约怎么结算</h2>
-  <p class="sub">方差互换在开始那天约定一个价。到期时，买方拿到这段时间实际的方差，付出约定的价；卖方正好相反。</p>
+  <h2><span class="l-zh"><span class="n">一</span>已实现的合约怎么结算</span><span class="l-en"><span class="n">1</span>How a realized contract settles</span></h2>
+  <p class="sub"><span class="l-zh">方差互换在开始那天约定一个价。到期时，买方拿到这段时间实际的方差，付出约定的价；卖方正好相反。</span><span class="l-en">A variance swap agrees on a price on the day it starts. At expiration the buyer receives the actual variance over the period and pays the agreed price; the seller does the opposite.</span></p>
   <div class="formula">
-    <div class="math">结算值 ＝ <span class="sym" data-say="一年大约 252 个交易日。前面算的是平均每天的方差，乘 252 换成每年。">252</span> ÷ <span class="sym" data-say="这段时间里一共有几个日涨跌。21 个交易日就是 21。">n</span> × <span class="sym" data-say="sigma 的大写，读作「西格玛」，意思是把后面那一项对每一天都算一遍再加起来。">Σ</span> <span class="sym" data-say="第 i 天的对数涨跌：ln(今天收盘 ÷ 昨天收盘)。涨 1% 约等于 +0.995%，跌 1% 约等于 −1.005%，小的时候和百分比涨跌几乎一样。">r<sub>i</sub></span>²</div>
-    <div class="gloss">每个交易日的对数涨跌先平方，全部加起来，除以天数得到平均每天的方差，再乘一年的交易日数</div>
+    <div class="math"><span class="l-zh">结算值 ＝ <span class="sym" data-say="一年大约 252 个交易日。前面算的是平均每天的方差，乘 252 换成每年。">252</span> ÷ <span class="sym" data-say="这段时间里一共有几个日涨跌。21 个交易日就是 21。">n</span> × <span class="sym" data-say="sigma 的大写，读作「西格玛」，意思是把后面那一项对每一天都算一遍再加起来。">Σ</span> <span class="sym" data-say="第 i 天的对数涨跌：ln(今天收盘 ÷ 昨天收盘)。涨 1% 约等于 +0.995%，跌 1% 约等于 −1.005%，小的时候和百分比涨跌几乎一样。">r<sub>i</sub></span></span><span class="l-en">Settlement value = <span class="sym" data-say="About 252 trading days in a year. What comes before it is the average daily variance; times 252 makes it annual.">252</span> ÷ <span class="sym" data-say="How many daily moves there are in the period. 21 trading days means 21.">n</span> × <span class="sym" data-say="Capital sigma: compute the term after it for every day and add them all up.">Σ</span> <span class="sym" data-say="The log return on day i: ln(today's close ÷ yesterday's close). A 1% rise is about +0.995%, a 1% fall about −1.005%; for small moves it is almost the same as the percentage change.">r<sub>i</sub></span></span>²</div>
+    <div class="gloss"><span class="l-zh">每个交易日的对数涨跌先平方，全部加起来，除以天数得到平均每天的方差，再乘一年的交易日数</span><span class="l-en">Square each trading day's log return, add them all up, divide by the number of days to get the average daily variance, then multiply by the number of trading days in a year</span></div>
   </div>
   <div class="pair">
     <div class="formula">
-      <div class="math">r<sub>i</sub> ＝ <span class="sym" data-say="自然对数。ln(今天 ÷ 昨天) 是按连续复利算的涨幅。涨 10% 再跌回原价，两天的对数涨跌是 +9.53% 和 −9.53%，正好抵消。">ln</span>(<span class="sym" data-say="第 i 天的收盘价。">p<sub>i</sub></span> ÷ p<sub>i−1</sub>)</div>
-      <div class="gloss">今天收盘比昨天收盘涨了多少，按对数算</div>
+      <div class="math">r<sub>i</sub> <span class="l-zh">＝ <span class="sym" data-say="自然对数。ln(今天 ÷ 昨天) 是按连续复利算的涨幅。涨 10% 再跌回原价，两天的对数涨跌是 +9.53% 和 −9.53%，正好抵消。">ln</span>(<span class="sym" data-say="第 i 天的收盘价。">p<sub>i</sub></span></span><span class="l-en">= <span class="sym" data-say="Natural logarithm. ln(today ÷ yesterday) is the gain under continuous compounding. Up 10% and then back to the original price, the two days' log returns are +9.53% and −9.53%, which cancel exactly.">ln</span>(<span class="sym" data-say="The closing price on day i.">p<sub>i</sub></span></span> ÷ p<sub>i−1</sub>)</div>
+      <div class="gloss"><span class="l-zh">今天收盘比昨天收盘涨了多少，按对数算</span><span class="l-en">How much today's close rose from yesterday's, measured in logs</span></div>
     </div>
     <div class="formula">
-      <div class="math">波动率合约 ＝ √(252 ÷ n × Σ r<sub>i</sub>²)</div>
-      <div class="gloss">结算方差的叫方差互换；把它开平方，结算的就是波动率</div>
+      <div class="math"><span class="l-zh">波动率合约 ＝ √(252 ÷ n × Σ r</span><span class="l-en">Volatility contract = √(252 ÷ n × Σ r</span><sub>i</sub>²)</div>
+      <div class="gloss"><span class="l-zh">结算方差的叫方差互换；把它开平方，结算的就是波动率</span><span class="l-en">A contract settling on variance is a variance swap; take the square root, and it settles on volatility</span></div>
     </div>
   </div>
-  <p>和 1.2 量波动率的办法比，有三处要注意：</p>
+  <p><span class="l-zh">和 1.2 量波动率的办法比，有三处要注意：</span><span class="l-en">Compared with how 1.2 measured volatility, three points to note:</span></p>
   <ul>
-    <li><b>不减平均值。</b>1.2 第四节讲过零均值：连涨十天、每天 +1% 的股票，普通标准差是 0，直接量离 0 多远才是年化 16%。合约用的就是量离 0 多远。</li>
-    <li><b>用对数涨跌。</b>涨 10% 再跌回原价，按百分比算是 +10% 和 −9.09%，按对数算正好一正一负。</li>
-    <li><b>年化用 252。</b>1.2 的心算口诀用 256（√256 ＝ 16），两者只差 0.8%。TSLA 4/14 到 5/15 这 24 天，1.2 的算法得 45.8%，按合约的公式是 44.90%。</li>
+    <li><span class="l-zh"><b>不减平均值。</b>1.2 第四节讲过零均值：连涨十天、每天 +1% 的股票，普通标准差是 0，直接量离 0 多远才是年化 16%。合约用的就是量离 0 多远。</span><span class="l-en"><b>No mean is subtracted.</b> Section 4 of 1.2 covered zero mean: a stock that rises 1% every day for ten days has an ordinary standard deviation of 0, while measuring directly how far it is from 0 gives 16% annualized. The contract measures the distance from 0.</span></li>
+    <li><span class="l-zh"><b>用对数涨跌。</b>涨 10% 再跌回原价，按百分比算是 +10% 和 −9.09%，按对数算正好一正一负。</span><span class="l-en"><b>Log returns are used.</b> Up 10% and then back to the original price is +10% and −9.09% in percentage terms, but exactly one plus and one minus in log terms.</span></li>
+    <li><span class="l-zh"><b>年化用 252。</b>1.2 的心算口诀用 256（√256 ＝ 16），两者只差 0.8%。TSLA 4/14 到 5/15 这 24 天，1.2 的算法得 45.8%，按合约的公式是 44.90%。</span><span class="l-en"><b>252 is used to annualize.</b> The mental-math rule in 1.2 uses 256 (√256 = 16); the two differ by only 0.8%. For the 24 TSLA days from 4/14 to 5/15, the 1.2 method gives 45.8% and the contract formula 44.90%.</span></li>
   </ul>
-  <p>为什么常见的是方差合约，不直接结算波动率：1.2 第三节讲过，互不相关的涨跌相加时，方差按天数相加。每天的平方涨跌是这一天的方差，一个月的方差就是逐日加起来的和。方差合约把每天涨跌的平方直接相加，大涨大跌落在哪一天都算一样多，不像 4.2 的对冲账本，要看那天期权的 gamma 大不大。第二节还会看到，一排期权再加上每天的对冲，能复制出来的也正是方差。</p>
+  <p><span class="l-zh">为什么常见的是方差合约，不直接结算波动率：1.2 第三节讲过，互不相关的涨跌相加时，方差按天数相加。每天的平方涨跌是这一天的方差，一个月的方差就是逐日加起来的和。方差合约把每天涨跌的平方直接相加，大涨大跌落在哪一天都算一样多，不像 4.2 的对冲账本，要看那天期权的 gamma 大不大。第二节还会看到，一排期权再加上每天的对冲，能复制出来的也正是方差。</span><span class="l-en">Why variance contracts are the common kind, rather than ones that settle on volatility directly: as section 3 of 1.2 showed, when uncorrelated moves are added, variance adds up by the number of days. Each day's squared move is that day's variance, and a month's variance is the sum of the daily ones. A variance contract adds up the squares of the daily moves directly, so a big move counts the same whichever day it lands on, unlike the hedging book in 4.2, which depends on whether the option's gamma was large that day. Section 2 will also show that what a row of options plus daily hedging replicates is exactly variance.</span></p>
 
-  <h3>两个真实的月份</h3>
-  <p>下面用标普 500 指数（SPX）的日收盘结算两份 30 天的方差合约。约定价取开始那天的 VIX：第三节讲它怎么算，这里先当作市场在那天给之后 30 天报的波动率。按方差结算，约定价就是 VIX 的平方，单位叫<span class="sym" data-say="波动率点的平方。VIX 是 17.07 时，方差合约的约定价是 17.07² ＝ 291.4 方差点。">方差点</span>。</p>
+  <h3><span class="l-zh">两个真实的月份</span><span class="l-en">Two real months</span></h3>
+  <p><span class="l-zh">下面用标普 500 指数（SPX）的日收盘结算两份 30 天的方差合约。约定价取开始那天的 VIX：第三节讲它怎么算，这里先当作市场在那天给之后 30 天报的波动率。按方差结算，约定价就是 VIX 的平方，单位叫<span class="sym" data-say="波动率点的平方。VIX 是 17.07 时，方差合约的约定价是 17.07² ＝ 291.4 方差点。">方差点</span>。</span><span class="l-en">Below, two 30-day variance contracts are settled on daily closes of the S&amp;P 500 index (SPX). The agreed price is the VIX on the starting day: section 3 explains how it is computed; for now take it as the volatility the market quoted that day for the next 30 days. When settling on variance, the agreed price is VIX squared, in units called <span class="sym" data-say="Volatility points squared. With VIX at 17.07, the variance contract's agreed price is 17.07² = 291.4 variance points.">variance points</span>.</span></p>
   <div class="panel">
     <div class="bar">
       <div class="seg" id="vsSeg">
-        <button data-k="crash" aria-pressed="true">2025-03-25 起</button>
-        <button data-k="calm" aria-pressed="false">2026-07-01 起</button>
+        <button data-k="crash" aria-pressed="true"><span class="l-zh">2025-03-25 起</span><span class="l-en">Starting 2025-03-25</span></button>
+        <button data-k="calm" aria-pressed="false"><span class="l-zh">2026-07-01 起</span><span class="l-en">Starting 2026-07-01</span></button>
       </div>
-      <button class="btn ghost" id="vsPlay">逐天结算</button>
+      <button class="btn ghost" id="vsPlay"><span class="l-zh">逐天结算</span><span class="l-en">Settle day by day</span></button>
     </div>
-    <svg id="vs" viewBox="0 0 720 392" role="img" aria-label="30 天里每天的对数涨跌，以及到这一天为止的实际波动率与约定价"></svg>
+    <svg id="vs" viewBox="0 0 720 392" role="img" aria-label="30 天里每天的对数涨跌，以及到这一天为止的实际波动率与约定价" data-en-aria-label="Each day's log return over the 30 days, and realized volatility to date against the agreed price"></svg>
     <div class="legend">
-      <span><i style="background:var(--control)"></i>超过约定价折成的一天</span>
-      <span><i style="background:var(--ink-faint)"></i>没超过</span>
-      <span><i class="ln" style="background:var(--control)"></i>到这一天为止的实际波动率</span>
-      <span style="color:var(--result)"><i class="dash"></i>约定价：开始那天的 VIX</span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">超过约定价折成的一天</span><span class="l-en">Beyond the agreed price per day</span></span>
+      <span><i style="background:var(--ink-faint)"></i><span class="l-zh">没超过</span><span class="l-en">Within it</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">到这一天为止的实际波动率</span><span class="l-en">Realized volatility to date</span></span>
+      <span style="color:var(--result)"><i class="dash"></i><span class="l-zh">约定价：开始那天的 VIX</span><span class="l-en">Agreed price: VIX on the starting day</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="vsD"></div><div class="d2" id="vsDb"></div></div>
-      <div class="stat"><div class="k">当天的对数涨跌</div><div class="d" id="vsR"></div></div>
-      <div class="stat"><div class="k">到这一天为止</div><div class="d" id="vsV" style="color:var(--control)"></div><div class="d2">√(252 ÷ 已过天数 × Σr²)</div></div>
-      <div class="stat"><div class="k">约定价</div><div class="d" id="vsK" style="color:var(--result)"></div><div class="d2" id="vsKb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="vsD"></div><div class="d2" id="vsDb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">当天的对数涨跌</span><span class="l-en">Log return that day</span></div><div class="d" id="vsR"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">到这一天为止</span><span class="l-en">To date</span></div><div class="d" id="vsV" style="color:var(--control)"></div><div class="d2"><span class="l-zh">√(252 ÷ 已过天数 × Σr²)</span><span class="l-en">√(252 ÷ days so far × Σr²)</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">约定价</span><span class="l-en">Agreed price</span></div><div class="d" id="vsK" style="color:var(--result)"></div><div class="d2" id="vsKb"></div></div>
     </div>
     <div class="say plain" id="vsSay"></div>
   </div>
-  <p class="tiny">数据：分钟线，SPX 取每个交易日美东 15:59 那根的收盘，VIX 取同一分钟。30 天指开始那天之后 30 个日历日内的全部交易日。</p>
+  <p class="tiny"><span class="l-zh">数据：分钟线，SPX 取每个交易日美东 15:59 那根的收盘，VIX 取同一分钟。30 天指开始那天之后 30 个日历日内的全部交易日。</span><span class="l-en">Data: minute bars; SPX uses the close of the 15:59 ET bar on each trading day, and VIX the same minute. 30 days means all trading days within 30 calendar days after the starting day.</span></p>
 </section>
 
 <!-- ══════════ 二 ══════════ -->
 <section id="s2">
-  <h2><span class="n">二</span>一排期权，每个行权价买多少</h2>
-  <p class="sub">讲义把 VIX 的设计写成两个问题：怎样用期权搭一个 vega 头寸，让它的价值等于一份波动率合约？怎样让这个头寸的 vega 不随行情变，到期时两者对得上？</p>
-  <p>2.3 讲过 vega：隐含波动率变 1 个点，期权价格变多少。一份波动率合约对波动率的敞口是固定的；要用期权复制它，期权头寸的 vega 也得固定，不能随标的价格变。讲义分三步走到答案。</p>
+  <h2><span class="l-zh"><span class="n">二</span>一排期权，每个行权价买多少</span><span class="l-en"><span class="n">2</span>A row of options: how many at each strike</span></h2>
+  <p class="sub"><span class="l-zh">讲义把 VIX 的设计写成两个问题：怎样用期权搭一个 vega 头寸，让它的价值等于一份波动率合约？怎样让这个头寸的 vega 不随行情变，到期时两者对得上？</span><span class="l-en">The lecture frames the design of VIX as two questions: how do you build a vega position out of options whose value equals a volatility contract? And how do you keep that position's vega from changing as the market moves, so that the two match at expiration?</span></p>
+  <p><span class="l-zh">2.3 讲过 vega：隐含波动率变 1 个点，期权价格变多少。一份波动率合约对波动率的敞口是固定的；要用期权复制它，期权头寸的 vega 也得固定，不能随标的价格变。讲义分三步走到答案。</span><span class="l-en">2.3 covered vega: how much an option's price changes when implied volatility changes by 1 point. A volatility contract has a fixed exposure to volatility; to replicate it with options, the options position's vega must also be fixed and must not change with the underlying price. The lecture reaches the answer in three steps.</span></p>
 
-  <h3>第一步：一张期权不够</h3>
-  <p>这一步起要用三个词。行权价正好在标的现价附近的期权叫<b>平值</b>。call 的行权价高于现价、put 的行权价低于现价，叫<b>虚值</b>：现在行权拿不到钱，价格全是时间价值。反过来，call 的行权价低于现价、put 的行权价高于现价，叫<b>实值</b>：现在行权就能拿到钱，这部分叫内在价值。离现价越远，就叫深实值、深虚值。</p>
-  <p>一张期权的 vega 在标的正好在行权价附近时最大，标的往哪边走远，vega 都变小。TSLA 在 350 时，350 的期权 vega 最大；TSLA 涨到 450，它成了深实值，vega 所剩无几。想让 vega 一直都在，手里就得一直有一张平值期权。标的会走到哪里事先不知道，所以每个行权价都要买。</p>
+  <h3><span class="l-zh">第一步：一张期权不够</span><span class="l-en">Step 1: one option is not enough</span></h3>
+  <p><span class="l-zh">这一步起要用三个词。行权价正好在标的现价附近的期权叫<b>平值</b>。call 的行权价高于现价、put 的行权价低于现价，叫<b>虚值</b>：现在行权拿不到钱，价格全是时间价值。反过来，call 的行权价低于现价、put 的行权价高于现价，叫<b>实值</b>：现在行权就能拿到钱，这部分叫内在价值。离现价越远，就叫深实值、深虚值。</span><span class="l-en">From this step on, three terms are needed. An option whose strike is right around the current price of the underlying is <b>at the money</b>. A call with its strike above the current price, or a put with its strike below it, is <b>out of the money</b>: exercising now pays nothing, and its price is all time value. Conversely, a call with its strike below the current price, or a put with its strike above it, is <b>in the money</b>: exercising now pays something, and that part is called intrinsic value. The further from the current price, the deeper in or out of the money.</span></p>
+  <p><span class="l-zh">一张期权的 vega 在标的正好在行权价附近时最大，标的往哪边走远，vega 都变小。TSLA 在 350 时，350 的期权 vega 最大；TSLA 涨到 450，它成了深实值，vega 所剩无几。想让 vega 一直都在，手里就得一直有一张平值期权。标的会走到哪里事先不知道，所以每个行权价都要买。</span><span class="l-en">An option's vega is largest when the underlying is right around its strike, and shrinks as the underlying moves away in either direction. With TSLA at 350, the 350 options have the largest vega; if TSLA rises to 450, they are deep in the money and little vega is left. To keep vega there all the time, you must always hold an at-the-money option. You do not know in advance where the underlying will go, so you have to buy every strike.</span></p>
 
-  <h3>第二步：每个行权价各买一张，还是不平</h3>
-  <p>讲义说，这样仍然得不到恒定的 vega：行权价高的平值期权，vega 比行权价低的平值期权大。原因有两个，两个都和价格成正比：</p>
+  <h3><span class="l-zh">第二步：每个行权价各买一张，还是不平</span><span class="l-en">Step 2: one option at each strike is still not flat</span></h3>
+  <p><span class="l-zh">讲义说，这样仍然得不到恒定的 vega：行权价高的平值期权，vega 比行权价低的平值期权大。原因有两个，两个都和价格成正比：</span><span class="l-en">The lecture says this still does not give a constant vega: an at-the-money option at a high strike has more vega than an at-the-money option at a low strike. There are two reasons, both proportional to price:</span></p>
   <ul>
-    <li><b>平值期权的 vega 和价格成正比。</b>σ ＝ 46.3%、30 天，标的 200 时 200 的平值期权 vega 是 0.228，标的 400 时 400 的平值期权是 0.456。价格翻倍，vega 翻倍。</li>
-    <li><b>同时起作用的行权价，档数也和价格成正比。</b>行权价按美元等距排（下图每 10 美元一档），而一个标准差的美元宽度和价格成正比：价格 200 时约 26.5 美元，400 时约 53.1 美元。落在标的 ±1 个标准差以内的行权价，200 时约 5 档，400 时约 11 档。</li>
+    <li><span class="l-zh"><b>平值期权的 vega 和价格成正比。</b>σ ＝ 46.3%、30 天，标的 200 时 200 的平值期权 vega 是 0.228，标的 400 时 400 的平值期权是 0.456。价格翻倍，vega 翻倍。</span><span class="l-en"><b>An at-the-money option's vega is proportional to price.</b> With σ = 46.3% and 30 days, the at-the-money 200 option with the underlying at 200 has vega 0.228; the at-the-money 400 option with the underlying at 400 has 0.456. Double the price, double the vega.</span></li>
+    <li><span class="l-zh"><b>同时起作用的行权价，档数也和价格成正比。</b>行权价按美元等距排（下图每 10 美元一档），而一个标准差的美元宽度和价格成正比：价格 200 时约 26.5 美元，400 时约 53.1 美元。落在标的 ±1 个标准差以内的行权价，200 时约 5 档，400 时约 11 档。</span><span class="l-en"><b>The number of strikes in play at once is also proportional to price.</b> Strikes are spaced evenly in dollars (every 10 dollars in the chart below), while one standard deviation in dollars is proportional to price: about 26.5 dollars at a price of 200 and about 53.1 dollars at 400. About 5 strikes lie within ±1 standard deviation of the underlying at 200, and about 11 at 400.</span></li>
   </ul>
-  <p>两个因素相乘，每档一张时的总 vega 按价格的<b>平方</b>变：以标的 350 时为 1，标的 250 时是 0.51，450 时是 1.65。</p>
+  <p><span class="l-zh">两个因素相乘，每档一张时的总 vega 按价格的<b>平方</b>变：以标的 350 时为 1，标的 250 时是 0.51，450 时是 1.65。</span><span class="l-en">Multiply the two factors and the total vega with one option per strike scales with the <b>square</b> of the price: taking the underlying at 350 as 1, it is 0.51 at 250 and 1.65 at 450.</span></p>
 
-  <h3>第三步：按 1/K² 配</h3>
-  <p>要抵掉价格的平方，每个行权价买的数量就按行权价平方的倒数配：低行权价多买，高行权价少买。以 350 买 1 张为准，175 买 (350 ÷ 175)² ＝ 4 张，700 买 0.25 张。这样总 vega 在标的 250、350、450 时是同一个数。讲义公式页顶上单独写着的 1/strike²，就是这个配方。</p>
+  <h3><span class="l-zh">第三步：按 1/K² 配</span><span class="l-en">Step 3: weight by 1/K²</span></h3>
+  <p><span class="l-zh">要抵掉价格的平方，每个行权价买的数量就按行权价平方的倒数配：低行权价多买，高行权价少买。以 350 买 1 张为准，175 买 (350 ÷ 175)² ＝ 4 张，700 买 0.25 张。这样总 vega 在标的 250、350、450 时是同一个数。讲义公式页顶上单独写着的 1/strike²，就是这个配方。</span><span class="l-en">To cancel the square of the price, the quantity at each strike is weighted by the inverse square of the strike: more at low strikes, fewer at high strikes. Taking 1 option at 350 as the base, buy (350 ÷ 175)² = 4 at 175 and 0.25 at 700. Then the total vega is the same number with the underlying at 250, 350 or 450. The 1/strike² written on its own at the top of the lecture's formula page is this recipe.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="vgPlay">逐档再加一遍</button></div>
-    <svg id="vg" viewBox="0 0 720 452" role="img" aria-label="逐个行权价加入期权，两种买法下总 vega 随标的价格的变化"></svg>
+    <div class="bar"><button class="btn ghost" id="vgPlay"><span class="l-zh">逐档再加一遍</span><span class="l-en">Add them strike by strike</span></button></div>
+    <svg id="vg" viewBox="0 0 720 452" role="img" aria-label="逐个行权价加入期权，两种买法下总 vega 随标的价格的变化" data-en-aria-label="Options added strike by strike: total vega against the underlying price under the two ways of buying"></svg>
     <div class="legend">
-      <span><i style="background:var(--result);opacity:.5"></i>每一层是一个行权价的 vega，一层层叠上去</span>
-      <span><i style="background:var(--control)"></i>刚加入的一档；350 那一档只在标的靠近 350 时厚</span>
-      <span><i class="ln" style="background:var(--ink)"></i>合计 vega</span>
+      <span><i style="background:var(--result);opacity:.5"></i><span class="l-zh">每一层是一个行权价的 vega，一层层叠上去</span><span class="l-en">Each layer is one strike's vega, stacked one on top of another</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">刚加入的一档；350 那一档只在标的靠近 350 时厚</span><span class="l-en">The strike just added; the 350 layer is thick only when the underlying is near 350</span></span>
+      <span><i class="ln" style="background:var(--ink)"></i><span class="l-zh">合计 vega</span><span class="l-en">Total vega</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已加入的行权价</div><div class="d" id="vgN"></div><div class="d2">100 到 800，每 10 美元一档</div></div>
-      <div class="stat"><div class="k">每档一张：标的 250 / 350 / 450</div><div class="d" id="vgA"></div><div class="d2">以 350 为 1</div></div>
-      <div class="stat"><div class="k">按 (350/K)²：标的 250 / 350 / 450</div><div class="d" id="vgB" style="color:var(--good)"></div><div class="d2">以 350 为 1</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已加入的行权价</span><span class="l-en">Strikes added</span></div><div class="d" id="vgN"></div><div class="d2"><span class="l-zh">100 到 800，每 10 美元一档</span><span class="l-en">100 to 800, every 10 dollars</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">每档一张：标的 250 / 350 / 450</span><span class="l-en">One per strike: underlying 250 / 350 / 450</span></div><div class="d" id="vgA"></div><div class="d2"><span class="l-zh">以 350 为 1</span><span class="l-en">350 = 1</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">按 (350/K)²：标的 250 / 350 / 450</span><span class="l-en">By (350/K)²: underlying 250 / 350 / 450</span></div><div class="d" id="vgB" style="color:var(--good)"></div><div class="d2"><span class="l-zh">以 350 为 1</span><span class="l-en">350 = 1</span></div></div>
     </div>
   </div>
-  <p class="tiny">模型值：Black-Scholes，σ ＝ 46.3%，30 天，利率取 0。vega 以每股、每 1 个波动率点计。</p>
-  <p>这一排按 1/K² 配好的期权，vega 不随标的价格变。按 Black-Scholes，gamma 乘股价的平方和 vega 成正比，所以它也不变：同一个模型里，每档一张时是 0.51 : 1 : 1.65，按 1/K² 配后是 1.00 : 1 : 1.00。</p>
-  <p>光买下这排期权还不是方差合约：它有 delta，标的一动，它的价值就跟着变。还要像 4.2 那样每天用标的把 delta 对冲掉。4.2 的账本缺的正是「gamma 乘股价的平方每天一样」这个条件，在这排期权上它自动成立，于是对冲下来的盈亏只看每天涨跌的平方加起来，比买入时的隐含方差多还是少，这就复制了一份方差合约。这一步是推导的结论，讲义给了配方，没有给证明。VIX 就是按这个配方，给一整排真实期权算出来的价值。</p>
+  <p class="tiny"><span class="l-zh">模型值：Black-Scholes，σ ＝ 46.3%，30 天，利率取 0。vega 以每股、每 1 个波动率点计。</span><span class="l-en">Model values: Black-Scholes, σ = 46.3%, 30 days, interest rate 0. Vega is per share, per 1 volatility point.</span></p>
+  <p><span class="l-zh">这一排按 1/K² 配好的期权，vega 不随标的价格变。按 Black-Scholes，gamma 乘股价的平方和 vega 成正比，所以它也不变：同一个模型里，每档一张时是 0.51 : 1 : 1.65，按 1/K² 配后是 1.00 : 1 : 1.00。</span><span class="l-en">This row of options weighted by 1/K² has a vega that does not change with the underlying price. Under Black-Scholes, gamma times the square of the stock price is proportional to vega, so it does not change either: in the same model, one option per strike gives 0.51 : 1 : 1.65, and weighting by 1/K² gives 1.00 : 1 : 1.00.</span></p>
+  <p><span class="l-zh">光买下这排期权还不是方差合约：它有 delta，标的一动，它的价值就跟着变。还要像 4.2 那样每天用标的把 delta 对冲掉。4.2 的账本缺的正是「gamma 乘股价的平方每天一样」这个条件，在这排期权上它自动成立，于是对冲下来的盈亏只看每天涨跌的平方加起来，比买入时的隐含方差多还是少，这就复制了一份方差合约。这一步是推导的结论，讲义给了配方，没有给证明。VIX 就是按这个配方，给一整排真实期权算出来的价值。</span><span class="l-en">Just buying this row of options is not yet a variance contract: it has delta, so its value moves as soon as the underlying moves. You also have to hedge the delta with the underlying every day, as in 4.2. What the 4.2 book lacked was exactly the condition that gamma times the square of the stock price is the same every day. On this row of options it holds automatically, so the hedged profit or loss depends only on whether the sum of squared daily moves is more or less than the implied variance at purchase, and that replicates a variance contract. This step is a result of derivation; the lecture gives the recipe but not the proof. VIX is the value of a whole row of real options computed with this recipe.</span></p>
 </section>
 
 <!-- ══════════ 三 ══════════ -->
 <section id="s3">
-  <h2><span class="n">三</span>VIX 的公式</h2>
-  <p class="sub">讲义说，VIX 和所有指数一样，是一串成分按各自的权重加起来：Σ(权重 × 成分)。它的成分是期权的价格，权重就是第二节的 1/K²。</p>
+  <h2><span class="l-zh"><span class="n">三</span>VIX 的公式</span><span class="l-en"><span class="n">3</span>The VIX formula</span></h2>
+  <p class="sub"><span class="l-zh">讲义说，VIX 和所有指数一样，是一串成分按各自的权重加起来：Σ(权重 × 成分)。它的成分是期权的价格，权重就是第二节的 1/K²。</span><span class="l-en">The lecture says that VIX, like every index, is a set of components added up with their weights: Σ(weight × component). Its components are option prices, and the weights are the 1/K² from section 2.</span></p>
   <div class="formula">
-    <div class="math"><span class="sym" data-say="这一个到期日算出来的方差，年化。开平方就是波动率。">σ²</span> ＝ (2 ÷ <span class="sym" data-say="离到期的时间，以年计。32 天是 32/365 年。">T</span>) × <span class="sym" data-say="对每个用到的行权价算一遍再加起来。">Σ</span> (<span class="sym" data-say="这个行权价「管」多宽：前后两个行权价之差的一半。最两头的，取它和唯一邻居之差。TSLA 平值附近每 5 美元一档，ΔK 就是 5。">ΔK<sub>i</sub></span> ÷ <span class="sym" data-say="第 i 个行权价。">K<sub>i</sub></span>²) × <span class="sym" data-say="把今天付的期权价格换算成到期那天的价值：利率 r，时间 T。T 很短时约等于 1 ＋ r·T，TSLA 5/15 这串是 1.00378。">e<sup>rT</sup></span> × <span class="sym" data-say="这个行权价上虚值期权的买一与卖一的中间价。">Q(K<sub>i</sub>)</span><br>− (1 ÷ T) × (<span class="sym" data-say="远期价，用 parity 从期权价格反推。">F</span> ÷ <span class="sym" data-say="不高于 F 的第一个行权价。讲义的公式里有它，说明里没有定义，这里按 Cboe 的规则取。">K<sub>0</sub></span> − 1)²</div>
-    <div class="gloss">每张虚值期权的价格，乘上它的权重 ΔK/K²，全部加起来，换算成一年的方差；再减掉一个很小的修正</div>
+    <div class="math"><span class="l-zh"><span class="sym" data-say="这一个到期日算出来的方差，年化。开平方就是波动率。">σ²</span> ＝ (2 ÷ <span class="sym" data-say="离到期的时间，以年计。32 天是 32/365 年。">T</span>) × <span class="sym" data-say="对每个用到的行权价算一遍再加起来。">Σ</span> (<span class="sym" data-say="这个行权价「管」多宽：前后两个行权价之差的一半。最两头的，取它和唯一邻居之差。TSLA 平值附近每 5 美元一档，ΔK 就是 5。">ΔK<sub>i</sub></span> ÷ <span class="sym" data-say="第 i 个行权价。">K<sub>i</sub></span>²) × <span class="sym" data-say="把今天付的期权价格换算成到期那天的价值：利率 r，时间 T。T 很短时约等于 1 ＋ r·T，TSLA 5/15 这串是 1.00378。">e<sup>rT</sup></span> × <span class="sym" data-say="这个行权价上虚值期权的买一与卖一的中间价。">Q(K<sub>i</sub>)</span><br>− (1 ÷ T) × (<span class="sym" data-say="远期价，用 parity 从期权价格反推。">F</span> ÷ <span class="sym" data-say="不高于 F 的第一个行权价。讲义的公式里有它，说明里没有定义，这里按 Cboe 的规则取。">K<sub>0</sub></span></span><span class="l-en"><span class="sym" data-say="The annualized variance computed for this one expiration. Its square root is the volatility.">σ²</span> = (2 ÷ <span class="sym" data-say="Time to expiration in years. 32 days is 32/365 of a year.">T</span>) × <span class="sym" data-say="Compute for each strike used and add them up.">Σ</span> (<span class="sym" data-say="How wide a range this strike covers: half the distance between the strikes on either side of it. For the two ends, the distance to their only neighbor. Near the money TSLA has a strike every 5 dollars, so ΔK is 5.">ΔK<sub>i</sub></span> ÷ <span class="sym" data-say="The i-th strike.">K<sub>i</sub></span>²) × <span class="sym" data-say="Converts the option price paid today into its value on expiration day: interest rate r, time T. For short T it is about 1 + r·T; for the TSLA 5/15 chain it is 1.00378.">e<sup>rT</sup></span> × <span class="sym" data-say="The midpoint of the bid and ask of the out-of-the-money option at this strike.">Q(K<sub>i</sub>)</span><br>− (1 ÷ T) × (<span class="sym" data-say="The forward price, backed out from option prices with parity.">F</span> ÷ <span class="sym" data-say="The first strike not above F. The lecture's formula includes it but its notes do not define it; here it follows the Cboe rule.">K<sub>0</sub></span></span> − 1)²</div>
+    <div class="gloss"><span class="l-zh">每张虚值期权的价格，乘上它的权重 ΔK/K²，全部加起来，换算成一年的方差；再减掉一个很小的修正</span><span class="l-en">Each out-of-the-money option's price times its weight ΔK/K², all added up and converted to an annual variance, minus a very small correction</span></div>
   </div>
-  <p>为什么乘 2 ÷ T：按 1/K² 配好的这一排虚值期权，如果每个行权价的隐含波动率都是同一个 σ，它们的价值 Σ(ΔK/K²)·e<sup>rT</sup>·Q 加起来约等于 σ² × T ÷ 2，也就是到期前总方差的一半。乘 2 还原成到期前的总方差，再除以 T 换成每年的方差。拿第四节 TSLA 5/15 这一串验证：每档都按平值的 46.07% 定价，Σ 只比 σ² × T ÷ 2 多 0.8%，代进公式算回 46.11%。为什么正好是一半，是推导的结论，讲义没有给证明。</p>
-  <p>每一项怎么取，讲义给了记号，Cboe（芝加哥期权交易所，编制 VIX 的机构）的规则给了细节：</p>
+  <p class="l-zh">为什么乘 2 ÷ T：按 1/K² 配好的这一排虚值期权，如果每个行权价的隐含波动率都是同一个 σ，它们的价值 Σ(ΔK/K²)·e<sup>rT</sup>·Q 加起来约等于 σ² × T ÷ 2，也就是到期前总方差的一半。乘 2 还原成到期前的总方差，再除以 T 换成每年的方差。拿第四节 TSLA 5/15 这一串验证：每档都按平值的 46.07% 定价，Σ 只比 σ² × T ÷ 2 多 0.8%，代进公式算回 46.11%。为什么正好是一半，是推导的结论，讲义没有给证明。</p><p class="l-en">Why multiply by 2 ÷ T: if every strike had the same implied volatility σ, the value of this row of out-of-the-money options weighted by 1/K², Σ(ΔK/K²)·e<sup>rT</sup>·Q, would add up to about σ² × T ÷ 2, half the total variance to expiration. Multiplying by 2 restores the total variance to expiration, and dividing by T turns it into variance per year. Checking with the TSLA 5/15 chain from section 4: with every strike priced at the at-the-money 46.07%, Σ is only 0.8% above σ² × T ÷ 2, and plugging it into the formula gives back 46.11%. Why it is exactly half is a result of derivation; the lecture gives no proof.</p>
+  <p><span class="l-zh">每一项怎么取，讲义给了记号，Cboe（芝加哥期权交易所，编制 VIX 的机构）的规则给了细节：</span><span class="l-en">The lecture gives the notation for each term; the rules of Cboe (the Chicago Board Options Exchange, which compiles VIX) give the details:</span></p>
   <table>
-    <thead><tr><th>这一项</th><th class="txt">怎么取</th><th class="txt">为什么</th></tr></thead>
+    <thead><tr><th><span class="l-zh">这一项</span><span class="l-en">Term</span></th><th class="txt"><span class="l-zh">怎么取</span><span class="l-en">How it is taken</span></th><th class="txt"><span class="l-zh">为什么</span><span class="l-en">Why</span></th></tr></thead>
     <tbody>
-      <tr><td>用哪些期权</td><td class="txt">只用虚值的：K<sub>0</sub> 以下用 put，K<sub>0</sub> 以上用 call，K<sub>0</sub> 那一档取 call 与 put 中间价的平均</td><td class="txt">实值期权的价格大部分是内在价值，与波动率无关。节点 8 讲过，实值那一张报价差几分钱，反推出来的 σ 就差很多。虚值期权的价格全是时间价值</td></tr>
-      <tr><td>取到哪里为止</td><td class="txt">从 K<sub>0</sub> 往两边走，买价为 0 的跳过；连续碰到两个买价为 0 的就停</td><td class="txt">没人肯出价的期权，价格说明不了什么</td></tr>
-      <tr><td>Q(K)</td><td class="txt">买一与卖一的中间价</td><td class="txt">1.1 起一直这样取</td></tr>
-      <tr><td>F</td><td class="txt">找 call 与 put 中间价最接近的行权价 K，F ＝ K ＋ e<sup>rT</sup> × (call − put)</td><td class="txt">5.2 讲的 parity</td></tr>
-      <tr><td>修正项</td><td class="txt">(F ÷ K<sub>0</sub> − 1)² ÷ T</td><td class="txt">F 比 K<sub>0</sub> 高一点，K<sub>0</sub> 那一档的 call 是实值的，平均进去的那一半多算了，这一项把它扣掉</td></tr>
+      <tr><td><span class="l-zh">用哪些期权</span><span class="l-en">Which options</span></td><td class="txt"><span class="l-zh">只用虚值的：K<sub>0</sub> 以下用 put，K<sub>0</sub> 以上用 call，K<sub>0</sub> 那一档取 call 与 put 中间价的平均</span><span class="l-en">Only out-of-the-money ones: puts below K<sub>0</sub>, calls above K<sub>0</sub>, and at K<sub>0</sub> the average of the call and put mids</span></td><td class="txt"><span class="l-zh">实值期权的价格大部分是内在价值，与波动率无关。节点 8 讲过，实值那一张报价差几分钱，反推出来的 σ 就差很多。虚值期权的价格全是时间价值</span><span class="l-en">An in-the-money option's price is mostly intrinsic value, which has nothing to do with volatility. As node 8 showed, a quote a few cents off on an in-the-money option moves the backed-out σ a lot. An out-of-the-money option's price is all time value</span></td></tr>
+      <tr><td><span class="l-zh">取到哪里为止</span><span class="l-en">Where to stop</span></td><td class="txt"><span class="l-zh">从 K<sub>0</sub> 往两边走，买价为 0 的跳过；连续碰到两个买价为 0 的就停</span><span class="l-en">Going out from K<sub>0</sub> in both directions, skip strikes with a bid of 0; stop after two bids of 0 in a row</span></td><td class="txt"><span class="l-zh">没人肯出价的期权，价格说明不了什么</span><span class="l-en">An option nobody will bid for says nothing through its price</span></td></tr>
+      <tr><td>Q(K)</td><td class="txt"><span class="l-zh">买一与卖一的中间价</span><span class="l-en">Midpoint of bid and ask</span></td><td class="txt"><span class="l-zh">1.1 起一直这样取</span><span class="l-en">Taken this way since 1.1</span></td></tr>
+      <tr><td>F</td><td class="txt"><span class="l-zh">找 call 与 put 中间价最接近的行权价 K，F ＝ K ＋ e</span><span class="l-en">Find the strike K where the call and put mids are closest; F = K + e</span><sup>rT</sup> × (call − put)</td><td class="txt"><span class="l-zh">5.2 讲的 parity</span><span class="l-en">The parity from 5.2</span></td></tr>
+      <tr><td><span class="l-zh">修正项</span><span class="l-en">Correction term</span></td><td class="txt">(F ÷ K<sub>0</sub> − 1)² ÷ T</td><td class="txt"><span class="l-zh">F 比 K<sub>0</sub> 高一点，K<sub>0</sub> 那一档的 call 是实值的，平均进去的那一半多算了，这一项把它扣掉</span><span class="l-en">F is slightly above K<sub>0</sub>, so the call at K<sub>0</sub> is in the money and the half averaged in is overcounted; this term takes it out</span></td></tr>
     </tbody>
   </table>
 
-  <h3>两个到期日插值到 30 天</h3>
-  <p>每个到期日照上面的公式各算一个 σ²。VIX 取离到期 23 到 30 天的一个（近月）和 30 到 37 天的一个（次月），按时间插值到正好 30 天：</p>
+  <h3><span class="l-zh">两个到期日插值到 30 天</span><span class="l-en">Interpolating two expirations to 30 days</span></h3>
+  <p><span class="l-zh">每个到期日照上面的公式各算一个 σ²。VIX 取离到期 23 到 30 天的一个（近月）和 30 到 37 天的一个（次月），按时间插值到正好 30 天：</span><span class="l-en">Each expiration gets its own σ² from the formula above. VIX takes one expiration 23 to 30 days out (the near term) and one 30 to 37 days out (the next term), and interpolates in time to exactly 30 days:</span></p>
   <div class="formula">
-    <div class="math">VIX ＝ 100 × √{ [ <span class="sym" data-say="近月到期前总的方差：年化方差 σ₁² 乘上年数 T₁。">T<sub>1</sub>σ<sub>1</sub>²</span> × (<span class="sym" data-say="次月离到期的时间。Cboe 以分钟计，这里用天数。">N<sub>2</sub></span> − <span class="sym" data-say="30 天。">N<sub>30</sub></span>) ÷ (N<sub>2</sub> − <span class="sym" data-say="近月离到期的时间。">N<sub>1</sub></span>) ＋ T<sub>2</sub>σ<sub>2</sub>² × (N<sub>30</sub> − N<sub>1</sub>) ÷ (N<sub>2</sub> − N<sub>1</sub>) ] × <span class="sym" data-say="一年的天数 365。前面算出的是 30 天里总的方差，乘 365/30 换回每年。">N<sub>365</sub></span> ÷ N<sub>30</sub> }</div>
-    <div class="gloss">两个到期日各自到期前的总方差，按离 30 天的远近加权平均，换回每年，开平方，乘 100</div>
+    <div class="math"><span class="l-zh">VIX ＝ 100 × √{ [ <span class="sym" data-say="近月到期前总的方差：年化方差 σ₁² 乘上年数 T₁。">T<sub>1</sub>σ<sub>1</sub>²</span> × (<span class="sym" data-say="次月离到期的时间。Cboe 以分钟计，这里用天数。">N<sub>2</sub></span> − <span class="sym" data-say="30 天。">N<sub>30</sub></span>) ÷ (N<sub>2</sub> − <span class="sym" data-say="近月离到期的时间。">N<sub>1</sub></span>) ＋ T<sub>2</sub>σ<sub>2</sub>² × (N<sub>30</sub> − N<sub>1</sub>) ÷ (N<sub>2</sub> − N<sub>1</sub>) ] × <span class="sym" data-say="一年的天数 365。前面算出的是 30 天里总的方差，乘 365/30 换回每年。">N<sub>365</sub></span></span><span class="l-en">VIX = 100 × √{ [ <span class="sym" data-say="Total variance to the near-term expiration: the annualized variance σ₁² times T₁ in years.">T<sub>1</sub>σ<sub>1</sub>²</span> × (<span class="sym" data-say="Time to the next-term expiration. Cboe counts it in minutes; here, in days.">N<sub>2</sub></span> − <span class="sym" data-say="30 days.">N<sub>30</sub></span>) ÷ (N<sub>2</sub> − <span class="sym" data-say="Time to the near-term expiration.">N<sub>1</sub></span>) + T<sub>2</sub>σ<sub>2</sub>² × (N<sub>30</sub> − N<sub>1</sub>) ÷ (N<sub>2</sub> − N<sub>1</sub>) ] × <span class="sym" data-say="365 days in a year. What comes before it is the total variance over 30 days; times 365/30 turns it back into per year.">N<sub>365</sub></span></span> ÷ N<sub>30</sub> }</div>
+    <div class="gloss"><span class="l-zh">两个到期日各自到期前的总方差，按离 30 天的远近加权平均，换回每年，开平方，乘 100</span><span class="l-en">The total variance to each of the two expirations, averaged with weights by distance from 30 days, turned back into per year, square-rooted and multiplied by 100</span></div>
   </div>
-  <p>插值之后，VIX 说的永远是「从现在起 30 天」，不管今天离哪个到期日近。一张期权的到期日是固定的，离到期的天数每天少一天；VIX 每天都往前看 30 天。</p>
-  <p class="tiny">Cboe 算真实的 VIX 用标普 500 指数期权，包括每周到期的那些，离到期的时间精确到分钟，两个到期日各用各的国债利率。</p>
+  <p><span class="l-zh">插值之后，VIX 说的永远是「从现在起 30 天」，不管今天离哪个到期日近。一张期权的到期日是固定的，离到期的天数每天少一天；VIX 每天都往前看 30 天。</span><span class="l-en">After interpolation, VIX always describes "the 30 days from now", whichever expiration today is close to. An option's expiration is fixed and its days to expiration shrink by one each day; VIX looks 30 days ahead every day.</span></p>
+  <p class="tiny"><span class="l-zh">Cboe 算真实的 VIX 用标普 500 指数期权，包括每周到期的那些，离到期的时间精确到分钟，两个到期日各用各的国债利率。</span><span class="l-en">Cboe computes the real VIX from S&amp;P 500 index options, including the weekly expirations, with time to expiration measured to the minute and each of the two expirations using its own Treasury rate.</span></p>
 </section>
 
 <!-- ══════════ 四 ══════════ -->
 <section id="s4">
-  <h2><span class="n">四</span>用 TSLA 4/13 收盘的期权链算一遍</h2>
-  <p class="sub">TSLA 没有官方的 VIX。把 4/13 收盘的真实报价放进同一套算法，得到一个「TSLA 30 天波动率指数」，拿它和 1.2 用的 46.3% 比。</p>
-  <p>4/13 收盘，TSLA 有这些到期日：<span id="expList"></span>。离到期 23 到 30 天的是 5/8（25 天），30 到 37 天的是 5/15（32 天），1.1 起用的就是 5/15 这一串。</p>
-  <p>先看 5/15。call 与 put 中间价最接近的行权价是 355：call 18.55，put 19.85，F ＝ 355 ＋ 1.00378 × (18.55 − 19.85) ＝ 353.70，和 1.1 用利率算的 353.69 只差 0.01。不高于它的第一个行权价是 350，就是 K<sub>0</sub>。往下取 put 取到 95，再往下 90 和 85 连续两档买价是 0，停；往上的 call 只有 950 一档买价是 0，跳过，一直取到 990。一共 142 张。</p>
-  <p>下面要拿真实报价和「平的微笑」比。节点 8 讲过微笑：同一到期日、不同行权价的隐含波动率连成一条曲线，两头往上翘；低行权价那一头叫左翼。平的微笑是假设每个行权价的隐含波动率都一样，都等于远期价处的隐含波动率，5/15 这一串是 46.07%。</p>
+  <h2><span class="l-zh"><span class="n">四</span>用 TSLA 4/13 收盘的期权链算一遍</span><span class="l-en"><span class="n">4</span>Working it out on the TSLA chain at the 4/13 close</span></h2>
+  <p class="sub"><span class="l-zh">TSLA 没有官方的 VIX。把 4/13 收盘的真实报价放进同一套算法，得到一个「TSLA 30 天波动率指数」，拿它和 1.2 用的 46.3% 比。</span><span class="l-en">TSLA has no official VIX. Putting the real quotes at the 4/13 close through the same algorithm gives a "TSLA 30-day volatility index", to compare with the 46.3% used in 1.2.</span></p>
+  <p><span class="l-zh">4/13 收盘，TSLA 有这些到期日：</span><span class="l-en">At the 4/13 close, TSLA had these expirations:</span><span id="expList"></span><span class="l-zh">。离到期 23 到 30 天的是 5/8（25 天），30 到 37 天的是 5/15（32 天），1.1 起用的就是 5/15 这一串。</span><span class="l-en">. The one 23 to 30 days out is 5/8 (25 days) and the one 30 to 37 days out is 5/15 (32 days); 5/15 is the chain used since 1.1.</span></p>
+  <p><span class="l-zh">先看 5/15。call 与 put 中间价最接近的行权价是 355：call 18.55，put 19.85，F ＝ 355 ＋ 1.00378 × (18.55 − 19.85) ＝ 353.70，和 1.1 用利率算的 353.69 只差 0.01。不高于它的第一个行权价是 350，就是 K<sub>0</sub>。往下取 put 取到 95，再往下 90 和 85 连续两档买价是 0，停；往上的 call 只有 950 一档买价是 0，跳过，一直取到 990。一共 142 张。</span><span class="l-en">Start with 5/15. The strike where the call and put mids are closest is 355: call 18.55, put 19.85, F = 355 + 1.00378 × (18.55 − 19.85) = 353.70, only 0.01 from the 353.69 that 1.1 computed from the interest rate. The first strike not above it is 350, which is K<sub>0</sub>. Going down, puts are taken to 95; below that, 90 and 85 both have a bid of 0, so stop. Going up, only the 950 call has a bid of 0 and is skipped, and calls are taken all the way to 990. 142 options in all.</span></p>
+  <p><span class="l-zh">下面要拿真实报价和「平的微笑」比。节点 8 讲过微笑：同一到期日、不同行权价的隐含波动率连成一条曲线，两头往上翘；低行权价那一头叫左翼。平的微笑是假设每个行权价的隐含波动率都一样，都等于远期价处的隐含波动率，5/15 这一串是 46.07%。</span><span class="l-en">Next, the real quotes are compared with a "flat smile". Node 8 covered the smile: the implied volatilities of different strikes at the same expiration form a curve that turns up at both ends; the low-strike end is called the left wing. A flat smile assumes every strike has the same implied volatility, equal to the implied volatility at the forward price; for the 5/15 chain that is 46.07%.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="stPlay">逐张再加一遍</button></div>
-    <svg id="st" viewBox="0 0 720 490" role="img" aria-label="TSLA 5/15 到期的每张虚值期权对方差的贡献，从平值往两边逐张加入"></svg>
+    <div class="bar"><button class="btn ghost" id="stPlay"><span class="l-zh">逐张再加一遍</span><span class="l-en">Add them option by option</span></button></div>
+    <svg id="st" viewBox="0 0 720 490" role="img" aria-label="TSLA 5/15 到期的每张虚值期权对方差的贡献，从平值往两边逐张加入" data-en-aria-label="Each out-of-the-money TSLA option's contribution to variance at the 5/15 expiration, added one at a time from the money outward"></svg>
     <div class="legend">
-      <span><i style="background:var(--result)"></i>虚值 put</span>
-      <span><i style="background:var(--control)"></i>虚值 call</span>
-      <span><i style="background:var(--ink)"></i>K<sub>0</sub> ＝ 350，call 与 put 平均</span>
-      <span><i class="dash" style="color:var(--ink)"></i>每档都按平值 46.07% 定价时的高度（平的微笑）</span>
-      <span>柱宽 ΔK，柱高 (2/T)·e<sup>rT</sup>·Q ÷ K²，面积就是这一张的贡献</span>
+      <span><i style="background:var(--result)"></i><span class="l-zh">虚值 put</span><span class="l-en">Out-of-the-money put</span></span>
+      <span><i style="background:var(--control)"></i><span class="l-zh">虚值 call</span><span class="l-en">Out-of-the-money call</span></span>
+      <span class="l-zh"><i style="background:var(--ink)"></i>K<sub>0</sub> ＝ 350，call 与 put 平均</span><span class="l-en"><i style="background:var(--ink)"></i>K<sub>0</sub> = 350, call and put averaged</span>
+      <span class="l-zh"><i class="dash" style="color:var(--ink)"></i>每档都按平值 46.07% 定价时的高度（平的微笑）</span><span class="l-en"><i class="dash" style="color:var(--ink)"></i>Height if every strike were priced at the at-the-money 46.07% (flat smile)</span>
+      <span><span class="l-zh">柱宽 ΔK，柱高 (2/T)·e<sup>rT</sup>·Q ÷ K²，面积就是这一张的贡献</span><span class="l-en">Bar width ΔK, bar height (2/T)·e<sup>rT</sup>·Q ÷ K²; the area is this option's contribution</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">已加入</div><div class="d" id="stN"></div><div class="d2" id="stNb"></div></div>
-      <div class="stat"><div class="k">累计 Σ，方差点</div><div class="d" id="stS"></div><div class="d2" id="stSb"></div></div>
-      <div class="stat"><div class="k">扣掉修正后折成波动率</div><div class="d" id="stV" style="color:var(--control)"></div><div class="d2">√(Σ − 12.71)</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">已加入</span><span class="l-en">Added</span></div><div class="d" id="stN"></div><div class="d2" id="stNb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">累计 Σ，方差点</span><span class="l-en">Running Σ, variance points</span></div><div class="d" id="stS"></div><div class="d2" id="stSb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">扣掉修正后折成波动率</span><span class="l-en">As volatility, after the correction</span></div><div class="d" id="stV" style="color:var(--control)"></div><div class="d2">√(Σ − 12.71)</div></div>
     </div>
     <div class="say plain" id="stSay"></div>
   </div>
-  <p>三张期权放在一起看权重和贡献：</p>
+  <p><span class="l-zh">三张期权放在一起看权重和贡献：</span><span class="l-en">Three options side by side, with weights and contributions:</span></p>
   <table>
-    <thead><tr><th>行权价</th><th>用哪张</th><th>中间价 Q</th><th>权重<br>以 350 为 1</th><th>贡献<br>方差点</th><th>隐含波动率</th></tr></thead>
+    <thead><tr><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">用哪张</span><span class="l-en">Which one</span></th><th><span class="l-zh">中间价 Q</span><span class="l-en">Mid Q</span></th><th><span class="l-zh">权重<br>以 350 为 1</span><span class="l-en">Weight<br>350 = 1</span></th><th><span class="l-zh">贡献<br>方差点</span><span class="l-en">Adds to Σ<br>variance points</span></th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied vol</span></th></tr></thead>
     <tbody id="exTb"></tbody>
   </table>
-  <p>250 的 put 只值 0.735，但按 1/K² 它的权重是 350 的 1.96 倍；它的隐含波动率 64.2%，比平值高出 18 个点。左翼抬高的那部分，就装在这些便宜的 put 的价格里。</p>
+  <p><span class="l-zh">250 的 put 只值 0.735，但按 1/K² 它的权重是 350 的 1.96 倍；它的隐含波动率 64.2%，比平值高出 18 个点。左翼抬高的那部分，就装在这些便宜的 put 的价格里。</span><span class="l-en">The 250 put is worth only 0.735, but by 1/K² its weight is 1.96 times the 350's; its implied volatility is 64.2%, 18 points above at the money. The raised part of the left wing sits in the prices of these cheap puts.</span></p>
 
-  <h3>两个到期日合成 30 天</h3>
+  <h3><span class="l-zh">两个到期日合成 30 天</span><span class="l-en">Combining two expirations into 30 days</span></h3>
   <table>
-    <thead><tr><th>到期日</th><th>远期价 F</th><th>分界行权价 K<sub>0</sub></th><th>用到的期权</th><th>算出的 σ</th><th>平值隐含波动率</th></tr></thead>
+    <thead><tr><th><span class="l-zh">到期日</span><span class="l-en">Expiry</span></th><th><span class="l-zh">远期价 F</span><span class="l-en">Forward price F</span></th><th><span class="l-zh">分界行权价 K</span><span class="l-en">Strike K</span><sub>0</sub></th><th><span class="l-zh">用到的期权</span><span class="l-en">Options used</span></th><th><span class="l-zh">算出的 σ</span><span class="l-en">Computed σ</span></th><th><span class="l-zh">平值隐含波动率</span><span class="l-en">ATM implied vol</span></th></tr></thead>
     <tbody id="termTb"></tbody>
   </table>
-  <p class="tiny">平值隐含波动率：远期价处的隐含波动率，由 F 两侧两档虚值期权的隐含波动率插值。</p>
-  <p>插值的权重：5/8 占 (32 − 30) ÷ (32 − 25) ＝ 2/7，5/15 占 5/7。合起来，<b>TSLA 30 天波动率指数 <span id="idxV"></span></b>。</p>
+  <p class="tiny"><span class="l-zh">平值隐含波动率：远期价处的隐含波动率，由 F 两侧两档虚值期权的隐含波动率插值。</span><span class="l-en">ATM implied vol: the at-the-money implied volatility, that is, the implied volatility at the forward price, interpolated from the implied volatilities of the two out-of-the-money options on either side of F.</span></p>
+  <p><span class="l-zh">插值的权重：5/8 占 (32 − 30) ÷ (32 − 25) ＝ 2/7，5/15 占 5/7。合起来，</span><span class="l-en">Interpolation weights: 5/8 gets (32 − 30) ÷ (32 − 25) = 2/7 and 5/15 gets 5/7. Together they give the</span><b><span class="l-zh">TSLA 30 天波动率指数</span><span class="l-en">TSLA 30-day volatility index of</span> <span id="idxV"></span></b><span class="l-zh">。</span><span class="l-en">.</span></p>
   <div class="vbars" id="vbars"></div>
 
-  <h3>多出来的 4.34 个点从哪来</h3>
-  <p>把每个行权价都按远期价处的隐含波动率重新定价（5/8 用 47.01%，5/15 用 46.07%），假装那天的微笑是平的，再放进同一套公式，得到 46.34%：微笑平的时候，这套算法还原出平值的隐含波动率，多出的 0.04 来自行权价一档一档不连续、两头又截断。</p>
-  <p>真实报价算出 50.68%，多出 4.34 个点，折成方差是从 2147.1 到 2568.0，多出 420.9 方差点。公式对价格是线性的，这 420.9 可以按行权价拆开：</p>
+  <h3><span class="l-zh">多出来的 4.34 个点从哪来</span><span class="l-en">Where the extra 4.34 points come from</span></h3>
+  <p><span class="l-zh">把每个行权价都按远期价处的隐含波动率重新定价（5/8 用 47.01%，5/15 用 46.07%），假装那天的微笑是平的，再放进同一套公式，得到 46.34%：微笑平的时候，这套算法还原出平值的隐含波动率，多出的 0.04 来自行权价一档一档不连续、两头又截断。</span><span class="l-en">Reprice every strike at the implied volatility at the forward price (47.01% for 5/8, 46.07% for 5/15), pretending the smile that day was flat, and put it through the same formula: the result is 46.34%. With a flat smile, the algorithm gives back the at-the-money implied volatility; the extra 0.04 comes from the strikes being discrete and both ends being cut off.</span></p>
+  <p><span class="l-zh">真实报价算出 50.68%，多出 4.34 个点，折成方差是从 2147.1 到 2568.0，多出 420.9 方差点。公式对价格是线性的，这 420.9 可以按行权价拆开：</span><span class="l-en">The real quotes give 50.68%, 4.34 points more; in variance that is from 2147.1 to 2568.0, 420.9 variance points more. The formula is linear in prices, so these 420.9 can be split up by strike:</span></p>
   <table>
-    <thead><tr><th>行权价</th><th>真实比平的多出<br>方差点</th><th>5/15 这一段<br>占 Σ 的比例</th></tr></thead>
+    <thead><tr><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">真实比平的多出<br>方差点</span><span class="l-en">Real minus flat<br>variance points</span></th><th><span class="l-zh">5/15 这一段<br>占 Σ 的比例</span><span class="l-en">Share of Σ<br>for 5/15</span></th></tr></thead>
     <tbody id="regTb"></tbody>
   </table>
-  <p>多出来的几乎全在 330 以下：左翼 put 的隐含波动率高（节点 8 讲过，这天 200 的 put 是 86.5%），又按 1/K² 拿到更大的权重。380 到 450 是这天微笑的谷底（节点 8 算出最低点在 378.7），比平值还低，拉低了一点。</p>
-  <p>这两个到期日都包含 4/22 盘后的财报（8 第四节），所以这天的 30 天指数里，也包含了财报那一晚可能的大涨大跌。</p>
-  <p class="tiny">数据：4/13 16:00 的报价快照，中间价 ＝ (买一 ＋ 卖一) ÷ 2。离到期时间按日历日 ÷ 365，利率 4.3%（1.1 从 parity 反推）。TSLA 期权是美式的，put 带一点提前行权的价值（节点 9），这里当作欧式处理。</p>
+  <p><span class="l-zh">多出来的几乎全在 330 以下：左翼 put 的隐含波动率高（节点 8 讲过，这天 200 的 put 是 86.5%），又按 1/K² 拿到更大的权重。380 到 450 是这天微笑的谷底（节点 8 算出最低点在 378.7），比平值还低，拉低了一点。</span><span class="l-en">Almost all of the extra is below 330: the left-wing puts have high implied volatility (as node 8 showed, the 200 put was at 86.5% that day) and also get larger weights by 1/K². 380 to 450 is the bottom of that day's smile (node 8 put the lowest point at 378.7), below at the money, which pulls the total down a little.</span></p>
+  <p><span class="l-zh">这两个到期日都包含 4/22 盘后的财报（8 第四节），所以这天的 30 天指数里，也包含了财报那一晚可能的大涨大跌。</span><span class="l-en">Both expirations include the earnings report after the close on 4/22 (section 4 of node 8), so that day's 30-day index also includes the possible big move on earnings night.</span></p>
+  <p class="tiny"><span class="l-zh">数据：4/13 16:00 的报价快照，中间价 ＝ (买一 ＋ 卖一) ÷ 2。离到期时间按日历日 ÷ 365，利率 4.3%（1.1 从 parity 反推）。TSLA 期权是美式的，put 带一点提前行权的价值（节点 9），这里当作欧式处理。</span><span class="l-en">Data: quote snapshot at 16:00 on 4/13, mid = (bid + ask) ÷ 2. Time to expiration is calendar days ÷ 365, interest rate 4.3% (backed out from parity in 1.1). TSLA options are American, so the puts carry a little early exercise value (node 9); here they are treated as European.</span></p>
 </section>
 
 <!-- ══════════ 五 ══════════ -->
 <section id="s5">
-  <h2><span class="n">五</span>VIX 与单个期权的隐含波动率</h2>
-  <p class="sub">两者都写成一个百分比，都叫隐含波动率，说的不是同一件事。</p>
+  <h2><span class="l-zh"><span class="n">五</span>VIX 与单个期权的隐含波动率</span><span class="l-en"><span class="n">5</span>VIX and a single option's implied volatility</span></h2>
+  <p class="sub"><span class="l-zh">两者都写成一个百分比，都叫隐含波动率，说的不是同一件事。</span><span class="l-en">Both are written as a percentage and both are called implied volatility, but they do not describe the same thing.</span></p>
   <table>
-    <thead><tr><th></th><th class="txt">单个期权的隐含波动率</th><th class="txt">VIX</th></tr></thead>
+    <thead><tr><th></th><th class="txt"><span class="l-zh">单个期权的隐含波动率</span><span class="l-en">Implied volatility of one option</span></th><th class="txt">VIX</th></tr></thead>
     <tbody>
-      <tr><td>用了几张期权</td><td class="txt">一张</td><td class="txt">两个到期日的一整排虚值期权，TSLA 这天是 104 ＋ 142 张</td></tr>
-      <tr><td>期限</td><td class="txt">到期日固定，离到期的天数每天少一天</td><td class="txt">永远是从今天起 30 天，靠两个到期日插值</td></tr>
-      <tr><td>要不要定价模型</td><td class="txt">要：把价格代进 Black-Scholes 反推 σ</td><td class="txt">不要：公式里只有价格、行权价、利率和时间</td></tr>
-      <tr><td>微笑</td><td class="txt">只是微笑上的一个点。350 call 是 46.3%</td><td class="txt">整条微笑都在里面，左翼按 1/K² 加重。TSLA 这天 50.68%</td></tr>
-      <tr><td>平方对应什么</td><td class="txt">没有对应的合约</td><td class="txt">一份 30 天方差合约的价格（第二节）</td></tr>
-      <tr><td>能不能直接买卖</td><td class="txt">能，买卖那张期权就是</td><td class="txt">不能，只能交易 VIX 期货、VIX 期权或跟踪它们的产品</td></tr>
+      <tr><td><span class="l-zh">用了几张期权</span><span class="l-en">Options used</span></td><td class="txt"><span class="l-zh">一张</span><span class="l-en">One</span></td><td class="txt"><span class="l-zh">两个到期日的一整排虚值期权，TSLA 这天是 104 ＋ 142 张</span><span class="l-en">A whole row of out-of-the-money options at two expirations; for TSLA that day, 104 + 142</span></td></tr>
+      <tr><td><span class="l-zh">期限</span><span class="l-en">Horizon</span></td><td class="txt"><span class="l-zh">到期日固定，离到期的天数每天少一天</span><span class="l-en">Fixed expiration; days to expiration shrink by one each day</span></td><td class="txt"><span class="l-zh">永远是从今天起 30 天，靠两个到期日插值</span><span class="l-en">Always 30 days from today, by interpolating two expirations</span></td></tr>
+      <tr><td><span class="l-zh">要不要定价模型</span><span class="l-en">Needs a pricing model?</span></td><td class="txt"><span class="l-zh">要：把价格代进 Black-Scholes 反推 σ</span><span class="l-en">Yes: plug the price into Black-Scholes and back out σ</span></td><td class="txt"><span class="l-zh">不要：公式里只有价格、行权价、利率和时间</span><span class="l-en">No: the formula has only prices, strikes, the interest rate and time</span></td></tr>
+      <tr><td><span class="l-zh">微笑</span><span class="l-en">Smile</span></td><td class="txt"><span class="l-zh">只是微笑上的一个点。350 call 是 46.3%</span><span class="l-en">Only one point on the smile. The 350 call: 46.3%</span></td><td class="txt"><span class="l-zh">整条微笑都在里面，左翼按 1/K² 加重。TSLA 这天 50.68%</span><span class="l-en">The whole smile is in it, with the left wing weighted up by 1/K². TSLA that day: 50.68%</span></td></tr>
+      <tr><td><span class="l-zh">平方对应什么</span><span class="l-en">What its square corresponds to</span></td><td class="txt"><span class="l-zh">没有对应的合约</span><span class="l-en">No corresponding contract</span></td><td class="txt"><span class="l-zh">一份 30 天方差合约的价格（第二节）</span><span class="l-en">The price of a 30-day variance contract (section 2)</span></td></tr>
+      <tr><td><span class="l-zh">能不能直接买卖</span><span class="l-en">Can it be traded directly?</span></td><td class="txt"><span class="l-zh">能，买卖那张期权就是</span><span class="l-en">Yes: trade that option</span></td><td class="txt"><span class="l-zh">不能，只能交易 VIX 期货、VIX 期权或跟踪它们的产品</span><span class="l-en">No: only VIX futures, VIX options or products that track them</span></td></tr>
     </tbody>
   </table>
-  <p>VIX 自己就换过一次算法。Cboe 1993 年推出 VIX 时，算的是 S&amp;P 100（标普 100 指数，由美国 100 家大公司组成）平值附近 8 张期权隐含波动率的平均，属于左边一列的做法；2003 年改成标普 500 期权和第三节的公式，旧算法改名 VXO。</p>
+  <p><span class="l-zh">VIX 自己就换过一次算法。Cboe 1993 年推出 VIX 时，算的是 S&amp;P 100（标普 100 指数，由美国 100 家大公司组成）平值附近 8 张期权隐含波动率的平均，属于左边一列的做法；2003 年改成标普 500 期权和第三节的公式，旧算法改名 VXO。</span><span class="l-en">VIX itself has changed its method once. When Cboe launched VIX in 1993, it was the average implied volatility of 8 options near the money on the S&amp;P 100 (an index of 100 large US companies), the approach in the left column; in 2003 it switched to S&amp;P 500 options and the formula in section 3, and the old method was renamed VXO.</span></p>
 
-  <h3>为什么 VIX 买不到</h3>
-  <p>讲义说，股票指数可以按权重把成分股买齐来复制，指数基金就是这样做的；VIX 不行，因为它的成分和权重一直在变。拿 TSLA 这串 5/15 的期权连看两天：</p>
+  <h3><span class="l-zh">为什么 VIX 买不到</span><span class="l-en">Why you cannot buy VIX</span></h3>
+  <p><span class="l-zh">讲义说，股票指数可以按权重把成分股买齐来复制，指数基金就是这样做的；VIX 不行，因为它的成分和权重一直在变。拿 TSLA 这串 5/15 的期权连看两天：</span><span class="l-en">The lecture says a stock index can be replicated by buying all its component stocks at their weights, which is what index funds do; VIX cannot, because its components and weights keep changing. Look at this TSLA 5/15 chain on two days:</span></p>
   <table>
     <thead><tr><th></th><th>4/13</th><th>4/15</th></tr></thead>
     <tbody id="d15Tb"></tbody>
   </table>
   <p id="d15Say"></p>
-  <p>想用期权跟住这个数，就得每天换掉一批期权、改一遍数量。讲义的结论：想交易 VIX，只能通过 VIX 期货、VIX 期权，或者跟踪它们的 ETF 和 ETN（ETF 是在交易所像股票一样买卖的基金；ETN 是银行发行、按某个指数的表现偿付的债券，也在交易所买卖）；而这些产品不一定跟得住指数，表现也不一定像你以为的那样（第七节）。</p>
+  <p><span class="l-zh">想用期权跟住这个数，就得每天换掉一批期权、改一遍数量。讲义的结论：想交易 VIX，只能通过 VIX 期货、VIX 期权，或者跟踪它们的 ETF 和 ETN（ETF 是在交易所像股票一样买卖的基金；ETN 是银行发行、按某个指数的表现偿付的债券，也在交易所买卖）；而这些产品不一定跟得住指数，表现也不一定像你以为的那样（第七节）。</span><span class="l-en">To track this number with options, you would have to swap out a batch of options and change the quantities every day. The lecture's conclusion: to trade VIX you can only go through VIX futures, VIX options, or the ETFs and ETNs that track them (an ETF is a fund traded on an exchange like a stock; an ETN is a bond issued by a bank that pays according to the performance of an index, also traded on an exchange); and these products do not necessarily keep up with the index, nor behave the way you might expect (section 7).</span></p>
 </section>
 
 <!-- ══════════ 六 ══════════ -->
 <section id="s6">
-  <h2><span class="n">六</span>真实的 VIX 与之后的实际波动</h2>
-  <p class="sub">Cboe 在交易时段里用标普 500 指数期权照第三节的公式连续算 VIX。它是市场今天给之后 30 天报的波动率；一份 30 天方差合约到期结算的，是这 30 天真实走出来的波动率。两个放在一起比。</p>
+  <h2><span class="l-zh"><span class="n">六</span>真实的 VIX 与之后的实际波动</span><span class="l-en"><span class="n">6</span>The real VIX and realized volatility afterward</span></h2>
+  <p class="sub"><span class="l-zh">Cboe 在交易时段里用标普 500 指数期权照第三节的公式连续算 VIX。它是市场今天给之后 30 天报的波动率；一份 30 天方差合约到期结算的，是这 30 天真实走出来的波动率。两个放在一起比。</span><span class="l-en">During trading hours Cboe computes VIX continuously from S&amp;P 500 index options with the formula in section 3. It is the volatility the market quotes today for the next 30 days; what a 30-day variance contract settles on at expiration is the volatility actually realized over those 30 days. Put the two side by side.</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="vxPlay">从 2020 年再放一遍</button></div>
-    <svg id="vx" viewBox="0 0 720 350" role="img" aria-label="2020 年 8 月以来每天的 VIX，与从那天起之后 30 天 SPX 的实际波动率"></svg>
+    <div class="bar"><button class="btn ghost" id="vxPlay"><span class="l-zh">从 2020 年再放一遍</span><span class="l-en">Replay from 2020</span></button></div>
+    <svg id="vx" viewBox="0 0 720 350" role="img" aria-label="2020 年 8 月以来每天的 VIX，与从那天起之后 30 天 SPX 的实际波动率" data-en-aria-label="Daily VIX since August 2020, and the realized volatility of SPX over the 30 days from each day"></svg>
     <div class="legend">
       <span><i class="ln" style="background:var(--ink)"></i>VIX</span>
-      <span><i class="ln" style="background:var(--result)"></i>从这一天起之后 30 天的实际波动率，画在起点那天</span>
-      <span><i style="background:var(--control);opacity:.55"></i>实际比 VIX 高的日子</span>
+      <span><i class="ln" style="background:var(--result)"></i><span class="l-zh">从这一天起之后 30 天的实际波动率，画在起点那天</span><span class="l-en">Realized volatility over the 30 days from this day, plotted on the starting day</span></span>
+      <span><i style="background:var(--control);opacity:.55"></i><span class="l-zh">实际比 VIX 高的日子</span><span class="l-en">Days when realized was above VIX</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="vxD"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="vxD"></div></div>
       <div class="stat"><div class="k">VIX</div><div class="d" id="vxV"></div></div>
-      <div class="stat"><div class="k">之后 30 天的实际</div><div class="d" id="vxR" style="color:var(--result)"></div></div>
-      <div class="stat"><div class="k">到这天为止，VIX 更高的日子</div><div class="d" id="vxP"></div><div class="d2" id="vxPb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">之后 30 天的实际</span><span class="l-en">Realized, next 30 days</span></div><div class="d" id="vxR" style="color:var(--result)"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">到这天为止，VIX 更高的日子</span><span class="l-en">Days to date with VIX higher</span></div><div class="d" id="vxP"></div><div class="d2" id="vxPb"></div></div>
     </div>
     <div class="say plain" id="vxSay"></div>
   </div>
-  <p>节点 7 用之后 21 个交易日比过同一件事：86.9% 的日子 VIX 更高，平均高 4.42 个点。这里按第一节的合约公式、之后 30 个日历日算，结果几乎一样。节点 7 讲过原因：卖方承担着对冲不掉的跳空，要多收一份钱。</p>
-  <p>两者的相关系数是 0.59：VIX 高的时候，之后通常也更波动，但 VIX 只说对了一部分。低估得最厉害的就是第一节那个月：2025-03-25 VIX 17.07，之后 30 天 SPX 实际走出 47.69%，差 30.62 个点，当中有 4/3、4/4 的大跌和 4/9 宣布暂缓加征关税那天的大涨。</p>
+  <p><span class="l-zh">节点 7 用之后 21 个交易日比过同一件事：86.9% 的日子 VIX 更高，平均高 4.42 个点。这里按第一节的合约公式、之后 30 个日历日算，结果几乎一样。节点 7 讲过原因：卖方承担着对冲不掉的跳空，要多收一份钱。</span><span class="l-en">Node 7 compared the same thing over the next 21 trading days: VIX was higher on 86.9% of days, by 4.42 points on average. Here, with the contract formula from section 1 over the next 30 calendar days, the result is almost the same. Node 7 explained why: the seller carries gaps that cannot be hedged and charges extra for them.</span></p>
+  <p><span class="l-zh">两者的相关系数是 0.59：VIX 高的时候，之后通常也更波动，但 VIX 只说对了一部分。低估得最厉害的就是第一节那个月：2025-03-25 VIX 17.07，之后 30 天 SPX 实际走出 47.69%，差 30.62 个点，当中有 4/3、4/4 的大跌和 4/9 宣布暂缓加征关税那天的大涨。</span><span class="l-en">The correlation between the two is 0.59: when VIX is high, the period after is usually more volatile too, but VIX gets it only partly right. The biggest underestimate was the month in section 1: on 2025-03-25 VIX was 17.07, and over the next 30 days SPX realized 47.69%, 30.62 points more, including the big drops on 4/3 and 4/4 and the big rise on 4/9, the day a pause in tariff increases was announced.</span></p>
 
-  <h3>卖方差的人赚什么</h3>
-  <p>设想每个交易日都按当天 VIX 的平方卖出一份 30 天方差合约，到期按实际方差结算。六年里平均每份赚 141.0 方差点，87.6% 的份数赚钱。但赚的时候平均赚 204.2，亏的时候平均亏 306.8；最差的一份是 2025-03-27 起的那一份，亏 2028.5，是平均每份收益的 14.4 倍。只取互不重叠的，每隔 21 个交易日卖一份，69 份里赚 63 份、亏 6 份。</p>
-  <p>大多数时候收一点，偶尔亏一大笔：第七节讲义的 covered call 例子也是这个形状。</p>
+  <h3><span class="l-zh">卖方差的人赚什么</span><span class="l-en">What variance sellers earn</span></h3>
+  <p><span class="l-zh">设想每个交易日都按当天 VIX 的平方卖出一份 30 天方差合约，到期按实际方差结算。六年里平均每份赚 141.0 方差点，87.6% 的份数赚钱。但赚的时候平均赚 204.2，亏的时候平均亏 306.8；最差的一份是 2025-03-27 起的那一份，亏 2028.5，是平均每份收益的 14.4 倍。只取互不重叠的，每隔 21 个交易日卖一份，69 份里赚 63 份、亏 6 份。</span><span class="l-en">Suppose that every trading day you sell a 30-day variance contract at the square of that day's VIX and settle it on realized variance at expiration. Over six years each contract earns 141.0 variance points on average, and 87.6% of them make money. But the winners make 204.2 on average and the losers lose 306.8 on average; the worst one, started on 2025-03-27, lost 2028.5, 14.4 times the average gain per contract. Taking only non-overlapping ones, one every 21 trading days, 63 of 69 make money and 6 lose.</span></p>
+  <p><span class="l-zh">大多数时候收一点，偶尔亏一大笔：第七节讲义的 covered call 例子也是这个形状。</span><span class="l-en">Collect a little most of the time, lose a lot once in a while: the lecture's covered call example in section 7 has the same shape.</span></p>
 
-  <h3>均值回复</h3>
-  <p>讲义说波动率会<b>均值回复</b>：冲上去会回来，跌下去也会回来。这六年 VIX 平均 19.75，中位数 18.52，最低 11.89（2024-05-24），最高 52.67（2025-04-08）。每次收盘冲过 30，回到 20 以下用了多久：</p>
+  <h3><span class="l-zh">均值回复</span><span class="l-en">Mean reversion</span></h3>
+  <p><span class="l-zh">讲义说波动率会<b>均值回复</b>：冲上去会回来，跌下去也会回来。这六年 VIX 平均 19.75，中位数 18.52，最低 11.89（2024-05-24），最高 52.67（2025-04-08）。每次收盘冲过 30，回到 20 以下用了多久：</span><span class="l-en">The lecture says volatility is <b>mean reverting</b>: when it spikes it comes back, and when it drops it comes back too. Over these six years VIX averaged 19.75, with a median of 18.52, a low of 11.89 (2024-05-24) and a high of 52.67 (2025-04-08). Each time it closed above 30, how long it took to get back below 20:</span></p>
   <table>
-    <thead><tr><th>第一次收在 30 以上</th><th>这一段最高</th><th>回到 20 以下</th><th>用了几个交易日</th></tr></thead>
+    <thead><tr><th><span class="l-zh">第一次收在 30 以上</span><span class="l-en">First close above 30</span></th><th><span class="l-zh">这一段最高</span><span class="l-en">Peak of the episode</span></th><th><span class="l-zh">回到 20 以下</span><span class="l-en">Back below 20</span></th><th><span class="l-zh">用了几个交易日</span><span class="l-en">Trading days taken</span></th></tr></thead>
     <tbody id="epTb"></tbody>
   </table>
-  <p>2024 年 8 月和 2025 年 4 月都是几天之内冲上去的：8/1 的 18.23 到 8/5 的 38.56，4/2 的 21.45 到 4/8 的 52.67。回落也快，分别用了 6 个和 25 个交易日。2020 年秋天那一段最高 40.7，却在 20 以上停了 111 个交易日；2022 年分三段，每段两到三个多月。</p>
-  <p class="tiny">数据：分钟线，SPX 与 VIX 取美东 15:59 那一分钟（半日市 12:59）。VIX 分钟线在 46 个月末的下午缺数据，那些天不算；2024-05-13 至 05-15 三天 SPX 缺数据，用 SPY 同一分钟的涨跌补。实际波动率按第一节的公式：之后 30 个日历日内的对数涨跌，252 ÷ n × Σr²，开平方。最后一个完整窗口从 2026-07-01 起。</p>
+  <p><span class="l-zh">2024 年 8 月和 2025 年 4 月都是几天之内冲上去的：8/1 的 18.23 到 8/5 的 38.56，4/2 的 21.45 到 4/8 的 52.67。回落也快，分别用了 6 个和 25 个交易日。2020 年秋天那一段最高 40.7，却在 20 以上停了 111 个交易日；2022 年分三段，每段两到三个多月。</span><span class="l-en">In August 2024 and April 2025 it spiked within a few days: from 18.23 on 8/1 to 38.56 on 8/5, and from 21.45 on 4/2 to 52.67 on 4/8. It also fell back quickly, in 6 and 25 trading days. The autumn 2020 episode peaked at only 40.7 but stayed above 20 for 111 trading days; 2022 had three episodes, each lasting two to three-plus months.</span></p>
+  <p class="tiny"><span class="l-zh">数据：分钟线，SPX 与 VIX 取美东 15:59 那一分钟（半日市 12:59）。VIX 分钟线在 46 个月末的下午缺数据，那些天不算；2024-05-13 至 05-15 三天 SPX 缺数据，用 SPY 同一分钟的涨跌补。实际波动率按第一节的公式：之后 30 个日历日内的对数涨跌，252 ÷ n × Σr²，开平方。最后一个完整窗口从 2026-07-01 起。</span><span class="l-en">Data: minute bars; SPX and VIX at the 15:59 ET minute (12:59 on half days). VIX minute bars are missing in the afternoon at 46 month-ends, and those days are left out; SPX is missing for the three days 2024-05-13 to 05-15, filled in with SPY's change in the same minute. Realized volatility follows the formula in section 1: log returns within the next 30 calendar days, 252 ÷ n × Σr², square-rooted. The last complete window starts on 2026-07-01.</span></p>
 </section>
 
 <!-- ══════════ 七 ══════════ -->
 <section id="s7">
-  <h2><span class="n">七</span>VIX 期货与期权</h2>
-  <p class="sub">VIX 本身买不到。以它结算的期货和期权，是隐含波动率合约。</p>
+  <h2><span class="l-zh"><span class="n">七</span>VIX 期货与期权</span><span class="l-en"><span class="n">7</span>VIX futures and options</span></h2>
+  <p class="sub"><span class="l-zh">VIX 本身买不到。以它结算的期货和期权，是隐含波动率合约。</span><span class="l-en">VIX itself cannot be bought. The futures and options that settle on it are implied volatility contracts.</span></p>
 
-  <h3>VIX 期货怎么结算</h3>
-  <p>期货是今天约定一个价，到期按结算值和约定价的差额收付现金，和 1.1 的远期合约是同一件事。不同的是期货在交易所买卖，每天按当天的期货价格结一次账：价格涨了，买方当天就收到涨的那部分，卖方付出，而不是等到期一次算清。</p>
-  <p>讲义说，VIX 期货在 SPX 期权到期日之前 30 天的那个周三结算，结算值是那天的 VIX。选这一天的原因讲义没写：那天离下一个 SPX 期权到期日正好 30 天，VIX 只用这一个到期日就能算出来，不用插值。实际结算用的不是那天收盘的 VIX，而是当天早上 Cboe 用 SPX 期权的开盘价专门算的一次 VIX（叫特别开盘报价，SOQ）。到期之前，期货价格是市场对结算那天 VIX 的估计，不等于今天的 VIX。</p>
+  <h3><span class="l-zh">VIX 期货怎么结算</span><span class="l-en">How VIX futures settle</span></h3>
+  <p><span class="l-zh">期货是今天约定一个价，到期按结算值和约定价的差额收付现金，和 1.1 的远期合约是同一件事。不同的是期货在交易所买卖，每天按当天的期货价格结一次账：价格涨了，买方当天就收到涨的那部分，卖方付出，而不是等到期一次算清。</span><span class="l-en">A futures contract agrees on a price today and at expiration pays cash equal to the difference between the settlement value and the agreed price, the same thing as the forward contract in 1.1. The difference is that futures trade on an exchange and are settled each day at that day's futures price: if the price rises, the buyer receives the rise that same day and the seller pays it, instead of everything being settled at once at expiration.</span></p>
+  <p><span class="l-zh">讲义说，VIX 期货在 SPX 期权到期日之前 30 天的那个周三结算，结算值是那天的 VIX。选这一天的原因讲义没写：那天离下一个 SPX 期权到期日正好 30 天，VIX 只用这一个到期日就能算出来，不用插值。实际结算用的不是那天收盘的 VIX，而是当天早上 Cboe 用 SPX 期权的开盘价专门算的一次 VIX（叫特别开盘报价，SOQ）。到期之前，期货价格是市场对结算那天 VIX 的估计，不等于今天的 VIX。</span><span class="l-en">The lecture says VIX futures settle on the Wednesday 30 days before an SPX option expiration, and the settlement value is that day's VIX. The lecture does not say why that day: it is exactly 30 days before the next SPX option expiration, so VIX can be computed from that one expiration alone, without interpolation. The actual settlement does not use that day's closing VIX but a special VIX that Cboe computes that morning from the opening prices of SPX options (called the Special Opening Quotation, SOQ). Before expiration, the futures price is the market's estimate of VIX on settlement day, not today's VIX.</span></p>
 
-  <h3>期限结构</h3>
-  <p>讲义的例子：三个到期月的隐含波动率现在都是 25%，整体上涨或整体下跌时各变成多少：</p>
+  <h3><span class="l-zh">期限结构</span><span class="l-en">Term structure</span></h3>
+  <p><span class="l-zh">讲义的例子：三个到期月的隐含波动率现在都是 25%，整体上涨或整体下跌时各变成多少：</span><span class="l-en">The lecture's example: three expiration months all have an implied volatility of 25% now; what each one becomes if volatility rises or falls across the board:</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>到期月</th><th>现在</th><th>整体上涨时</th><th>整体下跌时</th></tr></thead>
+    <thead><tr><th><span class="l-zh">到期月</span><span class="l-en">Expiration month</span></th><th><span class="l-zh">现在</span><span class="l-en">Now</span></th><th><span class="l-zh">整体上涨时</span><span class="l-en">If it all rises</span></th><th><span class="l-zh">整体下跌时</span><span class="l-en">If it all falls</span></th></tr></thead>
     <tbody>
-      <tr><td>3 月</td><td>25%</td><td>30%</td><td>20%</td></tr>
-      <tr><td>6 月</td><td>25%</td><td>28%</td><td>22%</td></tr>
-      <tr><td>9 月</td><td>25%</td><td>26%</td><td>24%</td></tr>
+      <tr><td><span class="l-zh">3 月</span><span class="l-en">March</span></td><td>25%</td><td>30%</td><td>20%</td></tr>
+      <tr><td><span class="l-zh">6 月</span><span class="l-en">June</span></td><td>25%</td><td>28%</td><td>22%</td></tr>
+      <tr><td><span class="l-zh">9 月</span><span class="l-en">September</span></td><td>25%</td><td>26%</td><td>24%</td></tr>
     </tbody>
   </table>
-  <p>以 25% 为均值，3 月一涨一跌是 ±5 个点，6 月 ±3，9 月 ±1：短期的隐含波动率动得快，长期的贴着均值。讲义说，波动率指数的期货，各月份也是这个样子。</p>
-  <p>讲义接着说：股票波动率指数的期限结构有时是 <span class="sym" data-say="backwardation 的简称。近月的隐含波动率高于远月，通常出现在市场刚大跌、波动率冲高的时候。">backward</span>，近月高于远月；更常见的是 <span class="sym" data-say="远月的隐含波动率高于近月。平静的时候通常是这样：眼下风平浪静，但远一点总有可能出事。">contango</span>，远月高于近月。在 contango 下，随着时间过去，一张期货离到期越来越近，它的价格往下滑向近月的水平，价值必然下降。所以讲义说，买入 VIX 期货要赚钱，至少要发生下面一件事：</p>
+  <p><span class="l-zh">以 25% 为均值，3 月一涨一跌是 ±5 个点，6 月 ±3，9 月 ±1：短期的隐含波动率动得快，长期的贴着均值。讲义说，波动率指数的期货，各月份也是这个样子。</span><span class="l-en">Around a mean of 25%, March moves ±5 points up or down, June ±3 and September ±1: short-term implied volatility moves fast and long-term stays close to the mean. The lecture says futures on volatility indexes look the same across months.</span></p>
+  <p><span class="l-zh">讲义接着说：股票波动率指数的期限结构有时是 <span class="sym" data-say="backwardation 的简称。近月的隐含波动率高于远月，通常出现在市场刚大跌、波动率冲高的时候。">backward</span>，近月高于远月；更常见的是 <span class="sym" data-say="远月的隐含波动率高于近月。平静的时候通常是这样：眼下风平浪静，但远一点总有可能出事。">contango</span>，远月高于近月。在 contango 下，随着时间过去，一张期货离到期越来越近，它的价格往下滑向近月的水平，价值必然下降。所以讲义说，买入 VIX 期货要赚钱，至少要发生下面一件事：</span><span class="l-en">The lecture goes on: the term structure of a stock volatility index is sometimes <span class="sym" data-say="Short for backwardation. Near-term implied volatility is above longer-term, usually right after a sharp market drop when volatility spikes.">backward</span>, with the near month above the far months; more often it is in <span class="sym" data-say="Longer-term implied volatility is above near-term. This is usual in calm times: things are quiet now, but something can always happen further out.">contango</span>, with far months above the near month. Under contango, as time passes a futures contract gets closer to expiration and its price slides down toward the near-month level, so its value has to fall. So the lecture says that for a long VIX futures position to make money, at least one of the following has to happen:</span></p>
   <ol>
-    <li>整条 contango 曲线往上移；</li>
-    <li>期限结构从 contango 翻成 backward；</li>
-    <li>到期那一刻隐含波动率突然冲高。</li>
+    <li><span class="l-zh">整条 contango 曲线往上移；</span><span class="l-en">the whole contango curve shifts up;</span></li>
+    <li><span class="l-zh">期限结构从 contango 翻成 backward；</span><span class="l-en">the term structure flips from contango to backward;</span></li>
+    <li><span class="l-zh">到期那一刻隐含波动率突然冲高。</span><span class="l-en">implied volatility suddenly spikes at the moment of expiration.</span></li>
   </ol>
 
-  <h3>跟踪 VIX 期货的产品</h3>
-  <p>UVXY 是一只 ETF（在交易所买卖的基金），持有最近两个月的 VIX 期货，每天调整到 1.5 倍杠杆。它跌得太多时会合股：把几股并成一股，每股价格按比例放大，持有人的总价值不变。它和 VIX 指数放在一起，从同一天的 100 出发：</p>
+  <h3><span class="l-zh">跟踪 VIX 期货的产品</span><span class="l-en">Products that track VIX futures</span></h3>
+  <p><span class="l-zh">UVXY 是一只 ETF（在交易所买卖的基金），持有最近两个月的 VIX 期货，每天调整到 1.5 倍杠杆。它跌得太多时会合股：把几股并成一股，每股价格按比例放大，持有人的总价值不变。它和 VIX 指数放在一起，从同一天的 100 出发：</span><span class="l-en">UVXY is an ETF (a fund traded on an exchange) that holds the two nearest months of VIX futures and resets to 1.5× leverage every day. When it falls too far it does a reverse split: several shares are merged into one, the price per share scales up in proportion, and the holder's total value does not change. Here it is next to the VIX index, both starting from 100 on the same day:</span></p>
   <div class="panel">
-    <div class="bar"><button class="btn ghost" id="uvPlay">从 2020 年再放一遍</button></div>
-    <svg id="uv" viewBox="0 0 720 340" role="img" aria-label="2020 年 8 月以来 VIX 指数、UVXY 与一个假想产品，都从 100 出发，纵轴按对数"></svg>
+    <div class="bar"><button class="btn ghost" id="uvPlay"><span class="l-zh">从 2020 年再放一遍</span><span class="l-en">Replay from 2020</span></button></div>
+    <svg id="uv" viewBox="0 0 720 340" role="img" aria-label="2020 年 8 月以来 VIX 指数、UVXY 与一个假想产品，都从 100 出发，纵轴按对数" data-en-aria-label="The VIX index, UVXY and a hypothetical product since August 2020, all starting from 100, log scale"></svg>
     <div class="legend">
-      <span><i class="ln" style="background:var(--ink)"></i>VIX 指数</span>
-      <span><i class="ln" style="background:var(--control)"></i>UVXY（已按合股调整）</span>
-      <span style="color:var(--result)"><i class="dash"></i>假想：每天拿 1.5 倍 VIX 指数当天的涨跌</span>
+      <span><i class="ln" style="background:var(--ink)"></i><span class="l-zh">VIX 指数</span><span class="l-en">VIX index</span></span>
+      <span><i class="ln" style="background:var(--control)"></i><span class="l-zh">UVXY（已按合股调整）</span><span class="l-en">UVXY (adjusted for reverse splits)</span></span>
+      <span style="color:var(--result)"><i class="dash"></i><span class="l-zh">假想：每天拿 1.5 倍 VIX 指数当天的涨跌</span><span class="l-en">Hypothetical: 1.5 × the VIX index's daily change, every day</span></span>
     </div>
     <div class="stats">
-      <div class="stat"><div class="k">日期</div><div class="d" id="uvD"></div></div>
-      <div class="stat"><div class="k">VIX 指数</div><div class="d" id="uvV"></div><div class="d2" id="uvVb"></div></div>
-      <div class="stat"><div class="k">UVXY</div><div class="d" id="uvU" style="color:var(--control)"></div><div class="d2">起点 ＝ 100</div></div>
-      <div class="stat"><div class="k">假想产品</div><div class="d" id="uvH" style="color:var(--result)"></div><div class="d2">起点 ＝ 100</div></div>
+      <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="uvD"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">VIX 指数</span><span class="l-en">VIX index</span></div><div class="d" id="uvV"></div><div class="d2" id="uvVb"></div></div>
+      <div class="stat"><div class="k">UVXY</div><div class="d" id="uvU" style="color:var(--control)"></div><div class="d2"><span class="l-zh">起点 ＝ 100</span><span class="l-en">Start = 100</span></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">假想产品</span><span class="l-en">Hypothetical product</span></div><div class="d" id="uvH" style="color:var(--result)"></div><div class="d2"><span class="l-zh">起点 ＝ 100</span><span class="l-en">Start = 100</span></div></div>
     </div>
     <div class="say plain" id="uvSay"></div>
   </div>
-  <p>冲高的时候 UVXY 也涨不到指数的 1.5 倍。2024-08-01 到 08-05，VIX 涨了 111.5%，1.5 倍是 167%，UVXY 涨了 120.6%；2025-04-02 到 04-08，VIX 涨了 145.5%，1.5 倍是 218%，UVXY 只涨了 112.2%。近月的期货涨得比指数少，后面讲 VIX 期权时会看到为什么。</p>
-  <p class="tiny">数据：分钟线，美东 15:59 那一分钟；图上每周取最后一个交易日。UVXY 的价格已按它历次合股调整，数据里没有合股造成的跳空。假想产品按 UVXY 与 VIX 都有收盘的 1438 天逐日计算。</p>
+  <p><span class="l-zh">冲高的时候 UVXY 也涨不到指数的 1.5 倍。2024-08-01 到 08-05，VIX 涨了 111.5%，1.5 倍是 167%，UVXY 涨了 120.6%；2025-04-02 到 04-08，VIX 涨了 145.5%，1.5 倍是 218%，UVXY 只涨了 112.2%。近月的期货涨得比指数少，后面讲 VIX 期权时会看到为什么。</span><span class="l-en">Even on spikes UVXY does not rise 1.5 times as much as the index. From 2024-08-01 to 08-05 VIX rose 111.5%, 1.5 times that is 167%, and UVXY rose 120.6%; from 2025-04-02 to 04-08 VIX rose 145.5%, 1.5 times that is 218%, and UVXY rose only 112.2%. Near-month futures rise less than the index; the part on VIX options below shows why.</span></p>
+  <p class="tiny"><span class="l-zh">数据：分钟线，美东 15:59 那一分钟；图上每周取最后一个交易日。UVXY 的价格已按它历次合股调整，数据里没有合股造成的跳空。假想产品按 UVXY 与 VIX 都有收盘的 1438 天逐日计算。</span><span class="l-en">Data: minute bars, the 15:59 ET minute; the chart takes the last trading day of each week. UVXY prices are adjusted for all its reverse splits, so the data have no jumps from them. The hypothetical product is computed day by day over the 1438 days on which both UVXY and VIX have a close.</span></p>
 
-  <h3>VIX 期权</h3>
-  <p>VIX 期权是欧式的（只能在到期那天行权，节点 9 讲过美式与欧式的区别），现金结算：到期也在那个周三，和同月的 VIX 期货按同一个 VIX 值结算。所以它实际上是那张同月 VIX 期货的期权。</p>
-  <p>讲义：想兑现一张期权的波动率价值，就要动态对冲。VIX 本身买不到，VIX 期权只能用 VIX 期货对冲，所以决定 VIX 期权价值的，是 VIX 期货的波动率，不是 VIX 指数的波动率。讲义给了 2015-05-21 的历史波动率：</p>
+  <h3><span class="l-zh">VIX 期权</span><span class="l-en">VIX options</span></h3>
+  <p><span class="l-zh">VIX 期权是欧式的（只能在到期那天行权，节点 9 讲过美式与欧式的区别），现金结算：到期也在那个周三，和同月的 VIX 期货按同一个 VIX 值结算。所以它实际上是那张同月 VIX 期货的期权。</span><span class="l-en">VIX options are European (they can be exercised only on expiration day; node 9 covered American versus European) and cash-settled: they also expire on that Wednesday and settle on the same VIX value as the VIX futures of the same month. So in effect they are options on that month's VIX futures.</span></p>
+  <p><span class="l-zh">讲义：想兑现一张期权的波动率价值，就要动态对冲。VIX 本身买不到，VIX 期权只能用 VIX 期货对冲，所以决定 VIX 期权价值的，是 VIX 期货的波动率，不是 VIX 指数的波动率。讲义给了 2015-05-21 的历史波动率：</span><span class="l-en">The lecture: to cash in on an option's volatility value, you have to hedge dynamically. VIX itself cannot be bought and VIX options can only be hedged with VIX futures, so what drives the value of VIX options is the volatility of VIX futures, not of the VIX index. The lecture gives historical volatilities for 2015-05-21:</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th></th><th>20 日</th><th>50 日</th><th>100 日</th></tr></thead>
+    <thead><tr><th></th><th><span class="l-zh">20 日</span><span class="l-en">20-day</span></th><th><span class="l-zh">50 日</span><span class="l-en">50-day</span></th><th><span class="l-zh">100 日</span><span class="l-en">100-day</span></th></tr></thead>
     <tbody>
-      <tr><td>VIX 指数</td><td>116.65</td><td>97.95</td><td>112.23</td></tr>
-      <tr><td>第 1 个月期货</td><td>72.66</td><td>66.07</td><td>78.28</td></tr>
-      <tr><td>第 2 个月期货</td><td>41.94</td><td>44.14</td><td>54.19</td></tr>
-      <tr><td>第 3 个月期货</td><td>28.91</td><td>29.37</td><td>41.66</td></tr>
+      <tr><td><span class="l-zh">VIX 指数</span><span class="l-en">VIX index</span></td><td>116.65</td><td>97.95</td><td>112.23</td></tr>
+      <tr><td><span class="l-zh">第 1 个月期货</span><span class="l-en">Month 1 futures</span></td><td>72.66</td><td>66.07</td><td>78.28</td></tr>
+      <tr><td><span class="l-zh">第 2 个月期货</span><span class="l-en">Month 2 futures</span></td><td>41.94</td><td>44.14</td><td>54.19</td></tr>
+      <tr><td><span class="l-zh">第 3 个月期货</span><span class="l-en">Month 3 futures</span></td><td>28.91</td><td>29.37</td><td>41.66</td></tr>
     </tbody>
   </table>
-  <p>VIX 指数自己的年化波动率超过 100%。越往后的月份越不波动：20 日那一列，从指数到第 1 个月乘 0.62，再往后每个月乘 0.58、0.69，第 3 个月只有指数的四分之一（116.65 对 28.91，4.03 倍）。这是均值回复落在期货上的样子：远月期货的结算日还远，今天的冲高到那时多半已经回落，所以它不跟着今天冲。用指数的波动率给远月的 VIX 期权定价，会高估好几倍。</p>
+  <p><span class="l-zh">VIX 指数自己的年化波动率超过 100%。越往后的月份越不波动：20 日那一列，从指数到第 1 个月乘 0.62，再往后每个月乘 0.58、0.69，第 3 个月只有指数的四分之一（116.65 对 28.91，4.03 倍）。这是均值回复落在期货上的样子：远月期货的结算日还远，今天的冲高到那时多半已经回落，所以它不跟着今天冲。用指数的波动率给远月的 VIX 期权定价，会高估好几倍。</span><span class="l-en">The VIX index's own annualized volatility is over 100%. The further out the month, the less volatile: in the 20-day column, going from the index to month 1 multiplies by 0.62, then by 0.58 and 0.69 for each further month, and month 3 is only a quarter of the index (116.65 against 28.91, 4.03 times). This is what mean reversion looks like in futures: a far-month future's settlement day is still far away, and today's spike will probably have faded by then, so it does not follow today's spike. Pricing far-month VIX options with the index's volatility overvalues them several times over.</span></p>
 
-  <h3>谁用 VIX</h3>
+  <h3><span class="l-zh">谁用 VIX</span><span class="l-en">Who uses VIX</span></h3>
   <table>
-    <thead><tr><th>讲义列的用途</th><th class="txt">说的是什么</th></tr></thead>
+    <thead><tr><th><span class="l-zh">讲义列的用途</span><span class="l-en">Use listed in the lecture</span></th><th class="txt"><span class="l-zh">说的是什么</span><span class="l-en">What it means</span></th></tr></thead>
     <tbody>
-      <tr><td>投机</td><td class="txt">直接押波动率涨或跌</td></tr>
-      <tr><td>对冲波动率头寸</td><td class="txt">手里的期权头寸有 vega，用 VIX 产品抵掉一部分</td></tr>
-      <tr><td>对冲市场头寸</td><td class="txt">市场和波动率反着走（节点 7：SPX 每涨 1%，VIX 平均跌 1.38 点），持有 VIX 产品能在下跌时补回一部分</td></tr>
-      <tr><td>对冲间接的波动率头寸</td><td class="txt">收入跟着交易量走、跟着流动性走的业务，以及任何对波动率敏感的策略，盈亏都暗中依赖波动率</td></tr>
+      <tr><td><span class="l-zh">投机</span><span class="l-en">Speculation</span></td><td class="txt"><span class="l-zh">直接押波动率涨或跌</span><span class="l-en">Betting directly on volatility rising or falling</span></td></tr>
+      <tr><td><span class="l-zh">对冲波动率头寸</span><span class="l-en">Hedging volatility positions</span></td><td class="txt"><span class="l-zh">手里的期权头寸有 vega，用 VIX 产品抵掉一部分</span><span class="l-en">An options position has vega; VIX products offset part of it</span></td></tr>
+      <tr><td><span class="l-zh">对冲市场头寸</span><span class="l-en">Hedging market positions</span></td><td class="txt"><span class="l-zh">市场和波动率反着走（节点 7：SPX 每涨 1%，VIX 平均跌 1.38 点），持有 VIX 产品能在下跌时补回一部分</span><span class="l-en">The market and volatility move in opposite directions (node 7: for each 1% rise in SPX, VIX falls 1.38 points on average), so holding VIX products makes back part of a drop</span></td></tr>
+      <tr><td><span class="l-zh">对冲间接的波动率头寸</span><span class="l-en">Hedging indirect volatility exposure</span></td><td class="txt"><span class="l-zh">收入跟着交易量走、跟着流动性走的业务，以及任何对波动率敏感的策略，盈亏都暗中依赖波动率</span><span class="l-en">Businesses whose revenue follows trading volume or liquidity, and any strategy sensitive to volatility, quietly depend on volatility for their profit and loss</span></td></tr>
     </tbody>
   </table>
 
-  <h3>covered call 是空波动率</h3>
-  <p>讲义最后一个例子：组合经理有两个目标，一是让组合增值，二是跑赢市场。他持有一篮子股票，同时卖出这些股票的 call 收权利金，这叫 covered call。什么情况下两个目标能同时达到？</p>
+  <h3><span class="l-zh">covered call 是空波动率</span><span class="l-en">A covered call is short volatility</span></h3>
+  <p><span class="l-zh">讲义最后一个例子：组合经理有两个目标，一是让组合增值，二是跑赢市场。他持有一篮子股票，同时卖出这些股票的 call 收权利金，这叫 covered call。什么情况下两个目标能同时达到？</span><span class="l-en">The lecture's last example: a portfolio manager has two goals, to grow the portfolio and to beat the market. They hold a basket of stocks and also sell calls on those stocks to collect premium; this is called a covered call. When can both goals be met at once?</span></p>
   <table>
-    <thead><tr><th>市场</th><th>目标一：增值</th><th>目标二：跑赢市场</th><th class="txt">原因</th></tr></thead>
+    <thead><tr><th><span class="l-zh">市场</span><span class="l-en">Market</span></th><th><span class="l-zh">目标一：增值</span><span class="l-en">Goal 1: grow</span></th><th><span class="l-zh">目标二：跑赢市场</span><span class="l-en">Goal 2: beat the market</span></th><th class="txt"><span class="l-zh">原因</span><span class="l-en">Reason</span></th></tr></thead>
     <tbody>
-      <tr><td>大涨</td><td class="ok">达到</td><td class="no">达不到</td><td class="txt">卖出的 call 封住了上涨</td></tr>
-      <tr><td>大跌</td><td class="no">达不到</td><td class="ok">达到</td><td class="txt">收的权利金只抵掉一小部分下跌</td></tr>
-      <tr><td>平静，小涨小跌</td><td class="ok">达到</td><td class="ok">达到</td><td class="txt">权利金落袋，call 不被行权</td></tr>
+      <tr><td><span class="l-zh">大涨</span><span class="l-en">Big rise</span></td><td class="ok"><span class="l-zh">达到</span><span class="l-en">Met</span></td><td class="no"><span class="l-zh">达不到</span><span class="l-en">Not met</span></td><td class="txt"><span class="l-zh">卖出的 call 封住了上涨</span><span class="l-en">The calls sold cap the upside</span></td></tr>
+      <tr><td><span class="l-zh">大跌</span><span class="l-en">Big drop</span></td><td class="no"><span class="l-zh">达不到</span><span class="l-en">Not met</span></td><td class="ok"><span class="l-zh">达到</span><span class="l-en">Met</span></td><td class="txt"><span class="l-zh">收的权利金只抵掉一小部分下跌</span><span class="l-en">The premium collected offsets only a small part of the drop</span></td></tr>
+      <tr><td><span class="l-zh">平静，小涨小跌</span><span class="l-en">Calm, small moves</span></td><td class="ok"><span class="l-zh">达到</span><span class="l-en">Met</span></td><td class="ok"><span class="l-zh">达到</span><span class="l-en">Met</span></td><td class="txt"><span class="l-zh">权利金落袋，call 不被行权</span><span class="l-en">The premium is kept and the calls are not exercised</span></td></tr>
     </tbody>
   </table>
-  <p>两个目标只在平静的市场里同时达到，所以 covered call 是一个空波动率的头寸，市场越不波动越好。讲义说，这个空波动率头寸可以用波动率合约来对冲：买入一份波动率合约，市场大动时它赚钱，抵掉 covered call 在大涨大跌时吃的亏。</p>
+  <p><span class="l-zh">两个目标只在平静的市场里同时达到，所以 covered call 是一个空波动率的头寸，市场越不波动越好。讲义说，这个空波动率头寸可以用波动率合约来对冲：买入一份波动率合约，市场大动时它赚钱，抵掉 covered call 在大涨大跌时吃的亏。</span><span class="l-en">Both goals are met only in a calm market, so a covered call is a short volatility position: the less the market moves, the better. The lecture says this short volatility position can be hedged with a volatility contract: buy a volatility contract, which makes money when the market moves a lot and offsets what the covered call loses on big rises and drops.</span></p>
 </section>
 
 <!-- ══════════ 八 ══════════ -->
 <section id="s8">
-  <h2><span class="n">八</span>费曼检验</h2>
-  <p class="sub">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</p>
-  <p class="tiny">答案只存在本机浏览器里。</p>
+  <h2><span class="l-zh"><span class="n">八</span>费曼检验</span><span class="l-en"><span class="n">8</span>Feynman test</span></h2>
+  <p class="sub"><span class="l-zh">七道题都不用计算器。先用自己的话写下来，再展开对照，看自己的解释缺了哪一步。</span><span class="l-en">None of the seven questions needs a calculator. Write your answer in your own words first, then expand the reference and see which step your explanation is missing.</span></p>
+  <p class="tiny"><span class="l-zh">答案只存在本机浏览器里。</span><span class="l-en">Answers are stored only in this browser.</span></p>
   <div id="feynman"></div>
 </section>
 
 <section style="border-bottom:none">
   <details id="glo">
-    <summary>本页出现的全部符号与术语</summary>
+    <summary><span class="l-zh">本页出现的全部符号与术语</span><span class="l-en">All symbols and terms on this page</span></summary>
     <div class="glossary">
-      <div class="gl"><div class="s">已实现波动率合约</div><div class="t">到期按这段时间标的实际走出来的波动率（或方差）结算的合约。例子：方差互换。</div></div>
-      <div class="gl"><div class="s">隐含波动率合约</div><div class="t">到期按期权价格反推出来的隐含波动率结算的合约。例子：VIX 期货与期权、VSTOXX 期货与期权。</div></div>
-      <div class="gl"><div class="s">方差互换</div><div class="t">开始时约定一个价，到期买方拿实际方差、付约定价。结算值 252 ÷ n × Σr²。</div></div>
-      <div class="gl"><div class="s">方差点</div><div class="t">波动率点的平方。VIX 17.07 对应 291.4 方差点。</div></div>
-      <div class="gl"><div class="s">r<sub>i</sub>, ln</div><div class="t">第 i 天的对数涨跌 ln(p<sub>i</sub> ÷ p<sub>i−1</sub>)。ln 是自然对数。</div></div>
-      <div class="gl"><div class="s">n, 252</div><div class="t">n 是这段时间的日涨跌个数；252 是一年的交易日数，用来年化。</div></div>
-      <div class="gl"><div class="s">Σ</div><div class="t">对每一项算一遍再加起来。</div></div>
-      <div class="gl"><div class="s">VIX</div><div class="t">Cboe 用标普 500 指数期权算的 30 天波动率指数：一整排虚值期权按 1/K² 加权，两个到期日插值到 30 天。</div></div>
-      <div class="gl"><div class="s">VXO</div><div class="t">2003 年以前的 VIX 算法：S&amp;P 100 指数平值附近 8 张期权隐含波动率的平均。</div></div>
-      <div class="gl"><div class="s">σ²</div><div class="t">一个到期日算出来的年化方差，开平方是波动率。</div></div>
-      <div class="gl"><div class="s">T</div><div class="t">离到期的时间，以年计。</div></div>
-      <div class="gl"><div class="s">K<sub>i</sub>, ΔK<sub>i</sub></div><div class="t">第 i 个行权价；它管的宽度，前后两个行权价之差的一半。</div></div>
-      <div class="gl"><div class="s">1/K²</div><div class="t">每个行权价期权数量的配法。抵掉「平值 vega 与价格成正比」和「起作用的档数与价格成正比」两个因素，总 vega 不随标的变。</div></div>
-      <div class="gl"><div class="s">Q(K)</div><div class="t">行权价 K 上虚值期权的中间价。</div></div>
-      <div class="gl"><div class="s">F, K<sub>0</sub></div><div class="t">F 是用 parity 反推的远期价；K<sub>0</sub> 是不高于 F 的第一个行权价，虚值 put 与 call 的分界。</div></div>
-      <div class="gl"><div class="s">e<sup>rT</sup></div><div class="t">把今天的期权价格换算成到期那天的价值。</div></div>
-      <div class="gl"><div class="s">N<sub>1</sub>, N<sub>2</sub>, N<sub>30</sub>, N<sub>365</sub></div><div class="t">近月、次月离到期的时间，30 天，一年。插值公式里用。</div></div>
-      <div class="gl"><div class="s">近月、次月</div><div class="t">VIX 用的两个到期日：离到期 23 到 30 天、30 到 37 天。</div></div>
-      <div class="gl"><div class="s">vega</div><div class="t">隐含波动率变 1 个点，期权价格变多少（2.3）。</div></div>
-      <div class="gl"><div class="s">平值、虚值、实值</div><div class="t">行权价在现价附近叫平值。call 行权价高于现价、put 行权价低于现价叫虚值，现在行权拿不到钱，价格全是时间价值；反过来叫实值，价格里有内在价值。</div></div>
-      <div class="gl"><div class="s">微笑、左翼</div><div class="t">同一到期日不同行权价的隐含波动率连成的曲线，两头往上翘，叫微笑（8）；低行权价那一头叫左翼。平的微笑：假设每个行权价都按平值的隐含波动率定价。</div></div>
-      <div class="gl"><div class="s">delta 对冲</div><div class="t">每天用标的抵掉期权头寸的 delta（4.1、4.2）。按 1/K² 配好的一排期权再做 delta 对冲，盈亏只看实际方差，才是方差合约。</div></div>
-      <div class="gl"><div class="s">Cboe</div><div class="t">芝加哥期权交易所，编制 VIX 的机构。</div></div>
-      <div class="gl"><div class="s">S&amp;P 100</div><div class="t">标普 100 指数，由美国 100 家大公司组成。旧的 VIX（VXO）用它的期权算。</div></div>
-      <div class="gl"><div class="s">期货</div><div class="t">今天约定一个价，到期按结算值与约定价的差额收付现金，和 1.1 的远期合约是同一件事；在交易所买卖，每天按当天价格结一次账。</div></div>
-      <div class="gl"><div class="s">SOQ</div><div class="t">特别开盘报价：VIX 期货与期权结算那天早上，Cboe 用 SPX 期权的开盘价专门算的一次 VIX，作为结算值。</div></div>
-      <div class="gl"><div class="s">ETF、ETN</div><div class="t">ETF 是在交易所像股票一样买卖的基金；ETN 是银行发行、按某个指数的表现偿付的债券，也在交易所买卖。</div></div>
-      <div class="gl"><div class="s">欧式期权</div><div class="t">只能在到期那天行权（节点 9）。VIX 期权是欧式、现金结算的。</div></div>
-      <div class="gl"><div class="s">合股</div><div class="t">把几股并成一股，每股价格按比例放大，持有人的总价值不变。</div></div>
-      <div class="gl"><div class="s">均值回复</div><div class="t">波动率冲高会回落、压低会回升，长期围着一个均值转。</div></div>
-      <div class="gl"><div class="s">期限结构</div><div class="t">同一标的不同到期日的隐含波动率连成的曲线。</div></div>
-      <div class="gl"><div class="s">contango</div><div class="t">远月高于近月。在它下面，期货随时间往下滑。</div></div>
-      <div class="gl"><div class="s">backward</div><div class="t">近月高于远月，常见于刚大跌之后。</div></div>
-      <div class="gl"><div class="s">UVXY</div><div class="t">持有最近两个月 VIX 期货、每天 1.5 倍杠杆的 ETF。</div></div>
-      <div class="gl"><div class="s">SPX</div><div class="t">标普 500 指数。VIX 用它的期权算。</div></div>
-      <div class="gl"><div class="s">covered call</div><div class="t">持有股票，同时卖出它的 call。平静时最好，是空波动率的头寸。</div></div>
+      <div class="gl"><div class="s"><span class="l-zh">已实现波动率合约</span><span class="l-en">Realized volatility contract</span></div><div class="t"><span class="l-zh">到期按这段时间标的实际走出来的波动率（或方差）结算的合约。例子：方差互换。</span><span class="l-en">A contract that settles at expiration on the volatility (or variance) the underlying actually showed over the period. Example: a variance swap.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">隐含波动率合约</span><span class="l-en">Implied volatility contract</span></div><div class="t"><span class="l-zh">到期按期权价格反推出来的隐含波动率结算的合约。例子：VIX 期货与期权、VSTOXX 期货与期权。</span><span class="l-en">A contract that settles at expiration on the implied volatility backed out from option prices. Examples: VIX futures and options, VSTOXX futures and options.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">方差互换</span><span class="l-en">Variance swap</span></div><div class="t"><span class="l-zh">开始时约定一个价，到期买方拿实际方差、付约定价。结算值 252 ÷ n × Σr²。</span><span class="l-en">Agree on a price at the start; at expiration the buyer receives realized variance and pays the agreed price. Settlement value 252 ÷ n × Σr².</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">方差点</span><span class="l-en">Variance point</span></div><div class="t"><span class="l-zh">波动率点的平方。VIX 17.07 对应 291.4 方差点。</span><span class="l-en">A volatility point squared. VIX at 17.07 corresponds to 291.4 variance points.</span></div></div>
+      <div class="gl"><div class="s">r<sub>i</sub>, ln</div><div class="t"><span class="l-zh">第 i 天的对数涨跌 ln(p<sub>i</sub> ÷ p<sub>i−1</sub>)。ln 是自然对数。</span><span class="l-en">The log return on day i, ln(p<sub>i</sub> ÷ p<sub>i−1</sub>). ln is the natural logarithm.</span></div></div>
+      <div class="gl"><div class="s">n, 252</div><div class="t"><span class="l-zh">n 是这段时间的日涨跌个数；252 是一年的交易日数，用来年化。</span><span class="l-en">n is the number of daily moves in the period; 252 is the number of trading days in a year, used to annualize.</span></div></div>
+      <div class="gl"><div class="s">Σ</div><div class="t"><span class="l-zh">对每一项算一遍再加起来。</span><span class="l-en">Compute each term and add them up.</span></div></div>
+      <div class="gl"><div class="s">VIX</div><div class="t"><span class="l-zh">Cboe 用标普 500 指数期权算的 30 天波动率指数：一整排虚值期权按 1/K² 加权，两个到期日插值到 30 天。</span><span class="l-en">The 30-day volatility index Cboe computes from S&amp;P 500 index options: a whole row of out-of-the-money options weighted by 1/K², with two expirations interpolated to 30 days.</span></div></div>
+      <div class="gl"><div class="s">VXO</div><div class="t"><span class="l-zh">2003 年以前的 VIX 算法：S&amp;P 100 指数平值附近 8 张期权隐含波动率的平均。</span><span class="l-en">The VIX method before 2003: the average implied volatility of 8 options near the money on the S&amp;P 100 index.</span></div></div>
+      <div class="gl"><div class="s">σ²</div><div class="t"><span class="l-zh">一个到期日算出来的年化方差，开平方是波动率。</span><span class="l-en">The annualized variance computed for one expiration; its square root is the volatility.</span></div></div>
+      <div class="gl"><div class="s">T</div><div class="t"><span class="l-zh">离到期的时间，以年计。</span><span class="l-en">Time to expiration in years.</span></div></div>
+      <div class="gl"><div class="s">K<sub>i</sub>, ΔK<sub>i</sub></div><div class="t"><span class="l-zh">第 i 个行权价；它管的宽度，前后两个行权价之差的一半。</span><span class="l-en">The i-th strike; the width it covers, half the distance between the strikes on either side.</span></div></div>
+      <div class="gl"><div class="s">1/K²</div><div class="t"><span class="l-zh">每个行权价期权数量的配法。抵掉「平值 vega 与价格成正比」和「起作用的档数与价格成正比」两个因素，总 vega 不随标的变。</span><span class="l-en">How many options to hold at each strike. It cancels two factors, "at-the-money vega is proportional to price" and "the number of strikes in play is proportional to price", so total vega does not change with the underlying.</span></div></div>
+      <div class="gl"><div class="s">Q(K)</div><div class="t"><span class="l-zh">行权价 K 上虚值期权的中间价。</span><span class="l-en">The mid of the out-of-the-money option at strike K.</span></div></div>
+      <div class="gl"><div class="s">F, K<sub>0</sub></div><div class="t"><span class="l-zh">F 是用 parity 反推的远期价；K<sub>0</sub> 是不高于 F 的第一个行权价，虚值 put 与 call 的分界。</span><span class="l-en">F is the forward price backed out with parity; K<sub>0</sub> is the first strike not above F, the dividing line between out-of-the-money puts and calls.</span></div></div>
+      <div class="gl"><div class="s">e<sup>rT</sup></div><div class="t"><span class="l-zh">把今天的期权价格换算成到期那天的价值。</span><span class="l-en">Converts today's option price into its value on expiration day.</span></div></div>
+      <div class="gl"><div class="s">N<sub>1</sub>, N<sub>2</sub>, N<sub>30</sub>, N<sub>365</sub></div><div class="t"><span class="l-zh">近月、次月离到期的时间，30 天，一年。插值公式里用。</span><span class="l-en">Time to the near-term and next-term expirations, 30 days, and one year. Used in the interpolation formula.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">近月、次月</span><span class="l-en">Near term, next term</span></div><div class="t"><span class="l-zh">VIX 用的两个到期日：离到期 23 到 30 天、30 到 37 天。</span><span class="l-en">The two expirations VIX uses: 23 to 30 days and 30 to 37 days to expiration.</span></div></div>
+      <div class="gl"><div class="s">vega</div><div class="t"><span class="l-zh">隐含波动率变 1 个点，期权价格变多少（2.3）。</span><span class="l-en">How much an option's price changes when implied volatility changes by 1 point (2.3).</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">平值、虚值、实值</span><span class="l-en">At, out of, in the money</span></div><div class="t"><span class="l-zh">行权价在现价附近叫平值。call 行权价高于现价、put 行权价低于现价叫虚值，现在行权拿不到钱，价格全是时间价值；反过来叫实值，价格里有内在价值。</span><span class="l-en">A strike near the current price is at the money. A call with its strike above the current price, or a put with its strike below it, is out of the money: exercising now pays nothing, and its price is all time value. The reverse is in the money, with intrinsic value in the price.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">微笑、左翼</span><span class="l-en">Smile, left wing</span></div><div class="t"><span class="l-zh">同一到期日不同行权价的隐含波动率连成的曲线，两头往上翘，叫微笑（8）；低行权价那一头叫左翼。平的微笑：假设每个行权价都按平值的隐含波动率定价。</span><span class="l-en">The curve formed by the implied volatilities of different strikes at the same expiration, turning up at both ends, is called the smile (8); the low-strike end is the left wing. Flat smile: assume every strike is priced at the at-the-money implied volatility.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">delta 对冲</span><span class="l-en">Delta hedging</span></div><div class="t"><span class="l-zh">每天用标的抵掉期权头寸的 delta（4.1、4.2）。按 1/K² 配好的一排期权再做 delta 对冲，盈亏只看实际方差，才是方差合约。</span><span class="l-en">Offsetting the options position's delta with the underlying every day (4.1, 4.2). Only a row of options weighted by 1/K² and then delta hedged, whose profit or loss depends only on realized variance, is a variance contract.</span></div></div>
+      <div class="gl"><div class="s">Cboe</div><div class="t"><span class="l-zh">芝加哥期权交易所，编制 VIX 的机构。</span><span class="l-en">The Chicago Board Options Exchange, which compiles VIX.</span></div></div>
+      <div class="gl"><div class="s">S&amp;P 100</div><div class="t"><span class="l-zh">标普 100 指数，由美国 100 家大公司组成。旧的 VIX（VXO）用它的期权算。</span><span class="l-en">The S&amp;P 100 index, made up of 100 large US companies. The old VIX (VXO) was computed from its options.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期货</span><span class="l-en">Futures</span></div><div class="t"><span class="l-zh">今天约定一个价，到期按结算值与约定价的差额收付现金，和 1.1 的远期合约是同一件事；在交易所买卖，每天按当天价格结一次账。</span><span class="l-en">Agree on a price today and at expiration pay cash equal to the difference between the settlement value and the agreed price, the same thing as the forward contract in 1.1; traded on an exchange and settled each day at that day's price.</span></div></div>
+      <div class="gl"><div class="s">SOQ</div><div class="t"><span class="l-zh">特别开盘报价：VIX 期货与期权结算那天早上，Cboe 用 SPX 期权的开盘价专门算的一次 VIX，作为结算值。</span><span class="l-en">Special Opening Quotation: on the morning VIX futures and options settle, a special VIX that Cboe computes from the opening prices of SPX options, used as the settlement value.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">ETF、ETN</span><span class="l-en">ETF, ETN</span></div><div class="t"><span class="l-zh">ETF 是在交易所像股票一样买卖的基金；ETN 是银行发行、按某个指数的表现偿付的债券，也在交易所买卖。</span><span class="l-en">An ETF is a fund traded on an exchange like a stock; an ETN is a bond issued by a bank that pays according to the performance of an index, also traded on an exchange.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">欧式期权</span><span class="l-en">European option</span></div><div class="t"><span class="l-zh">只能在到期那天行权（节点 9）。VIX 期权是欧式、现金结算的。</span><span class="l-en">Can be exercised only on expiration day (node 9). VIX options are European and cash-settled.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">合股</span><span class="l-en">Reverse split</span></div><div class="t"><span class="l-zh">把几股并成一股，每股价格按比例放大，持有人的总价值不变。</span><span class="l-en">Several shares are merged into one, the price per share scales up in proportion, and the holder's total value does not change.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">均值回复</span><span class="l-en">Mean reversion</span></div><div class="t"><span class="l-zh">波动率冲高会回落、压低会回升，长期围着一个均值转。</span><span class="l-en">Volatility that spikes falls back and volatility that is pushed down rises again, circling around a mean over the long run.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">期限结构</span><span class="l-en">Term structure</span></div><div class="t"><span class="l-zh">同一标的不同到期日的隐含波动率连成的曲线。</span><span class="l-en">The curve formed by the implied volatilities of different expirations on the same underlying.</span></div></div>
+      <div class="gl"><div class="s">contango</div><div class="t"><span class="l-zh">远月高于近月。在它下面，期货随时间往下滑。</span><span class="l-en">Far months above the near month. Under it, futures slide down over time.</span></div></div>
+      <div class="gl"><div class="s">backward</div><div class="t"><span class="l-zh">近月高于远月，常见于刚大跌之后。</span><span class="l-en">The near month above far months, common right after a sharp drop.</span></div></div>
+      <div class="gl"><div class="s">UVXY</div><div class="t"><span class="l-zh">持有最近两个月 VIX 期货、每天 1.5 倍杠杆的 ETF。</span><span class="l-en">An ETF holding the two nearest months of VIX futures at 1.5× leverage, reset daily.</span></div></div>
+      <div class="gl"><div class="s">SPX</div><div class="t"><span class="l-zh">标普 500 指数。VIX 用它的期权算。</span><span class="l-en">The S&amp;P 500 index. VIX is computed from its options.</span></div></div>
+      <div class="gl"><div class="s">covered call</div><div class="t"><span class="l-zh">持有股票，同时卖出它的 call。平静时最好，是空波动率的头寸。</span><span class="l-en">Hold a stock and sell calls on it. Best when calm; a short volatility position.</span></div></div>
     </div>
   </details>
 </section>
 
 <footer>
-  <p>支线到这里结束。回到课程地图可以看全部节点；另一条支线是 <a href="station-m-market-making.html"><b>M 做市报价</b></a>：拿着一张波动率曲面给每个行权价报双边价，边际从哪来。</p>
-  <p><a href="./">← 回到课程路线图</a></p>
-    <p class="tiny">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</p>
+  <p><span class="l-zh">支线到这里结束。回到课程地图可以看全部节点；另一条支线是 <a href="station-m-market-making.html"><b>M 做市报价</b></a>：拿着一张波动率曲面给每个行权价报双边价，边际从哪来。</span><span class="l-en">This branch ends here. Go back to the course map to see all the nodes; the other branch is <a href="station-m-market-making.html"><b>M Market making</b></a>: quoting a two-sided price at every strike from a volatility surface, and where the edge comes from.</span></p>
+  <p><a href="./"><span class="l-zh">← 回到课程路线图</span><span class="l-en">← Back to the course roadmap</span></a></p>
+    <p class="tiny"><span class="l-zh">期权入门交互课 · 案例用真实的历史期权报价与分钟价格</span><span class="l-en">An interactive introductory options course · the examples use real historical option quotes and minute prices</span></p>
 </footer>
 
 </div>
 <script>
+/* 英文模式（lang.js）：页面标题，以及带 data-en-* 的悬停说明、title、aria-label 换成英文 */
+document.title=L(document.title,'Volatility contracts and VIX');
+if(LANG==='en') document.querySelectorAll('[data-en-say],[data-en-title],[data-en-aria-label],[data-en-placeholder]').forEach(e=>{
+  for(const a of ['say','title','aria-label','placeholder']){ const v=e.getAttribute('data-en-'+a); if(v!=null) e.setAttribute(a==='say'?'data-say':a,v); }
+});
 const $ = id => document.getElementById(id);
 const f1 = n => n.toFixed(1), f2 = n => n.toFixed(2);
 const fm = (n,d=2) => (n<0?'−':'')+Math.abs(n).toFixed(d);          // 负数用真正的减号
@@ -645,7 +651,7 @@ const md = s => +s.slice(5,7)+'/'+(+s.slice(8,10));
 const VG={"sig":0.463,"days":30,"k0":100,"k1":800,"dk":10,"ref":350};
 const EXPS=[["4/13",0],["4/15",2],["4/17",4],["4/20",7],["4/24",11],["4/27",14],["5/1",18],["5/8",25],["5/15",32]];
 const F355=[18.55,19.85];
-const REG=[["250 以下",197.1,8.4],["250 到 330",197.7,23.8],["330 到 380",10.0,50.3],["380 到 450",-17.2,15.3],["450 以上",33.3,2.2]];
+const REG=[[L("250 以下","Below 250"),197.1,8.4],[L("250 到 330","250 to 330"),197.7,23.8],[L("330 到 380","330 to 380"),10.0,50.3],[L("380 到 450","380 to 450"),-17.2,15.3],[L("450 以上","Above 450"),33.3,2.2]];
 const STRIP=[[95.0,"P",0.02,5.0,2.537,142.84,0.0],[100.0,"P",0.03,5.0,3.435,142.93,0.0],[105.0,"P",0.035,5.0,3.635,138.97,0.0],[110.0,"P",0.045,5.0,4.258,0.0,0.0],[115.0,"P",0.045,5.0,3.896,132.1,-0.0],[120.0,"P",0.045,5.0,3.578,128.93,0.0],[125.0,"P",0.06,5.0,4.397,375.19,0.0],[130.0,"P",0.065,5.0,4.404,371.9,0.0],[135.0,"P",0.08,5.0,5.026,370.0,0.0],[140.0,"P",0.09,5.0,5.257,367.37,0.0],[145.0,"P",0.095,5.0,5.173,114.37,0.0],[150.0,"P",0.115,5.0,5.852,112.56,0.0],[155.0,"P",0.12,5.0,5.719,109.0,0.0],[160.0,"P",0.135,5.0,6.038,106.45,0.0],[165.0,"P",0.15,5.0,6.308,103.9,0.0],[170.0,"P",0.17,5.0,6.735,101.56,0.0],[175.0,"P",0.185,5.0,6.916,98.78,0.0],[180.0,"P",0.2,5.0,7.067,96.0,0.0],[185.0,"P",0.225,5.0,7.527,93.78,0.0],[190.0,"P",0.25,5.0,7.929,91.53,0.001],[195.0,"P",0.27,5.0,8.13,88.87,0.001],[200.0,"P",0.295,5.0,8.444,86.48,0.003],[205.0,"P",0.32,5.0,8.718,83.97,0.007],[210.0,"P",0.345,5.0,8.957,81.26,0.015],[215.0,"P",0.375,5.0,9.288,75.85,0.03],[220.0,"P",0.41,5.0,9.699,76.84,0.056],[225.0,"P",0.45,5.0,10.177,74.61,0.103],[230.0,"P",0.49,5.0,10.605,72.38,0.183],[235.0,"P",0.54,5.0,11.195,70.19,0.312],[240.0,"P",0.595,5.0,11.827,67.84,0.517],[245.0,"P",0.665,5.0,12.684,66.2,0.829],[250.0,"P",0.735,5.0,13.464,64.2,1.291],[255.0,"P",0.83,5.0,14.614,62.24,1.959],[260.0,"P",0.94,5.0,15.921,60.59,2.896],[265.0,"P",1.07,5.0,17.445,58.85,4.181],[270.0,"P",1.235,5.0,19.396,57.31,5.902],[275.0,"P",1.44,5.0,21.801,56.02,8.155],[280.0,"P",1.695,5.0,24.753,54.77,11.044],[285.0,"P",2.015,5.0,28.403,53.67,14.677],[290.0,"P",2.4,5.0,32.673,52.69,19.161],[295.0,"P",2.87,5.0,37.759,51.81,24.597],[300.0,"P",3.45,5.0,43.889,51.1,31.08],[305.0,"P",4.1,5.0,50.462,50.26,38.691],[310.0,"P",4.9,5.0,58.378,49.62,47.492],[315.0,"P",5.85,5.0,67.502,49.06,57.529],[320.0,"P",6.95,5.0,77.708,48.55,68.825],[325.0,"P",8.2,5.0,88.885,48.02,81.38],[330.0,"P",9.65,5.0,101.456,47.6,95.169],[335.0,"P",11.25,5.0,114.774,47.09,110.147],[340.0,"P",13.1,5.0,129.746,46.75,126.247],[345.0,"P",15.125,5.0,145.491,46.35,143.383],[350.0,"A",19.225,5.0,179.684,46.18,178.657],[355.0,"C",18.55,5.0,168.526,46.06,168.536],[360.0,"C",16.225,5.0,143.337,45.76,144.447],[365.0,"C",14.15,5.0,121.605,45.58,123.31],[370.0,"C",12.25,5.0,102.45,45.35,104.851],[375.0,"C",10.55,5.0,85.895,45.16,88.805],[380.0,"C",9.075,5.0,71.955,45.08,74.922],[385.0,"C",7.75,5.0,59.863,44.96,62.967],[390.0,"C",6.65,5.0,50.058,45.03,52.719],[395.0,"C",5.65,5.0,41.46,45.01,43.974],[400.0,"C",4.775,5.0,34.169,44.96,36.545],[405.0,"C",4.05,5.0,28.27,45.05,30.261],[410.0,"C",3.45,5.0,23.498,45.24,24.968],[415.0,"C",2.925,5.0,19.445,45.43,20.53],[420.0,"C",2.485,5.0,16.129,45.65,16.823],[425.0,"C",2.12,5.0,13.438,45.88,13.74],[430.0,"C",1.81,5.0,11.208,46.17,11.185],[435.0,"C",1.55,5.0,9.378,46.48,9.076],[440.0,"C",1.335,5.0,7.895,46.9,7.342],[445.0,"C",1.155,5.0,6.678,47.28,5.921],[450.0,"C",1.01,5.0,5.711,47.77,4.761],[455.0,"C",0.88,5.0,4.867,48.24,3.818],[460.0,"C",0.775,5.0,4.193,48.75,3.052],[465.0,"C",0.685,5.0,3.627,49.31,2.434],[470.0,"C",0.61,5.0,3.162,49.81,1.936],[475.0,"C",0.545,5.0,2.766,50.47,1.535],[480.0,"C",0.49,5.0,2.435,51.03,1.215],[485.0,"C",0.445,5.0,2.166,51.71,0.959],[490.0,"C",0.41,5.0,1.955,52.39,0.755],[495.0,"C",0.37,5.0,1.729,53.05,0.593],[500.0,"C",0.34,5.0,1.557,53.54,0.465],[505.0,"C",0.32,5.0,1.437,54.51,0.364],[510.0,"C",0.295,5.0,1.299,55.58,0.284],[515.0,"C",0.27,5.0,1.166,55.9,0.221],[520.0,"C",0.255,5.0,1.08,56.69,0.172],[525.0,"C",0.24,5.0,0.997,57.27,0.133],[530.0,"C",0.23,5.0,0.937,58.14,0.103],[535.0,"C",0.215,5.0,0.86,59.83,0.08],[540.0,"C",0.2,5.0,0.785,59.64,0.062],[545.0,"C",0.19,5.0,0.732,60.17,0.048],[550.0,"C",0.185,5.0,0.7,61.08,0.037],[555.0,"C",0.18,5.0,0.669,61.97,0.028],[560.0,"C",0.165,5.0,0.602,62.61,0.022],[565.0,"C",0.16,5.0,0.574,63.19,0.016],[570.0,"C",0.155,5.0,0.546,63.97,0.013],[575.0,"C",0.15,5.0,0.519,64.74,0.01],[580.0,"C",0.145,5.0,0.494,65.5,0.007],[585.0,"C",0.135,5.0,0.452,65.96,0.006],[590.0,"C",0.135,5.0,0.444,66.93,0.004],[595.0,"C",0.13,5.0,0.42,67.35,0.003],[600.0,"C",0.125,5.0,0.398,68.3,0.002],[605.0,"C",0.125,5.0,0.391,69.24,0.002],[610.0,"C",0.115,5.0,0.354,69.54,0.001],[615.0,"C",0.115,5.0,0.348,70.43,0.001],[620.0,"C",0.11,7.5,0.491,71.02,0.001],[630.0,"C",0.105,10.0,0.606,72.39,0.001],[640.0,"C",0.09,10.0,0.503,73.02,0.001],[650.0,"C",0.09,10.0,0.488,74.69,0.0],[660.0,"C",0.08,10.0,0.421,75.46,0.0],[670.0,"C",0.075,10.0,0.383,76.66,0.0],[680.0,"C",0.07,10.0,0.347,77.69,0.0],[690.0,"C",0.06,10.0,0.289,0.0,0.0],[700.0,"C",0.065,10.0,0.304,316.02,0.0],[710.0,"C",0.055,10.0,0.25,80.4,0.0],[720.0,"C",0.055,10.0,0.243,82.44,0.0],[730.0,"C",0.05,10.0,0.215,82.47,0.0],[740.0,"C",0.05,10.0,0.209,83.83,0.0],[750.0,"C",0.045,10.0,0.183,84.53,0.0],[760.0,"C",0.045,10.0,0.178,334.43,0.0],[770.0,"C",0.045,10.0,0.174,86.79,0.0],[780.0,"C",0.04,10.0,0.151,87.43,0.0],[790.0,"C",0.04,10.0,0.147,88.67,0.0],[800.0,"C",0.04,10.0,0.143,338.55,0.0],[810.0,"C",0.04,10.0,0.14,91.09,0.0],[820.0,"C",0.035,10.0,0.119,90.95,0.0],[830.0,"C",0.035,10.0,0.116,92.12,0.0],[840.0,"C",0.03,10.0,0.097,92.43,0.0],[850.0,"C",0.03,10.0,0.095,93.55,0.0],[860.0,"C",0.025,10.0,0.077,92.45,0.0],[870.0,"C",0.025,10.0,0.076,342.4,0.0],[880.0,"C",0.025,10.0,0.074,0.0,0.0],[890.0,"C",0.025,10.0,0.072,95.61,0.0],[900.0,"C",0.025,10.0,0.071,96.64,0.0],[910.0,"C",0.025,10.0,0.069,97.65,0.0],[920.0,"C",0.025,10.0,0.068,97.57,0.0],[930.0,"C",0.02,10.0,0.053,352.45,0.0],[940.0,"C",0.02,15.0,0.078,353.48,0.0],[960.0,"C",0.02,15.0,0.075,355.43,0.0],[970.0,"C",0.02,10.0,0.049,356.39,0.0],[980.0,"C",0.015,10.0,0.036,354.13,0.0],[990.0,"C",0.015,10.0,0.035,102.65,0.0]];
 const TERM={"25":{"F":353.3953,"K0":350.0,"n":104,"lo":110.0,"hi":760.0,"s2":0.259458,"sig":50.94,"adj":0.0013739,"atf":47.01,"flat":47.06,"ert":1.00295},"32":{"F":353.6951,"K0":350.0,"n":142,"lo":95.0,"hi":990.0,"s2":0.255966,"sig":50.59,"adj":0.0012713,"atf":46.07,"flat":46.11,"ert":1.00378}};
 const IDX={"v":50.68,"flat":46.34,"wA":0.2857,"wB":0.7143};
@@ -731,11 +737,11 @@ const VS=(()=>{
     const vmax=Math.max(w.vix,...rv)*1.14, Y2=v=>B2-v/vmax*(B2-T2);
     const xc=i=>L+(i+.5)*bw;
     let g='';
-    g+=lab(L,T1-12,'每天的对数涨跌（%）','var(--ink-soft)','start',11.5);
+    g+=lab(L,T1-12,window.L('每天的对数涨跌（%）','Daily log return (%)'),'var(--ink-soft)','start',11.5);
     g+=`<line x1="${L}" y1="${Y1(0)}" x2="${R}" y2="${Y1(0)}" stroke="var(--ink-faint)"/>`;
     g+=lab(L-7,Y1(0)+4,'0','var(--ink-faint)','end',10.5);
     [day1,-day1].forEach(v=>{ g+=`<line x1="${L}" y1="${Y1(v)}" x2="${R}" y2="${Y1(v)}" stroke="var(--result)" stroke-width="1.2" stroke-dasharray="2 4"/>`; });
-    g+=lab(R,T1-12,`约定价折成一天：${f2(w.vix)} ÷ √252 ＝ ±${f2(day1)}%`,'var(--result)','end',10.5);
+    g+=lab(R,T1-12,window.L(`约定价折成一天：${f2(w.vix)} ÷ √252 ＝ ±${f2(day1)}%`,`Agreed price per day: ${f2(w.vix)} ÷ √252 = ±${f2(day1)}%`),'var(--result)','end',10.5);
     let pl=null;                                  // 上一个数字标签：相邻两根同向时错开一行
     for(let i=0;i<n;i++){
       const f=Math.max(0,Math.min(1,k-i)); if(f<=0) break;
@@ -749,31 +755,31 @@ const VS=(()=>{
       }
     }
     // 下半：到这一天为止的实际波动率
-    g+=lab(L,T2-12,'到这一天为止的实际波动率（%，年化）','var(--ink-soft)','start',11.5);
+    g+=lab(L,T2-12,window.L('到这一天为止的实际波动率（%，年化）','Realized vol to date (%, annualized)'),'var(--ink-soft)','start',11.5);
     const step=vmax>40?10:vmax>20?5:2;
     for(let v=0;v<=vmax;v+=step){ g+=`<line x1="${L}" y1="${Y2(v)}" x2="${R}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.1}"/>`; g+=lab(L-7,Y2(v)+4,v,'var(--ink-faint)','end',10); }
     g+=`<line x1="${L}" y1="${Y2(w.vix)}" x2="${R}" y2="${Y2(w.vix)}" stroke="var(--result)" stroke-width="1.8" stroke-dasharray="7 5"/>`;
-    g+=lab(R,Y2(w.vix)-6,`约定价：开始那天的 VIX ${f2(w.vix)}`,'var(--result)','end',10.5);
+    g+=lab(R,Y2(w.vix)-6,window.L(`约定价：开始那天的 VIX ${f2(w.vix)}`,`Agreed price: VIX at the start, ${f2(w.vix)}`),'var(--result)','end',10.5);
     if(kd>=1){
       let pts=[]; for(let i=0;i<kd;i++) pts.push(xc(i).toFixed(1)+','+Y2(rv[i]).toFixed(1));
       g+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--control)" stroke-width="2.4" stroke-linejoin="round"/>`;
       g+=`<circle cx="${xc(kd-1)}" cy="${Y2(rv[kd-1])}" r="4" fill="var(--control)"/>`;
-      if(kd===n) g+=lab(xc(n-1)-8,Y2(rv[n-1])+(rv[n-1]>w.vix?-10:18),`结算 ${f2(w.settle)}`,'var(--control)','end',11.5,600);
+      if(kd===n) g+=lab(xc(n-1)-8,Y2(rv[n-1])+(rv[n-1]>w.vix?-10:18),window.L(`结算 ${f2(w.settle)}`,`Settle ${f2(w.settle)}`),'var(--control)','end',11.5,600);
     }
     for(let i=0;i<n;i++) if(i%3===0||i===n-1) g+=lab(xc(i),B2+18,w.d[i],'var(--ink-faint)','middle',10);
     $('vs').innerHTML=g;
     // 读数
     const i=Math.max(0,Math.ceil(k)-1);
-    if(k<=0){ $('vsD').textContent=md(w.t0); $('vsDb').textContent='开始那天'; $('vsR').textContent=''; $('vsV').textContent=''; }
-    else { $('vsD').textContent=w.d[i]; $('vsDb').textContent=`第 ${i+1} 个交易日，共 ${n} 个`; $('vsR').textContent=sgn(w.r[i])+'%'; $('vsV').textContent=f2(rv[i])+'%'; }
-    $('vsK').textContent=f2(w.vix)+'%'; $('vsKb').textContent=`方差 ${f1(w.vix**2)}`;
+    if(k<=0){ $('vsD').textContent=md(w.t0); $('vsDb').textContent=window.L('开始那天','Starting day'); $('vsR').textContent=''; $('vsV').textContent=''; }
+    else { $('vsD').textContent=w.d[i]; $('vsDb').textContent=window.L(`第 ${i+1} 个交易日，共 ${n} 个`,`Trading day ${i+1} of ${n}`); $('vsR').textContent=sgn(w.r[i])+'%'; $('vsV').textContent=f2(rv[i])+'%'; }
+    $('vsK').textContent=f2(w.vix)+'%'; $('vsKb').textContent=window.L(`方差 ${f1(w.vix**2)}`,`Variance ${f1(w.vix**2)}`);
     const say=$('vsSay');
     if(k<n){ say.textContent=''; return; }
     const K2=w.vix**2, S2=w.settle**2, sq=w.r.map(x=>x*x), tot=sq.reduce((a,b)=>a+b,0), top3=[...sq].sort((a,b)=>b-a).slice(0,3).reduce((a,b)=>a+b,0);
     if(key==='crash'){
-      say.textContent=`${w.t0} 起的 30 天，开始那天 VIX ${f2(w.vix)}，约定价 ${f1(K2)} 方差点。4/3、4/4 两天分别跌 ${f2(-w.r[6])}% 和 ${f2(-w.r[7])}%，4/9 涨 ${f2(w.r[10])}%。${n} 个交易日走完，实际波动率 ${f2(w.settle)}%，方差 ${f1(S2)}：买方付 ${f1(K2)}、拿回 ${f1(S2)}，赚 ${f1(S2-K2)} 方差点，是约定价的 ${(S2/K2-1).toFixed(1)} 倍。涨跌先平方再加，大的日子占大头：最大的三天占了全部平方和的 ${f1(top3/tot*100)}%。`;
+      say.textContent=window.L(`${w.t0} 起的 30 天，开始那天 VIX ${f2(w.vix)}，约定价 ${f1(K2)} 方差点。4/3、4/4 两天分别跌 ${f2(-w.r[6])}% 和 ${f2(-w.r[7])}%，4/9 涨 ${f2(w.r[10])}%。${n} 个交易日走完，实际波动率 ${f2(w.settle)}%，方差 ${f1(S2)}：买方付 ${f1(K2)}、拿回 ${f1(S2)}，赚 ${f1(S2-K2)} 方差点，是约定价的 ${(S2/K2-1).toFixed(1)} 倍。涨跌先平方再加，大的日子占大头：最大的三天占了全部平方和的 ${f1(top3/tot*100)}%。`,`The 30 days from ${w.t0}: VIX on the starting day ${f2(w.vix)}, agreed price ${f1(K2)} variance points. On 4/3 and 4/4 the index fell ${f2(-w.r[6])}% and ${f2(-w.r[7])}%, and on 4/9 it rose ${f2(w.r[10])}%. After all ${n} trading days, realized volatility is ${f2(w.settle)}% and variance ${f1(S2)}: the buyer pays ${f1(K2)} and receives ${f1(S2)}, a gain of ${f1(S2-K2)} variance points, ${(S2/K2-1).toFixed(1)} times the agreed price. Moves are squared before they are added, so the big days dominate: the three largest account for ${f1(top3/tot*100)}% of the whole sum of squares.`);
     } else {
-      say.textContent=`${w.t0} 起的 30 天，开始那天 VIX ${f2(w.vix)}，约定价 ${f1(K2)} 方差点。${n} 个交易日里最大的一天只动了 ${f2(Math.max(...w.r.map(Math.abs)))}%，实际波动率 ${f2(w.settle)}%，方差 ${f1(S2)}：买方付 ${f1(K2)}、拿回 ${f1(S2)}，亏 ${f1(K2-S2)} 方差点。这是常见的一个月，第六节会看到，六年里 ${f1(RVS.pct)}% 的日子，之后 30 天的实际波动率低于当天的 VIX。`;
+      say.textContent=window.L(`${w.t0} 起的 30 天，开始那天 VIX ${f2(w.vix)}，约定价 ${f1(K2)} 方差点。${n} 个交易日里最大的一天只动了 ${f2(Math.max(...w.r.map(Math.abs)))}%，实际波动率 ${f2(w.settle)}%，方差 ${f1(S2)}：买方付 ${f1(K2)}、拿回 ${f1(S2)}，亏 ${f1(K2-S2)} 方差点。这是常见的一个月，第六节会看到，六年里 ${f1(RVS.pct)}% 的日子，之后 30 天的实际波动率低于当天的 VIX。`,`The 30 days from ${w.t0}: VIX on the starting day ${f2(w.vix)}, agreed price ${f1(K2)} variance points. The largest move in ${n} trading days was only ${f2(Math.max(...w.r.map(Math.abs)))}%; realized volatility is ${f2(w.settle)}% and variance ${f1(S2)}: the buyer pays ${f1(K2)} and receives ${f1(S2)}, a loss of ${f1(K2-S2)} variance points. This is a typical month: section 6 shows that on ${f1(RVS.pct)}% of days over six years, realized volatility over the next 30 days was below that day's VIX.`);
     }
   }
   const P=player(21,16.7,16.7/300,draw);
@@ -795,7 +801,7 @@ const VGA=(()=>{
   const at=(c,S)=>{ const f=(S-S0)/(S1-S0)*(NS-1), i=Math.floor(f); return c[i]+(c[Math.min(NS-1,i+1)]-c[i])*(f-i); };
   const YM=[Math.ceil(Math.max(...CUM[0][Ks.length])/2)*2, 8];
   const X=S=>L+(S-S0)/(S1-S0)*(R-L);
-  const TITLE=['每个行权价各买一张','按 (350 ÷ K)² 张买：175 买 4 张，350 买 1 张，700 买 0.25 张'];
+  const TITLE=[window.L('每个行权价各买一张','One option at each strike'),window.L('按 (350 ÷ K)² 张买：175 买 4 张，350 买 1 张，700 买 0.25 张','By (350 ÷ K)²: 4 at 175, 1 at 350, 0.25 at 700')];
   let lastK=-1;
   function draw(p,force){
     const k=Math.min(Ks.length,Math.floor(p));
@@ -818,15 +824,15 @@ const VGA=(()=>{
       [250,350,450].forEach(S=>{ g+=`<line x1="${X(S)}" y1="${T}" x2="${X(S)}" y2="${B}" stroke="var(--ink-faint)" stroke-width=".8" stroke-dasharray="2 4"/>`; });
       if(k===Ks.length){
         const r=at(c[k],350);
-        [250,350,450].forEach(S=>{ const v=at(c[k],S); g+=`<circle cx="${X(S)}" cy="${Y(v)}" r="4" fill="var(--ink)"/>`; g+=lab(X(S),Y(v)-10,(v/r).toFixed(2)+' 倍','var(--ink)','middle',11,600); });
+        [250,350,450].forEach(S=>{ const v=at(c[k],S); g+=`<circle cx="${X(S)}" cy="${Y(v)}" r="4" fill="var(--ink)"/>`; g+=lab(X(S),Y(v)-10,(v/r).toFixed(2)+window.L(' 倍','×'),'var(--ink)','middle',11,600); });
       }
       for(let S=200;S<=500;S+=50) g+=lab(X(S),B+17,S,'var(--ink-faint)','middle',10);
     });
-    g+=lab((L+R)/2,PAN[1][1]+32,'标的价格','var(--ink-faint)','middle',10.5);
-    { const K= k<Ks.length ? (k>0?Ks[k-1]:null) : VG.ref; if(K!==null&&K>=S0&&K<=S1){ const t=(k<Ks.length?'刚加入 K ＝ ':'橙色一层：K ＝ ')+K;
+    g+=lab((L+R)/2,PAN[1][1]+32,window.L('标的价格','Underlying price'),'var(--ink-faint)','middle',10.5);
+    { const K= k<Ks.length ? (k>0?Ks[k-1]:null) : VG.ref; if(K!==null&&K>=S0&&K<=S1){ const t=(k<Ks.length?window.L('刚加入 K ＝ ','Just added: K ='):window.L('橙色一层：K ＝ ','Orange layer: K ='))+K;
       g+= FS>1 ? lab(R,PAN[0][0]-12,t,'var(--control)','end',10.5,600) : lab(X(K),PAN[0][1]+30,t,'var(--control)','middle',10.5,600); } }
     $('vg').innerHTML=g;
-    $('vgN').textContent=`${k} / ${Ks.length} 档`;
+    $('vgN').textContent=window.L(`${k} / ${Ks.length} 档`,`${k} / ${Ks.length} strikes`);
     const rat=c=>[250,350,450].map(S=>(at(c,S)/at(c,350)).toFixed(2)).join(' : ');
     $('vgA').textContent= k===Ks.length?rat(CUM[0][k]):'';
     $('vgB').textContent= k===Ks.length?rat(CUM[1][k]):'';
@@ -854,8 +860,8 @@ const STA=(()=>{
     const k=Math.min(n,Math.floor(p)), on=new Set(order.slice(0,k)), lastI=k<n&&k>0?order[k-1]:-1;
     let g='';
     for(let v=0;v<=ym;v+=10){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width="${v?0.7:1.1}"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10); }
-    g+=lab(L,T-12,'每 1 美元行权价贡献的方差点','var(--ink-soft)','start',11);
-    g+=lab(L,T3-12,'真实报价比平的微笑多出的部分（同一个单位）','var(--ink-soft)','start',11);
+    g+=lab(L,T-12,window.L('每 1 美元行权价贡献的方差点','Variance points per 1 dollar of strike'),'var(--ink-soft)','start',11);
+    g+=lab(L,T3-12,window.L('真实报价比平的微笑多出的部分（同一个单位）','Real quotes minus the flat smile (same unit)'),'var(--ink-soft)','start',11);
     const st=Math.abs(dp-dn)>1.2?(FS>1?1:0.5):0.2;
     for(let v=Math.ceil(dn/st)*st; v<=dp+1e-9; v+=st){ const z=Math.abs(v)<1e-9; g+=`<line x1="${L}" y1="${Y3(v)}" x2="${R}" y2="${Y3(v)}" stroke="${z?'var(--ink-faint)':'var(--rule)'}" stroke-width="${z?1.1:0.7}"/>`; g+=lab(L-7,Y3(v)+4,z?'0':fm(v,st<1?1:0),'var(--ink-faint)','end',10); }
     STRIP.forEach((s,i)=>{
@@ -868,22 +874,22 @@ const STA=(()=>{
     let d=''; STRIP.forEach((s,i)=>{ if(!inR(i)) return; const [K,,,dK]=s; d+=`M${X(K-dK/2).toFixed(1)},${Y(HF[i]).toFixed(1)}H${X(K+dK/2).toFixed(1)}`; });
     g+=`<path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="3 2"/>`;
     for(let K=150;K<=700;K+=50){ g+=lab(X(K),B+17,K,'var(--ink-faint)','middle',10); g+=lab(X(K),B3+17,K,'var(--ink-faint)','middle',10); }
-    g+=lab((L+R)/2,B3+36,'行权价','var(--ink-faint)','middle',10.5);
+    g+=lab((L+R)/2,B3+36,window.L('行权价','Strike'),'var(--ink-faint)','middle',10.5);
     g+=`<line x1="${X(tm.F)}" y1="${T}" x2="${X(tm.F)}" y2="${B}" stroke="var(--ink-faint)" stroke-width=".9" stroke-dasharray="2 3"/>`;
     g+=lab(X(tm.F)+5,T+10,'F '+f2(tm.F),'var(--ink-faint)','start',10);
-    g+=lab(R,T+10,'150 以下 11 档、700 以上 28 档画在图外','var(--ink-faint)','end',10);
+    g+=lab(R,T+10,window.L('150 以下 11 档、700 以上 28 档画在图外','Off chart: 11 below 150, 28 above 700'),'var(--ink-faint)','end',10);
     $('st').innerHTML=g;
     let S=0, nP=0, nC=0; order.slice(0,k).forEach(i=>{ S+=STRIP[i][4]; if(STRIP[i][1]==='P') nP++; if(STRIP[i][1]==='C') nC++; });
-    $('stN').textContent=`${k} / ${n} 张`;
-    $('stNb').textContent=`put ${nP}，K₀ ${k?1:0}，call ${nC}`;
+    $('stN').textContent=window.L(`${k} / ${n} 张`,`${k} / ${n} options`);
+    $('stNb').textContent=window.L(`put ${nP}，K₀ ${k?1:0}，call ${nC}`,`put ${nP}, K₀ ${k?1:0}, call ${nC}`);
     $('stS').textContent=f1(S);
-    $('stSb').textContent=`合计 ${f1(tot)}`;
+    $('stSb').textContent=window.L(`合计 ${f1(tot)}`,`Total ${f1(tot)}`);
     $('stV').textContent= S>adj ? f2(Math.sqrt(S-adj))+'%' : '';
     const say=$('stSay');
     if(k<n){ say.textContent=''; return; }
     const sh=t=>STRIP.filter(s=>s[1]===t).reduce((a,s)=>a+s[4],0)/tot*100;
     const mid=STRIP.filter(s=>Math.abs(s[0]-K0)<=25).reduce((a,s)=>a+s[4],0)/tot*100;
-    say.textContent=`${n} 张加完：Σ ＝ ${f1(tot)} 方差点，减掉修正项 ${f2(adj)}，σ² ＝ ${f1(tot-adj)}，σ ＝ ${f2(tm.sig)}%。离平值最近的 325 到 375 这 11 档占了 ${f1(mid)}%；虚值 put 合计 ${f1(sh('P'))}%，K₀ 一档 ${f1(sh('A'))}%，虚值 call ${f1(sh('C'))}%。和平的微笑比，330 以下的 put 一路高出，380 到 450 的 call 略低，450 以上又高出一点。`;
+    say.textContent=window.L(`${n} 张加完：Σ ＝ ${f1(tot)} 方差点，减掉修正项 ${f2(adj)}，σ² ＝ ${f1(tot-adj)}，σ ＝ ${f2(tm.sig)}%。离平值最近的 325 到 375 这 11 档占了 ${f1(mid)}%；虚值 put 合计 ${f1(sh('P'))}%，K₀ 一档 ${f1(sh('A'))}%，虚值 call ${f1(sh('C'))}%。和平的微笑比，330 以下的 put 一路高出，380 到 450 的 call 略低，450 以上又高出一点。`,`All ${n} options added: Σ = ${f1(tot)} variance points, minus the correction ${f2(adj)}, σ² = ${f1(tot-adj)}, σ = ${f2(tm.sig)}%. The 11 strikes closest to the money, 325 to 375, account for ${f1(mid)}%; out-of-the-money puts ${f1(sh('P'))}% in total, the K₀ strike ${f1(sh('A'))}%, out-of-the-money calls ${f1(sh('C'))}%. Against the flat smile, the puts below 330 are higher all the way down, the calls from 380 to 450 slightly lower, and above 450 a little higher again.`);
   }
   const P=player(n,16.7,16.7/45,draw);
   $('stPlay').addEventListener('click',P.start);
@@ -892,30 +898,30 @@ const STA=(()=>{
 
 /* ══════════ 四 · 表格 ══════════ */
 function renderTables(){
-  $('expList').textContent=EXPS.filter(e=>e[1]>0).map(e=>`${e[0]}（${e[1]} 天）`).join('、');
+  $('expList').textContent=EXPS.filter(e=>e[1]>0).map(e=>L(`${e[0]}（${e[1]} 天）`,`${e[0]} (${e[1]} days)`)).join(L('、',','));
   const ref=STRIP.find(s=>s[0]===350);
   $('exTb').innerHTML=[250,350,450].map(K=>{
     const s=STRIP.find(x=>x[0]===K), w=(s[3]/K**2)/(ref[3]/350**2);
-    const nm= s[1]==='P'?'put':s[1]==='C'?'call':'call 与 put 平均';
+    const nm= s[1]==='P'?'put':s[1]==='C'?'call':L('call 与 put 平均','call and put average');
     return `<tr${K===350?' class="hot"':''}><td>${K}</td><td>${nm}</td><td>${s[2].toFixed(3)}</td><td>${w.toFixed(2)}</td><td>${f2(s[4])}</td><td>${f2(s[5])}%</td></tr>`;
   }).join('');
   $('termTb').innerHTML=[['5/8','25'],['5/15','32']].map(([d,k])=>{ const t=TERM[k];
-    return `<tr><td>${d}<br><span class="tiny">离到期 ${k} 天</span></td><td>${f2(t.F)}</td><td>${t.K0}</td><td>${t.n} 张<br>${t.lo} 到 ${t.hi}</td><td>${f2(t.sig)}%</td><td>${f2(t.atf)}%</td></tr>`; }).join('');
+    return L(`<tr><td>${d}<br><span class="tiny">离到期 ${k} 天</span></td><td>${f2(t.F)}</td><td>${t.K0}</td><td>${t.n} 张<br>${t.lo} 到 ${t.hi}</td><td>${f2(t.sig)}%</td><td>${f2(t.atf)}%</td></tr>`,`<tr><td>${d}<br><span class="tiny">${k} days out</span></td><td>${f2(t.F)}</td><td>${t.K0}</td><td>${t.n} options<br>${t.lo} to ${t.hi}</td><td>${f2(t.sig)}%</td><td>${f2(t.atf)}%</td></tr>`); }).join('');
   $('idxV').textContent=f2(IDX.v)+'%';
-  const bars=[['350 call 的隐含波动率<br><span class="tiny">1.2 用的数</span>',46.29,'var(--ink-faint)'],
-    ['5/15 远期价处<br><span class="tiny">节点 8 算的平值</span>',TERM['32'].atf,'var(--ink-faint)'],
-    ['平的微笑代入公式',IDX.flat,'var(--result)'],
-    ['真实报价代入公式<br><span class="tiny">TSLA 30 天指数</span>',IDX.v,'var(--control)']];
+  const bars=[[L('350 call 的隐含波动率<br><span class="tiny">1.2 用的数</span>','350 call implied volatility<br><span class="tiny">the number used in 1.2</span>'),46.29,'var(--ink-faint)'],
+    [L('5/15 远期价处<br><span class="tiny">节点 8 算的平值</span>','5/15 at the forward price<br><span class="tiny">at the money, from node 8</span>'),TERM['32'].atf,'var(--ink-faint)'],
+    [L('平的微笑代入公式','Flat smile in the formula'),IDX.flat,'var(--result)'],
+    [L('真实报价代入公式<br><span class="tiny">TSLA 30 天指数</span>','Real quotes in the formula<br><span class="tiny">TSLA 30-day index</span>'),IDX.v,'var(--control)']];
   const mx=60;
   $('vbars').innerHTML=bars.map(([l,v,c])=>`<div class="vb"><span class="l">${l}</span><div class="track"><div class="fill" style="width:${v/mx*100}%;background:${c}"></div></div><span class="n" style="color:${c}">${f2(v)}%</span></div>`).join('');
   $('regTb').innerHTML=REG.map(r=>`<tr${r[1]>100?' class="hot"':''}><td>${r[0]}</td><td>${r[1]>=0?'+':'−'}${Math.abs(r[1]).toFixed(1)}</td><td>${f1(r[2])}%</td></tr>`).join('')
-    +`<tr><td><b>合计</b></td><td><b>+${f1(REG.reduce((a,r)=>a+r[1],0))}</b></td><td>100%</td></tr>`;
+    +L(`<tr><td><b>合计</b></td><td><b>+${f1(REG.reduce((a,r)=>a+r[1],0))}</b></td><td>100%</td></tr>`,`<tr><td><b>Total</b></td><td><b>+${f1(REG.reduce((a,r)=>a+r[1],0))}</b></td><td>100%</td></tr>`);
   // 五 · 4/13 与 4/15
   const a=TERM['32'], b=D15;
-  const rows=[['TSLA 收盘','352.36',f2(b.S)],['远期价 F',f2(a.F),f2(b.F)],['分界行权价 K₀',a.K0,b.K0],['离到期','32 天','30 天'],
-    ['用到的期权',`${a.n} 张，${a.lo} 到 ${a.hi}`,`${b.n} 张，${b.lo} 到 ${b.hi}`],['算出的 σ',f2(a.sig)+'%',f2(b.sig)+'%']];
+  const rows=[[L('TSLA 收盘','TSLA close'),'352.36',f2(b.S)],[L('远期价 F','Forward price F'),f2(a.F),f2(b.F)],[L('分界行权价 K₀','Dividing strike K₀'),a.K0,b.K0],[L('离到期','Days to expiration'),L('32 天','32 days'),L('30 天','30 days')],
+    [L('用到的期权','Options used'),L(`${a.n} 张，${a.lo} 到 ${a.hi}`,`${a.n} options, ${a.lo} to ${a.hi}`),L(`${b.n} 张，${b.lo} 到 ${b.hi}`,`${b.n} options, ${b.lo} to ${b.hi}`)],[L('算出的 σ','Computed σ'),f2(a.sig)+'%',f2(b.sig)+'%']];
   $('d15Tb').innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
-  $('d15Say').textContent=`两天里 TSLA 涨了 ${f1((b.S/352.36-1)*100)}%。K₀ 从 ${a.K0} 挪到 ${b.K0}：${b.sw0} 从 call 与 put 平均变成 put，${b.swc0} 到 ${b.swc1} 这 ${b.nswc} 档从 call 换成 put；最低的 95 因为买价掉到 0 被截掉，950 在 4/13 没人出价、4/15 有了买价，新加了进来；离到期少了两天，公式里的 2/T 让每一档的权重都乘上 1.0664。近月那一串 5/8 离到期只剩 23 天，出了 23 到 30 天的范围；4/15 那天 5/15 正好离到期 30 天，指数就只用它一个到期日。`;
+  $('d15Say').textContent=L(`两天里 TSLA 涨了 ${f1((b.S/352.36-1)*100)}%。K₀ 从 ${a.K0} 挪到 ${b.K0}：${b.sw0} 从 call 与 put 平均变成 put，${b.swc0} 到 ${b.swc1} 这 ${b.nswc} 档从 call 换成 put；最低的 95 因为买价掉到 0 被截掉，950 在 4/13 没人出价、4/15 有了买价，新加了进来；离到期少了两天，公式里的 2/T 让每一档的权重都乘上 1.0664。近月那一串 5/8 离到期只剩 23 天，出了 23 到 30 天的范围；4/15 那天 5/15 正好离到期 30 天，指数就只用它一个到期日。`,`Over the two days TSLA rose ${f1((b.S/352.36-1)*100)}%. K₀ moved from ${a.K0} to ${b.K0}: ${b.sw0} went from the call and put average to a put, and the ${b.nswc} strikes from ${b.swc0} to ${b.swc1} switched from calls to puts. The lowest strike, 95, was cut off because its bid fell to 0; 950 had no bid on 4/13 but did on 4/15, so it was added. With two fewer days to expiration, the 2/T in the formula multiplies every strike's weight by 1.0664. The near-term 5/8 chain is down to 23 days to expiration, out of the 23-to-30-day range; on 4/15, 5/15 was exactly 30 days from expiration, so the index uses only that one expiration.`);
   // 六 · 均值回复
   $('epTb').innerHTML=EP.map(e=>`<tr${e[1]>38?' class="hot"':''}><td>${e[0]}</td><td>${f2(e[1])}</td><td>${e[2]}</td><td>${e[3]}</td></tr>`).join('');
 }
@@ -941,19 +947,19 @@ const VXA=(()=>{
     if(k>=N){
       const iR=DATES.indexOf(RVS.g0), iV=VIXC.indexOf(Math.max(...VIXC));
       g+=`<circle cx="${X(iR)}" cy="${Y(rvAt(iR))}" r="3.5" fill="var(--result)"/>`;
-      g+=lab(X(iR)-8,Y(rvAt(iR))+14,`${RVS.g0} 起：VIX ${f2(RVS.gv)}，之后 30 天 ${f2(RVS.gr)}`,'var(--result)','end',10.5,600);
+      g+=lab(X(iR)-8,Y(rvAt(iR))+14,window.L(`${RVS.g0} 起：VIX ${f2(RVS.gv)}，之后 30 天 ${f2(RVS.gr)}`,`From ${RVS.g0}: VIX ${f2(RVS.gv)}, next 30 days ${f2(RVS.gr)}`),'var(--result)','end',10.5,600);
       g+=`<circle cx="${X(iV)}" cy="${Y(vixAt(iV))}" r="3.5" fill="var(--ink)"/>`;
-      g+=lab(X(iV)-8,Y(vixAt(iV))+4,`VIX 最高 ${f2(vixAt(iV))}（${DATES[iV]}）`,'var(--ink)','end',10.5,600);
+      g+=lab(X(iV)-8,Y(vixAt(iV))+4,window.L(`VIX 最高 ${f2(vixAt(iV))}（${DATES[iV]}）`,`VIX peak ${f2(vixAt(iV))} (${DATES[iV]})`),'var(--ink)','end',10.5,600);
     }
     $('vx').innerHTML=g;
     const i=Math.max(0,k-1);
     $('vxD').textContent=DATES[i];
-    $('vxV').textContent=vixAt(i)===null?'缺':f2(vixAt(i));
+    $('vxV').textContent=vixAt(i)===null?window.L('缺','n/a'):f2(vixAt(i));
     $('vxR').textContent=f2(rvAt(i));
     const say=$('vxSay');
-    if(k<N){ $('vxP').textContent=both?f1(up/both*100)+'%':''; $('vxPb').textContent=`${up} / ${both} 天`; say.textContent=''; return; }
-    $('vxP').textContent=f1(RVS.pct)+'%'; $('vxPb').textContent=`${RVS.up} / ${RVS.n} 天`;
-    say.textContent=`${RVS.n} 天里（VIX 与之后 30 天都有数据的日子），VIX 高于之后 30 天实际波动率的有 ${RVS.up} 天，占 ${f1(RVS.pct)}%。VIX 平均 ${f2(RVS.vix)}，之后的实际平均 ${f2(RVS.rv)}，平均高 ${f2(RVS.gap)} 个点。实际不低于 VIX 的起点集中在 2022 年的 9 个月、2024 年 7 月（之后 30 天里有 8/5 跌 2.98%）、2024 年 12 月（之后 30 天里有 12/18 跌 3.04%）和 2025 年 2 到 3 月（之后赶上 3 月的回调和 4 月的关税）。`;
+    if(k<N){ $('vxP').textContent=both?f1(up/both*100)+'%':''; $('vxPb').textContent=window.L(`${up} / ${both} 天`,`${up} / ${both} days`); say.textContent=''; return; }
+    $('vxP').textContent=f1(RVS.pct)+'%'; $('vxPb').textContent=window.L(`${RVS.up} / ${RVS.n} 天`,`${RVS.up} / ${RVS.n} days`);
+    say.textContent=window.L(`${RVS.n} 天里（VIX 与之后 30 天都有数据的日子），VIX 高于之后 30 天实际波动率的有 ${RVS.up} 天，占 ${f1(RVS.pct)}%。VIX 平均 ${f2(RVS.vix)}，之后的实际平均 ${f2(RVS.rv)}，平均高 ${f2(RVS.gap)} 个点。实际不低于 VIX 的起点集中在 2022 年的 9 个月、2024 年 7 月（之后 30 天里有 8/5 跌 2.98%）、2024 年 12 月（之后 30 天里有 12/18 跌 3.04%）和 2025 年 2 到 3 月（之后赶上 3 月的回调和 4 月的关税）。`,`Over ${RVS.n} days (days with data for both VIX and the next 30 days), VIX was above realized volatility over the next 30 days on ${RVS.up} days, ${f1(RVS.pct)}%. VIX averaged ${f2(RVS.vix)} and subsequent realized volatility ${f2(RVS.rv)}, ${f2(RVS.gap)} points higher on average. The starting days on which realized volatility was not below VIX cluster in 9 months of 2022, July 2024 (the next 30 days included the 2.98% drop on 8/5), December 2024 (the next 30 days included the 3.04% drop on 12/18) and February to March 2025 (followed by the March pullback and the April tariffs).`);
   }
   const P=player(N,16.7,16.7*N/7000,draw);
   $('vxPlay').addEventListener('click',P.start);
@@ -982,16 +988,16 @@ const UVA=(()=>{
     const e=k-1;
     g+=`<circle cx="${X(e)}" cy="${Y(UV.u[e])}" r="3.5" fill="var(--control)"/>`;
     g+=lab(X(e)+8,Y(V[e])+4,`VIX ${f1(V[e])}`,'var(--ink)','start',11,600);
-    g+=lab(X(e)+8,Y(UV.h[e])+4,`假想 ${UV.h[e]>=10?f1(UV.h[e]):UV.h[e].toPrecision(2)}`,'var(--result)','start',11,600);
+    g+=lab(X(e)+8,Y(UV.h[e])+4,window.L(`假想 ${UV.h[e]>=10?f1(UV.h[e]):UV.h[e].toPrecision(2)}`,`Hyp. ${UV.h[e]>=10?f1(UV.h[e]):UV.h[e].toPrecision(2)}`),'var(--result)','start',11,600);
     g+=lab(X(e)+8,Y(UV.u[e])+4,`UVXY ${UV.u[e]>=10?f1(UV.u[e]):UV.u[e].toPrecision(2)}`,'var(--control)','start',11,600);
     $('uv').innerHTML=g;
     $('uvD').textContent=D[e];
-    $('uvV').textContent=f2(UV.v[e]); $('uvVb').textContent=`起点 ＝ 100 时 ${f1(V[e])}`;
+    $('uvV').textContent=f2(UV.v[e]); $('uvVb').textContent=window.L(`起点 ＝ 100 时 ${f1(V[e])}`,`Start = 100: ${f1(V[e])}`);
     $('uvU').textContent= UV.u[e]>=1?f1(UV.u[e]):UV.u[e].toPrecision(2);
     $('uvH').textContent= UV.h[e]>=1?f1(UV.h[e]):UV.h[e].toPrecision(2);
     const say=$('uvSay');
     if(k<N){ say.textContent=''; return; }
-    say.textContent=`${UVS.d0} 到 ${UVS.d1}，VIX 从 ${f2(UVS.v0)} 到 ${f2(UVS.v1)}，跌了 ${f1((1-UVS.v1/UVS.v0)*100)}%；UVXY 跌掉 ${f2(100-UVS.left)}%，100 块只剩 ${UVS.left.toPrecision(2)} 块。每天 1.5 倍杠杆本身就会磨损：同样每天 1.5 倍、但跟 VIX 指数本身的假想产品，同期剩 ${f1(UVS.lev)}。UVXY 跟的是期货，只剩这个假想产品的 1/${Math.round(UVS.lev/UVS.left)}。这里的推断（手头没有 VIX 期货的价格，没法把缺口拆开量）：大部分缺口来自 contango 下期货一路往下滑，另一部分是期货本身涨跌得比指数少。`;
+    say.textContent=window.L(`${UVS.d0} 到 ${UVS.d1}，VIX 从 ${f2(UVS.v0)} 到 ${f2(UVS.v1)}，跌了 ${f1((1-UVS.v1/UVS.v0)*100)}%；UVXY 跌掉 ${f2(100-UVS.left)}%，100 块只剩 ${UVS.left.toPrecision(2)} 块。每天 1.5 倍杠杆本身就会磨损：同样每天 1.5 倍、但跟 VIX 指数本身的假想产品，同期剩 ${f1(UVS.lev)}。UVXY 跟的是期货，只剩这个假想产品的 1/${Math.round(UVS.lev/UVS.left)}。这里的推断（手头没有 VIX 期货的价格，没法把缺口拆开量）：大部分缺口来自 contango 下期货一路往下滑，另一部分是期货本身涨跌得比指数少。`,`${UVS.d0} to ${UVS.d1}: VIX went from ${f2(UVS.v0)} to ${f2(UVS.v1)}, down ${f1((1-UVS.v1/UVS.v0)*100)}%; UVXY lost ${f2(100-UVS.left)}%, so 100 dollars became ${UVS.left.toPrecision(2)} dollars. Daily 1.5× leverage wears value down by itself: a hypothetical product that is also 1.5× daily but follows the VIX index itself was left with ${f1(UVS.lev)} over the same period. UVXY follows futures and has only 1/${Math.round(UVS.lev/UVS.left)} of what this hypothetical product has left. What follows is an inference (without VIX futures prices at hand, the gap cannot be split up and measured): most of the gap comes from futures sliding down all the way under contango, and the rest from futures moving less than the index.`);
   }
   const P=player(N,16.7,16.7*N/7000,draw);
   $('uvPlay').addEventListener('click',P.start);
@@ -1000,52 +1006,52 @@ const UVA=(()=>{
 
 /* ══════════ 八 · 费曼检验 ══════════ */
 const QS=[
- {q:`不看公式，向一个只懂期权基本概念的人讲清楚：VIX 是用哪些期权、怎么算出来的？`,
-  a:['用标普 500 指数的期权，取离到期 23 到 30 天、30 到 37 天的两个到期日。',
-     '每个到期日只取虚值期权：远期价以下用 put，以上用 call，从平值往两边取，取到连续两档没人出价为止。实值期权的价格大多是内在价值，和波动率无关。',
-     '每张期权的中间价乘上权重 ΔK/K²，全部加起来，换算成一年的方差。',
-     '两个到期日按离 30 天的远近插值成正好 30 天，开平方，乘 100。'],
-  s:'「VIX 就是标普 500 的平值隐含波动率」：那是 2003 年以前的旧算法，现在叫 VXO。现在的 VIX 用一整排虚值期权。'},
- {q:`为什么每个行权价买的期权数量要按 1/K² 配，而不是每档一张？只讲道理。`,
-  a:['目标是一个 vega 不随标的价格变的期权头寸，再每天用标的做 delta 对冲，对冲下来的盈亏只看实际走出来的方差比买入时的隐含方差多还是少，这才复制出一份方差合约。',
-     '一张期权的 vega 只在标的靠近它的行权价时大，所以每个行权价都要有。',
-     '每档一张时，标的越高总 vega 越大：平值期权的 vega 和价格成正比；一个标准差的美元宽度也和价格成正比，同时起作用的档数就和价格成正比。',
-     '两个因素相乘是价格的平方，所以数量按 1/K² 配，正好抵掉。第二节的模型里，每档一张时标的 450 的总 vega 是 350 的 1.65 倍，按 1/K² 配以后是 1.00 倍。'],
-  s:'「低行权价的期权便宜，所以多买」：便宜不是理由，要抵掉的是 vega 随价格变大。「买齐这排期权就等于持有方差合约」：不做 delta 对冲，标的一动它的价值就跟着变。'},
- {q:`4/13 那天，TSLA 350 call 的隐含波动率是 46.3%，照 VIX 的算法算出来是 50.68%。多出的 4 个多点从哪来？如果那天每个行权价的隐含波动率都一样，会算出多少？`,
-  a:['VIX 的算法用的是整条微笑，不只是平值那一点。',
-     '这天左翼 put 的隐含波动率高，250 的 put 是 64.2%，而且它们按 1/K² 拿到更大的权重。',
-     '每个行权价都按平值重新定价，同一套公式算出 46.34%，几乎就是平值。',
-     '真实报价比这多出 420.9 方差点，其中 330 以下的 put 贡献了 394.8。'],
-  s:'「因为 VIX 用了两个到期日」：两个到期日的平值只有 47.01% 和 46.07%，插值出来也在 46% 多；多出来的是微笑。'},
- {q:`单个期权的隐含波动率和 VIX 有哪几点不同？为什么股票指数可以把成分股买齐来复制，VIX 却不行？`,
-  a:['单个期权：一张期权、一个固定的到期日，要把价格代进 Black-Scholes 反推。VIX：一整排虚值期权、两个到期日插值成固定的 30 天，公式里没有定价模型。',
-     '单个期权只是微笑上的一个点；VIX 把整条微笑装进去，左翼按 1/K² 加重。VIX 的平方是一份 30 天方差合约的价格。',
-     'VIX 的成分每天都在换：标的一动，K₀ 跟着挪，call 和 put 互换（TSLA 两天就有 8 档换了用法）；两头按有没有人出价截断；T 变小，每一档的权重都变；到期日还会往后滚。',
-     '所以只能交易 VIX 期货、期权和跟踪产品，而它们不一定跟得住指数。'],
-  s:'「VIX 就是很多隐含波动率的平均」：没说按什么权重、为什么左翼更重，也没说它固定看 30 天。'},
- {q:`一份 30 天方差合约，21 个交易日里有一天跌 6%，其余 20 天每天只涨跌 0.5%。结算大概是多少？那一天占了多大分量？合约为什么用平方、不减平均值？`,
-  a:['跌 6% 的对数涨跌约 −6.19%，平方约 38.3；其余 20 天每天约 0.25，合计约 5.0。平方和约 43.3。',
-     '乘 252 ÷ 21 ＝ 12，约 519，开平方约 22.8%。那一天占平方和的 88%；如果那天也只动 0.5%，结算只有 7.9%。',
-     '平方让大的日子占大头，一次大跌就能决定整个月的结算。',
-     '不减平均值是 1.2 的零均值：朝一个方向稳定地走，对持有人来说也是波动。'],
-  s:'「平均每天只跌 0.3%，波动率很低」：结算看的是平方和，不看平均。'},
- {q:`VIX 期货的期限结构是 contango 时，买入一张 VIX 期货，VIX 指数一动不动也会亏，为什么？要赚钱，至少得发生什么？`,
-  a:['contango：远月的期货高于近月，也高于指数。',
-     '期货到期按那天的 VIX 结算。时间一天天过去，这张期货离到期越来越近，价格往下滑向近月和指数的水平；指数不动，期货就一路跌。',
-     '讲义给了三种情形，至少发生一种才赚：整条曲线上移；期限结构翻成 backward；到期那一刻隐含波动率冲高。',
-     '持有近两个月期货的 UVXY 六年里跌掉 99.96%，同期 VIX 指数只跌了 34.4%。'],
-  s:'「只要波动率上升就赚」：略升一点，会被期货往下滑的那部分吃掉。'},
- {q:`六年里 87.6% 的日子，VIX 高于之后 30 天的实际波动率。常年按 VIX 卖出方差合约是不是稳赚？这和讲义的 covered call 例子有什么关系？`,
-  a:['平均每份赚 141.0 方差点，大多数时候赚。',
-     '亏的时候亏得多：赚的份数平均赚 204.2，亏的份数平均亏 306.8；2025-03-27 起的那一份亏 2028.5，是平均每份收益的 14.4 倍。',
-     '结算按平方算，对大行情特别敏感；VIX 比之后的实际高出的那部分，是卖方为这种月份收的保险费。',
-     'covered call 也是空波动率：平静时两个目标都达到，大涨大跌至少丢一个。两者都是大多数时候收一点、偶尔亏一大笔，讲义说可以用波动率合约对冲。'],
-  s:'「87.6% 的胜率，当然稳赚」：只数了赢的次数，没看输的时候输多少。'}
+ {q:L(`不看公式，向一个只懂期权基本概念的人讲清楚：VIX 是用哪些期权、怎么算出来的？`,`Without looking at the formula, explain to someone who knows only the basic ideas of options: which options is VIX computed from, and how?`),
+  a:[L('用标普 500 指数的期权，取离到期 23 到 30 天、30 到 37 天的两个到期日。','It uses S&amp;P 500 index options at two expirations, one 23 to 30 days out and one 30 to 37 days out.'),
+     L('每个到期日只取虚值期权：远期价以下用 put，以上用 call，从平值往两边取，取到连续两档没人出价为止。实值期权的价格大多是内在价值，和波动率无关。','At each expiration it takes only out-of-the-money options: puts below the forward price and calls above it, going out from the money in both directions until two strikes in a row have no bid. An in-the-money option\'s price is mostly intrinsic value, which has nothing to do with volatility.'),
+     L('每张期权的中间价乘上权重 ΔK/K²，全部加起来，换算成一年的方差。','Each option\'s mid times its weight ΔK/K², all added up and converted to an annual variance.'),
+     L('两个到期日按离 30 天的远近插值成正好 30 天，开平方，乘 100。','The two expirations are interpolated by distance from 30 days to exactly 30 days, square-rooted and multiplied by 100.')],
+  s:L('「VIX 就是标普 500 的平值隐含波动率」：那是 2003 年以前的旧算法，现在叫 VXO。现在的 VIX 用一整排虚值期权。','"VIX is the at-the-money implied volatility of the S&amp;P 500": that is the old method from before 2003, now called VXO. Today\'s VIX uses a whole row of out-of-the-money options.')},
+ {q:L(`为什么每个行权价买的期权数量要按 1/K² 配，而不是每档一张？只讲道理。`,`Why is the number of options at each strike weighted by 1/K², rather than one per strike? Give the reasoning only.`),
+  a:[L('目标是一个 vega 不随标的价格变的期权头寸，再每天用标的做 delta 对冲，对冲下来的盈亏只看实际走出来的方差比买入时的隐含方差多还是少，这才复制出一份方差合约。','The goal is an options position whose vega does not change with the underlying price, delta hedged with the underlying every day, so that the hedged profit or loss depends only on whether the realized variance is more or less than the implied variance at purchase; only then is a variance contract replicated.'),
+     L('一张期权的 vega 只在标的靠近它的行权价时大，所以每个行权价都要有。','An option\'s vega is large only when the underlying is near its strike, so every strike is needed.'),
+     L('每档一张时，标的越高总 vega 越大：平值期权的 vega 和价格成正比；一个标准差的美元宽度也和价格成正比，同时起作用的档数就和价格成正比。','With one option per strike, the higher the underlying, the larger the total vega: an at-the-money option\'s vega is proportional to price, and one standard deviation in dollars is also proportional to price, so the number of strikes in play is proportional to price.'),
+     L('两个因素相乘是价格的平方，所以数量按 1/K² 配，正好抵掉。第二节的模型里，每档一张时标的 450 的总 vega 是 350 的 1.65 倍，按 1/K² 配以后是 1.00 倍。','The two factors multiply to the square of the price, so weighting the quantity by 1/K² cancels it exactly. In the model in section 2, with one option per strike the total vega with the underlying at 450 is 1.65 times that at 350; weighted by 1/K², it is 1.00 times.')],
+  s:L('「低行权价的期权便宜，所以多买」：便宜不是理由，要抵掉的是 vega 随价格变大。「买齐这排期权就等于持有方差合约」：不做 delta 对冲，标的一动它的价值就跟着变。','"Low-strike options are cheap, so buy more of them": being cheap is not the reason; what has to be cancelled is vega growing with price. "Buying the whole row of options is the same as holding a variance contract": without delta hedging, its value moves as soon as the underlying moves.')},
+ {q:L(`4/13 那天，TSLA 350 call 的隐含波动率是 46.3%，照 VIX 的算法算出来是 50.68%。多出的 4 个多点从哪来？如果那天每个行权价的隐含波动率都一样，会算出多少？`,`On 4/13 the TSLA 350 call's implied volatility was 46.3%, while the VIX method gives 50.68%. Where do the extra 4-plus points come from? If every strike had the same implied volatility that day, what would it give?`),
+  a:[L('VIX 的算法用的是整条微笑，不只是平值那一点。','The VIX method uses the whole smile, not just the at-the-money point.'),
+     L('这天左翼 put 的隐含波动率高，250 的 put 是 64.2%，而且它们按 1/K² 拿到更大的权重。','That day the left-wing puts had high implied volatility, 64.2% for the 250 put, and they get larger weights by 1/K².'),
+     L('每个行权价都按平值重新定价，同一套公式算出 46.34%，几乎就是平值。','Repricing every strike at the money, the same formula gives 46.34%, almost exactly the at-the-money level.'),
+     L('真实报价比这多出 420.9 方差点，其中 330 以下的 put 贡献了 394.8。','The real quotes give 420.9 variance points more than that, of which the puts below 330 contribute 394.8.')],
+  s:L('「因为 VIX 用了两个到期日」：两个到期日的平值只有 47.01% 和 46.07%，插值出来也在 46% 多；多出来的是微笑。','"Because VIX uses two expirations": at the money the two expirations are only 47.01% and 46.07%, and interpolating them still gives just over 46%; the extra comes from the smile.')},
+ {q:L(`单个期权的隐含波动率和 VIX 有哪几点不同？为什么股票指数可以把成分股买齐来复制，VIX 却不行？`,`In what ways does a single option's implied volatility differ from VIX? Why can a stock index be replicated by buying all its component stocks, while VIX cannot?`),
+  a:[L('单个期权：一张期权、一个固定的到期日，要把价格代进 Black-Scholes 反推。VIX：一整排虚值期权、两个到期日插值成固定的 30 天，公式里没有定价模型。','A single option: one option with a fixed expiration, and the price has to be plugged into Black-Scholes to back out σ. VIX: a whole row of out-of-the-money options, two expirations interpolated to a fixed 30 days, and no pricing model in the formula.'),
+     L('单个期权只是微笑上的一个点；VIX 把整条微笑装进去，左翼按 1/K² 加重。VIX 的平方是一份 30 天方差合约的价格。','A single option is only one point on the smile; VIX takes in the whole smile, with the left wing weighted up by 1/K². VIX squared is the price of a 30-day variance contract.'),
+     L('VIX 的成分每天都在换：标的一动，K₀ 跟着挪，call 和 put 互换（TSLA 两天就有 8 档换了用法）；两头按有没有人出价截断；T 变小，每一档的权重都变；到期日还会往后滚。','VIX\'s components change every day: when the underlying moves, K₀ moves with it and calls and puts swap (for TSLA, 8 strikes switched in two days); both ends are cut off depending on whether anyone bids; T gets smaller, so every strike\'s weight changes; and the expirations roll forward.'),
+     L('所以只能交易 VIX 期货、期权和跟踪产品，而它们不一定跟得住指数。','So you can only trade VIX futures, options and tracking products, and they do not necessarily keep up with the index.')],
+  s:L('「VIX 就是很多隐含波动率的平均」：没说按什么权重、为什么左翼更重，也没说它固定看 30 天。','"VIX is an average of many implied volatilities": this does not say with what weights, why the left wing weighs more, or that it always looks 30 days ahead.')},
+ {q:L(`一份 30 天方差合约，21 个交易日里有一天跌 6%，其余 20 天每天只涨跌 0.5%。结算大概是多少？那一天占了多大分量？合约为什么用平方、不减平均值？`,`A 30-day variance contract: in 21 trading days there is one day down 6%, and the other 20 days each move only 0.5%. Roughly what does it settle at? How much does that one day count? Why does the contract use squares and not subtract the mean?`),
+  a:[L('跌 6% 的对数涨跌约 −6.19%，平方约 38.3；其余 20 天每天约 0.25，合计约 5.0。平方和约 43.3。','A 6% drop is a log return of about −6.19%, squared about 38.3; the other 20 days are about 0.25 each, about 5.0 in total. The sum of squares is about 43.3.'),
+     L('乘 252 ÷ 21 ＝ 12，约 519，开平方约 22.8%。那一天占平方和的 88%；如果那天也只动 0.5%，结算只有 7.9%。','Times 252 ÷ 21 = 12 is about 519; the square root is about 22.8%. That one day is 88% of the sum of squares; if it had also moved only 0.5%, the settlement would be just 7.9%.'),
+     L('平方让大的日子占大头，一次大跌就能决定整个月的结算。','Squaring lets the big days dominate; one big drop can decide the whole month\'s settlement.'),
+     L('不减平均值是 1.2 的零均值：朝一个方向稳定地走，对持有人来说也是波动。','Not subtracting the mean is the zero mean from 1.2: moving steadily in one direction is also volatility to the holder.')],
+  s:L('「平均每天只跌 0.3%，波动率很低」：结算看的是平方和，不看平均。','"It only fell 0.3% a day on average, so volatility is low": settlement looks at the sum of squares, not the average.')},
+ {q:L(`VIX 期货的期限结构是 contango 时，买入一张 VIX 期货，VIX 指数一动不动也会亏，为什么？要赚钱，至少得发生什么？`,`When the VIX futures term structure is in contango, a long VIX future loses money even if the VIX index does not move at all. Why? To make money, what has to happen at the very least?`),
+  a:[L('contango：远月的期货高于近月，也高于指数。','Contango: far-month futures are above near-month ones, and above the index.'),
+     L('期货到期按那天的 VIX 结算。时间一天天过去，这张期货离到期越来越近，价格往下滑向近月和指数的水平；指数不动，期货就一路跌。','Futures settle on VIX on their expiration day. As the days pass, a future gets closer to expiration and its price slides down toward the near-month and index level; if the index does not move, the future falls all the way.'),
+     L('讲义给了三种情形，至少发生一种才赚：整条曲线上移；期限结构翻成 backward；到期那一刻隐含波动率冲高。','The lecture gives three cases, and at least one has to happen to make money: the whole curve shifts up; the term structure flips to backward; implied volatility spikes at the moment of expiration.'),
+     L('持有近两个月期货的 UVXY 六年里跌掉 99.96%，同期 VIX 指数只跌了 34.4%。','UVXY, which holds the two nearest months of futures, lost 99.96% over six years, while the VIX index fell only 34.4% over the same period.')],
+  s:L('「只要波动率上升就赚」：略升一点，会被期货往下滑的那部分吃掉。','"It makes money as long as volatility rises": a small rise gets eaten by the futures sliding down.')},
+ {q:L(`六年里 87.6% 的日子，VIX 高于之后 30 天的实际波动率。常年按 VIX 卖出方差合约是不是稳赚？这和讲义的 covered call 例子有什么关系？`,`On 87.6% of days over six years, VIX was above realized volatility over the next 30 days. Is selling variance contracts at VIX year in, year out a sure win? How does this relate to the lecture's covered call example?`),
+  a:[L('平均每份赚 141.0 方差点，大多数时候赚。','Each contract earns 141.0 variance points on average, and most of the time it makes money.'),
+     L('亏的时候亏得多：赚的份数平均赚 204.2，亏的份数平均亏 306.8；2025-03-27 起的那一份亏 2028.5，是平均每份收益的 14.4 倍。','When it loses, it loses a lot: winning contracts make 204.2 on average and losing ones lose 306.8 on average; the one started on 2025-03-27 lost 2028.5, 14.4 times the average gain per contract.'),
+     L('结算按平方算，对大行情特别敏感；VIX 比之后的实际高出的那部分，是卖方为这种月份收的保险费。','Settlement is in squares, so it is especially sensitive to big moves; the amount by which VIX exceeds subsequent realized volatility is the insurance premium the seller collects for months like that.'),
+     L('covered call 也是空波动率：平静时两个目标都达到，大涨大跌至少丢一个。两者都是大多数时候收一点、偶尔亏一大笔，讲义说可以用波动率合约对冲。','A covered call is also short volatility: when calm, both goals are met; on a big rise or drop at least one is missed. Both collect a little most of the time and lose a lot once in a while, and the lecture says both can be hedged with a volatility contract.')],
+  s:L('「87.6% 的胜率，当然稳赚」：只数了赢的次数，没看输的时候输多少。','"An 87.6% win rate, so it is a sure thing": this counts only how often it wins, not how much it loses when it loses.')}
 ];
 (function(){
   const box=$('feynman');
-  box.innerHTML=QS.map((x,i)=>`
+  box.innerHTML=QS.map((x,i)=>L(`
     <div class="q">
       <div class="qn">第 ${i+1} 题</div>
       <p class="qt">${x.q}</p>
@@ -1059,7 +1065,20 @@ const QS=[
         <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
         <div class="shallow"><b>常见的浅答：</b>${x.s}</div>
       </div>
-    </div>`).join('');
+    </div>`,`    <div class="q">
+      <div class="qn">Question ${i+1}</div>
+      <p class="qt">${x.q}</p>
+      <textarea id="fq${i}" placeholder="Write it in your own words first. Where you get stuck is what you have not understood yet."></textarea>
+      <div class="qrow">
+        <button class="ghost" data-i="${i}">Compare with the reference answer</button>
+        <span class="qmark" id="fm${i}"></span>
+      </div>
+      <div class="qa" id="fa${i}" hidden>
+        <b>A sound answer has to reach at least these steps:</b>
+        <ul>${x.a.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div class="shallow"><b>Common shallow answer: </b>${x.s}</div>
+      </div>
+    </div>`)).join('');
   QS.forEach((_,i)=>{
     const t=$('fq'+i);
     try{ const v=localStorage.getItem('fin580-V-q'+i); if(v) t.value=v; }catch(e){}
@@ -1068,8 +1087,8 @@ const QS=[
   box.querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{
     const i=b.dataset.i, a=$('fa'+i), t=$('fq'+i);
     a.hidden=!a.hidden;
-    b.textContent = a.hidden ? '对照参考答案' : '收起参考答案';
-    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? '先自己写一版再看，效果差很多' : '';
+    b.textContent = a.hidden ? L('对照参考答案','Compare with the reference answer') : L('收起参考答案','Hide the reference answer');
+    $('fm'+i).textContent = (!a.hidden && t.value.trim().length<20) ? L('先自己写一版再看，效果差很多','Write your own version first; it works much better') : '';
   }));
 })();
 
