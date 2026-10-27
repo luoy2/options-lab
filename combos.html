@@ -696,31 +696,43 @@ function setBus(which,on){
 
 /* ══════════ 配音：每句字幕一段 mp3。映射由 audio/combos/voice.js 提供
    （window.COMBOS_VOICE.lines[字幕原文] = {f:'v-<10 位哈希>.mp3', d:秒}），装不到或某句没有就无声 ══════════ */
-const VOX={on:true,cur:null,last:'',cache:new Map(),tmr:0,dir:'audio/combos/',made:0,played:0};
+const VOX={on:true,cur:null,last:'',blobs:new Map(),tmr:0,dir:'audio/combos/',made:0,played:0,el:new Audio(),unlocked:false,want:0};
 try{ if(localStorage.getItem('fin580-combos-vox')==='0') VOX.on=false; }catch(e){}
 const voxLines=()=>{ const v=window.COMBOS_VOICE; return v&&v.lines?v.lines:null; };
-function voxEl(txt){
+/* iPhone 的 Safari 只让在点击里 play() 过的那个 <audio> 之后自己出声，也不理 preload。
+   所以全片只用一个 <audio>：第一次点击时在点击里放一小段静音解锁它，之后每句换它的 src；
+   后面几句先 fetch 成 blob 地址，轮到时不等网络（双击本地打开 fetch 不到，就直接用文件地址） */
+VOX.el.preload='auto';
+VOX.el.addEventListener('ended',()=>{ if(VOX.cur) voxDone(); });
+VOX.el.addEventListener('error',()=>{ if(VOX.cur) voxDone(); });
+VOX.el.addEventListener('loadedmetadata',()=>{ if(VOX.cur&&VOX.want>.05){ try{ VOX.el.currentTime=VOX.want; }catch(e){} } });
+const VOX_SILENT='data:audio/wav;base64,UklGRsQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA';
+function voxUnlock(){
+  if(VOX.unlocked||VOX.cur) return;
+  const a=VOX.el; a.src=VOX_SILENT; const p=a.play(); if(p&&p.then) p.then(()=>{ VOX.unlocked=true; },()=>{});
+}
+['click','touchend','keydown'].forEach(t=>addEventListener(t,voxUnlock,true));
+function voxBlob(txt){
   const m=voxLines(), e=m&&m[txt]; if(!e||!e.f) return null;
-  let a=VOX.cache.get(txt);
-  if(!a){
-    a=new Audio(); a.preload='auto'; a.src=VOX.dir+e.f; VOX.made++;
-    a.addEventListener('ended',()=>{ if(VOX.cur===a) voxDone(); });
-    a.addEventListener('error',()=>{ if(VOX.cur===a) voxDone(); });
-    VOX.cache.set(txt,a);
-    for(const [k,old] of VOX.cache){ if(VOX.cache.size<=16) break; if(old===VOX.cur) continue; VOX.cache.delete(k); try{ old.pause(); old.removeAttribute('src'); old.load(); }catch(err){} }
+  let b=VOX.blobs.get(txt);
+  if(!b){
+    b={url:null}; VOX.blobs.set(txt,b); VOX.made++;
+    fetch(VOX.dir+e.f).then(r=>r.ok?r.blob():null).then(bl=>{ if(bl&&VOX.blobs.get(txt)===b) b.url=URL.createObjectURL(new Blob([bl],{type:'audio/mpeg'})); }).catch(()=>{});
+    for(const [k,old] of VOX.blobs){ if(VOX.blobs.size<=16) break; if(k===VOX.cur) continue; VOX.blobs.delete(k); if(old.url) URL.revokeObjectURL(old.url); }
   }
-  return a;
+  return b;
 }
 function voxPlay(txt,off){
-  voxStop(); const a=voxEl(txt); if(!a) return;
-  VOX.cur=a; VOX.played++;
-  try{ a.playbackRate=PL_.speed; a.currentTime=Math.max(0,off||0); }catch(e){}
-  const p=a.play(); if(p&&p.catch) p.catch(()=>{ if(VOX.cur===a) voxDone(); });
+  voxStop(); const b=voxBlob(txt); if(!b) return;
+  const a=VOX.el; a.src=b.url||VOX.dir+voxLines()[txt].f;   // 还没下完就直接连网放
+  VOX.cur=txt; VOX.want=Math.max(0,off||0); VOX.played++;
+  try{ a.defaultPlaybackRate=a.playbackRate=PL_.speed; a.currentTime=VOX.want; }catch(e){}
+  const p=a.play(); if(p&&p.then) p.then(()=>{ VOX.unlocked=true; },()=>{ if(VOX.cur===txt) voxDone(); });
   duck(true); MLOG.push([+PL_.T.toFixed(2),'vox',txt.slice(0,10)]);
 }
-function voxStop(){ const a=VOX.cur; if(!a) return; VOX.cur=null; try{ a.pause(); a.currentTime=0; }catch(e){} duck(false); }
+function voxStop(){ if(!VOX.cur) return; VOX.cur=null; try{ VOX.el.pause(); }catch(e){} duck(false); }
 function voxDone(){ VOX.cur=null; duck(false); }
-function voxPrefetch(s,ci){ let n=0, si=s.i, j=ci+1; while(n<3&&si<SCN.length){ const cs=SCN[si].caps; if(j<cs.length){ voxEl(cs[j][2]); n++; j++; } else { si++; j=0; } } }
+function voxPrefetch(s,ci){ let n=0, si=s.i, j=ci+1; while(n<3&&si<SCN.length){ const cs=SCN[si].caps; if(j<cs.length){ voxBlob(cs[j][2]); n++; j++; } else { si++; j=0; } } }
 /* 每帧调用：正在播、配音开着、当前字幕换了，就放这一句（从字幕开始到现在的偏移处起）；并提前建好后面三句 */
 function voxSync(s,cp,lt,txt){
   if(!PL_.playing||!VOX.on||!voxLines()) return;
@@ -1756,7 +1768,7 @@ function seek(Tm,play){
 function setPlayIco(){ $('playIco').innerHTML=PL_.playing?'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>':'<path d="M7 4l13 8-13 8z"/>'; $('playBtn').setAttribute('aria-label',PL_.playing?'暂停':'播放');
   if(!PL_.playing){ voxStop(); VOX.last=''; } }   // 暂停停掉当前句；再播从这句当前位置接上
 const SPEEDS=[1,1.5,2,.75];
-function setSpeed(v){ PL_.speed=v; $('spdBtn').textContent=v+'×'; if(VOX.cur){ try{ VOX.cur.playbackRate=v; }catch(e){} } MLOG.push([+PL_.T.toFixed(2),'speed',v]); }
+function setSpeed(v){ PL_.speed=v; $('spdBtn').textContent=v+'×'; if(VOX.cur){ try{ VOX.el.playbackRate=v; }catch(e){} } MLOG.push([+PL_.T.toFixed(2),'speed',v]); }
 function startFilm(Tm){
   auInit(); $('start').hidden=true; PL_.started=true;
   if(Tm<1){ QS={}; saveScore(); QPICK.clear(); QDONE.clear(); scoreShow(); }   // 从头看是新的一遍，猜对数清零；接着看、按章进来不清
