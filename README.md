@@ -46,7 +46,7 @@ Pages show Chinese or English according to the browser's default language. Add `
 | [Options trading in one hour (Chinese)](https://luoy2.github.io/options-lab/combos.html) | one video covering 31 common option combinations, with Chinese narration, about 35 minutes |
 | [Speedrun](https://luoy2.github.io/options-lab/combos-en.html) | Options Trading in One Hour: the same video in English, with English narration, about 34 minutes |
 | [1.1 Forward price](https://luoy2.github.io/options-lab/station-1-1-forward-price.html) | What an option is, payoff diagrams, the center point of pricing |
-| [1.2 Volatility](https://luoy2.github.io/options-lab/station-1-2-volatility.html) | How wide the distribution is; stock price model assumptions; the /16 rule; normal vs lognormal |
+| [1.2 Volatility](https://luoy2.github.io/options-lab/station-1-2-volatility.html) | How wide the distribution is; stock price model assumptions; the /16 rule; normal versus lognormal |
 | [2.1 Delta](https://luoy2.github.io/options-lab/station-2-1-delta.html) | The first Greek, four ways to read it |
 | [2.2 Gamma and theta](https://luoy2.github.io/options-lab/station-2-2-gamma-theta.html) | Trading time for movement |
 | [2.3 Vega and rho](https://luoy2.github.io/options-lab/station-2-3-vega-rho.html) | Sensitivity to volatility and interest rates |

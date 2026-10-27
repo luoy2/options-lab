@@ -268,7 +268,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p><span class="l-zh">讲义特意写明：两条腿必须<b>同一行权价、同一到期日</b>。错开行权价，比如 350 call 配 330 put，330 到 350 之间两张都没人行权，这一段你既没买也没卖，线是平的，不再是标的。错开到期日，一张先到期、另一张还活着，先到期那天你手里只剩半个仓位。</span><span class="l-en">The lecture notes state it explicitly: the two legs must have <b>the same strike and the same expiration</b>. With different strikes, say a 350 call with a 330 put, between 330 and 350 neither is exercised, so over that range you neither buy nor sell, the line is flat, and it is no longer the underlying. With different expirations, one expires while the other is still alive, and on the first expiration day you are left holding half the position.</span></p>
 
   <h3><span class="l-zh">TSLA 的真实价格</span><span class="l-en">Real TSLA prices</span></h3>
-  <p><span class="l-zh">4/13 收盘，350 call 中间价 21.05，350 put 中间价 17.40，做一个合成多头要付 3.65。5/15 TSLA 收在 422.32：合成多头值 72.32，赚 68.67；4/13 直接按 352.36 买股票，到 5/15 赚 69.96，多 1.29。合成多头的<span class="sym" data-say="breakeven：到期时 TSLA 在这个价，仓位不赚不亏（3.1）。这里是行权价加上开仓付的钱。">盈亏平衡点</span>是 350 ＋ 3.65 ＝ 353.65，贴着 1.1 算出的远期价 353.69。为什么是 3.65、差的 1.29 从哪来，是 5.2 的内容。这一节只讲结构，不讲价格。</span><span class="l-en">At the 4/13 close, the 350 call's mid price is 21.05 and the 350 put's is 17.40, so building a synthetic long costs 3.65. TSLA closes at 422.32 on 5/15: the synthetic long is worth 72.32, a gain of 68.67; buying the stock directly at 352.36 on 4/13 gains 69.96 by 5/15, 1.29 more. The synthetic long's <span class="sym" data-say="Breakeven: the TSLA price at expiration at which the position neither gains nor loses (3.1). Here it is the strike plus the money paid to open.">breakeven</span> is 350 + 3.65 = 353.65, right next to the forward price of 353.69 computed in 1.1. Why it is 3.65 and where the 1.29 difference comes from is the content of 5.2. This node covers only structure, not price.</span></p>
+  <p><span class="l-zh">4/13 收盘，350 call 中间价 21.05，350 put 中间价 17.40，做一个合成多头要付 3.65。5/15 TSLA 收在 422.32：合成多头值 72.32，赚 68.67；4/13 直接按 352.36 买股票，到 5/15 赚 69.96，多 1.29。合成多头的<span class="sym" data-say="breakeven：到期时 TSLA 在这个价，仓位不赚不亏（3.1）。这里是行权价加上开仓付的钱。">盈亏平衡点</span>是 350 ＋ 3.65 ＝ 353.65，贴着 1.1 算出的远期价 353.69。为什么是 3.65、差的 1.29 从哪来，是 5.2 的内容。这一节只讲结构，不讲价格。</span><span class="l-en">At the 4/13 close, the 350 call's mid price is 21.05 and the 350 put's is 17.40, so building a synthetic long costs 3.65. TSLA closes at 422.32 on 5/15: the synthetic long is worth 72.32, a gain of 68.67; buying the stock directly at 352.36 on 4/13 gains 69.96 by 5/15, 1.29 more. The synthetic long's <span class="sym" data-say="Break-even: the TSLA price at expiration at which the position neither gains nor loses (3.1). Here it is the strike plus the money paid to open.">break-even</span> is 350 + 3.65 = 353.65, right next to the forward price of 353.69 computed in 1.1. Why it is 3.65 and where the 1.29 difference comes from is the content of 5.2. This node covers only structure, not price.</span></p>
 </section>
 
 <!-- ══════════ 一 ══════════ -->
@@ -598,7 +598,7 @@ ul,ol{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <div class="gl"><div class="s"><span class="l-zh">中间价</span><span class="l-en">Mid price</span></div><div class="t"><span class="l-zh">（买一 ＋ 卖一）÷ 2。买一是有人愿意买的最高价，卖一是有人愿意卖的最低价。</span><span class="l-en">(Bid + ask) ÷ 2. The bid is the highest price someone will pay; the ask is the lowest price someone will sell at.</span></div></div>
       <div class="gl"><div class="s"><span class="l-zh">买卖价差</span><span class="l-en">Bid-ask spread</span></div><div class="t"><span class="l-zh">卖一减买一。买入按卖一成交、卖出按买一成交，每条腿多付半个买卖价差（3.1）。深度实值期权的买卖价差宽，中间价的误差也大。</span><span class="l-en">Ask minus bid. Buys fill at the ask and sells at the bid, so each leg costs an extra half spread (3.1). Deep-in-the-money options have wide spreads, and their mid prices have large errors.</span></div></div>
       <div class="gl"><div class="s"><span class="l-zh">实值 / 虚值 / 深度实值</span><span class="l-en">In the money / out of the money / deep in the money</span></div><div class="t"><span class="l-zh">现在行权就值钱的叫实值，不值钱的叫虚值（3.2）。call 行权价低于现价是实值，put 行权价高于现价是实值。深度实值是离现价很远的实值。</span><span class="l-en">An option worth something if exercised now is in the money; one worth nothing is out of the money (3.2). A call is in the money when its strike is below the current price, a put when its strike is above it. Deep in the money means far from the current price.</span></div></div>
-      <div class="gl"><div class="s"><span class="l-zh">盈亏平衡点</span><span class="l-en">Breakeven</span></div><div class="t"><span class="l-zh">到期时标的在这个价，仓位不赚不亏（3.1）。合成多头 350 是 350 ＋ 3.65 ＝ 353.65。</span><span class="l-en">The underlying price at expiration at which the position neither gains nor loses (3.1). For the 350 synthetic long it is 350 + 3.65 = 353.65.</span></div></div>
+      <div class="gl"><div class="s"><span class="l-zh">盈亏平衡点</span><span class="l-en">Break-even</span></div><div class="t"><span class="l-zh">到期时标的在这个价，仓位不赚不亏（3.1）。合成多头 350 是 350 ＋ 3.65 ＝ 353.65。</span><span class="l-en">The underlying price at expiration at which the position neither gains nor loses (3.1). For the 350 synthetic long it is 350 + 3.65 = 353.65.</span></div></div>
       <div class="gl"><div class="s"><span class="l-zh">折回（现值）</span><span class="l-en">Discounting (present value)</span></div><div class="t"><span class="l-zh">到期才拿到的钱，按利率算出今天值多少（1.1）。本页用 4.3%、单利：25 折 32 天是 24.91。</span><span class="l-en">Money received only at expiration, valued today using the interest rate (1.1). This page uses 4.3%, simple interest: 25 discounted for 32 days is 24.91.</span></div></div>
     </div>
   </details>
@@ -709,7 +709,7 @@ function Overlay(p,rels){
   function draw(){
     const r=rels[st.i], pr=st.prog, A=s=>legVal(r.a.legs,s), Bf=s=>legVal(r.b.legs,s);
     svg.setAttribute('viewBox',`0 0 ${W} ${FK>1?326:308}`);
-    let g=lab(L,T-14,window.L('到期价值（每股美元）','Value at expiration ($ per share)'),'var(--ink-soft)','start',11.5*FK);
+    let g=lab(L,T-14,window.L('到期价值（每股美元）','Value at expiration (in $ per share)'),'var(--ink-soft)','start',11.5*FK);
     for(let v=-50;v<=50;v+=25){ g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,fm(v,0),'var(--ink-faint)','end',12*FK); }
     for(let s=300;s<=400;s+=25) g+=lab(X(s),B+20,s,'var(--ink-faint)','middle',12*FK);
     g+=lab(Rr,B+22+20*FK,window.L('到期时 TSLA','TSLA at expiration'),'var(--ink-faint)','end',12*FK);
@@ -742,17 +742,17 @@ function Overlay(p,rels){
 }
 const OV0=Overlay('ov0',[
   {label:L('同一行权价 350','Same strike, 350'),a:{name:L('买入 350 call','Long 350 call'),legs:[[1,'C',350]]},b:{name:L('卖出 350 put','Short 350 put'),legs:[[-1,'P',350]]},sum:L('按 350 买入 TSLA','Buy TSLA at 350'),ks:[350],short:L('合计 ＝ 按 350 买入','Total = buy at 350'),lx:400,ly:-14,
-   say:L('两条线各有一个弯，都在 350。左边 call 是 0，卖出的 put 每跌 1 亏 1；右边 put 是 0，call 每涨 1 赚 1。拼起来是一条穿过 350 的直线：TSLA 到期每高 1 美元，合计就多 1 美元，和持有股票一样。','Each line has one kink, both at 350. On the left the call is 0 and the short put loses 1 for every 1 drop; on the right the put is 0 and the call gains 1 for every 1 rise. Together they form a straight line through 350: for every dollar TSLA is higher at expiration, the total is a dollar higher, the same as holding the stock.')},
+   say:L('两条线各有一个弯，都在 350。左边 call 是 0，卖出的 put 每跌 1 亏 1；右边 put 是 0，call 每涨 1 赚 1。拼起来是一条穿过 350 的直线：TSLA 到期每高 1 美元，合计就多 1 美元，和持有股票一样。','Each line has one kink, both at 350. On the left the call is 0 and the short put loses 1 for every 1 drop; on the right the put is 0 and the call gains 1 for every 1 rise. Together they form a straight line through 350: for every $1 TSLA is higher at expiration, the total is $1 higher, the same as holding the stock.')},
   {label:L('错开：350 call 配 330 put','Mismatched: 350 call with 330 put'),a:{name:L('买入 350 call','Long 350 call'),legs:[[1,'C',350]]},b:{name:L('卖出 330 put','Short 330 put'),legs:[[-1,'P',330]]},sum:L('中间一段是平的','Flat in the middle'),ks:[330,350],short:L('330 到 350 是平的','Flat from 330 to 350'),lx:398,ly:-14,
    say:L('行权价错开 20：TSLA 到期在 330 和 350 之间时，call 和 put 都没人行权，合计是 0，这一段 TSLA 动多少都与你无关。线不再是直的，就不是标的。','Strikes 20 apart: if TSLA expires between 330 and 350, neither the call nor the put is exercised, the total is 0, and however much TSLA moves in that range has nothing to do with you. The line is no longer straight, so it is not the underlying.')}
 ]);
 const OV1=Overlay('ov1',[
   {label:L('合成买入 call','Synthetic long call'),a:{name:L('买入 350 put','Long 350 put'),legs:[[1,'P',350]]},b:{name:L('买入标的（按 350）','Long underlying (at 350)'),legs:[[1,'U',350]]},sum:L('买入 350 call','Long 350 call'),ks:[350],short:L('合计 ＝ 买入 350 call','Total = long 350 call'),lx:398,ly:-14,
-   say:L('350 以下，put 每多 1 美元正好补上股票跌掉的 1 美元，合计停在 0；350 以上 put 作废，股票涨多少合计就涨多少。先平后涨，就是 350 call。','Below 350, each extra dollar on the put makes up exactly the dollar the stock lost, and the total stays at 0; above 350 the put expires, and the total rises as much as the stock. Flat then rising: a 350 call.')},
+   say:L('350 以下，put 每多 1 美元正好补上股票跌掉的 1 美元，合计停在 0；350 以上 put 作废，股票涨多少合计就涨多少。先平后涨，就是 350 call。','Below 350, each extra $1 on the put makes up exactly the $1 the stock lost, and the total stays at 0; above 350 the put expires, and the total rises as much as the stock. Flat then rising: a 350 call.')},
   {label:L('合成卖出 call','Synthetic short call'),a:{name:L('卖出 350 put','Short 350 put'),legs:[[-1,'P',350]]},b:{name:L('卖出标的（按 350）','Short underlying (at 350)'),legs:[[-1,'U',350]]},sum:L('卖出 350 call','Short 350 call'),ks:[350],short:L('合计 ＝ 卖出 350 call','Total = short 350 call'),lx:398,ly:22,
    say:L('上一个例子整个取反：卖出的 put 与卖出的标的在 350 以下互相抵掉，350 以上卖空每涨 1 亏 1。先平后跌，就是卖出一张 350 call。','The previous example reversed: below 350 the short put and the short underlying cancel; above 350 the short loses 1 for every 1 rise. Flat then falling: a short 350 call.')},
   {label:L('合成买入 put','Synthetic long put'),a:{name:L('买入 350 call','Long 350 call'),legs:[[1,'C',350]]},b:{name:L('卖出标的（按 350）','Short underlying (at 350)'),legs:[[-1,'U',350]]},sum:L('买入 350 put','Long 350 put'),ks:[350],short:L('合计 ＝ 买入 350 put','Total = long 350 put'),lx:296,ly:-14,la:'start',
-   say:L('350 以上，call 每多 1 美元正好补上卖空亏掉的 1 美元，合计停在 0；350 以下 call 作废，TSLA 每跌 1 卖空赚 1。这是 350 put 的形状。','Above 350, each extra dollar on the call makes up exactly the dollar lost on the short, and the total stays at 0; below 350 the call expires, and the short gains 1 for every 1 TSLA falls. This is the shape of a 350 put.')},
+   say:L('350 以上，call 每多 1 美元正好补上卖空亏掉的 1 美元，合计停在 0；350 以下 call 作废，TSLA 每跌 1 卖空赚 1。这是 350 put 的形状。','Above 350, each extra $1 on the call makes up exactly the $1 lost on the short, and the total stays at 0; below 350 the call expires, and the short gains 1 for every 1 TSLA falls. This is the shape of a 350 put.')},
   {label:L('合成卖出 put','Synthetic short put'),a:{name:L('卖出 350 call','Short 350 call'),legs:[[-1,'C',350]]},b:{name:L('买入标的（按 350）','Long underlying (at 350)'),legs:[[1,'U',350]]},sum:L('卖出 350 put','Short 350 put'),ks:[350],short:L('合计 ＝ 卖出 350 put','Total = short 350 put'),lx:L(296,290),ly:22,la:'start',   // 英文长，左移免得压到横轴的 350
    say:L('持有股票、卖出 350 call：涨过 350 的部分被 call 拿走，合计停在 0；跌下去股票亏多少合计就亏多少。这是卖出 350 put 的形状，也就是备兑卖 call（5.3 的 collar 会再用到它）。','Hold the stock and sell a 350 call: anything above 350 is taken by the call and the total stays at 0; below, the total loses as much as the stock. This is the shape of a short 350 put, also known as a covered call (5.3\'s collar uses it again).')},
   {label:L('合成卖出标的','Synthetic short underlying'),a:{name:L('卖出 350 call','Short 350 call'),legs:[[-1,'C',350]]},b:{name:L('买入 350 put','Long 350 put'),legs:[[1,'P',350]]},sum:L('按 350 卖出 TSLA','Sell TSLA at 350'),ks:[350],short:L('合计 ＝ 按 350 卖出','Total = sell at 350'),lx:296,ly:-14,la:'start',
@@ -795,9 +795,9 @@ const SR=(()=>{
     g+=`<circle cx="${hx}" cy="${hy}" r="4" fill="var(--control)"/>`;
     svg.innerHTML=g;
     $('srD').textContent=md(SYN.days[k]); $('srDb').textContent=window.L(`第 ${k} 个交易日`,`Trading day ${k}`);
-    $('srS').textContent=f2(S[k]); $('srSb').textContent=window.L('减 350 是 ','Minus 350:')+fm(US[k]);
+    $('srS').textContent=f2(S[k]); $('srSb').textContent=window.L('减 350 是 ','Minus 350: ')+fm(US[k]);
     $('srY').textContent=fm(SY[k],3); $('srYb').textContent=k<n?`${f3(SYN.C[350][k])} − ${f3(SYN.P[350][k])}`:window.L('到期价值 72.32 − 0','Value at expiration 72.32 − 0');
-    $('srG').textContent=fm(GAP[k],3); $('srGb').textContent=window.L('利息 ','Interest')+f3(INT[k]);
+    $('srG').textContent=fm(GAP[k],3); $('srGb').textContent=window.L('利息 ','Interest ')+f3(INT[k]);
     $('srSay').textContent= pr<n ? '' :
       window.L(`${md(SYN.days[big+1])} TSLA 一天涨 ${f2(dS[big])}，合成多头同一天涨 ${f3(dY[big])}。24 个交易日里，TSLA 每动 1 美元，合成多头平均动 ${slope.toFixed(4)} 美元。`,`On ${md(SYN.days[big+1])}, TSLA rose ${f2(dS[big])} in one day and the synthetic long rose ${f3(dY[big])}. Over the 24 trading days, for each $1 TSLA moved, the synthetic long moved $${slope.toFixed(4)} on average.`)+
       window.L(`两者之差从 4/13 的 ${f2(GAP[0])} 一路缩到到期的 0，贴着虚线走：虚线是 350 美元晚到 5/15 才付、按 4.3% 省下的利息，4/13 是 ${f2(INT[0])}，5.2 讲。差额离虚线平均 ${f2(devMean)}，到期前 24 天里有 23 天在 350 call、350 put 各半个买卖价差之和以内，是报价误差。最多的一天是 ${md(SYN.days[devDay])}，差 ${f2(devMax)}，超出了这个范围：快照里 TSLA 的价格和期权报价不在同一瞬间。那天 340 到 390 各行权价按合成关系反推的 TSLA 都在 376.16 到 376.26 之间，快照记的是 ${f2(S[devDay])}。`,`The difference shrinks from ${f2(GAP[0])} on 4/13 all the way to 0 at expiration, tracking the dashed line: the dashed line is the interest saved by paying the $350 later, on 5/15, at 4.3%; on 4/13 it is ${f2(INT[0])}, covered in 5.2. The difference sits ${f2(devMean)} from the dashed line on average, and on 23 of the 24 days before expiration it is within half the 350 call's bid-ask spread plus half the 350 put's, which is quote error. The largest is on ${md(SYN.days[devDay])}, ${f2(devMax)}, beyond that range: in the snapshot, the TSLA price and the option quotes were not taken at the same instant. That day, the TSLA price backed out of the synthetic relationship at every strike from 340 to 390 is between 376.16 and 376.26, while the snapshot records ${f2(S[devDay])}.`);
@@ -912,7 +912,7 @@ function Simp(p,presets,sel=0){
     if(pr.mark!=null){
       const j=grid.reduce((b,s,i)=>Math.abs(s-pr.mark)<Math.abs(grid[b]-pr.mark)?i:b,0);
       g+=`<line x1="${X(pr.mark)}" y1="${T}" x2="${X(pr.mark)}" y2="${B}" stroke="var(--result)" stroke-dasharray="3 3"/>`;
-      g+=`<circle cx="${X(pr.mark)}" cy="${Y(ys[j])}" r="4" fill="var(--result)"/>`+lab(X(pr.mark)-6,T+10,window.L('现价 ','Spot')+pr.mark.toFixed(2),'var(--result)','end',11);
+      g+=`<circle cx="${X(pr.mark)}" cy="${Y(ys[j])}" r="4" fill="var(--result)"/>`+lab(X(pr.mark)-6,T+10,window.L('现价 ','Spot ')+pr.mark.toFixed(2),'var(--result)','end',11);
     }
     svg.innerHTML=g;
     const dmax=Math.max(...ys.map((y,j)=>Math.abs(y-base[j])));
@@ -1052,7 +1052,7 @@ const FC=(()=>{
   const F=s=>legVal(fly,s), I=s=>legVal(ib,s);
   function draw(){
     const pr=st.prog, a=clamp(pr,0,1), b=clamp(pr-1,0,1), c=clamp(pr-2,0,1);
-    let g=lab(L,T-14,window.L('到期价值（每股美元）','Value at expiration ($ per share)'),'var(--ink-soft)','start',11.5*FK);
+    let g=lab(L,T-14,window.L('到期价值（每股美元）','Value at expiration (in $ per share)'),'var(--ink-soft)','start',11.5*FK);
     [0,10,25].forEach(v=>g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',12*FK));
     [300,325,350,375,400].forEach(s=>g+=lab(X(s),B+20,s,'var(--ink-faint)','middle',12*FK));
     [325,350,375].forEach(k=>g+=`<line x1="${X(k)}" y1="${T}" x2="${X(k)}" y2="${B}" stroke="var(--ink-faint)" stroke-dasharray="2 4"/>`);
@@ -1095,7 +1095,7 @@ const FD=(()=>{
   const inside=SYN.lo.slice(0,n).filter((l,i)=>l<=PV[i]&&PV[i]<=SYN.hi[i]).length;
   const im=a=>a.slice(0,n).reduce((b,x,i)=>x<a[b]?i:b,0), iM=a=>a.slice(0,n).reduce((b,x,i)=>x>a[b]?i:b,0);
   function draw(){
-    const pr=st.prog; let g=lab(L,T-14,window.L('每股价格（中间价，美元）','Price per share (mid, $)'),'var(--ink-soft)','start',11.5*FK);
+    const pr=st.prog; let g=lab(L,T-14,window.L('每股价格（中间价，美元）','Price per share (mid, in $)'),'var(--ink-soft)','start',11.5*FK);
     [0,10,20,30].forEach(v=>g+=hline(L,Rr,Y(v),'var(--rule)',v?0.8:1.5)+lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',12*FK));
     [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),B+20,md(SYN.days[i]),'var(--ink-faint)','middle',12*FK));
     const up=poly(SYN.hi,pr), dn=poly(SYN.lo,pr).reverse();

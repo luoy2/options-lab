@@ -446,7 +446,7 @@ td .fix{color:var(--warn);font-size:.72rem;margin-left:.15rem}
 
   <h3><span class="l-zh">到期对账，和讲义同一个格式</span><span class="l-en">Reconciliation at expiration, in the lecture's format</span></h3>
   <table class="rec" style="max-width:40rem">
-    <thead><tr><th><span class="l-zh">项目</span><span class="l-en">Item</span></th><th class="txt"><span class="l-zh">怎么算</span><span class="l-en">Calculation</span></th><th><span class="l-zh">美元，一张</span><span class="l-en">Dollars, one contract</span></th></tr></thead>
+    <thead><tr><th><span class="l-zh">项目</span><span class="l-en">Item</span></th><th class="txt"><span class="l-zh">怎么算</span><span class="l-en">Calculation</span></th><th><span class="l-zh">美元，一张</span><span class="l-en">In $, one contract</span></th></tr></thead>
     <tbody>
       <tr><td><span class="l-zh">原始头寸</span><span class="l-en">Original position</span></td><td class="txt"><span class="l-zh">call：100 × (72.32 − 21.05) ＝ +5,127.00；最初卖的 56 股：56 × (352.36 − 422.32) ＝ −3,917.76</span><span class="l-en">Call: 100 × (72.32 − 21.05) = +5,127.00; the 56 shares sold at the start: 56 × (352.36 − 422.32) = −3,917.76</span></td><td>+1,209.24</td></tr>
       <tr><td><span class="l-zh">调仓</span><span class="l-en">Adjustment</span></td><td class="txt"><span class="l-zh">之后 18 次买卖的差价，共 78 股</span><span class="l-en">Price difference from the 18 later trades, 78 shares in all</span></td><td>−1,313.62</td></tr>
@@ -712,8 +712,8 @@ function drawLec(p){
     const op=(w===cur && f>=0.55)?Math.min(1,adjf*2):1, x=X(w), y=Y(LR[w][1]);
     // 窄屏上，下一周大涨时价格线会从标签右半边穿过：标签改成右端对齐，整个放在上升线的左边
     const lift= W<520 && w<10 && LR[w+1][1]-LR[w][1]>3;
-    if(a<0){ g+=`<path d="M${x-6} ${y-17}L${x+6} ${y-17}L${x} ${y-8}Z" fill="var(--control)" opacity="${op}"/>`; g+=`<g opacity="${op}">${lab(lift?x+4:x,y-22,window.L('卖 ','Sell')+(-a),'var(--control)',lift?'end':'middle',11,600)}</g>`; }
-    else { g+=`<path d="M${x-6} ${y+17}L${x+6} ${y+17}L${x} ${y+8}Z" fill="var(--result)" opacity="${op}"/>`; g+=`<g opacity="${op}">${lab(x,y+31,window.L('买 ','Buy')+a,'var(--result)','middle',11,600)}</g>`; }
+    if(a<0){ g+=`<path d="M${x-6} ${y-17}L${x+6} ${y-17}L${x} ${y-8}Z" fill="var(--control)" opacity="${op}"/>`; g+=`<g opacity="${op}">${lab(lift?x+4:x,y-22,window.L('卖 ','Sell ')+(-a),'var(--control)',lift?'end':'middle',11,600)}</g>`; }
+    else { g+=`<path d="M${x-6} ${y+17}L${x+6} ${y+17}L${x} ${y+8}Z" fill="var(--result)" opacity="${op}"/>`; g+=`<g opacity="${op}">${lab(x,y+31,window.L('买 ','Buy ')+a,'var(--result)','middle',11,600)}</g>`; }
   }
   svg.innerHTML=g;
   // 仓位 delta 表
@@ -736,7 +736,7 @@ function drawLec(p){
     const r=LR[cur], r0=LR[cur-1];
     if(cur<10){
       say=window.L(`第 ${cur} 周：标的 ${r0[1].toFixed(2)} → ${r[1].toFixed(2)}，delta ${r0[2]} → ${r[2]}，仓位 delta ${sn(r[3],0)}。`,`Week ${cur}: underlying ${r0[1].toFixed(2)} → ${r[1].toFixed(2)}, delta ${r0[2]} → ${r[2]}, position delta ${sn(r[3],0)}.`);
-      if(!moving) say+= r[4]? window.L(`${r[4]<0?'卖出':'买入'} ${Math.abs(r[4])} 张，现金流 ${sn(r[6])}，回到 0。`,`${r[4]<0?'Sell':'Buy'} ${Math.abs(r[4])} contracts, cash flow ${sn(r[6])}, back to 0.`) : window.L('不用调。','No adjustment needed.');
+      if(!moving) say+= r[4]? window.L(`${r[4]<0?'卖出':'买入'} ${Math.abs(r[4])} 张，现金流 ${sn(r[6])}，回到 0。`,`${r[4]<0?'Sell':'Buy'} ${Math.abs(r[4])} contract${Math.abs(r[4])===1?'':'s'}, cash flow ${sn(r[6])}, back to 0.`) : window.L('不用调。','No adjustment needed.');
     } else {
       say=window.L(`第 10 周到期：标的 105.70，call 值 5.70。`,`Week 10, expiration: underlying 105.70, call worth 5.70.`)+(moving?'':window.L('买回 21 张，把第 1 到 9 周累计的 −21 张平掉；最初卖的 50 张按 105.70 平掉，算在原始头寸里。','Buy back 21 contracts to close the −21 accumulated over weeks 1 to 9; the 50 contracts sold at the start are closed at 105.70 and counted in the original position.'));
     }
@@ -838,7 +838,7 @@ function drawTs(p){
 const A3=Anim(24,420,drawTs);
 $('tsPlay').addEventListener('click',A3.start);
 $('dayTb').innerHTML=DR.map((r,i)=>{
-  const t= i===0 ? L('建仓卖 56','Open: sell 56') : i===24 ? L('买回 100','Buy back 100') : r[4]<0 ? L('卖 ','Sell')+(-r[4]) : r[4]>0 ? L('买 ','Buy')+r[4] : '0';
+  const t= i===0 ? L('建仓卖 56','Open: sell 56') : i===24 ? L('买回 100','Buy back 100') : r[4]<0 ? L('卖 ','Sell ')+(-r[4]) : r[4]>0 ? L('买 ','Buy ')+r[4] : '0';
   const c= i===24 ? 'buy' : r[4]<0 ? 'sell' : r[4]>0 ? 'buy' : '';
   return `<tr><td>${md(r[0])}</td><td>${r[1].toFixed(2)}</td><td>${r[2].toFixed(4)}</td><td>${-r[3]}</td><td class="${c}">${t}</td><td>${r[5].toFixed(2)}</td><td>${nf(r[6])}</td><td>${sn(r[8])}</td></tr>`;
 }).join('');

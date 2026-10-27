@@ -441,7 +441,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <h3><span class="l-zh">用 TSLA 的微笑算</span><span class="l-en">Computing with TSLA's smile</span></h3>
   <p><span class="l-zh">假设 4/13 这条微笑按标准差个数整条跟着 TSLA 平移。TSLA 涨 1 美元，远期价跟着涨，每个行权价的 z 变小一点，在曲线上往左滑；隐含波动率变多少，由那一点的斜率决定：</span><span class="l-en">Assume the whole 4/13 smile shifts with TSLA in standard-deviation terms. When TSLA rises $1, the forward price rises with it, each strike's z gets a little smaller, and it slides left along the curve; how much its implied volatility changes is set by the slope at that point:</span></p>
   <div class="tw"><table>
-    <thead><tr><th><span class="l-zh">期权</span><span class="l-en">Option</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></th><th><span class="l-zh">模型 delta</span><span class="l-en">Model delta</span></th><th><span class="l-zh">标的 +1 美元<br>隐含变化（点）</span><span class="l-en">Underlying +$1<br>implied change (pts)</span></th><th><span class="l-zh">偏斜 delta</span><span class="l-en">Skewed delta</span></th><th><span class="l-zh">占模型</span><span class="l-en">Share of model</span></th></tr></thead>
+    <thead><tr><th><span class="l-zh">期权</span><span class="l-en">Option</span></th><th><span class="l-zh">行权价</span><span class="l-en">Strike</span></th><th><span class="l-zh">隐含波动率</span><span class="l-en">Implied volatility</span></th><th><span class="l-zh">模型 delta</span><span class="l-en">Model delta</span></th><th><span class="l-zh">标的 +1 美元<br>隐含变化（点）</span><span class="l-en">Underlying +$1<br>implied change (points)</span></th><th><span class="l-zh">偏斜 delta</span><span class="l-en">Skewed delta</span></th><th><span class="l-zh">占模型</span><span class="l-en">Share of model</span></th></tr></thead>
     <tbody id="skdTb"></tbody>
   </table></div>
   <p><span class="l-zh">put 一侧全部缩小，越虚值缩得越多：25 delta 的 put 从 −0.250 变成 −0.218，5 delta 的只剩模型的 55%。call 一侧，在谷底 378.7 右边的缩小，5 delta 的 call 剩 76%；35 和 45 delta 的 call 在谷底左边，TSLA 上涨时它们往离谷底更远的地方滑，隐含波动率微升，delta 反而大 1% 到 2%。讲义的 105 call 在谷底右边，所以缩小。</span><span class="l-en">Every put shrinks, and the further out of the money, the more: the 25 delta put goes from −0.250 to −0.218, and the 5 delta put keeps only 55% of model. On the call side, those right of the trough at 378.7 shrink, with the 5 delta call keeping 76%; the 35 and 45 delta calls are left of the trough, so when TSLA rises they slide further from it, their implied volatility edges up, and their delta is 1% to 2% larger instead. The lecture's 105 call is right of the trough, so it shrinks.</span></p>
@@ -853,8 +853,10 @@ const SCALE=(()=>{
     g+=`<circle cx="${X(F0)}" cy="${Y(A*m)}" r="4" fill="var(--ink)"/>`+lab(X(F0)+8,Y(A*m)+18,window.L('平值 ','ATM ')+(A*m).toFixed(1)+'%','var(--ink)','start',12,600);
     const vm=p300*m, va=p300+(m-1)*A;
     g+=`<circle cx="${X(300)}" cy="${Y(vm)}" r="4.5" fill="var(--control)"/><circle cx="${X(300)}" cy="${Y(va)}" r="4.5" fill="var(--paper)" stroke="var(--result)" stroke-width="2"/>`;
-    g+=lab(X(300)+10,Y(vm)-12,window.L('乘性 ','Mult. ')+vm.toFixed(1)+'%','var(--control)','start',12,600);
-    g+=lab(X(300)-10,Y(va)+20,window.L('加性 ','Add. ')+va.toFixed(1)+'%','var(--result)','end',12,600);
+    g+=lab(X(300)+10,Y(vm)-12,window.L('乘性 ','Multiplicative ')+vm.toFixed(1)+'%','var(--control)','start',12,600);
+    g+= window.LANG==='en'&&FK>1   // 英文手机上 Additive 一行放不下，数值另起一行
+      ? lab(X(300)-10,Y(va)+20,'Additive','var(--result)','end',12,600)+lab(X(300)-10,Y(va)+46,va.toFixed(1)+'%','var(--result)','end',12,600)
+      : lab(X(300)-10,Y(va)+20,window.L('加性 ','Additive ')+va.toFixed(1)+'%','var(--result)','end',12,600);
     $('s3c').innerHTML=g;
     $('s3A').textContent=(A*m).toFixed(1)+'%'; $('s3Ab').textContent='× '+m.toFixed(2);
     $('s3M').textContent=vm.toFixed(1)+'%'; $('s3Mb').textContent=window.L(`高出平值 ${(vm-A*m).toFixed(1)} 点，占 ${(vm/(A*m)*100).toFixed(1)}%`,`${(vm-A*m).toFixed(1)} points above ATM, ${(vm/(A*m)*100).toFixed(1)}% of ATM`);
@@ -867,7 +869,7 @@ const SCALE=(()=>{
 /* ══════════ 四 · 热力图 ══════════ */
 function surfAt(s,k){ const K=s.k, V=s.v; if(k<K[0]||k>K[K.length-1]) return null; for(let i=1;i<K.length;i++) if(k<=K[i]){ const u=(k-K[i-1])/(K[i]-K[i-1]); return V[i-1]+u*(V[i]-V[i-1]); } return null; }
 function drawHeat(){
-  const W=640,H=300,L=96,R=566,T=16,RH=26, rows=D.SURF.length, B=T+rows*RH, k0=250,k1=470,dk=5, nc=(k1-k0)/dk+1;
+  const W=640,H=300,L=window.LANG==='en'&&FK===1?112:96,R=566,T=16,RH=26, rows=D.SURF.length, B=T+rows*RH, k0=250,k1=470,dk=5, nc=(k1-k0)/dk+1;
   const cw=(R-L)/nc, X=k=>L+(k-k0)/dk*cw;
   const v0=35,v1=90, col=v=>`color-mix(in oklch,var(--control) ${(10+90*clamp((v-v0)/(v1-v0))).toFixed(0)}%,var(--panel))`;
   let g='';
@@ -875,7 +877,7 @@ function drawHeat(){
     const y=T+r*RH;
     for(let c=0;c<nc;c++){ const v=surfAt(s,k0+c*dk); if(v===null) continue;
       g+=`<rect x="${(L+c*cw).toFixed(1)}" y="${y}" width="${(cw+.4).toFixed(1)}" height="${RH-1}" style="fill:${col(v)}"/>`; }
-    g+=lab(L-8,y+RH/2+4,FK>1?window.L(`${s.n} 天`,`${s.n} days`):window.L(`${s.e} · ${s.n} 天`,`${s.e} · ${s.n}d`),'var(--ink-soft)','end',12);
+    g+=lab(L-8,y+RH/2+4,FK>1?window.L(`${s.n} 天`,`${s.n} days`):window.L(`${s.e} · ${s.n} 天`,`${s.e} · ${s.n} days`),'var(--ink-soft)','end',12);
     g+=lab(R+10,y+RH/2+4,s.atm.toFixed(2)+'%',s.n===11?'var(--control)':'var(--ink)','start',12,s.n===11?600:400);
   });
   g+=lab(R+10,T-4,window.L('平值','ATM'),'var(--ink-faint)','start',11);
@@ -948,7 +950,7 @@ const WF=(()=>{
       const Y=p=>B-(p-c.lo)/(c.hi-c.lo)*(B-T), cx=[x0+44*q,x0+(x1-x0)/2,x1-44*q], mid=(x0+x1)/2;
       g+=lab(mid,T-22*q,c.t,'var(--control)','middle',13,600);
       g+=hline(x0,x1,B+10,'var(--rule)',1);
-      [L('原价','Before'),L('按模型 delta','Model delta'),L('加上隐含的变化','+ implied vol')].forEach((t,i)=>g+=lab(cx[i],B+28*q,t,'var(--ink-faint)','middle',11.5));
+      [L('原价','Before'),L('按模型 delta','Model delta'),L('加上隐含的变化','+ implied change')].forEach((t,i)=>g+=lab(cx[i],B+28*q,t,'var(--ink-faint)','middle',11.5));
       const u1=ease(clamp((e-600)/900)), u2=ease(clamp((e-2200)/900));
       if(e>=600){ g+=`<line x1="${cx[0]}" y1="${Y(c.v[0])}" x2="${lerp(cx[0],cx[1],u1)}" y2="${lerp(Y(c.v[0]),Y(c.v[1]),u1)}" stroke="var(--ink-soft)" stroke-width="1.6" stroke-dasharray="4 3"/>`;
         g+=lab(mid,B+54*q,c.d1,'var(--ink-soft)','middle',11.5); }

@@ -258,7 +258,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   </div>
   <p><span class="l-zh">中间那几格比钟形高，1 到 3 个标准差的格子比钟形矮，最外面零星落着钟形几乎不该有的日子。按幅度分成三档数一数：</span><span class="l-en">The middle bins are taller than the bell, the bins at 1 to 3 standard deviations are shorter, and out at the edges lie scattered days the bell shape should hardly have at all. Counted in three bands by size:</span></p>
   <table style="max-width:36rem">
-    <thead><tr><th><span class="l-zh">离平均值</span><span class="l-en">From the average</span></th><th><span class="l-zh">真实天数</span><span class="l-en">Actual days</span></th><th><span class="l-zh">钟形预测</span><span class="l-en">Bell-shape prediction</span></th><th><span class="l-zh">真实比钟形</span><span class="l-en">Actual vs bell shape</span></th></tr></thead>
+    <thead><tr><th><span class="l-zh">离平均值</span><span class="l-en">From the average</span></th><th><span class="l-zh">真实天数</span><span class="l-en">Actual days</span></th><th><span class="l-zh">钟形预测</span><span class="l-en">Bell-shape prediction</span></th><th><span class="l-zh">真实比钟形</span><span class="l-en">Actual ÷ bell shape</span></th></tr></thead>
     <tbody id="buckTb"></tbody>
   </table>
   <p><span class="l-zh">小幅的日子更多，中等的更少，大幅的更多。三条合起来是同一个形状：中间更尖、两条尾巴更长。统计上用两个数描述分布和钟形差在哪：</span><span class="l-en">More small days, fewer medium ones, more large ones. The three together are one shape: a sharper middle and two longer tails. Statistics uses two numbers to describe how a distribution differs from the bell shape:</span></p>
@@ -323,7 +323,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <table style="max-width:34rem">
     <thead><tr><th><span class="l-zh">讲义：107 天，32%，F = 100</span><span class="l-en">Lecture: 107 days, 32%, F = 100</span></th><th><span class="l-zh">100 call 或 put</span><span class="l-en">100 call or put</span></th><th>80 put</th><th>120 call</th></tr></thead>
     <tbody>
-      <tr><td><span class="l-zh">波动率不变（BS）</span><span class="l-en">Constant volatility (BS)</span></td><td>6.90</td><td>.72</td><td>1.43</td></tr>
+      <tr><td><span class="l-zh">波动率不变（BS）</span><span class="l-en">Constant volatility (Black-Scholes)</span></td><td>6.90</td><td>.72</td><td>1.43</td></tr>
       <tr><td><span class="l-zh">波动率下降</span><span class="l-en">Volatility falling</span></td><td class="no">4.93</td><td class="ok">1.03</td><td class="ok">1.89</td></tr>
       <tr><td><span class="l-zh">波动率上升</span><span class="l-en">Volatility rising</span></td><td class="ok">8.10</td><td class="no">.43</td><td class="no">.99</td></tr>
     </tbody>
@@ -361,7 +361,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <h3><span class="l-zh">为什么「来不及调仓」要紧</span><span class="l-en">Why "no time to adjust" matters</span></h3>
   <p><span class="l-zh">对冲过的仓位，每次价格变动的盈亏大约是 ½ × gamma × 变动²。卖方是负的。同样一段距离，如果分成 k 小步走、每步之后重新对冲，每步的变动是原来的 1/k，平方后是 1/k²，走 k 步加起来是 1/k。</span><span class="l-en">For a hedged position, the P&amp;L on each price move is about ½ × gamma × move², negative for the seller. If the same distance is covered in k small steps, re-hedging after each, each step is 1/k of the move, 1/k² once squared, and k steps add up to 1/k.</span></p>
   <table style="max-width:34rem">
-    <thead><tr><th>387.20 → 375.28</th><th><span class="l-zh">卖方每股</span><span class="l-en">Seller, per share</span></th><th><span class="l-zh">每张（美元）</span><span class="l-en">Per contract ($)</span></th></tr></thead>
+    <thead><tr><th>387.20 → 375.28</th><th><span class="l-zh">卖方每股</span><span class="l-en">Seller, per share</span></th><th><span class="l-zh">每张（美元）</span><span class="l-en">Per contract (in $)</span></th></tr></thead>
     <tbody id="kTb"></tbody>
   </table>
   <p class="tiny"><span class="l-zh">卖方：卖出 350 call 并做 delta 中性对冲。「2 步」指分成 2 段走、每段走完重新对冲一次，其余类推。模型值：Black-Scholes，4/22 收盘时的状态（离 5/15 到期 23 天，隐含波动率 48.55%，利率 4.3%），只看价格变动这一项，隐含波动率与时间不变。</span><span class="l-en">Seller: sell the 350 call and hedge to delta neutral. "2 steps" means covering the distance in 2 legs and re-hedging after each, and so on. Model values: Black-Scholes at the 4/22 close (23 days to the 5/15 expiration, implied volatility 48.55%, interest rate 4.3%), counting only the price move, with implied volatility and time held fixed.</span></p>
@@ -444,7 +444,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p class="sub"><span class="l-zh">讲义给了两个修补模型，各修一条假设。讲义只给了定义，下面的式子是这两个模型的常见写法，参数用真实数据估。</span><span class="l-en">The lecture notes give two patched models, each fixing one assumption. The notes give only definitions; the formulas below are the usual way these models are written, with parameters estimated from real data.</span></p>
 
   <h3><span class="l-zh">CEV：波动率随价格变</span><span class="l-en">CEV: volatility changes with price</span></h3>
-  <p><span class="l-zh">讲义的定义：<span class="sym" data-say="Constant Elasticity of Variance，常弹性方差模型。价格的波动幅度与价格水平成固定的幂次关系。">CEV</span> 模型假设波动率随标的价格往哪边走而变化。它修的是假设 ④。</span><span class="l-en">The lecture's definition: the <span class="sym" data-say="Constant Elasticity of Variance model. The size of price moves has a fixed power relationship with the price level.">CEV</span> model assumes volatility changes depending on which way the underlying price goes. It fixes assumption ④.</span></p>
+  <p><span class="l-zh">讲义的定义：<span class="sym" data-say="Constant Elasticity of Variance，常弹性方差模型。价格的波动幅度与价格水平成固定的幂次关系。">CEV</span> 模型假设波动率随标的价格往哪边走而变化。它修的是假设 ④。</span><span class="l-en">The lecture's definition: the constant elasticity of variance (<span class="sym" data-say="Constant elasticity of variance model. The size of price moves has a fixed power relationship with the price level.">CEV</span>) model assumes volatility changes depending on which way the underlying price goes. It fixes assumption ④.</span></p>
   <div class="formula">
     <div class="math"><span class="l-zh"><span class="sym" data-say="价格为 S 时的年化波动率。">σ(S)</span> ＝ <span class="sym" data-say="起点价格上的波动率。">σ₀</span> × (<span class="sym" data-say="当前价格。">S</span> ÷ <span class="sym" data-say="起点价格。">S₀</span>)<sup><span class="sym" data-say="beta，弹性参数。β = 1 时波动率不随价格变，就是 Black-Scholes；β = 0 时每天的美元幅度不随价格变，就是 1.2 讲的按加减算；β 小于 1 时价格越低波动率越高。">β</span> − 1</sup></span><span class="l-en"><span class="sym" data-say="Annualized volatility at price S.">σ(S)</span> = <span class="sym" data-say="Volatility at the starting price.">σ₀</span> × (<span class="sym" data-say="Current price.">S</span> ÷ <span class="sym" data-say="Starting price.">S₀</span>)<sup><span class="sym" data-say="Beta, the elasticity parameter. At β = 1 volatility does not change with price, which is Black-Scholes; at β = 0 the daily dollar range does not change with price, which is the additive model of 1.2; below 1, the lower the price, the higher the volatility.">β</span> − 1</sup></span></div>
     <div class="gloss"><span class="l-zh">价格为 S 时的波动率 ＝ 起点的波动率 × 价格相对起点的倍数的 β − 1 次方</span><span class="l-en">Volatility at price S = starting volatility × (price as a multiple of the start) to the power β − 1</span></div>
@@ -895,7 +895,7 @@ const MR=(()=>{
   [[30,'16:00'],[90,'17:00'],[150,'18:00'],[210,'19:00'],[750,'4:00'],[870,'6:00'],[990,'8:00'],[1080,'9:30']].forEach(([m,t])=>{
     base+=`<line x1="${X(m)}" y1="${B}" x2="${X(m)}" y2="${B+5}" stroke="var(--ink-faint)"/>`+lab(X(m),B+18,t,'var(--ink-faint)','middle',10);
   });
-  base+=lab(X(0),T-8,window.L('4/22 常规','4/22 day'),'var(--ink-faint)','start',10)+lab((X(30)+X(E1))/2,T-8,window.L('盘后','After hrs'),'var(--ink-faint)','middle',10)
+  base+=lab(X(0)-(window.LANG==='en'?30:0),T-8,window.L('4/22 常规','4/22 regular'),'var(--ink-faint)','start',10)+lab((X(30)+X(E1))/2,T-8,window.L('盘后','After hours'),'var(--ink-faint)','middle',10)
        +lab(gx,T-8,window.L('隔夜','Overnight'),'var(--ink-faint)','middle',10)+lab((X(M0)+X(1080))/2,T-8,window.L('4/23 盘前','4/23 pre-market'),'var(--ink-faint)','middle',10)
        +lab(X(1110),T-8,window.L('开盘','Open'),'var(--ink-faint)','end',10);
   base+=lab(gx,B+34,window.L('无成交','No trades'),'var(--ink-faint)','middle',10);
@@ -957,7 +957,7 @@ const SC=(()=>{
     if(k>=P.length){
       const b=(k*sxy-sx*sy)/(k*sxx-sx*sx), a=(sy-b*sx)/k;
       gF.innerHTML=`<line x1="${X(XL)}" y1="${Y(a+b*XL)}" x2="${X(XH)}" y2="${Y(a+b*XH)}" stroke="var(--ink)" stroke-width="2"/>`
-        +lab(X(XH)-2,Y(6),window.L(`SPX 每涨 1%，VIX 平均 ${fm(b)} 点`,`SPX +1% → VIX ${fm(b)} pts (avg)`),'var(--ink)','end',11.5);
+        +lab(X(XH)-2,Y(6),window.L(`SPX 每涨 1%，VIX 平均 ${fm(b)} 点`,`SPX +1% → VIX ${fm(b)} points on average`),'var(--ink)','end',11.5);
     }
   }
   function start(){ st.playing=false; reset(); if(reduced){ add(P.length); stats(); return; } runLoop(st,16.7,()=>add(6),stats,()=>st.k>=P.length); }

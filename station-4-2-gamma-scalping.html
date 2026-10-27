@@ -292,13 +292,13 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="gloss"><span class="l-zh">当天涨跌的美元数 ＝ 股价 × 盈亏平衡波动率 × 这段时间占一年比例的平方根</span><span class="l-en">The day's move in dollars = stock price × break-even volatility × square root of the period's share of a year</span></div>
     <div class="note"><span class="l-zh">TSLA 4/13：352.36 × 46.3% ÷ √365 ＝ 352.36 × 46.3% ÷ 19.105 ≈ 8.54 美元，即 2.42%</span><span class="l-en">TSLA 4/13: 352.36 × 46.3% ÷ √365 = 352.36 × 46.3% ÷ 19.105 ≈ $8.54, or 2.42%</span></div>
   </div>
-  <p><span class="l-zh">右边就是按盈亏平衡波动率算的、这段时间的一个标准差（1.2）。讲义（S8）问过同一个问题：买一个 delta 中性的 <span class="sym" data-say="同一个行权价、同一个到期日的 call 和 put 各买一张。3.2 讲。">straddle</span>，或者买一张期权再用标的对冲，希望标的动还是不动？不动，theta 让你亏；动得够多，gamma 让你赚。要动多少才刚好打平？上下一个标准差。</span><span class="l-en">The right side is one standard deviation for the period at the break-even volatility (1.2). The lecture notes (S8) ask the same question: if you buy a delta-neutral <span class="sym" data-say="Buy one call and one put with the same strike and the same expiration. Covered in 3.2.">straddle</span>, or buy an option and hedge it with the underlying, do you want the underlying to move or not? If it doesn't move, theta makes you lose; if it moves enough, gamma makes you money. How much must it move to break exactly even? One standard deviation up or down.</span></p>
+  <p><span class="l-zh">右边就是按盈亏平衡波动率算的、这段时间的一个标准差（1.2）。讲义（S8）问过同一个问题：买一个 delta 中性的 <span class="sym" data-say="同一个行权价、同一个到期日的 call 和 put 各买一张。3.2 讲。">straddle</span>，或者买一张期权再用标的对冲，希望标的动还是不动？不动，theta 让你亏；动得够多，gamma 让你赚。要动多少才刚好打平？上下一个标准差。</span><span class="l-en">The right side is one standard deviation for the period at the break-even volatility (1.2). The lecture notes (Session 8) ask the same question: if you buy a delta-neutral <span class="sym" data-say="Buy one call and one put with the same strike and the same expiration. Covered in 3.2.">straddle</span>, or buy an option and hedge it with the underlying, do you want the underlying to move or not? If it doesn't move, theta makes you lose; if it moves enough, gamma makes you money. How much must it move to break exactly even? One standard deviation up or down.</span></p>
 
   <h3><span class="l-zh">为什么按日历日算</span><span class="l-en">Why calendar days</span></h3>
   <p><span class="l-zh">公式里的「天数」是从上一个收盘到这一个收盘隔了几个日历日。报价快照里的 theta 按日历日收，周末也收（2.2）。周五收盘到周一收盘隔 3 天，周一要背 3 天的租金，门槛乘 √3。</span><span class="l-en">"Days" in the formula is the number of calendar days from the previous close to this close. The theta in the quote snapshot is charged by calendar day, weekends included (2.2). From Friday's close to Monday's close is 3 days, so Monday carries 3 days of rent and its threshold is multiplied by √3.</span></p>
   <div class="tscroll">
   <table>
-    <thead><tr><th><span class="l-zh">哪种日子</span><span class="l-en">Type of day</span></th><th><span class="l-zh">这 24 个交易日里</span><span class="l-en">Among these 24 trading days</span></th><th><span class="l-zh">隔几个日历日</span><span class="l-en">Calendar days since last close</span></th><th><span class="l-zh">门槛</span><span class="l-en">Threshold</span></th><th><span class="l-zh">按 352.36 折成美元</span><span class="l-en">In dollars at 352.36</span></th></tr></thead>
+    <thead><tr><th><span class="l-zh">哪种日子</span><span class="l-en">Type of day</span></th><th><span class="l-zh">这 24 个交易日里</span><span class="l-en">Among these 24 trading days</span></th><th><span class="l-zh">隔几个日历日</span><span class="l-en">Calendar days since last close</span></th><th><span class="l-zh">门槛</span><span class="l-en">Threshold</span></th><th><span class="l-zh">按 352.36 折成美元</span><span class="l-en">In $ at 352.36</span></th></tr></thead>
     <tbody>
       <tr><td><span class="l-zh">周二到周五</span><span class="l-en">Tuesday to Friday</span></td><td><span class="l-zh">20 天</span><span class="l-en">20 days</span></td><td>1</td><td>2.42%</td><td>8.54</td></tr>
       <tr><td><span class="l-zh">周一</span><span class="l-en">Monday</span></td><td><span class="l-zh">4 天</span><span class="l-en">4 days</span></td><td>3</td><td>4.20%</td><td>14.79</td></tr>
@@ -325,7 +325,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p><span class="l-zh">买入 call、卖出 delta 股以后，仓位的 delta 是 0（2.1）。股价一涨，call 的 delta 变大（gamma 为正，2.2），仓位变成净多头，要回到 0 就再卖一些股票：卖在涨上去的价位。股价一跌，delta 变小，仓位变成净空头，要回到 0 就买回一些：买在跌下来的价位。所以每次调仓都是涨了卖、跌了买，股价涨上去再跌回来，就完成一笔低买高卖。这叫 <span class="sym" data-say="gamma scalping。持有 gamma 为正的仓位并按 delta 对冲，靠「涨了卖、跌了买」的差价挣钱，用来抵每天的租金。scalp 是「一小笔一小笔地赚」。">gamma scalping</span>。</span><span class="l-en">After buying a call and selling delta shares, the position's delta is 0 (2.1). When the stock rises, the call's delta grows (gamma is positive, 2.2), the position becomes net long, and to get back to 0 you sell more stock: selling at the higher price. When the stock falls, delta shrinks, the position becomes net short, and to get back to 0 you buy some back: buying at the lower price. So every adjustment sells after a rise and buys after a drop, and when the stock goes up and comes back down, one buy-low, sell-high round trip is complete. This is called <span class="sym" data-say="Gamma scalping. Holding a positive-gamma position and hedging it by delta, earning the difference from selling after rises and buying after drops, to pay the daily rent. To scalp means to earn in many small amounts.">gamma scalping</span>.</span></p>
   <div class="formula">
     <div class="math"><span class="l-zh">来回一趟赚 ＝ 100 × <span class="sym" data-say="gamma：股价动 1 美元，delta 变多少（2.2）。乘 100 是一张合约要多卖或买回的股数。">Γ</span> × <span class="sym" data-say="股价这一趟来回的幅度，美元。">m</span></span><span class="l-en">One round trip earns = 100 × <span class="sym" data-say="Gamma: how much delta changes when the stock moves $1 (2.2). Times 100 is the number of shares one contract has to sell or buy back.">Γ</span> × <span class="sym" data-say="The size of this round trip in the stock price, in dollars.">m</span></span>²</div>
-    <div class="gloss"><span class="l-zh">一张合约：股价涨 m 美元时多卖 100 × Γ × m 股，跌回原价时把它们买回来，每股赚 m</span><span class="l-en">One contract: when the stock rises m dollars, sell 100 × Γ × m more shares; when it falls back to the starting price, buy them back, earning m per share</span></div>
+    <div class="gloss"><span class="l-zh">一张合约：股价涨 m 美元时多卖 100 × Γ × m 股，跌回原价时把它们买回来，每股赚 m</span><span class="l-en">One contract: when the stock rises $m, sell 100 × Γ × m more shares; when it falls back to the starting price, buy them back, earning m per share</span></div>
     <div class="note"><span class="l-zh">4/23 开盘：Γ ＝ 0.00771，m ＝ 2 美元：100 × 0.00771 × 2² ≈ 3.08 美元</span><span class="l-en">4/23 open: Γ = 0.00771, m = $2: 100 × 0.00771 × 2² ≈ $3.08</span></div>
   </div>
   <p><span class="l-zh">4/22 收盘到 4/23 收盘，这张期权的租金是 24.71 美元一张（按 46.3% 算，扣掉现金利息）。靠 2 美元的来回挣回来，要走 8 趟。</span><span class="l-en">From the 4/22 close to the 4/23 close, this option's rent is $24.71 per contract (at 46.3%, net of interest on cash). Earning it back with $2 round trips takes 8 of them.</span></p>
@@ -355,7 +355,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <div class="stat"><div class="k"><span class="l-zh">时刻</span><span class="l-en">Time</span></div><div class="d" id="inT"></div><div class="d2" id="inTb"></div></div>
       <div class="stat"><div class="k"><span class="l-zh">手里的股票</span><span class="l-en">Shares held</span></div><div class="d" id="inH"></div><div class="d2"><span class="l-zh">每张 call 对应</span><span class="l-en">Per call</span></div></div>
       <div class="stat"><div class="k"><span class="l-zh">调仓次数</span><span class="l-en">Adjustments</span></div><div class="d" id="inN"></div><div class="d2" id="inNb"></div></div>
-      <div class="stat"><div class="k"><span class="l-zh">这一天的收入（美元一张）</span><span class="l-en">Income for the day ($ per contract)</span></div><div class="d" id="inI" style="color:var(--result)"></div><div class="d2" id="inIb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">这一天的收入（美元一张）</span><span class="l-en">Income for the day (in $ per contract)</span></div><div class="d" id="inI" style="color:var(--result)"></div><div class="d2" id="inIb"></div></div>
     </div>
     <div class="say plain" id="inSay"></div>
   </div>
@@ -382,7 +382,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
       <div class="stat"><div class="k"><span class="l-zh">日期</span><span class="l-en">Date</span></div><div class="d" id="ldD"></div><div class="d2" id="ldDb"></div></div>
       <div class="stat"><div class="k"><span class="l-zh">当天涨跌</span><span class="l-en">Day's move</span></div><div class="d" id="ldM"></div><div class="d2" id="ldMb"></div></div>
       <div class="stat"><div class="k"><span class="l-zh">收盘调仓</span><span class="l-en">Close adjustment</span></div><div class="d" id="ldT"></div><div class="d2" id="ldTb"></div></div>
-      <div class="stat"><div class="k"><span class="l-zh">当天（美元一张）</span><span class="l-en">That day ($ per contract)</span></div><div class="d" id="ldP"></div><div class="d2" id="ldPb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">当天（美元一张）</span><span class="l-en">That day (in $ per contract)</span></div><div class="d" id="ldP"></div><div class="d2" id="ldPb"></div></div>
       <div class="stat"><div class="k"><span class="l-zh">累计收入 − 租金</span><span class="l-en">Cumulative income − rent</span></div><div class="d" id="ldC2"></div><div class="d2" id="ldCb"></div></div>
     </div>
     <div class="say plain" id="ldSay"></div>
@@ -390,7 +390,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p><span class="l-zh">落在门槛外的 9 天里，6 天赚；另外 3 天（5/12、5/13、5/15）call 已经<span class="sym" data-say="call 的行权价远低于股价。delta 接近 1，gamma 接近 0，和 100 股股票几乎一样（2.1、2.2）。实值是行权价低于股价，虚值是高于股价。">深度实值</span>，delta 到了 1，gamma 是 0，不赚不亏。落在门槛内的 15 天里，10 天亏，3 天不到 1 美元；5/1 和 5/6 涨了 2.37% 和 2.34%，只差门槛不到 0.1 个百分点，反而赚了 2.77 和 3.88 美元。原因是实值 call 的 delta 会随时间自己往 1 走，前一天收盘调好的股数到第二天已经略少，上涨的日子因此多赚一点，节点 6 讲这种漂移。</span><span class="l-en">Of the 9 days that landed outside the threshold, 6 made money; on the other 3 (5/12, 5/13, 5/15) the call was already <span class="sym" data-say="A call whose strike is far below the stock price. Delta is close to 1 and gamma close to 0, so it behaves almost exactly like 100 shares of stock (2.1, 2.2). In the money means the strike is below the stock price; out of the money means above.">deep in the money</span>, delta had reached 1 and gamma was 0, so they neither gained nor lost. Of the 15 days inside the threshold, 10 lost money and 3 moved less than $1; 5/1 and 5/6 rose 2.37% and 2.34%, less than 0.1 percentage point short of the threshold, yet made $2.77 and $3.88. The reason is that an in-the-money call's delta drifts toward 1 by itself over time, so the shares adjusted at the previous close are slightly too few by the next day, and up days earn a little extra. Node 6 covers this drift.</span></p>
   <div class="tscroll">
   <table style="max-width:36rem">
-    <thead><tr><th><span class="l-zh">项目</span><span class="l-en">Item</span></th><th><span class="l-zh">美元一张</span><span class="l-en">$ per contract</span></th></tr></thead>
+    <thead><tr><th><span class="l-zh">项目</span><span class="l-en">Item</span></th><th><span class="l-zh">美元一张</span><span class="l-en">In $ per contract</span></th></tr></thead>
     <tbody>
       <tr><td><span class="l-zh">期权：21.05 买入，5/15 按内在价值 72.32 结算</span><span class="l-en">Option: bought at 21.05, settled at intrinsic value 72.32 on 5/15</span></td><td class="pos">+5,127.00</td></tr>
       <tr><td><span class="l-zh">股票：先卖 55.77 股，之后收盘调仓 20 次（卖 13 次、买 7 次）</span><span class="l-en">Stock: sell 55.77 shares first, then 20 adjustments at the close (13 sales, 7 purchases)</span></td><td class="neg">−5,273.02</td></tr>
@@ -472,7 +472,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p><span class="l-zh">买方的 24 天：10 天亏，最多的一天 −86.65（4/27，周一，背了三天的租金）；8 天赚，最多的一天 +231.90（4/15，涨了 7.58%），是 4/14 那天租金 30.04 的 7.7 倍。多数日子小亏，少数日子大赚。卖方正好反过来：多数日子小赚，怕的是 4/15 这样的一天。</span><span class="l-en">The buyer's 24 days: 10 losing days, the worst −86.65 (4/27, a Monday carrying three days of rent); 8 winning days, the best +231.90 (4/15, up 7.58%), 7.7 times the 30.04 rent on 4/14. Small losses on most days, large gains on a few. The seller is exactly the reverse: small gains on most days, and the fear is a day like 4/15.</span></p>
 
   <h3><span class="l-zh">讲义的判据</span><span class="l-en">The lecture's rule</span></h3>
-  <p><span class="l-zh">讲义（S4）的判据：按自己认为的未来波动率算出理论值。市价高于理论值，时间衰减会赢，做卖方；市价低于理论值，对冲产生的现金会赢，做买方；相等，打平。讲义收尾的一句是：期权的价格是隐含波动率，价值是未来的实际波动率；价高值低做卖方，价低值高做买方。</span><span class="l-en">The lecture's rule (S4): compute the theoretical value using your own estimate of future volatility. If the market price is above theoretical value, time decay will win, so be the seller; if it is below, the cash from hedging will win, so be the buyer; if equal, it is a tie. The lecture closes with: an option's price is its implied volatility, its value is the future realized volatility; when price is high and value low, sell; when price is low and value high, buy.</span></p>
+  <p><span class="l-zh">讲义（S4）的判据：按自己认为的未来波动率算出理论值。市价高于理论值，时间衰减会赢，做卖方；市价低于理论值，对冲产生的现金会赢，做买方；相等，打平。讲义收尾的一句是：期权的价格是隐含波动率，价值是未来的实际波动率；价高值低做卖方，价低值高做买方。</span><span class="l-en">The lecture's rule (Session 4): compute the theoretical value using your own estimate of future volatility. If the market price is above theoretical value, time decay will win, so be the seller; if it is below, the cash from hedging will win, so be the buyer; if equal, it is a tie. The lecture closes with: an option's price is its implied volatility, its value is the future realized volatility; when price is high and value low, sell; when price is low and value high, buy.</span></p>
   <p><span class="l-zh">不对冲的买方另当别论：持有到期的 call 只看到期价，赌的是方向加波动（1.2、4.1）。本节说的买方和卖方都每天对冲。</span><span class="l-en">An unhedged buyer is a different matter: a call held to expiration depends only on the price at expiration and is a bet on direction plus volatility (1.2, 4.1). The buyers and sellers in this section all hedge daily.</span></p>
 </section>
 
@@ -491,7 +491,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
   <p><span class="l-zh">再看事后：</span><span class="l-en">Then, after the fact:</span></p>
   <div class="tscroll">
   <table class="wide2">
-    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th><span class="l-zh">5/15 收盘</span><span class="l-en">5/15 close</span></th><th><span class="l-zh">之后 32 天实际波动</span><span class="l-en">Realized volatility over the next 32 days</span></th><th><span class="l-zh">减盈亏平衡（个点）</span><span class="l-en">Minus break-even (points)</span></th><th><span class="l-zh">对冲的买方（美元一张）</span><span class="l-en">Hedged buyer ($ per contract)</span></th><th><span class="l-zh">占权利金</span><span class="l-en">Share of premium</span></th></tr></thead>
+    <thead><tr><th><span class="l-zh">标的</span><span class="l-en">Underlying</span></th><th><span class="l-zh">5/15 收盘</span><span class="l-en">5/15 close</span></th><th><span class="l-zh">之后 32 天实际波动</span><span class="l-en">Realized volatility over the next 32 days</span></th><th><span class="l-zh">减盈亏平衡（个点）</span><span class="l-en">Minus break-even (points)</span></th><th><span class="l-zh">对冲的买方（美元一张）</span><span class="l-en">Hedged buyer (in $ per contract)</span></th><th><span class="l-zh">占权利金</span><span class="l-en">Share of premium</span></th></tr></thead>
     <tbody id="tkB"></tbody>
   </table>
   </div>
@@ -508,7 +508,7 @@ ul{padding-left:1.3rem;margin:.6rem 0} li{margin:.35rem 0}
     <div class="stats">
       <div class="stat"><div class="k"><span class="l-zh">盈亏平衡波动率</span><span class="l-en">Break-even volatility</span></div><div class="d" id="fcB" style="color:var(--control)"></div><div class="d2" id="fcBb"></div></div>
       <div class="stat"><div class="k"><span class="l-zh">按预测，这张 call 值（每股）</span><span class="l-en">Value of this call at the forecast (per share)</span></div><div class="d" id="fcW"></div><div class="d2" id="fcWb"></div></div>
-      <div class="stat"><div class="k"><span class="l-zh">和中间价比（美元一张）</span><span class="l-en">Versus the mid price ($ per contract)</span></div><div class="d" id="fcG"></div><div class="d2" id="fcGb"></div></div>
+      <div class="stat"><div class="k"><span class="l-zh">和中间价比（美元一张）</span><span class="l-en">Versus the mid price (in $ per contract)</span></div><div class="d" id="fcG"></div><div class="d2" id="fcGb"></div></div>
       <div class="stat"><div class="k"><span class="l-zh">回本一天要动</span><span class="l-en">Daily move to pay for itself</span></div><div class="d" id="fcM"></div><div class="d2" id="fcMb"></div></div>
     </div>
     <div class="say plain" id="fcSay"></div>
@@ -695,7 +695,7 @@ const BEC=(()=>{
     const sp=m.lo+s.p*(m.hi-m.lo);
     // 市价横线
     g+=`<line x1="${L}" y1="${Y(m.px)}" x2="${R}" y2="${Y(m.px)}" stroke="var(--control)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
-    g+=lab(R,Y(m.px)-7,window.L('市价 ','Market')+m.pxTxt,'var(--control)','end',11.5);
+    g+=lab(R,Y(m.px)-7,window.L('市价 ','Market ')+m.pxTxt,'var(--control)','end',11.5);
     // 曲线，画到 sp
     let pts=[]; for(let x=m.lo; x<=sp+1e-9; x+=0.5) pts.push(X(x).toFixed(1)+','+Y(val(m,Math.min(x,m.hi))).toFixed(1));
     pts.push(X(sp).toFixed(1)+','+Y(val(m,sp)).toFixed(1));
@@ -765,14 +765,14 @@ const IN=(()=>{
     let g='';
     for(let v=370; v<=390; v+=5){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width=".7"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10.5); }
     for(let v=0; v<=iMax*1.05; v+=50){ g+=`<line x1="${L}" y1="${Y2(v)}" x2="${R}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v===0?1.1:.7}"/>`; g+=lab(L-7,Y2(v)+4,v,'var(--ink-faint)','end',10.5); }
-    [[-1,window.L('前收','Prev close')],[89,'11:00'],[179,'12:30'],[269,'14:00'],[389,'16:00']].forEach(([k,t])=>{
+    [[-1,window.L('前收','Last close')],[89,'11:00'],[179,'12:30'],[269,'14:00'],[389,'16:00']].forEach(([k,t])=>{
       g+=lab(X(k),H-14,t,'var(--ink-faint)',k<0?'start':k===389?'end':'middle',10.5);
       g+=`<line x1="${X(k)}" y1="${B2}" x2="${X(k)}" y2="${B2+5}" stroke="var(--ink-faint)"/>`;
     });
-    g+=lab(L,T2-10,window.L('收入，美元一张','Income, $ per contract'),'var(--ink-soft)','start',11);
+    g+=lab(L,T2-10,window.L('收入，美元一张','Income, in $ per contract'),'var(--ink-soft)','start',11);
     // 租金线
     g+=`<line x1="${L}" y1="${Y2(RENT)}" x2="${R}" y2="${Y2(RENT)}" stroke="var(--control)" stroke-width="1.5" stroke-dasharray="6 5"/>`;
-    g+=lab(R,Y2(RENT)-6,window.L('租金 ','Rent')+f2(RENT),'var(--control)','end',11);
+    g+=lab(R,Y2(RENT)-6,window.L('租金 ','Rent ')+f2(RENT),'var(--control)','end',11);
     if(kc>=0){
       // 调仓间隔带：从上次调仓的时刻画到现在
       const lt=sim.tr.filter(t=>t[0]<=kc), k0=lt.length?lt[lt.length-1][0]:-1, la=sim.LA[kc];
@@ -793,8 +793,8 @@ const IN=(()=>{
     $('inC').innerHTML=g;
     // 数字
     const k=kc, sells=sim.tr.filter(t=>t[0]<=k&&t[2]>0).length, buys=sim.tr.filter(t=>t[0]<=k&&t[2]<0).length;
-    $('inT').textContent= k<0?'4/22 16:00':tm(k); $('inTb').textContent= k<0?window.L('前一天收盘','Previous close'):window.L('股价 ','Stock')+f2(px[k]);
-    $('inH').textContent=window.L('空 ','Short')+f2((k<0?d0:sim.H[k])*100)+window.L(' 股',' shares');
+    $('inT').textContent= k<0?'4/22 16:00':tm(k); $('inTb').textContent= k<0?window.L('前一天收盘','Previous close'):window.L('股价 ','Stock ')+f2(px[k]);
+    $('inH').textContent=window.L('空 ','Short ')+f2((k<0?d0:sim.H[k])*100)+window.L(' 股',' shares');
     $('inN').textContent=(sells+buys)+window.L(' 次',' adjustments'); $('inNb').textContent=window.L(`卖 ${sells} · 买 ${buys}`,`Sell ${sells} · buy ${buys}`);
     $('inI').textContent= k<0?'0.00':fm(sim.I[k]); $('inIb').textContent= k<0?'':window.L('只在收盘调一次：','Close-only adjustment:')+fm(CLOSE[k]);
     const say=$('inSay');
@@ -830,7 +830,7 @@ const LD=(()=>{
     for(let v=350; v<=460; v+=25){ g+=`<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="var(--rule)" stroke-width=".7"/>`; g+=lab(L-7,Y(v)+4,v,'var(--ink-faint)','end',10.5); }
     for(let v=0; v<=600; v+=200){ g+=`<line x1="${L}" y1="${Y2(v)}" x2="${R}" y2="${Y2(v)}" stroke="var(--rule)" stroke-width="${v===0?1.1:.7}"/>`; g+=lab(L-7,Y2(v)+4,v,'var(--ink-faint)','end',10.5); }
     [0,5,10,15,20,24].forEach(i=>g+=lab(X(i),H-14,md(DAYS[i]),'var(--ink-faint)','middle',10.5));
-    g+=lab(L,T2-12,window.L('累计，美元一张','Cumulative, $ per contract'),'var(--ink-soft)','start',11);
+    g+=lab(L,T2-12,window.L('累计，美元一张','Cumulative, in $ per contract'),'var(--ink-soft)','start',11);
     const bw=Math.max(5,(R-L)/N*0.5);
     // 门槛竖条
     for(let i=1;i<=Math.min(N,k+ (pe>k?1:0));i++){
@@ -855,14 +855,14 @@ const LD=(()=>{
     g+=line(cr,'var(--control)',2.2)+line(ci,'var(--result)',2.2);
     const kk=Math.min(N,k);
     const lx=kk>18?X(kk)-6:X(kk)+6, la=kk>18?'end':'start';
-    g+=lab(lx,Y2(ci[kk])+(ci[kk]>cr[kk]?-8:16),window.L('收入 ','Income')+f2(ci[kk]),'var(--result)',la,11);
-    g+=lab(lx,Y2(cr[kk])+(ci[kk]>cr[kk]?16:-8),window.L('租金 ','Rent')+f2(cr[kk]),'var(--control)',la,11);
+    g+=lab(lx,Y2(ci[kk])+(ci[kk]>cr[kk]?-8:16),window.L('收入 ','Income ')+f2(ci[kk]),'var(--result)',la,11);
+    g+=lab(lx,Y2(cr[kk])+(ci[kk]>cr[kk]?16:-8),window.L('租金 ','Rent ')+f2(cr[kk]),'var(--control)',la,11);
     $('ldC').innerHTML=g;
     // 数字
     if(kk===0){
       $('ldD').textContent='4/13'; $('ldDb').textContent=window.L('入场，收盘 352.36','Entry, close 352.36');
       $('ldM').textContent=window.L('入场','Entry'); $('ldM').style.color='var(--ink)'; $('ldMb').textContent='';
-      $('ldT').textContent=window.L('卖 ','Sell')+f2(LEDT.d0*100)+window.L(' 股',' shares'); $('ldTb').textContent=window.L('@ 352.36，delta ','@ 352.36, delta')+LEDT.d0.toFixed(4);
+      $('ldT').textContent=window.L('卖 ','Sell ')+f2(LEDT.d0*100)+window.L(' 股',' shares'); $('ldTb').textContent=window.L('@ 352.36，delta ','At 352.36, delta ')+LEDT.d0.toFixed(4);
       $('ldP').textContent='0.00'; $('ldPb').textContent='';
       $('ldC2').textContent='0.00'; $('ldCb').textContent='';
     } else {
@@ -870,7 +870,7 @@ const LD=(()=>{
       $('ldD').textContent=md(DAYS[kk]); $('ldDb').textContent=window.L(`第 ${kk} 个交易日，收盘 ${f2(U[kk])}`,`Trading day ${kk}, close ${f2(U[kk])}`);
       $('ldM').textContent=sgn(r.mv*100)+'%'; $('ldM').style.color= Math.abs(r.mv)>r.thr?'var(--result)':'var(--ink)';
       $('ldMb').textContent=window.L(`门槛 ±${(r.thr*100).toFixed(2)}%${r.gap>1?'（周一）':''}`,`Threshold ±${(r.thr*100).toFixed(2)}%${r.gap>1?' (Monday)':''}`);
-      $('ldT').textContent= Math.abs(r.tr)<0.005 ? window.L('不调','No trade') : (r.tr>0?window.L('卖 ','Sell'):window.L('买 ','Buy'))+f2(Math.abs(r.tr))+window.L(' 股',' shares');
+      $('ldT').textContent= Math.abs(r.tr)<0.005 ? window.L('不调','No trade') : (r.tr>0?window.L('卖 ','Sell '):window.L('买 ','Buy '))+f2(Math.abs(r.tr))+window.L(' 股',' shares');
       $('ldTb').textContent= window.L(`新 delta ${r.d.toFixed(4)}`,`New delta ${r.d.toFixed(4)}`);
       $('ldP').textContent=sgn(r.pnl); $('ldP').style.color= r.pnl>=1?'var(--result)':r.pnl<=-1?'var(--control)':'var(--ink)';
       $('ldPb').textContent=window.L(`收入 ${f2(r.inc)} · 租金 ${f2(r.rent)}`,`Income ${f2(r.inc)} · rent ${f2(r.rent)}`);
@@ -879,7 +879,7 @@ const LD=(()=>{
     const say=$('ldSay');
     if(pe<N){ say.textContent=''; return; }
     const out=rows.filter(r=>Math.abs(r.mv)>r.thr).length;
-    say.textContent=window.L(`24 天的收入合计 ${f2(LEDT.inc)}，租金合计 ${f2(LEDT.rent)}，相差 ${fm(LEDT.pnl)} 美元一张。收盘落在门槛外的 ${out} 天，落在门槛内的 ${N-out} 天。`,`Total income over 24 days ${f2(LEDT.inc)}, total rent ${f2(LEDT.rent)}, a difference of ${fm(LEDT.pnl)} dollars per contract. ${out} closes landed outside the threshold and ${N-out} inside.`);
+    say.textContent=window.L(`24 天的收入合计 ${f2(LEDT.inc)}，租金合计 ${f2(LEDT.rent)}，相差 ${fm(LEDT.pnl)} 美元一张。收盘落在门槛外的 ${out} 天，落在门槛内的 ${N-out} 天。`,`Total income over 24 days ${f2(LEDT.inc)}, total rent ${f2(LEDT.rent)}, a difference of ${LEDT.pnl<0?'−':''}$${f2(Math.abs(LEDT.pnl))} per contract. ${out} closes landed outside the threshold and ${N-out} inside.`);
   }
   function start(){
     s.playing=false; s.p=0;
@@ -901,7 +901,7 @@ const WN=(()=>{
   $('wnax').innerHTML=[20,40,60,80,100,120].map(v=>`<span style="left:${pc(X(v),W)};top:${pc(PB+5,H)}">${v}%</span>`).join('')+
     [[2000,'+2000'],[1000,'+1000'],[0,'0'],[-1000,'−1000']].map(([v,t])=>`<span style="left:auto;right:${pc(W-PL+3,W)};transform:translateY(-50%);top:${pc(Y(v),H)}">${t}</span>`).join('')+
     L(`<span style="left:${pc((PL+PR)/2,W)};top:${pc(PB+19,H)};color:var(--ink-soft)">实际波动率</span>`,`<span style="left:${pc((PL+PR)/2,W)};top:${pc(PB+19,H)};color:var(--ink-soft)">Realized volatility</span>`)+
-    L(`<span style="left:0;transform:none;top:0;color:var(--ink-soft)">美元一张</span>`,`<span style="left:0;transform:none;top:0;color:var(--ink-soft)">$ per contract</span>`)+
+    L(`<span style="left:0;transform:none;top:0;color:var(--ink-soft)">美元一张</span>`,`<span style="left:0;transform:none;top:0;color:var(--ink-soft)">In $ per contract</span>`)+
     L(`<span style="left:${pc(X(46.3)+2,W)};transform:none;top:0">隐含 46.3%</span>`,`<span style="left:${pc(X(46.3)+2,W)};transform:none;top:0">Implied 46.3%</span>`);
   const s={n:N, playing:false};
   function draw(){
@@ -952,7 +952,7 @@ function drawBS(){
   const L=50*FS, R=CW-12, T=24, B=210;
   const v=LD.rows.map(r=>({d:DAYS[r.i], p:r.pnl*bsSide})).sort((a,b)=>b.p-a.p);
   const lo=-240, hi=240, Y=x=>T+(hi-x)/(hi-lo)*(B-T), bw=(R-L)/v.length;
-  let g=lab(L,10,window.L('每天的盈亏，美元一张（按中间价 21.05 成交）','Daily P&amp;L, $ per contract (21.05 mid fill)'),'var(--ink-soft)','start',11);
+  let g=lab(L,10,window.L('每天的盈亏，美元一张（按中间价 21.05 成交）','Daily P&amp;L, in $ per contract (21.05 mid fill)'),'var(--ink-soft)','start',11);
   [-200,-100,0,100,200].forEach(x=>{ g+=`<line x1="${L}" y1="${Y(x)}" x2="${R}" y2="${Y(x)}" stroke="var(--rule)" stroke-width="${x===0?1.2:.7}"/>`; g+=lab(L-7,Y(x)+4,x>0?'+'+x:fm(x,0),'var(--ink-faint)','end',10.5); });
   v.forEach((d,j)=>{
     const y0=Y(0), y1=Y(d.p), col= d.p>=1?'var(--result)':d.p<=-1?'var(--control)':'var(--ink-faint)';
@@ -962,7 +962,7 @@ function drawBS(){
   g+=lab(L+bw*1.1,Y(top.p)+12,`${md(top.d)} ${sgn(top.p)}`,'var(--result)','start',11);
   g+=lab(R-bw*.5,Y(bot.p)+16,`${md(bot.d)} ${sgn(bot.p)}`,'var(--control)','end',11);
   const nw=v.filter(d=>d.p>=1).length, nl=v.filter(d=>d.p<=-1).length;
-  g+=lab((L+R)/2,H-8,window.L(`赚 ${nw} 天 · 不到 1 美元 ${v.length-nw-nl} 天 · 亏 ${nl} 天`,`Gain ${nw} days · under $1 ${v.length-nw-nl} days · loss ${nl} days`),'var(--ink-soft)','middle',11);
+  g+=lab((L+R)/2,H-8,window.L(`赚 ${nw} 天 · 不到 1 美元 ${v.length-nw-nl} 天 · 亏 ${nl} 天`,`Gain ${nw} day${nw===1?'':'s'} · under $1 ${v.length-nw-nl} day${v.length-nw-nl===1?'':'s'} · loss ${nl} day${nl===1?'':'s'}`),'var(--ink-soft)','middle',11);
   $('bsC').innerHTML=g;
 }
 segOn('bsSeg',d=>{ bsSide=+d.s; drawBS(); });
@@ -984,9 +984,9 @@ const FC=(()=>{
     const v=bsC(S,Kx,T0,f/100)[0], gap=(v-mid)*100;
     $('fcV').textContent=f1(f)+'%';
     $('fcB').textContent=f2(be)+'%'; $('fcBb').textContent=L(`${t[0]} ${Kx} call，中间价 ${f2(mid)}`,`${t[0]} ${Kx} call, mid ${f2(mid)}`);
-    $('fcW').textContent=f2(v); $('fcWb').textContent=L('中间价 ','Mid')+f2(mid);
+    $('fcW').textContent=f2(v); $('fcWb').textContent=L('中间价 ','Mid ')+f2(mid);
     $('fcG').textContent=sgn(gap); $('fcG').style.color= gap>=0?'var(--result)':'var(--control)'; $('fcGb').textContent= gap>=0?L('按预测，便宜','Cheap by the forecast'):L('按预测，贵','Expensive by the forecast');
-    $('fcM').textContent=f2(t[5])+L(' 美元',' dollars'); $('fcMb').textContent=(be/Math.sqrt(365)).toFixed(2)+L('%，一个日历日','%, one calendar day');
+    $('fcM').textContent=L('','$')+f2(t[5])+L(' 美元',''); $('fcMb').textContent=(be/Math.sqrt(365)).toFixed(2)+L('%，一个日历日','%, one calendar day');
     const cheap=f>be;
     $('fcSay').textContent=L(`预测 ${f1(f)}% ${cheap?'高于':'低于'}盈亏平衡 ${f2(be)}%：按这个预测，这张 call ${cheap?'便宜':'贵'} ${f2(Math.abs(gap))} 美元一张，${cheap?'买入':'卖出'}并每天对冲，预测准的话平均挣到这个差（4.1，不算买卖价差）。事后 ${t[0]} 的实际波动是 ${f1(t[8])}%，对冲的买方${t[10]>=0?'赚了':'亏了'} ${Math.abs(t[10]).toFixed(0)} 美元一张。`,`Forecast ${f1(f)}% is ${cheap?'above':'below'} the break-even of ${f2(be)}%: by this forecast the call is ${cheap?'cheap':'expensive'} by $${f2(Math.abs(gap))} per contract; ${cheap?'buy':'sell'} it and hedge daily, and if the forecast is right you collect this difference on average (4.1, ignoring the bid-ask spread). After the fact, ${t[0]}'s realized volatility was ${f1(t[8])}%, and the hedged buyer ${t[10]>=0?'made':'lost'} $${Math.abs(t[10]).toFixed(0)} per contract.`);
   }
@@ -1014,11 +1014,11 @@ const QS=[
  {q:L(`gamma scalping 的钱具体是从哪几笔买卖里来的？用「涨了卖、跌了买」讲清楚。`,`Which trades does gamma scalping money actually come from? Explain it with "sell after a rise, buy after a drop".`),
   a:[L('买入 call 再卖出 delta 股，仓位的 delta 是 0。','Buy a call and sell delta shares, and the position\'s delta is 0.'),
      L('股价涨，call 的 delta 变大，仓位变成净多头，要多卖股票：卖在高处。股价跌，delta 变小，要买回股票：买在低处。','When the stock rises, the call\'s delta grows, the position becomes net long, and you sell more stock: selling high. When the stock falls, delta shrinks and you buy stock back: buying low.'),
-     L('股价涨 m 美元再跌回来，就完成一笔低买高卖，一张合约赚 100 × Γ × m²。','When the stock rises m dollars and comes back, one buy-low, sell-high round trip is complete, and one contract earns 100 × Γ × m².'),
+     L('股价涨 m 美元再跌回来，就完成一笔低买高卖，一张合约赚 100 × Γ × m²。','When the stock rises $m and comes back, one buy-low, sell-high round trip is complete, and one contract earns 100 × Γ × m².'),
      L('这些钱要抵掉每天的租金。来回的次数和幅度够大，才赚。','This money has to cover the daily rent. You make money only if the round trips are frequent and large enough.')],
   s:L('「因为期权涨价了」：对冲以后，期权涨的钱被卖空的股票亏掉，赚的是来回买卖的差价。','"Because the option went up in price": after hedging, the option\'s gain is lost on the short stock; what you earn is the difference from trading back and forth.')},
  {q:L(`4/23 只在收盘调一次的人收入 54.50，每走 2 美元调一次的人收入 134.33。是不是调得越勤越好？`,`On 4/23, someone who adjusted only at the close earned 54.50, and someone who adjusted every $2 earned 134.33. Is it always better to adjust more often?`),
-  a:[L('那天股价来回走：跳空低开，涨了十几美元，又跌回去。调得勤，每个来回都做成了低买高卖。','That day the stock went back and forth: it gapped down at the open, rose more than ten dollars, and fell back. Frequent adjustment turned each round trip into a buy-low, sell-high trade.'),
+  a:[L('那天股价来回走：跳空低开，涨了十几美元，又跌回去。调得勤，每个来回都做成了低买高卖。','That day the stock went back and forth: it gapped down at the open, rose more than $10, and fell back. Frequent adjustment turned each round trip into a buy-low, sell-high trade.'),
      L('单边走的日子相反：4/15 一路涨，调得勤就一路卖在半路，没有跌回来买的机会，比收盘调一次少赚（4.1）。','One-way days are the opposite: on 4/15 the stock climbed steadily, frequent adjustment kept selling partway up, never got a pullback to buy on, and made less than adjusting once at the close (4.1).'),
      L('按模型，调仓频率不改变平均收入，只改变每一次结果散得多开：4.1 的模拟里平均一样，调得越勤标准差越小。','Under the model, adjustment frequency does not change average income, only how widely each result spreads: in the 4.1 simulation the average is the same, and the more often you adjust, the smaller the standard deviation.'),
      L('现实里每次调仓都有交易成本，讲义把它列在现实约束的第一条，调得太勤会被成本吃掉。','In reality every adjustment has transaction costs; the lecture notes put them first among real-world constraints, and adjusting too often gets eaten by costs.')],
